@@ -1,0 +1,56 @@
+name: CommandBook
+main: com.sk89q.commandbook.CommandBookPlugin
+version: __VERSION_MACRO__
+commands:
+    cmdbook:
+        description: CommandBook commands
+        usage: /<command> <arguments...>
+    item:
+        aliases: [item, i]
+        description: Create an item
+        usage: /<command> [-d] [target] <item[:data]> [amount]
+    give:
+        description: Give an item
+        usage: /<command> [-d] <target> <item[:data]> [amount]
+    who:
+        aliases: [list, playerlist, online, players]
+        description: Get the list of players
+        usage: /<command> [filter]
+    motd:
+        description: Show the message of the day
+        usage: /<command>
+    rules:
+        description: Show the rules
+        usage: /<command>
+    spawn:
+        description: Teleport to spawn
+        usage: /<command>
+    teleport:
+        aliases: tp
+        description: Teleport to a location
+        usage: /<command> [target] <destination>
+    bring:
+        aliases: tphere
+        description: Bring a player to you
+        usage: /<command> <target>
+    time:
+        description: Set the time of your current world
+        usage: /<command> [world] <time|"current">
+    msg:
+        aliases: [message, whisper, pm]
+        description: Send a private message to a user
+        usage: /<command> <target> <message...>
+    reply:
+        aliases: r
+        description: Reply to the last user
+        usage: /<command> <message...>
+    whereami:
+        aliases: [getpos, pos, where]
+        description: Get your current location
+        usage: /<command>
+    compass:
+        description: Get your compass direction
+        usage: /<command>
+    clear:
+        description: Clear your inventory
+        usage: /<command> [-a] [target]

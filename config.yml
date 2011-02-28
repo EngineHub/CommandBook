@@ -1,0 +1,10 @@
+online-on-join: true
+motd: |
+    Hello, `Y%name%`w.
+    The time now is `Y%time%`w and you're in world '%world%'.
+    `2This is the default CommandBook MOTD! Adjust it in config.yml.
+    `2See `bhttp://wiki.sk89q.com/wiki/CommandBook`2 for more configuration information and help!
+rules: |
+    - Be courteous and respect others.
+    - Don't use any tools to give you an unfair advantage.
+    `2This is the default CommandBook rules text! You can adjust it in config.yml.
