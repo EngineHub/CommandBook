@@ -22,6 +22,9 @@ commands:
     rules:
         description: Show the rules
         usage: /<command>
+    setspawn:
+        description: Set the spawn location
+        usage: /<command> [location]
     spawn:
         description: Teleport to spawn
         usage: /<command>

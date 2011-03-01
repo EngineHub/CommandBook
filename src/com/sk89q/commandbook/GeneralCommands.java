@@ -370,6 +370,31 @@ public class GeneralCommands {
                         getCardinalDirection(player)));
     }
     
+    @Command(aliases = {"setspawn"},
+            usage = "[location]", desc = "Change spawn location",
+            flags = "", min = 0, max = 1)
+    @CommandPermissions({"commandbook.setspawn"})
+    public static void setspawn(CommandContext args, CommandBookPlugin plugin,
+            CommandSender sender) throws CommandException {
+        
+        World world;
+        Location loc;
+        
+        if (args.argsLength() == 0) {
+            Player player = plugin.checkPlayer(sender);
+            world = player.getWorld();
+            loc = player.getLocation();
+        } else {
+            loc = plugin.matchLocation(sender, args.getString(0));
+            world = loc.getWorld();
+        }
+
+        world.setSpawnLocation(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
+
+        sender.sendMessage(ChatColor.YELLOW +
+                "Spawn location of '" + world.getName() + "' set!");
+    }
+    
     @Command(aliases = {"clear"},
             usage = "[-a] [target]", desc = "Clear your inventory",
             flags = "a", min = 0, max = 1)
