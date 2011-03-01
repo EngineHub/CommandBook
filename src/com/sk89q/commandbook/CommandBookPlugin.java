@@ -40,7 +40,6 @@ import org.bukkit.util.config.Configuration;
 import com.sk89q.bukkit.migration.PermissionsResolverManager;
 import com.sk89q.bukkit.migration.PermissionsResolverServerListener;
 import com.sk89q.minecraft.util.commands.*;
-import com.sk89q.worldedit.InvalidItemException;
 import com.sk89q.worldedit.blocks.BlockID;
 import com.sk89q.worldedit.blocks.BlockType;
 import com.sk89q.worldedit.blocks.ClothColor;
