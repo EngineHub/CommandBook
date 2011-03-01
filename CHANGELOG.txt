@@ -1,2 +1,10 @@
+1.1:
+**Warning:** Minimum CraftBukkit build is 479.
+- Added item data value aliases for dye, slabs, double slabs and wood.
+- /ping added as requested by Kainzo. This sends back a dummy reply
+    so you don't have to spam chat with test messages. No permissions
+    are required for its usage.
+- /setspawn [location] added. It uses commandbook.setspawn for permissions.
+
 1.0:
 - Initial release.
