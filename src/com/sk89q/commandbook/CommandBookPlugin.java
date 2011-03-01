@@ -40,7 +40,9 @@ import org.bukkit.util.config.Configuration;
 import com.sk89q.bukkit.migration.PermissionsResolverManager;
 import com.sk89q.bukkit.migration.PermissionsResolverServerListener;
 import com.sk89q.minecraft.util.commands.*;
+import com.sk89q.worldedit.InvalidItemException;
 import com.sk89q.worldedit.blocks.BlockID;
+import com.sk89q.worldedit.blocks.BlockType;
 import com.sk89q.worldedit.blocks.ClothColor;
 import com.sk89q.worldedit.blocks.ItemType;
 import static com.sk89q.commandbook.CommandBookUtil.*;
@@ -731,26 +733,76 @@ public class CommandBookPlugin extends JavaPlugin {
             id = type.getID();
         }
         
-        // Try to get damage desired
+        // If the user specified an item data or damage value, let's try
+        // to parse it!
         if (dataName != null) {            
-            try {
-                dmg = Integer.parseInt(dataName);
-            } catch (NumberFormatException e) {
-                // In the case of cloth, we have aliases for that
-                if (id == BlockID.CLOTH) {
-                    ClothColor col = ClothColor.lookup(dataName);
-                    if (col != null) {
-                        dmg = col.getID();
-                    } else {
-                        throw new CommandException("Unknown wool color name of '" + dataName + "'.");
-                    }
-                } else {
-                    throw new CommandException("Invalid data value of '" + dataName + "'.");
-                }
-            }
+            dmg = matchItemData(id, dataName);
         }
         
         return new ItemStack(id, 1, (short)dmg, (byte)dmg);
+    }
+    
+    /**
+     * Attempt to match item data values.
+     * 
+     * @param id
+     * @param filter
+     * @return
+     * @throws CommandException 
+     */
+    public int matchItemData(int id, String filter) throws CommandException {
+        try {
+            // First let's try the filter as if it was a number
+            return Integer.parseInt(filter);
+        } catch (NumberFormatException e) {
+        }
+
+        // So the value isn't a number, but it may be an alias!
+        switch (id) {
+            case BlockID.WOOD:
+                if (filter.equalsIgnoreCase("redwood")) {
+                    return 1;
+                } else if (filter.equalsIgnoreCase("birch")) {
+                    return 2;
+                }
+                
+                throw new CommandException("Unknown wood type name of '" + filter + "'.");
+            case BlockID.STEP:
+            case BlockID.DOUBLE_STEP:
+                BlockType dataType = BlockType.lookup(filter);
+                
+                if (dataType != null) {
+                    if (dataType == BlockType.STONE) {
+                        return 0;
+                    } else if (dataType == BlockType.SANDSTONE) {
+                        return 1;
+                    } else if (dataType == BlockType.WOOD) {
+                        return 2;
+                    } else if (dataType == BlockType.COBBLESTONE) {
+                        return 3;
+                    } else {
+                        throw new CommandException("Invalid slab material of '" + filter + "'.");
+                    }
+                } else {
+                    throw new CommandException("Unknown slab material of '" + filter + "'.");
+                }
+            case BlockID.CLOTH:
+                ClothColor col = ClothColor.lookup(filter);
+                if (col != null) {
+                    return col.getID();
+                }
+                
+                throw new CommandException("Unknown wool color name of '" + filter + "'.");
+            case 351: // Dye
+                ClothColor dyeCol = ClothColor.lookup(filter);
+                if (dyeCol != null) {
+                    return 15 - dyeCol.getID();
+                }
+                
+                throw new CommandException("Unknown dye color name of '" + filter + "'.");
+            default: 
+                throw new CommandException("Invalid data value of '" + filter + "'.");
+        }
     }
     
     /**
