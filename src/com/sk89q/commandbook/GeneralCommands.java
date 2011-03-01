@@ -452,4 +452,24 @@ public class GeneralCommands {
                     + "Inventories cleared.");
         }
     }
+    
+    @Command(aliases = {"ping"},
+            usage = "", desc = "A dummy command",
+            flags = "", min = 0, max = 0)
+    public static void ping(CommandContext args, CommandBookPlugin plugin,
+            CommandSender sender) throws CommandException {
+        
+        sender.sendMessage(ChatColor.YELLOW +
+                "Pong!");
+    }
+    
+    @Command(aliases = {"pong"},
+            usage = "", desc = "A dummy command",
+            flags = "", min = 0, max = 0)
+    public static void pong(CommandContext args, CommandBookPlugin plugin,
+            CommandSender sender) throws CommandException {
+        
+        sender.sendMessage(ChatColor.YELLOW +
+                "I hear " + plugin.toName(sender) + " likes cute Asian boys.");
+    }
 }

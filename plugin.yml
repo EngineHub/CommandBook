@@ -57,3 +57,9 @@ commands:
     clear:
         description: Clear your inventory
         usage: /<command> [-a] [target]
+    ping:
+        description: Get back a dummy reply
+        usage: /<command>
+    pong:
+        description: Get back a dummy reply
+        usage: /<command>
