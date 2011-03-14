@@ -318,6 +318,13 @@ public class CommandBookPlugin extends JavaPlugin {
      */
     public void checkAllowedItem(CommandSender sender, int id)
             throws CommandException {
+        
+        if (id < 1 || (id > 27 && id < 35) || id == 36
+                || (id > 94 && id < 256)
+                || (id > 356 && id < 2256)
+                || id > 2257) {
+            throw new CommandException("Non-existent item specified.");
+        }
 
         // Check if the user has an override
         if (hasPermission(sender, "commandbook.override.any-item")) {
