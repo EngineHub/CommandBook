@@ -167,8 +167,12 @@ public class CommandBookPlugin extends JavaPlugin {
             sender.sendMessage(ChatColor.RED + e.getMessage());
             sender.sendMessage(ChatColor.RED + e.getUsage());
         } catch (WrappedCommandException e) {
-            sender.sendMessage(ChatColor.RED + "An error has occurred. See console.");
-            e.printStackTrace();
+            if (e.getCause() instanceof NumberFormatException) {
+                sender.sendMessage(ChatColor.RED + "Number expected, string received instead.");
+            } else {
+                sender.sendMessage(ChatColor.RED + "An error has occurred. See console.");
+                e.printStackTrace();
+            }
         } catch (CommandException e) {
             sender.sendMessage(ChatColor.RED + e.getMessage());
         }
