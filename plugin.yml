@@ -33,7 +33,7 @@ commands:
         description: Teleport to a location
         usage: /<command> [target] <destination>
     bring:
-        aliases: tphere
+        aliases: tphere, summon, s
         description: Bring a player to you
         usage: /<command> <target>
     time:
