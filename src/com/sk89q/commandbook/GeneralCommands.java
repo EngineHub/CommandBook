@@ -43,7 +43,7 @@ public class GeneralCommands {
     }
     
     @Command(aliases = {"item"},
-            usage = "[-d] [target] <item[:data]> [amount]", desc = "Give an item",
+            usage = "[target] <item[:data]> [amount]", desc = "Give an item",
             flags = "d", min = 1, max = 3)
     @CommandPermissions({"commandbook.give"})
     public static void item(CommandContext args, CommandBookPlugin plugin,
