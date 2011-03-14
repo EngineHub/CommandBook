@@ -405,6 +405,24 @@ public class CommandBookPlugin extends JavaPlugin {
     }
     
     /**
+     * Checks if the given list of players is greater than size 0, otherwise
+     * throw an exception.
+     * 
+     * @param players
+     * @return 
+     * @throws CommandException
+     */
+    protected Iterable<Player> checkPlayerMatch(List<Player> players)
+            throws CommandException {
+        // Check to see if there were any matches
+        if (players.size() == 0) {
+            throw new CommandException("No players matched query.");
+        }
+        
+        return players;
+    }
+    
+    /**
      * Checks permissions and throws an exception if permission is not met.
      * 
      * @param source 
@@ -420,7 +438,7 @@ public class CommandBookPlugin extends JavaPlugin {
         }
         
         if (filter.equals("*")) {
-            return Arrays.asList(getServer().getOnlinePlayers());
+            return checkPlayerMatch(Arrays.asList(getServer().getOnlinePlayers()));
         }
 
         // Handle special hash tag groups
@@ -437,8 +455,8 @@ public class CommandBookPlugin extends JavaPlugin {
                         players.add(player);
                     }
                 }
-                
-                return players;
+
+                return checkPlayerMatch(players);
             
             // Handle #near, which is for nearby players.
             } else if (filter.equalsIgnoreCase("#near")) {
@@ -455,8 +473,8 @@ public class CommandBookPlugin extends JavaPlugin {
                         players.add(player);
                     }
                 }
-                
-                return players;
+
+                return checkPlayerMatch(players);
             
             } else {
                 throw new CommandException("Invalid group '" + filter + "'.");
@@ -465,12 +483,7 @@ public class CommandBookPlugin extends JavaPlugin {
         
         List<Player> players = matchPlayerNames(filter);
         
-        // Check to see if there were any matches
-        if (players.size() == 0) {
-            throw new CommandException("No players matched query.");
-        }
-        
-        return players;
+        return checkPlayerMatch(players);
     }
     
     /**
