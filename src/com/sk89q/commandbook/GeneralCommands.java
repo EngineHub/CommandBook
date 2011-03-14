@@ -219,7 +219,7 @@ public class GeneralCommands {
                 int hours = Integer.parseInt(parts[0]);
                 int mins = Integer.parseInt(parts[1]);
                 int n = (int) (((hours - 8) % 24) * 1000
-                    + (mins % 60) / 60.0 * 1000);
+                    + Math.round((mins % 60) / 60.0 * 1000));
                 world.setTime(n);
             
             // Or perhaps 12-hour time
