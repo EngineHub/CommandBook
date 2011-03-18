@@ -5,6 +5,12 @@ commands:
     cmdbook:
         description: CommandBook commands
         usage: /<command> <arguments...>
+    say:
+        description: Say a message
+        usage: /<command> <msg...>
+    me:
+        description: Say an action message
+        usage: /<command> <msg...>
     item:
         aliases: [item, i]
         description: Create an item

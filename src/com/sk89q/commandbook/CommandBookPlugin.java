@@ -711,7 +711,11 @@ public class CommandBookPlugin extends JavaPlugin {
      */
     public String toName(CommandSender sender) {
         if (sender instanceof Player) {
-            return ((Player) sender).getName();
+            String name = ((Player) sender).getDisplayName();
+            if (name.contains("\u00A7")) {
+                name = name + ChatColor.WHITE;
+            }
+            return name;
         } else {
             return "*Console*";
         }

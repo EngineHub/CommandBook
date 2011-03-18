@@ -29,6 +29,28 @@ import com.sk89q.minecraft.util.commands.CommandPermissions;
 
 public class MessageCommands {
     
+    @Command(aliases = {"me"},
+            usage = "<message...>", desc = "Send an action message",
+            min = 1, max = -1)
+    @CommandPermissions({"commandbook.say.me"})
+    public static void me(CommandContext args, CommandBookPlugin plugin,
+            CommandSender sender) throws CommandException {
+        
+        plugin.getServer().broadcastMessage(
+                "* " + plugin.toName(sender) + " " + args.getJoinedStrings(0));
+    }
+    
+    @Command(aliases = {"say"},
+            usage = "<message...>", desc = "Send a message",
+            min = 1, max = -1)
+    @CommandPermissions({"commandbook.say"})
+    public static void say(CommandContext args, CommandBookPlugin plugin,
+            CommandSender sender) throws CommandException {
+        
+        plugin.getServer().broadcastMessage(
+                "<" + plugin.toName(sender) + "> " + args.getJoinedStrings(0));
+    }
+    
     @Command(aliases = {"msg"},
             usage = "<target> <message...>", desc = "Private message a user",
             min = 2, max = -1)
