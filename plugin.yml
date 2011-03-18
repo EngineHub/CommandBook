@@ -11,6 +11,9 @@ commands:
     me:
         description: Say an action message
         usage: /<command> <msg...>
+    slap:
+        description: Slap a player
+        usage: /<command> [-h|-v] [-d] [target]
     item:
         aliases: [item, i]
         description: Create an item
