@@ -436,13 +436,13 @@ public class GeneralCommands {
         for (Player player : targets) {
             Inventory inventory = player.getInventory();
             
-            for (int i = (clearAll ? 0 : 9); i < 35; i++) {
+            for (int i = (clearAll ? 0 : 9); i < 36; i++) {
                 inventory.setItem(i, null);
             }
             
             if (clearAll) {
                 // Armor slots
-                for (int i = 36; i < 39; i++) {
+                for (int i = 36; i <= 39; i++) {
                     inventory.setItem(i, null);
                 }
             }
