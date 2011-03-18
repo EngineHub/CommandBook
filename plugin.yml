@@ -63,3 +63,9 @@ commands:
     pong:
         description: Get back a dummy reply
         usage: /<command>
+    serverinfo:
+        description: Show RAM usage and basic server information
+        usage: /<command>
+    testclock:
+        description: Test the rate of the MC clock
+        usage: /<command> [collection-time]
