@@ -86,18 +86,18 @@ public class AdministratorCommands {
                     included = true;
                 } else {
                     player.sendMessage(ChatColor.YELLOW + "You've been slapped by "
-                            + plugin.toName(sender) + ChatColor.YELLOW + ".");
+                            + plugin.toName(sender) + ".");
                     
                 }
             } else {
                 if (count < 6) {
                     plugin.getServer().broadcastMessage(
                             ChatColor.YELLOW + plugin.toName(sender)
-                            + ChatColor.YELLOW + " slapped " + plugin.toName(sender));
+                            + " slapped " + plugin.toName(sender));
                 } else if (count == 6) {
                     plugin.getServer().broadcastMessage(
                             ChatColor.YELLOW + plugin.toName(sender)
-                            + ChatColor.YELLOW + " slapped more people...");
+                            + " slapped more people...");
                 }
             }
         }
@@ -146,17 +146,17 @@ public class AdministratorCommands {
                     included = true;
                 } else {
                     player.sendMessage(ChatColor.YELLOW + "You've been rocketed by "
-                            + plugin.toName(sender) +  ChatColor.YELLOW + ".");
+                            + plugin.toName(sender) + ".");
                     
                 }
             } else {
                 if (count < 6) {
                     plugin.getServer().broadcastMessage(
-                            ChatColor.YELLOW + plugin.toName(sender) + ChatColor.YELLOW
+                            ChatColor.YELLOW + plugin.toName(sender)
                             + " rocketed " + plugin.toName(sender));
                 } else if (count == 6) {
                     plugin.getServer().broadcastMessage(
-                            ChatColor.YELLOW + plugin.toName(sender) +  ChatColor.YELLOW
+                            ChatColor.YELLOW + plugin.toName(sender)
                             + " rocketed more people...");
                 }
             }

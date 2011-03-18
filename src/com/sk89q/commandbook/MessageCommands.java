@@ -48,7 +48,8 @@ public class MessageCommands {
             CommandSender sender) throws CommandException {
         
         plugin.getServer().broadcastMessage(
-                "<" + plugin.toName(sender) + "> " + args.getJoinedStrings(0));
+                "<" + plugin.toColoredName(sender, ChatColor.WHITE)
+                + "> " + args.getJoinedStrings(0));
     }
     
     @Command(aliases = {"msg"},

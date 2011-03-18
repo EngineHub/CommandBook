@@ -713,8 +713,24 @@ public class CommandBookPlugin extends JavaPlugin {
     public String toName(CommandSender sender) {
         if (sender instanceof Player) {
             String name = ((Player) sender).getDisplayName();
+            return ChatColor.stripColor(name);
+        } else {
+            return "*Console*";
+        }
+    }
+    
+    /**
+     * Gets the name of a command sender. This play be a display name.
+     * 
+     * @param sender
+     * @param endColor 
+     * @return
+     */
+    public String toColoredName(CommandSender sender, ChatColor endColor) {
+        if (sender instanceof Player) {
+            String name = ((Player) sender).getDisplayName();
             if (name.contains("\u00A7")) {
-                name = name + ChatColor.WHITE;
+                name = name + endColor;
             }
             return name;
         } else {
