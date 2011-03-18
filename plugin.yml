@@ -60,10 +60,10 @@ commands:
     whereami:
         aliases: [getpos, pos, where]
         description: Get your current location
-        usage: /<command>
+        usage: /<command> [target]
     compass:
         description: Get your compass direction
-        usage: /<command>
+        usage: /<command> [target]
     clear:
         description: Clear your inventory
         usage: /<command> [-a] [target]

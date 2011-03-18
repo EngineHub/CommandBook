@@ -334,13 +334,22 @@ public class GeneralCommands {
     }
     
     @Command(aliases = {"whereami"},
-            usage = "", desc = "Show your current location",
-            flags = "", min = 0, max = 0)
+            usage = "[player]", desc = "Show your current location",
+            flags = "", min = 0, max = 1)
     @CommandPermissions({"commandbook.whereami"})
     public static void whereAmI(CommandContext args, CommandBookPlugin plugin,
             CommandSender sender) throws CommandException {
         
-        Player player = plugin.checkPlayer(sender);
+        Player player;
+        
+        if (args.argsLength() == 0) {
+            player = plugin.checkPlayer(sender);
+        } else {
+            plugin.checkPermission(sender, "commandbook.whereami.other");
+            
+            player = plugin.matchSinglePlayer(sender, args.getString(0));
+        }
+
         Location pos = player.getLocation();
 
         player.sendMessage(ChatColor.YELLOW +
@@ -357,13 +366,21 @@ public class GeneralCommands {
     }
     
     @Command(aliases = {"compass"},
-            usage = "", desc = "Show your current compass direction",
-            flags = "", min = 0, max = 0)
-    @CommandPermissions({"commandbook.whereami.compass"})
+            usage = "[player]", desc = "Show your current compass direction",
+            flags = "", min = 0, max = 1)
+    @CommandPermissions({"commandbook.whereami.compass.other"})
     public static void compass(CommandContext args, CommandBookPlugin plugin,
             CommandSender sender) throws CommandException {
+
+        Player player;
         
-        Player player = plugin.checkPlayer(sender);
+        if (args.argsLength() == 0) {
+            player = plugin.checkPlayer(sender);
+        } else {
+            plugin.checkPermission(sender, "commandbook.whereami.other");
+            
+            player = plugin.matchSinglePlayer(sender, args.getString(0));
+        }
 
         player.sendMessage(ChatColor.YELLOW +
                 String.format("Your direction: %s",
