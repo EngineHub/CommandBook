@@ -30,6 +30,7 @@ import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.entity.CreatureType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.Listener;
@@ -364,6 +365,32 @@ public class CommandBookPlugin extends JavaPlugin {
         } else {
             throw new CommandException("A player is expected.");
         }
+    }
+    
+    /**
+     * Attempts to match a creature type.
+     * 
+     * @param sender
+     * @param filter
+     * @return
+     * @throws CommandException
+     */
+    protected CreatureType matchCreatureType(CommandSender sender,
+            String filter) throws CommandException {
+        CreatureType type = CreatureType.fromName(filter);
+        if (type != null) {
+            return type;
+        }
+        
+        for (CreatureType testType : CreatureType.values()) {
+            if (testType.getName().toLowerCase().startsWith(filter.toLowerCase())) {
+                return testType;
+            }
+        }
+
+        throw new CommandException("Unknown mob specified! You can "
+                + "choose from the list of: "
+                + CommandBookUtil.getCreatureTypeNameList());
     }
     
     /**

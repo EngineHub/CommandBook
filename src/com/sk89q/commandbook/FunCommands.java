@@ -20,7 +20,10 @@ package com.sk89q.commandbook;
 
 import java.util.Random;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Creature;
+import org.bukkit.entity.CreatureType;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import com.sk89q.minecraft.util.commands.Command;
@@ -31,6 +34,48 @@ import com.sk89q.minecraft.util.commands.CommandPermissions;
 public class FunCommands {
     
     protected static Random random = new Random();
+    
+    @Command(aliases = {"spawnmob"},
+            usage = "<mob> [count] [location]", desc = "Spawn a mob",
+            flags = "dir",
+            min = 1, max = 3)
+    @CommandPermissions({"commandbook.spawnmob"})
+    public static void spawnMob(CommandContext args, CommandBookPlugin plugin,
+            CommandSender sender) throws CommandException {
+
+        Location loc;
+
+        if (args.argsLength() >= 3) {
+            loc = plugin.matchLocation(sender, args.getString(2));
+        } else {
+            loc = plugin.checkPlayer(sender).getLocation();
+        }
+
+        String creatureName = args.getString(0);
+        int count = Math.max(1, args.getInteger(1, 1));
+        CreatureType type = plugin.matchCreatureType(sender, creatureName);
+        
+        plugin.checkPermission(sender, "commandbook.spawnmob." + type.getName());
+        
+        if (count > 10) {
+            plugin.checkPermission(sender, "commandbook.spawnmob.many");
+        }
+        
+        for (int i = 0; i < count; i++) {
+            Creature creature = loc.getWorld().spawnCreature(loc, type);
+            if (args.hasFlag('d')) {
+                creature.setHealth(1);
+            }
+            if (args.hasFlag('i')) {
+                creature.setFireTicks(20 * 25);
+            }
+            if (args.hasFlag('r')) {
+                creature.setVelocity(new Vector(0, 2, 0));
+            }
+        }
+        
+        sender.sendMessage(ChatColor.YELLOW + "" + count + " mob(s) spawned!");
+    }
     
     @Command(aliases = {"slap"},
             usage = "[target]", desc = "Slap a player", flags = "hdvs",

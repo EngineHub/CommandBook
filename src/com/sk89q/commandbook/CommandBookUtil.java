@@ -22,6 +22,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.CreatureType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
@@ -311,5 +312,22 @@ public class CommandBookUtil {
         loc.setY(finalVecLoc.getY());
         loc.setZ(finalVecLoc.getZ());
         player.getWorld().spawnArrow(loc, dir, speed, spread);
+    }
+    
+    /**
+     * Get a list of creature names.
+     * 
+     * @return
+     */
+    public static String getCreatureTypeNameList() {
+        StringBuilder str = new StringBuilder();
+        for (CreatureType type : CreatureType.values()) {
+            if (str.length() > 0) {
+                str.append(", ");
+            }
+            str.append(type.getName());
+        }
+        
+        return str.toString();
     }
 }
