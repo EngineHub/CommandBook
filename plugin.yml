@@ -13,10 +13,10 @@ commands:
         usage: /<command> <msg...>
     slap:
         description: Slap a player
-        usage: /<command> [-p] [-h|-v] [-d] [target]
+        usage: /<command> [-s] [-h|-v] [-d] [target]
     rocket:
         description: Rocket a player
-        usage: /<command> [-p] [-h] [target]
+        usage: /<command> [-s] [-h] [target]
     item:
         aliases: [item, i]
         description: Create an item

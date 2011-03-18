@@ -33,7 +33,7 @@ public class AdministratorCommands {
     protected static Random random = new Random();
     
     @Command(aliases = {"slap"},
-            usage = "[target]", desc = "Slap a player", flags = "hdvp",
+            usage = "[target]", desc = "Slap a player", flags = "hdvs",
             min = 0, max = 1)
     @CommandPermissions({"commandbook.slap"})
     public static void slap(CommandContext args, CommandBookPlugin plugin,
@@ -77,7 +77,7 @@ public class AdministratorCommands {
                 player.setHealth(player.getHealth() - 1);
             }
 
-            if (args.hasFlag('p')) {
+            if (args.hasFlag('s')) {
                 // Tell the user
                 if (player.equals(sender)) {
                     player.sendMessage(ChatColor.YELLOW + "Slapped!");
@@ -104,13 +104,13 @@ public class AdministratorCommands {
         
         // The player didn't receive any items, then we need to send the
         // user a message so s/he know that something is indeed working
-        if (!included && args.hasFlag('p')) {
+        if (!included && args.hasFlag('s')) {
             sender.sendMessage(ChatColor.YELLOW.toString() + "Players slapped.");
         }
     }
     
     @Command(aliases = {"rocket"},
-            usage = "[target]", desc = "Rocket a player", flags = "hp",
+            usage = "[target]", desc = "Rocket a player", flags = "hs",
             min = 0, max = 1)
     @CommandPermissions({"commandbook.rocket"})
     public static void rocket(CommandContext args, CommandBookPlugin plugin,
@@ -137,7 +137,7 @@ public class AdministratorCommands {
                 player.setVelocity(new Vector(0, 20, 0));
             }
 
-            if (args.hasFlag('p')) {
+            if (args.hasFlag('s')) {
                 // Tell the user
                 if (player.equals(sender)) {
                     player.sendMessage(ChatColor.YELLOW + "Rocketed!");
@@ -164,7 +164,7 @@ public class AdministratorCommands {
         
         // The player didn't receive any items, then we need to send the
         // user a message so s/he know that something is indeed working
-        if (!included && args.hasFlag('p')) {
+        if (!included && args.hasFlag('s')) {
             sender.sendMessage(ChatColor.YELLOW.toString() + "Players rocketed.");
         }
     }
