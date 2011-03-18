@@ -44,7 +44,7 @@ commands:
         description: Set the time of your current world
         usage: /<command> [world] <time|"current">
     msg:
-        aliases: [message, whisper, pm]
+        aliases: [message, whisper, pm, tell]
         description: Send a private message to a user
         usage: /<command> <target> <message...>
     reply:
