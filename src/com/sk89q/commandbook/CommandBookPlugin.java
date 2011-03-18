@@ -26,6 +26,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
+import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -587,13 +588,29 @@ public class CommandBookPlugin extends JavaPlugin {
         // Handle special hash tag groups
         } else if (filter.charAt(0) == '#') {
             checkPermission(source, "commandbook.spawn");
-            
+
             // Handle #world, which matches player of the same world as the
             // calling source
             if (filter.equalsIgnoreCase("#spawn")) {
                 Player sourcePlayer = checkPlayer(source);
 
                 return sourcePlayer.getLocation().getWorld().getSpawnLocation();
+
+            // Handle #target, which matches the player's target position
+            } else if (filter.equalsIgnoreCase("#target")) {
+                Player player = checkPlayer(source);
+                Location playerLoc = player.getLocation();
+                Block targetBlock = player.getTargetBlock(null, 100);
+                
+                if (targetBlock == null) {
+                    throw new CommandException("Failed to find a block in your target!");
+                } else {
+                    Location loc = targetBlock.getLocation();
+                    playerLoc.setX(loc.getX());
+                    playerLoc.setY(loc.getY());
+                    playerLoc.setZ(loc.getZ());
+                    return CommandBookUtil.findFreePosition(playerLoc);
+                }
             
             } else {
                 throw new CommandException("Invalid group '" + filter + "'.");

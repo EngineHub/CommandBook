@@ -36,6 +36,10 @@ commands:
         aliases: tphere, summon, s
         description: Bring a player to you
         usage: /<command> <target>
+    put:
+        aliases: place
+        description: Place a player at the location you are looking at
+        usage: /<command> <target>
     time:
         description: Set the time of your current world
         usage: /<command> [world] <time|"current">

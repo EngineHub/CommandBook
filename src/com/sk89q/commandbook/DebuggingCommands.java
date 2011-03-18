@@ -41,9 +41,9 @@ public class DebuggingCommands {
             expected = Math.min(30, Math.max(1, args.getInteger(0)));
         }
 
-        sender.sendMessage(ChatColor.YELLOW
-                + "Timing clock test for " + expected + " seconds...");
-        sender.sendMessage(ChatColor.YELLOW
+        sender.sendMessage(ChatColor.DARK_RED
+                + "Timing clock test for " + expected + " IN-GAME seconds...");
+        sender.sendMessage(ChatColor.DARK_RED
                 + "DO NOT CHANGE A WORLD'S TIME OR PERFORM A HEAVY OPERATION.");
         
         final World world = plugin.getServer().getWorlds().get(0);
@@ -77,11 +77,18 @@ public class DebuggingCommands {
                             + ChatColor.GREEN + "EXCELLENT");
                 } else {
                     if (elapsedSecs > expectedSecs) {
-                        sender.sendMessage(ChatColor.YELLOW + "Clock test result: "
-                                + ChatColor.DARK_RED + "MC CLOCK BEHIND");
+                        if (clockRate < 19) {
+                            sender.sendMessage(ChatColor.YELLOW + "Clock test result: "
+                                    + ChatColor.DARK_RED + "CLOCK BEHIND");
+                            sender.sendMessage(ChatColor.DARK_RED
+                                    + "WARNING: You have potential block respawn issues.");
+                        } else {
+                            sender.sendMessage(ChatColor.YELLOW + "Clock test result: "
+                                    + ChatColor.DARK_RED + "CLOCK BEHIND");
+                        }
                     } else {
                         sender.sendMessage(ChatColor.YELLOW + "Clock test result: "
-                                + ChatColor.DARK_RED + "MC CLOCK AHEAD");
+                                + ChatColor.DARK_RED + "CLOCK AHEAD");
                     }
                 }
 

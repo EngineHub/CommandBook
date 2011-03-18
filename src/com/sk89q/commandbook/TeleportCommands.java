@@ -121,4 +121,41 @@ public class TeleportCommands {
             sender.sendMessage(ChatColor.YELLOW.toString() + "Players teleported.");
         }
     }
+    
+    @Command(aliases = {"put"},
+            usage = "<target>", desc = "Put a player at where you are looking",
+            min = 1, max = 1)
+    @CommandPermissions({"commandbook.teleport.other"})
+    public static void put(CommandContext args, CommandBookPlugin plugin,
+            CommandSender sender) throws CommandException {
+
+        Iterable<Player> targets = plugin.matchPlayers(sender, args.getString(0));
+        Location loc = plugin.matchLocation(sender, "#target");
+        boolean included = false;
+
+        for (Player player : targets) {
+            Location playerLoc = player.getLocation();
+            loc.setPitch(playerLoc.getPitch());
+            loc.setYaw(playerLoc.getYaw());
+            player.teleportTo(loc);
+            
+            // Tell the user
+            if (player.equals(sender)) {
+                player.sendMessage(ChatColor.YELLOW + "Teleported!");
+                
+                // Keep track of this
+                included = true;
+            } else {
+                player.sendMessage(ChatColor.YELLOW + "You've been teleported by "
+                        + plugin.toName(sender) + ".");
+                
+            }
+        }
+        
+        // The player didn't receive any items, then we need to send the
+        // user a message so s/he know that something is indeed working
+        if (!included) {
+            sender.sendMessage(ChatColor.YELLOW.toString() + "Players teleported.");
+        }
+    }
 }

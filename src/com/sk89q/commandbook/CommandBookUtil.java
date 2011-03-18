@@ -19,10 +19,13 @@
 package com.sk89q.commandbook;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import com.sk89q.minecraft.util.commands.CommandException;
+import com.sk89q.worldedit.blocks.BlockType;
 
 /**
  * Utility methods for CommandBook, borrowed from Tetsuuuu (the plugin
@@ -246,5 +249,47 @@ public class CommandBookUtil {
             sender.sendMessage(ChatColor.YELLOW.toString() + amtText + " "
                     + plugin.toItemName(item.getTypeId()) + " has been given.");
         }
+    }
+
+    /**
+     * Find a position for the player to stand that is not inside a block.
+     * Blocks above the player will be iteratively tested until there is
+     * a series of two free blocks. The player will be teleported to
+     * that free position.
+     * 
+     * @param searchPos search position
+     * @return 
+     */
+    public static Location findFreePosition(Location searchPos) {
+        World world = searchPos.getWorld();
+        Location loc = searchPos.clone();
+        int x = searchPos.getBlockX();
+        int y = Math.max(0, searchPos.getBlockY());
+        int origY = y;
+        int z = searchPos.getBlockZ();
+
+        byte free = 0;
+
+        while (y <= 129) {
+            if (BlockType.canPassThrough(world.getBlockTypeIdAt(x, y, z))) {
+                free++;
+            } else {
+                free = 0;
+            }
+
+            if (free == 2) {
+                if (y - 1 != origY) {
+                    loc.setX(x + 0.5);
+                    loc.setY(y - 1);
+                    loc.setZ(z + 0.5);
+                }
+
+                return loc;
+            }
+
+            y++;
+        }
+        
+        return null;
     }
 }
