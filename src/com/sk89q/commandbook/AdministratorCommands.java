@@ -33,7 +33,7 @@ public class AdministratorCommands {
     protected static Random random = new Random();
     
     @Command(aliases = {"slap"},
-            usage = "[target]", desc = "Slap a player", flags = "hdv",
+            usage = "[target]", desc = "Slap a player", flags = "hdvp",
             min = 0, max = 1)
     @CommandPermissions({"commandbook.slap"})
     public static void slap(CommandContext args, CommandBookPlugin plugin,
@@ -41,6 +41,7 @@ public class AdministratorCommands {
 
         Iterable<Player> targets = null;
         boolean included = false;
+        int count = 0;
         
         // Detect arguments based on the number of arguments provided
         if (args.argsLength() == 0) {
@@ -53,6 +54,8 @@ public class AdministratorCommands {
         }
 
         for (Player player : targets) {
+            count++;
+            
             if (args.hasFlag('v')) {
                 player.setVelocity(new Vector(
                         random.nextDouble() * 10.0 - 5,
@@ -73,29 +76,41 @@ public class AdministratorCommands {
             if (args.hasFlag('d')) {
                 player.setHealth(player.getHealth() - 1);
             }
-            
-            // Tell the user
-            if (player.equals(sender)) {
-                player.sendMessage(ChatColor.YELLOW + "Slapped!");
-                
-                // Keep track of this
-                included = true;
+
+            if (args.hasFlag('p')) {
+                // Tell the user
+                if (player.equals(sender)) {
+                    player.sendMessage(ChatColor.YELLOW + "Slapped!");
+                    
+                    // Keep track of this
+                    included = true;
+                } else {
+                    player.sendMessage(ChatColor.YELLOW + "You've been slapped by "
+                            + plugin.toName(sender) + ChatColor.YELLOW + ".");
+                    
+                }
             } else {
-                player.sendMessage(ChatColor.YELLOW + "You've been slapped by "
-                        + plugin.toName(sender) + ".");
-                
+                if (count < 6) {
+                    plugin.getServer().broadcastMessage(
+                            ChatColor.YELLOW + plugin.toName(sender)
+                            + ChatColor.YELLOW + " slapped " + plugin.toName(sender));
+                } else if (count == 6) {
+                    plugin.getServer().broadcastMessage(
+                            ChatColor.YELLOW + plugin.toName(sender)
+                            + ChatColor.YELLOW + " slapped more people...");
+                }
             }
         }
         
         // The player didn't receive any items, then we need to send the
         // user a message so s/he know that something is indeed working
-        if (!included) {
+        if (!included && args.hasFlag('p')) {
             sender.sendMessage(ChatColor.YELLOW.toString() + "Players slapped.");
         }
     }
     
     @Command(aliases = {"rocket"},
-            usage = "[target]", desc = "Rocket a player", flags = "h",
+            usage = "[target]", desc = "Rocket a player", flags = "hp",
             min = 0, max = 1)
     @CommandPermissions({"commandbook.rocket"})
     public static void rocket(CommandContext args, CommandBookPlugin plugin,
@@ -103,6 +118,7 @@ public class AdministratorCommands {
 
         Iterable<Player> targets = null;
         boolean included = false;
+        int count = 0;
         
         // Detect arguments based on the number of arguments provided
         if (args.argsLength() == 0) {
@@ -120,23 +136,35 @@ public class AdministratorCommands {
             } else {
                 player.setVelocity(new Vector(0, 20, 0));
             }
-            
-            // Tell the user
-            if (player.equals(sender)) {
-                player.sendMessage(ChatColor.YELLOW + "Rocketed!");
-                
-                // Keep track of this
-                included = true;
+
+            if (args.hasFlag('p')) {
+                // Tell the user
+                if (player.equals(sender)) {
+                    player.sendMessage(ChatColor.YELLOW + "Rocketed!");
+                    
+                    // Keep track of this
+                    included = true;
+                } else {
+                    player.sendMessage(ChatColor.YELLOW + "You've been rocketed by "
+                            + plugin.toName(sender) +  ChatColor.YELLOW + ".");
+                    
+                }
             } else {
-                player.sendMessage(ChatColor.YELLOW + "You've been rocketed by "
-                        + plugin.toName(sender) + ".");
-                
+                if (count < 6) {
+                    plugin.getServer().broadcastMessage(
+                            ChatColor.YELLOW + plugin.toName(sender) + ChatColor.YELLOW
+                            + " rocketed " + plugin.toName(sender));
+                } else if (count == 6) {
+                    plugin.getServer().broadcastMessage(
+                            ChatColor.YELLOW + plugin.toName(sender) +  ChatColor.YELLOW
+                            + " rocketed more people...");
+                }
             }
         }
         
         // The player didn't receive any items, then we need to send the
         // user a message so s/he know that something is indeed working
-        if (!included) {
+        if (!included && args.hasFlag('p')) {
             sender.sendMessage(ChatColor.YELLOW.toString() + "Players rocketed.");
         }
     }
