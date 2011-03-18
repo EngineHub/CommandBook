@@ -14,6 +14,9 @@ commands:
     slap:
         description: Slap a player
         usage: /<command> [-h|-v] [-d] [target]
+    rocket:
+        description: Rocket a player
+        usage: /<command> [target]
     item:
         aliases: [item, i]
         description: Create an item

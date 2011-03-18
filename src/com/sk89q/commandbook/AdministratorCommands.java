@@ -94,4 +94,51 @@ public class AdministratorCommands {
         }
     }
     
+    @Command(aliases = {"rocket"},
+            usage = "[target]", desc = "Rocket a player", flags = "h",
+            min = 0, max = 1)
+    @CommandPermissions({"commandbook.rocket"})
+    public static void rocket(CommandContext args, CommandBookPlugin plugin,
+            CommandSender sender) throws CommandException {
+
+        Iterable<Player> targets = null;
+        boolean included = false;
+        
+        // Detect arguments based on the number of arguments provided
+        if (args.argsLength() == 0) {
+            targets = plugin.matchPlayers(plugin.checkPlayer(sender));
+        } else if (args.argsLength() == 1) {            
+            targets = plugin.matchPlayers(sender, args.getString(0));
+            
+            // Check permissions!
+            plugin.checkPermission(sender, "commandbook.rocket.other");
+        }
+
+        for (Player player : targets) {
+            if (args.hasFlag('h')) {
+                player.setVelocity(new Vector(0, 50, 0));
+            } else {
+                player.setVelocity(new Vector(0, 20, 0));
+            }
+            
+            // Tell the user
+            if (player.equals(sender)) {
+                player.sendMessage(ChatColor.YELLOW + "Rocketed!");
+                
+                // Keep track of this
+                included = true;
+            } else {
+                player.sendMessage(ChatColor.YELLOW + "You've been rocketed by "
+                        + plugin.toName(sender) + ".");
+                
+            }
+        }
+        
+        // The player didn't receive any items, then we need to send the
+        // user a message so s/he know that something is indeed working
+        if (!included) {
+            sender.sendMessage(ChatColor.YELLOW.toString() + "Players rocketed.");
+        }
+    }
+    
 }
