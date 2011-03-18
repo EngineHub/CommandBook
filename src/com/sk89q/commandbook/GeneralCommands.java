@@ -387,6 +387,35 @@ public class GeneralCommands {
                         getCardinalDirection(player)));
     }
     
+    @Command(aliases = {"whois"},
+            usage = "[player]", desc = "Tell information about a player",
+            flags = "", min = 0, max = 1)
+    @CommandPermissions({"commandbook.whois"})
+    public static void whois(CommandContext args, CommandBookPlugin plugin,
+            CommandSender sender) throws CommandException {
+        
+        Player player;
+        
+        if (args.argsLength() == 0) {
+            player = plugin.checkPlayer(sender);
+        } else {
+            plugin.checkPermission(sender, "commandbook.whois.other");
+            
+            player = plugin.matchSinglePlayer(sender, args.getString(0));
+        }
+
+        player.sendMessage(ChatColor.YELLOW
+                + "Name: " + player.getName());
+        player.sendMessage(ChatColor.YELLOW
+                + "Display name: " + player.getDisplayName());
+        player.sendMessage(ChatColor.YELLOW
+                + "Entity ID #: " + player.getEntityId());
+        player.sendMessage(ChatColor.YELLOW
+                + "Current vehicle: " + player.getVehicle());
+        player.sendMessage(ChatColor.YELLOW
+                + "Address: " + player.getAddress().toString());
+    }
+    
     @Command(aliases = {"setspawn"},
             usage = "[location]", desc = "Change spawn location",
             flags = "", min = 0, max = 1)

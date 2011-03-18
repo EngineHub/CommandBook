@@ -37,6 +37,9 @@ commands:
     rules:
         description: Show the rules
         usage: /<command>
+    whois:
+        description: Tell information about a user
+        usage: /<command> [target]
     setspawn:
         description: Set the spawn location
         usage: /<command> [location]
