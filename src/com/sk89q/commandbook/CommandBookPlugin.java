@@ -125,7 +125,7 @@ public class CommandBookPlugin extends JavaPlugin {
         };
         
         commands.register(GeneralCommands.class);
-        commands.register(AdministratorCommands.class);
+        commands.register(FunCommands.class);
         commands.register(TeleportCommands.class);
         commands.register(MessageCommands.class);
         commands.register(DebuggingCommands.class);
