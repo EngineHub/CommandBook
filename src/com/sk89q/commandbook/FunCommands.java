@@ -138,7 +138,7 @@ public class FunCommands {
                 if (count < 6) {
                     plugin.getServer().broadcastMessage(
                             ChatColor.YELLOW + plugin.toName(sender)
-                            + " slapped " + plugin.toName(sender));
+                            + " slapped " + plugin.toName(player));
                 } else if (count == 6) {
                     plugin.getServer().broadcastMessage(
                             ChatColor.YELLOW + plugin.toName(sender)
@@ -198,7 +198,7 @@ public class FunCommands {
                 if (count < 6) {
                     plugin.getServer().broadcastMessage(
                             ChatColor.YELLOW + plugin.toName(sender)
-                            + " rocketed " + plugin.toName(sender));
+                            + " rocketed " + plugin.toName(player));
                 } else if (count == 6) {
                     plugin.getServer().broadcastMessage(
                             ChatColor.YELLOW + plugin.toName(sender)
@@ -258,7 +258,7 @@ public class FunCommands {
                 if (count < 6) {
                     plugin.getServer().broadcastMessage(
                             ChatColor.YELLOW + plugin.toName(sender)
-                            + " used BARRAGE on " + plugin.toName(sender));
+                            + " used BARRAGE on " + plugin.toName(player));
                 } else if (count == 6) {
                     plugin.getServer().broadcastMessage(
                             ChatColor.YELLOW + plugin.toName(sender)
