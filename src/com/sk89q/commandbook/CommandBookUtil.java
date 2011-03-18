@@ -24,6 +24,7 @@ import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.blocks.BlockType;
 
@@ -291,5 +292,24 @@ public class CommandBookUtil {
         }
         
         return null;
+    }
+    
+    /**
+     * Send an arrow from a player eye level.
+     * 
+     * @param player
+     * @param dir
+     * @param speed
+     * @param spread
+     */
+    public static void sendArrowFromPlayer(Player player,
+            Vector dir, float speed, float spread) {
+        Location loc = player.getEyeLocation();
+        Vector actualDir = dir.clone().normalize();
+        Vector finalVecLoc = loc.toVector().add(actualDir.multiply(2));
+        loc.setX(finalVecLoc.getX());
+        loc.setY(finalVecLoc.getY());
+        loc.setZ(finalVecLoc.getZ());
+        player.getWorld().spawnArrow(loc, dir, speed, spread);
     }
 }

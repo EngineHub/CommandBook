@@ -20,6 +20,7 @@ package com.sk89q.commandbook;
 
 import java.util.Random;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -166,6 +167,66 @@ public class AdministratorCommands {
         // user a message so s/he know that something is indeed working
         if (!included && args.hasFlag('s')) {
             sender.sendMessage(ChatColor.YELLOW.toString() + "Players rocketed.");
+        }
+    }
+    
+    @Command(aliases = {"barrage"},
+            usage = "[target]", desc = "Send a barrage of arrows", flags = "s",
+            min = 0, max = 1)
+    @CommandPermissions({"commandbook.barrage"})
+    public static void barrage(CommandContext args, CommandBookPlugin plugin,
+            CommandSender sender) throws CommandException {
+
+        Iterable<Player> targets = null;
+        boolean included = false;
+        int count = 0;
+        
+        // Detect arguments based on the number of arguments provided
+        if (args.argsLength() == 0) {
+            targets = plugin.matchPlayers(plugin.checkPlayer(sender));
+        } else if (args.argsLength() == 1) {            
+            targets = plugin.matchPlayers(sender, args.getString(0));
+            
+            // Check permissions!
+            plugin.checkPermission(sender, "commandbook.barrage.other");
+        }
+
+        for (Player player : targets) {
+            double diff = (2 * Math.PI) / 24.0;
+            for (double a = 0; a < 2 * Math.PI; a += diff) {
+                Vector vel = new Vector(Math.cos(a), 0, Math.sin(a));
+                CommandBookUtil.sendArrowFromPlayer(player, vel, 2, 12);
+            }
+
+            if (args.hasFlag('s')) {
+                // Tell the user
+                if (player.equals(sender)) {
+                    player.sendMessage(ChatColor.YELLOW + "Barrage attack!");
+                    
+                    // Keep track of this
+                    included = true;
+                } else {
+                    player.sendMessage(ChatColor.YELLOW + "BARRAGE attack from "
+                            + plugin.toName(sender) + ".");
+                    
+                }
+            } else {
+                if (count < 6) {
+                    plugin.getServer().broadcastMessage(
+                            ChatColor.YELLOW + plugin.toName(sender)
+                            + " used BARRAGE on " + plugin.toName(sender));
+                } else if (count == 6) {
+                    plugin.getServer().broadcastMessage(
+                            ChatColor.YELLOW + plugin.toName(sender)
+                            + " used it more people...");
+                }
+            }
+        }
+        
+        // The player didn't receive any items, then we need to send the
+        // user a message so s/he know that something is indeed working
+        if (!included && args.hasFlag('s')) {
+            sender.sendMessage(ChatColor.YELLOW.toString() + "Barrage attack sent.");
         }
     }
     
