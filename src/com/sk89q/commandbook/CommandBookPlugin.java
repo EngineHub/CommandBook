@@ -120,6 +120,11 @@ public class CommandBookPlugin extends JavaPlugin {
      * Ban message.
      */
     protected String banMessage;
+    
+    /**
+     * Whether to give ops permissions.
+     */
+    protected boolean opPermissions;
 
     /**
      * Called when the plugin is enabled. This is where configuration is loaded,
@@ -258,11 +263,13 @@ public class CommandBookPlugin extends JavaPlugin {
         disallowedItems = new HashSet<Integer>(
                 config.getIntList("disallowed-items", null));
         
-        loadItemList();  
+        loadItemList();
         
         // Load messages
         messages.put("motd", config.getString("motd", null));
         messages.put("rules", config.getString("rules", null));
+        
+        opPermissions = config.getBoolean("op-permissions", true);
         
         banMessage = config.getString("bans.message", "You were banned.");
     }
@@ -346,7 +353,7 @@ public class CommandBookPlugin extends JavaPlugin {
      * @return 
      */
     public boolean hasPermission(CommandSender sender, String perm) {
-        if (sender.isOp()) {
+        if (sender.isOp() && opPermissions) {
             return true;
         }
         

@@ -1,3 +1,6 @@
+# Give ops all permissions
+op-permissions: true
+
 online-on-join: true
 motd: |
     Hello, `Y%name%`w.
