@@ -33,6 +33,51 @@ public class ModerationCommands {
 
     protected static final Logger logger = Logger.getLogger("Minecraft.CommandBook");
 
+    /*@Command(aliases = {"freeze"},
+            usage = "<target>", desc = "Freeze a player",
+            min = 1, max = 1)
+    @CommandPermissions({"commandbook.freeze"})
+    public static void freeze(CommandContext args, CommandBookPlugin plugin,
+            CommandSender sender) throws CommandException {
+        
+        Player player = plugin.matchSinglePlayer(sender, args.getString(0));
+        plugin.freezePlayer(player);
+        
+        // Let's check if the player was frozen to begin with
+        if (plugin.isFrozen(player)) {
+            player.sendMessage(ChatColor.RED + "That player is already frozen.");
+            return;
+        }
+
+        player.sendMessage(ChatColor.YELLOW + "You've been frozen by "
+                + plugin.toName(sender));
+        sender.sendMessage(ChatColor.YELLOW + "You've frozen "
+                + plugin.toName(player));
+    }*/
+
+    @Command(aliases = {"unfreeze"},
+            usage = "<target>", desc = "unFreeze a player",
+            min = 1, max = 1)
+    @CommandPermissions({"commandbook.freeze.unfreeze"})
+    public static void unfreeze(CommandContext args, CommandBookPlugin plugin,
+            CommandSender sender) throws CommandException {
+        
+        Player player = plugin.matchSinglePlayer(sender, args.getString(0));
+        
+        // Let's check if the player was frozen to begin with
+        if (!plugin.isFrozen(player)) {
+            player.sendMessage(ChatColor.RED + "That player is not frozen.");
+            return;
+        }
+        
+        plugin.unfreezePlayer(player);
+
+        player.sendMessage(ChatColor.YELLOW + "You've been unfrozen by "
+                + plugin.toName(sender));
+        sender.sendMessage(ChatColor.YELLOW + "You've unfrozen "
+                + plugin.toName(player));
+    }
+
     @Command(aliases = {"kick"},
             usage = "<target> [reason...]", desc = "Kick a user",
             min = 1, max = -1)

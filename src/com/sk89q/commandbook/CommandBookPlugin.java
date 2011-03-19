@@ -120,6 +120,11 @@ public class CommandBookPlugin extends JavaPlugin {
     protected Map<String, String> msgTargets = new HashMap<String, String>();
     
     /**
+     * List of frozen player names.
+     */
+    protected Set<String> frozen = new HashSet<String>();
+    
+    /**
      * Ban database.
      */
     protected BanDatabase bans;
@@ -1139,5 +1144,34 @@ public class CommandBookPlugin extends JavaPlugin {
         }
         
         return message;
+    }
+
+    /**
+     * Freeze a player.
+     * 
+     * @param player
+     */
+    public void freezePlayer(Player player) {
+        frozen.add(player.getName());
+    }
+
+    /**
+     * Unfreeze a player.
+     * 
+     * @param player
+     * @return 
+     */
+    public boolean unfreezePlayer(Player player) {
+        return frozen.remove(player.getName());
+    }
+
+    /**
+     * Check if a player is frozen.
+     * 
+     * @param player
+     * @return 
+     */
+    public boolean isFrozen(Player player) {
+        return frozen.contains(player.getName());
     }
 }
