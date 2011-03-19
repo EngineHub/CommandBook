@@ -89,23 +89,23 @@ commands:
         description: Get back a dummy reply
         usage: /<command>
     kick:
-        description: Kick a player
+        description: Kick a player by name
         usage: /<command> <target> [reason...]
     ban:
-        description: Ban a player
+        description: Ban a player by name
         usage: /<command> <target> [reason...]
     unban:
-        description: Unban a player
+        description: Unban a player by name
         usage: /<command> <target> [reason...]
     isbanned:
         description: Checks if a player's name is banned
         usage: /<command> <target>
     bans:
-        description: Ban management commands
+        description: Ban save/load commands
         usage: /<command> ...
     kit:
-        description: Get a kit
+        description: Get a kit (or list kits)
         usage: /<command> <kit> [target]
     debug:
-        description: Perform debugging
+        description: Get server information / benchmark Minecraft clock speed
         usage: /<command> ...
