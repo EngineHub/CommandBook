@@ -133,6 +133,11 @@ public class CommandBookPlugin extends JavaPlugin {
      * Whether to give ops permissions.
      */
     protected boolean opPermissions;
+    
+    /**
+     * Use display names.
+     */
+    protected boolean useDisplayNames;
 
     /**
      * Called when the plugin is enabled. This is where configuration is loaded,
@@ -278,6 +283,7 @@ public class CommandBookPlugin extends JavaPlugin {
         messages.put("rules", config.getString("rules", null));
         
         opPermissions = config.getBoolean("op-permissions", true);
+        useDisplayNames = config.getBoolean("use-display-names", true);
         
         banMessage = config.getString("bans.message", "You were banned.");
     }
@@ -847,7 +853,9 @@ public class CommandBookPlugin extends JavaPlugin {
      */
     public String toName(CommandSender sender) {
         if (sender instanceof Player) {
-            String name = ((Player) sender).getDisplayName();
+            String name = useDisplayNames
+                    ? ((Player) sender).getDisplayName()
+                    : ((Player) sender).getName();
             return ChatColor.stripColor(name);
         } else {
             return "*Console*";
@@ -863,7 +871,9 @@ public class CommandBookPlugin extends JavaPlugin {
      */
     public String toColoredName(CommandSender sender, ChatColor endColor) {
         if (sender instanceof Player) {
-            String name = ((Player) sender).getDisplayName();
+            String name = useDisplayNames
+                    ? ((Player) sender).getDisplayName()
+                    : ((Player) sender).getName();
             if (endColor != null && name.contains("\u00A7")) {
                 name = name + endColor;
             }
