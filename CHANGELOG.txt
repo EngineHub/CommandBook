@@ -1,3 +1,41 @@
+1.2:
+- Added new macros: %online%, %players% (list of players), %cname%
+    (colored player name where applicable), %id% (unadulterated name).
+- Added support for kits with /kit <kit> [target] and /kit to list.
+- Added /kick [target] command.
+- Added a basic flat-file ban system. Commands: /ban, /unban, /isbanned,
+    /bans load, and /bans save.
+- Added /spawnmob [-d] [-i] [-r] <mob> [count] [location].
+- Added /whois to query information about a player.
+- Added /barrage [-s] [target] to send a barrage of arrows from a player.
+- Added /rocket [-s] [-h] [target] to rocket a player.
+- Added /slap [-s] [-h|-v] [-d] [target] to slap a player.
+- Added console support to /whereami and /compass.
+- Added /me and /say. This allows you to properly apply permissions to these
+    commands, in additional to support from the console.
+- Added /tell as an alias of /msg.
+- Added /put and /place to teleport players to a target block.
+- Added #target as a special location code to select the first free spot
+    at the location that you are looking at.
+- Added /debug info for server information.
+- Added /debug clock to test your internal Minecraft server clock speed to see
+    if it's healthy.
+- Added /summon and /s as aliases for /bring.
+- Added op-permissions setting, allowing you to disable giving
+    ops permissions automatically.
+- Fixed minor +/- 1 second accuracy bug with /time command
+    (thanks to ochristi!).
+- Fixed the lack of item ID sanitization.
+- Fixed NumberFormatException not properly handled.
+- Fixed player matching routine potentially returning empty lists (resulting
+    in odd behavior).
+- Fixed /item having double flag usage information.
+- Fixed /clear not clearing two slots.
+- Fixed item aliases processing.
+- Improved how colored names were handled.
+- Now name displays will use the player's display name. You can disable
+    this with the new 'use-display-names' configuration setting.
+
 1.1:
 **Warning:** Minimum CraftBukkit build is 479.
 - Added item data value aliases for dye, slabs, double slabs and wood.
