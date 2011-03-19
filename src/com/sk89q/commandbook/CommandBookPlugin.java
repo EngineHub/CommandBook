@@ -132,8 +132,9 @@ public class CommandBookPlugin extends JavaPlugin {
         // Make the data folder for the plugin where configuration files
         // and other data files will be stored
         getDataFolder().mkdirs();
-        
+
         createDefaultConfiguration("config.yml");
+        createDefaultConfiguration("kits.txt");
         
         // Load configuration
         populateConfiguration();

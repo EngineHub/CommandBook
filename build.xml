@@ -41,6 +41,7 @@
     <replace file="${build.dir}/plugin.yml" token="__VERSION_MACRO__" value="${version}"/>
     <mkdir dir="${build.dir}/defaults"/>
     <copy tofile="${build.dir}/defaults/config.yml" file="config.yml"/>
+    <copy tofile="${build.dir}/defaults/kits.txt" file="kits.txt"/>
     <jar jarfile="${dist.dir}/CommandBook.jar" basedir="${build.dir}" manifest="manifest.mf">
     </jar>
   </target>
