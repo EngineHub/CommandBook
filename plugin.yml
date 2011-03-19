@@ -103,6 +103,9 @@ commands:
     bans:
         description: Ban management commands
         usage: /<command> ...
+    kit:
+        description: Get a kit
+        usage: /<command> <kit> [target]
     serverinfo:
         description: Show RAM usage and basic server information
         usage: /<command>

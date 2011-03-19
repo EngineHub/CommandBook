@@ -1,0 +1,15 @@
+#
+# This is the default kit file for CommandBook.
+#
+# Each kit requires the commandbook.kit.[name] permission, such as:
+# commandbook.kit.starter (as seen below).
+#
+# The name of the items are names that you can use with the /item command,
+# so you can do step:wood if you want. If you want to specify an amount, enter
+# the number after a comma, like "wood,64".
+#
+[starter]
+woodpick
+woodaxe
+woodshovel
+wood,64

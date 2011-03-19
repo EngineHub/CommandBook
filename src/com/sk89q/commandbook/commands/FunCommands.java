@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.sk89q.commandbook;
+package com.sk89q.commandbook.commands;
 
 import java.util.Random;
 import org.bukkit.ChatColor;
@@ -26,6 +26,8 @@ import org.bukkit.entity.Creature;
 import org.bukkit.entity.CreatureType;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+import com.sk89q.commandbook.CommandBookPlugin;
+import com.sk89q.commandbook.CommandBookUtil;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;

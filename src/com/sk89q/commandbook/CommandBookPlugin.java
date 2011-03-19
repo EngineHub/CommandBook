@@ -43,6 +43,15 @@ import com.sk89q.bukkit.migration.PermissionsResolverManager;
 import com.sk89q.bukkit.migration.PermissionsResolverServerListener;
 import com.sk89q.commandbook.bans.BanDatabase;
 import com.sk89q.commandbook.bans.FlatFileBanDatabase;
+import com.sk89q.commandbook.commands.DebuggingCommands;
+import com.sk89q.commandbook.commands.FunCommands;
+import com.sk89q.commandbook.commands.GeneralCommands;
+import com.sk89q.commandbook.commands.KitCommands;
+import com.sk89q.commandbook.commands.MessageCommands;
+import com.sk89q.commandbook.commands.ModerationCommands;
+import com.sk89q.commandbook.commands.TeleportCommands;
+import com.sk89q.commandbook.kits.FlatFileKitsManager;
+import com.sk89q.commandbook.kits.KitManager;
 import com.sk89q.minecraft.util.commands.*;
 import com.sk89q.worldedit.blocks.BlockID;
 import com.sk89q.worldedit.blocks.BlockType;
@@ -87,6 +96,11 @@ public class CommandBookPlugin extends JavaPlugin {
     protected Map<String, Integer> itemNames;
     
     /**
+     * Manage of kits.
+     */
+    protected KitManager kits;
+    
+    /**
      * Holds various preprogrammed messages such as rules and help.
      */
     protected Map<String, String> messages = new HashMap<String, String>();
@@ -128,6 +142,10 @@ public class CommandBookPlugin extends JavaPlugin {
         bans = new FlatFileBanDatabase(getDataFolder(), this);
         bans.load();
         
+        // Setup kits
+        kits = new FlatFileKitsManager(new File(getDataFolder(), "kits.txt"), this);
+        kits.load();
+        
         // Prepare permissions
         perms = new PermissionsResolverManager(
                 getConfiguration(), getServer(), getDescription().getName(), logger);
@@ -147,6 +165,7 @@ public class CommandBookPlugin extends JavaPlugin {
         commands.register(MessageCommands.class);
         commands.register(DebuggingCommands.class);
         commands.register(ModerationCommands.class);
+        commands.register(KitCommands.class);
         
         // Register events
         registerEvents();
@@ -228,8 +247,7 @@ public class CommandBookPlugin extends JavaPlugin {
     /**
      * Loads the configuration.
      */
-    @SuppressWarnings("unchecked")
-    protected void populateConfiguration() {
+    public void populateConfiguration() {
         Configuration config = getConfiguration();
         config.load();
         
@@ -238,6 +256,22 @@ public class CommandBookPlugin extends JavaPlugin {
                 config.getIntList("allowed-items", null));
         disallowedItems = new HashSet<Integer>(
                 config.getIntList("disallowed-items", null));
+        
+        loadItemList();  
+        
+        // Load messages
+        messages.put("motd", config.getString("motd", null));
+        messages.put("rules", config.getString("rules", null));
+        
+        banMessage = config.getString("bans.message", "You were banned.");
+    }
+    
+    /**
+     * Loads the item list.
+     */
+    @SuppressWarnings("unchecked")
+    protected void loadItemList() {
+        Configuration config = getConfiguration();
         
         // Load item names aliases list
         Object itemNamesTemp = config.getProperty("item-names");
@@ -260,12 +294,6 @@ public class CommandBookPlugin extends JavaPlugin {
         } else {
             itemNames = new HashMap<String, Integer>();
         }
-        
-        // Load messages
-        messages.put("motd", config.getString("motd", null));
-        messages.put("rules", config.getString("rules", null));
-        
-        banMessage = config.getString("bans.message", "You were banned.");
     }
     
     /**
@@ -405,7 +433,7 @@ public class CommandBookPlugin extends JavaPlugin {
      * @return
      * @throws CommandException
      */
-    protected CreatureType matchCreatureType(CommandSender sender,
+    public CreatureType matchCreatureType(CommandSender sender,
             String filter) throws CommandException {
         CreatureType type = CreatureType.fromName(filter);
         if (type != null) {
@@ -846,6 +874,57 @@ public class CommandBookPlugin extends JavaPlugin {
     }
     
     /**
+     * Returns a matched item.
+     * 
+     * @param name
+     * @return item
+     */
+    public ItemStack getItem(String name) {
+
+        int id = 0;
+        int dmg = 0;
+        String dataName = null;
+
+        if (name.contains(":")) {
+            String[] parts = name.split(":");
+            dataName = parts[1];
+            name = parts[0];
+        }
+        
+        try {
+            id = Integer.parseInt(name);
+        } catch (NumberFormatException e) {
+            // First check the configurable list of aliases
+            Integer idTemp = itemNames.get(name.toLowerCase());
+            
+            if (idTemp != null) {
+                id = (int) idTemp;
+            } else {
+                // Then check WorldEdit
+                ItemType type = ItemType.lookup(name);
+                
+                if (type == null) {
+                    return null;
+                }
+                
+                id = type.getID();
+            }
+        }
+        
+        // If the user specified an item data or damage value, let's try
+        // to parse it!
+        if (dataName != null) {            
+            try {
+                dmg = matchItemData(id, dataName);
+            } catch (CommandException e) {
+                return null;
+            }
+        }
+        
+        return new ItemStack(id, 1, (short)dmg, (byte)dmg);
+    }
+    
+    /**
      * Matches an item and gets the appropriate item stack.
      * 
      * @param source 
@@ -984,6 +1063,15 @@ public class CommandBookPlugin extends JavaPlugin {
      */
     public BanDatabase getBanDatabase() {
         return bans;
+    }
+    
+    /**
+     * Return the kit manager.
+     * 
+     * @return
+     */
+    public KitManager getKitManager() {
+        return kits;
     }
     
     /**

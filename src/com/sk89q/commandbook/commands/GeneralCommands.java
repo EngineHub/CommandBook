@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.sk89q.commandbook;
+package com.sk89q.commandbook.commands;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,6 +28,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import com.sk89q.commandbook.CommandBookPlugin;
+import com.sk89q.commandbook.CommandBookUtil;
 import com.sk89q.minecraft.util.commands.*;
 import static com.sk89q.commandbook.CommandBookUtil.*;
 
