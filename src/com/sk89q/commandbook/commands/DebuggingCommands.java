@@ -29,10 +29,10 @@ import com.sk89q.minecraft.util.commands.CommandPermissions;
 
 public class DebuggingCommands {
 
-    @Command(aliases = {"testclock"},
+    @Command(aliases = {"clock"},
             usage = "", desc = "Tests the clock rate of your server",
             flags = "", min = 0, max = 1)
-    @CommandPermissions({"commandbook.debug.testclock"})
+    @CommandPermissions({"commandbook.debug.clock"})
     public static void testClock(CommandContext args, CommandBookPlugin plugin,
             final CommandSender sender) throws CommandException {
         
@@ -104,10 +104,10 @@ public class DebuggingCommands {
         plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, task, expectedTicks);
     }
     
-    @Command(aliases = {"serverinfo"},
+    @Command(aliases = {"info"},
             usage = "", desc = "Get server information",
             flags = "", min = 0, max = 0)
-    @CommandPermissions({"commandbook.debug.serverinfo"})
+    @CommandPermissions({"commandbook.debug.info"})
     public static void serverInfo(CommandContext args, CommandBookPlugin plugin,
             CommandSender sender) throws CommandException {
         

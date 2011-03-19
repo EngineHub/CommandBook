@@ -516,4 +516,10 @@ public class GeneralCommands {
         sender.sendMessage(ChatColor.YELLOW +
                 "I hear " + plugin.toName(sender) + " likes cute Asian boys.");
     }
+    
+    @Command(aliases = {"debug"}, desc = "Debugging commands")
+    @NestedCommand({DebuggingCommands.class})
+    public static void debug(CommandContext args, CommandBookPlugin plugin,
+            CommandSender sender) throws CommandException {
+    }
 }

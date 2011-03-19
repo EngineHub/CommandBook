@@ -106,9 +106,6 @@ commands:
     kit:
         description: Get a kit
         usage: /<command> <kit> [target]
-    serverinfo:
-        description: Show RAM usage and basic server information
-        usage: /<command>
-    testclock:
-        description: Test the rate of the MC clock
-        usage: /<command> [collection-time]
+    debug:
+        description: Perform debugging
+        usage: /<command> ...
