@@ -22,6 +22,7 @@ package com.sk89q.commandbook;
 import java.io.*;
 import java.util.*;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -70,6 +71,13 @@ public class CommandBookPlugin extends JavaPlugin {
      * Logger for messages.
      */
     protected static final Logger logger = Logger.getLogger("Minecraft.CommandBook");
+    
+    /**
+     * Pattern for macros.
+     */
+    protected static final Pattern macroPattern =
+            Pattern.compile("%([^% ]+)%");
+    
     /**
      * The permissions resolver in use.
      */
@@ -856,7 +864,7 @@ public class CommandBookPlugin extends JavaPlugin {
     public String toColoredName(CommandSender sender, ChatColor endColor) {
         if (sender instanceof Player) {
             String name = ((Player) sender).getDisplayName();
-            if (name.contains("\u00A7")) {
+            if (endColor != null && name.contains("\u00A7")) {
                 name = name + endColor;
             }
             return name;
@@ -1099,7 +1107,18 @@ public class CommandBookPlugin extends JavaPlugin {
      * @return
      */
     public String replaceMacros(CommandSender sender, String message) {
+        Player[] online = getServer().getOnlinePlayers();
+        
         message = message.replace("%name%", toName(sender));
+        message = message.replace("%cname%", toColoredName(sender, null));
+        message = message.replace("%id%", toUniqueName(sender));
+        message = message.replace("%online%", String.valueOf(online.length));
+        
+        // Don't want to build the list unless we need to
+        if (message.contains("%players%")) {
+            message = message.replace("%players%",
+                    CommandBookUtil.getOnlineList(online));
+        }
         
         if (sender instanceof Player) {
             Player player = (Player) sender;

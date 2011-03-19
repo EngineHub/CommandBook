@@ -126,6 +126,31 @@ public class CommandBookUtil {
     }
     
     /**
+     * Returns a comma-delimited list of players.
+     * 
+     * @param online
+     * @return
+     */
+    public static String getOnlineList(Player[] online) {
+        StringBuilder out = new StringBuilder();
+        
+        // To keep track of commas
+        boolean first = true;
+        
+        for (Player player : online) {
+            if (!first) {
+                out.append(", ");
+            }
+            
+            out.append(player.getName());
+            
+            first = false;
+        }
+        
+        return out.toString();
+    }
+    
+    /**
      * Get the cardinal compass direction of a player.
      * 
      * @param player
@@ -329,5 +354,17 @@ public class CommandBookUtil {
         }
         
         return str.toString();
+    }
+    
+    /**
+     * Send a complex message properly.
+     * 
+     * @param sender
+     * @param message
+     */
+    public static void sendMessage(CommandSender sender, String message) {
+        for (String line : message.split("\n")) {
+            sender.sendMessage(line.replaceAll("[\r\n]", ""));
+        }
     }
 }

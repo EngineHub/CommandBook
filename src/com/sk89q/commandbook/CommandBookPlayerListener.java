@@ -20,6 +20,7 @@
 package com.sk89q.commandbook;
 
 import static com.sk89q.commandbook.CommandBookUtil.replaceColorMacros;
+import static com.sk89q.commandbook.CommandBookUtil.sendMessage;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerListener;
@@ -72,12 +73,10 @@ public class CommandBookPlayerListener extends PlayerListener {
         String motd = plugin.getMessage("motd");
         
         if (motd != null) {
-            for (String line : motd.split("\n")) {
-                player.sendMessage(
-                        replaceColorMacros(
-                        plugin.replaceMacros(
-                        player, line.replaceAll("[\r\n]", ""))));
-            }
+            sendMessage(player,
+                    replaceColorMacros(
+                    plugin.replaceMacros(
+                    player, motd)));
         }
         
         // Show the online list

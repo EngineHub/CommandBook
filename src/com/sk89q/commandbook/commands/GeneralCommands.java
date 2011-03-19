@@ -305,12 +305,10 @@ public class GeneralCommands {
         if (motd == null) {
             sender.sendMessage(ChatColor.RED + "MOTD not configured in CommandBook yet!");
         } else {
-            for (String line : motd.split("\n")) {
-                sender.sendMessage(
-                        replaceColorMacros(
-                        plugin.replaceMacros(
-                        sender, line.replaceAll("[\r\n]", ""))));
-            }
+            sendMessage(sender,
+                    replaceColorMacros(
+                    plugin.replaceMacros(
+                    sender, motd)));
         }
     }
     
@@ -326,12 +324,10 @@ public class GeneralCommands {
         if (motd == null) {
             sender.sendMessage(ChatColor.RED + "Rules not configured in CommandBook yet!");
         } else {
-            for (String line : motd.split("\n")) {
-                sender.sendMessage(
-                        replaceColorMacros(
-                        plugin.replaceMacros(
-                        sender, line.replaceAll("[\r\n]", ""))));
-            }
+            sendMessage(sender,
+                    replaceColorMacros(
+                    plugin.replaceMacros(
+                    sender, motd)));
         }
     }
     
