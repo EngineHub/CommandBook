@@ -23,6 +23,8 @@ import static com.sk89q.commandbook.CommandBookUtil.replaceColorMacros;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerListener;
+import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerLoginEvent.Result;
 
 /**
  * Handler for player events.
@@ -40,6 +42,23 @@ public class CommandBookPlayerListener extends PlayerListener {
      */
     public CommandBookPlayerListener(CommandBookPlugin plugin) {
         this.plugin = plugin;
+    }
+
+    /**
+     * Called on player login.
+     */
+    @Override
+    public void onPlayerLogin(PlayerLoginEvent event) {
+        try {
+            if (plugin.getBanDatabase().isBannedName(event.getPlayer().getName())
+                    || plugin.getBanDatabase().isBannedAddress(
+                            event.getPlayer().getAddress().getAddress())) {
+                event.disallow(Result.KICK_BANNED, plugin.getBanMessage());
+                return;
+            }
+        } catch (NullPointerException e) {
+            // Bug in CraftBukkit
+        }
     }
     
     /**

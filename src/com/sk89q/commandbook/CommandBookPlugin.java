@@ -41,6 +41,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.config.Configuration;
 import com.sk89q.bukkit.migration.PermissionsResolverManager;
 import com.sk89q.bukkit.migration.PermissionsResolverServerListener;
+import com.sk89q.commandbook.bans.BanDatabase;
+import com.sk89q.commandbook.bans.FlatFileBanDatabase;
 import com.sk89q.minecraft.util.commands.*;
 import com.sk89q.worldedit.blocks.BlockID;
 import com.sk89q.worldedit.blocks.BlockType;
@@ -94,6 +96,16 @@ public class CommandBookPlugin extends JavaPlugin {
      * the /r command for quick replying.
      */
     protected Map<String, String> msgTargets = new HashMap<String, String>();
+    
+    /**
+     * Ban database.
+     */
+    protected BanDatabase bans;
+    
+    /**
+     * Ban message.
+     */
+    protected String banMessage;
 
     /**
      * Called when the plugin is enabled. This is where configuration is loaded,
@@ -111,6 +123,10 @@ public class CommandBookPlugin extends JavaPlugin {
         
         // Load configuration
         populateConfiguration();
+        
+        // Setup the ban database
+        bans = new FlatFileBanDatabase(getDataFolder(), this);
+        bans.load();
         
         // Prepare permissions
         perms = new PermissionsResolverManager(
@@ -130,6 +146,7 @@ public class CommandBookPlugin extends JavaPlugin {
         commands.register(TeleportCommands.class);
         commands.register(MessageCommands.class);
         commands.register(DebuggingCommands.class);
+        commands.register(ModerationCommands.class);
         
         // Register events
         registerEvents();
@@ -144,6 +161,7 @@ public class CommandBookPlugin extends JavaPlugin {
     protected void registerEvents() {
         PlayerListener playerListener = new CommandBookPlayerListener(this);
 
+        registerEvent(Event.Type.PLAYER_LOGIN, playerListener);
         registerEvent(Event.Type.PLAYER_JOIN, playerListener);
         registerEvent(Event.Type.PLAYER_QUIT, playerListener);
     }
@@ -236,6 +254,8 @@ public class CommandBookPlugin extends JavaPlugin {
         // Load messages
         messages.put("motd", config.getString("motd", null));
         messages.put("rules", config.getString("rules", null));
+        
+        banMessage = config.getString("bans.message", "You were banned.");
     }
     
     /**
@@ -528,6 +548,26 @@ public class CommandBookPlugin extends JavaPlugin {
     }
     
     /**
+     * Match a single player exactly.
+     * 
+     * @param sender
+     * @param filter
+     * @return
+     * @throws CommandException
+     */
+    public Player matchPlayerExactly(CommandSender sender, String filter)
+            throws CommandException {
+        Player[] players = getServer().getOnlinePlayers();
+        for (Player player : players) {
+            if (player.getName().equalsIgnoreCase(filter)) {
+                return player;
+            }
+        }
+    
+        throw new CommandException("No player found!");
+    }
+    
+    /**
      * Match only a single player.
      * 
      * @param sender
@@ -714,6 +754,20 @@ public class CommandBookPlugin extends JavaPlugin {
         }
         
         throw new CommandException("No world by that exact name found.");
+    }
+    
+    /**
+     * Gets the IP address of a command sender.
+     * 
+     * @param sender
+     * @return
+     */
+    public String toInetAddressString(CommandSender sender) {
+        if (sender instanceof Player) {
+            return ((Player) sender).getAddress().getAddress().getHostAddress();
+        } else {
+            return "127.0.0.1";
+        }
     }
     
     /**
@@ -911,6 +965,24 @@ public class CommandBookPlugin extends JavaPlugin {
      */
     public Map<String, String> getMessageTargets() {
         return msgTargets;
+    }
+    
+    /**
+     * Get the ban database.
+     * 
+     * @return
+     */
+    public BanDatabase getBanDatabase() {
+        return bans;
+    }
+    
+    /**
+     * Get the ban message.
+     * 
+     * @return
+     */
+    public String getBanMessage() {
+        return banMessage;
     }
     
     /**

@@ -88,6 +88,21 @@ commands:
     pong:
         description: Get back a dummy reply
         usage: /<command>
+    kick:
+        description: Kick a player
+        usage: /<command> <target> [reason...]
+    ban:
+        description: Ban a player
+        usage: /<command> <target> [reason...]
+    unban:
+        description: Unban a player
+        usage: /<command> <target> [reason...]
+    isbanned:
+        description: Checks if a player's name is banned
+        usage: /<command> <target>
+    bans:
+        description: Ban management commands
+        usage: /<command> ...
     serverinfo:
         description: Show RAM usage and basic server information
         usage: /<command>
