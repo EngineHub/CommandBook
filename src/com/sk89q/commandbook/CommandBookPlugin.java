@@ -242,10 +242,20 @@ public class CommandBookPlugin extends JavaPlugin {
         // Load item names aliases list
         Object itemNamesTemp = config.getProperty("item-names");
         if (itemNamesTemp != null && itemNamesTemp instanceof Map) {
+            itemNames = new HashMap<String, Integer>();
+            
             try {
-                itemNames = (Map<String, Integer>) itemNamesTemp;
+                Map<Object, Object> temp = (Map<Object, Object>) itemNamesTemp;
+                
+                for (Map.Entry<Object, Object> entry : temp.entrySet()) {
+                    String name = entry.getKey().toString().toLowerCase();
+                    
+                    // Check if the item ID is a number
+                    if (entry.getValue() instanceof Integer) {
+                        itemNames.put(name, (Integer) entry.getValue());        
+                    }
+                }
             } catch (ClassCastException e) {
-                itemNames = new HashMap<String, Integer>();
             }
         } else {
             itemNames = new HashMap<String, Integer>();
@@ -864,16 +874,16 @@ public class CommandBookPlugin extends JavaPlugin {
             
             if (idTemp != null) {
                 id = (int) idTemp;
+            } else {
+                // Then check WorldEdit
+                ItemType type = ItemType.lookup(name);
+                
+                if (type == null) {
+                    throw new CommandException("No item type known by '" + name + "'");
+                }
+                
+                id = type.getID();
             }
-            
-            // Then check WorldEdit
-            ItemType type = ItemType.lookup(name);
-            
-            if (type == null) {
-                throw new CommandException("No item type known by '" + name + "'");
-            }
-            
-            id = type.getID();
         }
         
         // If the user specified an item data or damage value, let's try

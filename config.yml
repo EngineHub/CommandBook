@@ -8,3 +8,8 @@ rules: |
     - Be courteous and respect others.
     - Don't use any tools to give you an unfair advantage.
     `2This is the default CommandBook rules text! You can adjust it in config.yml.
+disallowed-items: []
+allowed-items: []
+item-names:
+    goldblock: 41
+    ice: 79
