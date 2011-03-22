@@ -45,7 +45,7 @@ public class ModerationCommands {
         
         // Let's check if the player was frozen to begin with
         if (plugin.isFrozen(player)) {
-            player.sendMessage(ChatColor.RED + "That player is already frozen.");
+            sender.sendMessage(ChatColor.RED + "That player is already frozen.");
             return;
         }
 
@@ -53,7 +53,7 @@ public class ModerationCommands {
                 + plugin.toName(sender));
         sender.sendMessage(ChatColor.YELLOW + "You've frozen "
                 + plugin.toName(player));
-    }*/
+    
 
     @Command(aliases = {"unfreeze"},
             usage = "<target>", desc = "unFreeze a player",
@@ -65,8 +65,8 @@ public class ModerationCommands {
         Player player = plugin.matchSinglePlayer(sender, args.getString(0));
         
         // Let's check if the player was frozen to begin with
-        if (!plugin.isFrozen(player)) {
-            player.sendMessage(ChatColor.RED + "That player is not frozen.");
+        if (!sender.isFrozen(player)) {
+            sender.sendMessage(ChatColor.RED + "That player is not frozen.");
             return;
         }
         
@@ -76,7 +76,7 @@ public class ModerationCommands {
                 + plugin.toName(sender));
         sender.sendMessage(ChatColor.YELLOW + "You've unfrozen "
                 + plugin.toName(player));
-    }
+    }*/
 
     @Command(aliases = {"kick"},
             usage = "<target> [reason...]", desc = "Kick a user",

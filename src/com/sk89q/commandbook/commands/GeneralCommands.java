@@ -350,14 +350,14 @@ public class GeneralCommands {
 
         Location pos = player.getLocation();
 
-        player.sendMessage(ChatColor.YELLOW +
+        sender.sendMessage(ChatColor.YELLOW +
                 String.format("You're at: (%.4f, %.4f, %.4f)",
                         pos.getX(), pos.getY(), pos.getZ()));
-        player.sendMessage(ChatColor.YELLOW +
+        sender.sendMessage(ChatColor.YELLOW +
                 "Your depth is: " + (int) Math.floor(pos.getY()));
         
         if (plugin.hasPermission(sender, "commandbook.whereami.compass")) {
-            player.sendMessage(ChatColor.YELLOW +
+            sender.sendMessage(ChatColor.YELLOW +
                     String.format("Your direction: %s",
                             getCardinalDirection(player)));
         }
@@ -380,7 +380,7 @@ public class GeneralCommands {
             player = plugin.matchSinglePlayer(sender, args.getString(0));
         }
 
-        player.sendMessage(ChatColor.YELLOW +
+        sender.sendMessage(ChatColor.YELLOW +
                 String.format("Your direction: %s",
                         getCardinalDirection(player)));
     }
@@ -402,15 +402,15 @@ public class GeneralCommands {
             player = plugin.matchSinglePlayer(sender, args.getString(0));
         }
 
-        player.sendMessage(ChatColor.YELLOW
+        sender.sendMessage(ChatColor.YELLOW
                 + "Name: " + player.getName());
-        player.sendMessage(ChatColor.YELLOW
+        sender.sendMessage(ChatColor.YELLOW
                 + "Display name: " + player.getDisplayName());
-        player.sendMessage(ChatColor.YELLOW
+        sender.sendMessage(ChatColor.YELLOW
                 + "Entity ID #: " + player.getEntityId());
-        player.sendMessage(ChatColor.YELLOW
+        sender.sendMessage(ChatColor.YELLOW
                 + "Current vehicle: " + player.getVehicle());
-        player.sendMessage(ChatColor.YELLOW
+        sender.sendMessage(ChatColor.YELLOW
                 + "Address: " + player.getAddress().toString());
     }
     
