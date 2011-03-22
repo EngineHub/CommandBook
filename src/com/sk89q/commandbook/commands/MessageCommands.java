@@ -20,6 +20,7 @@
 package com.sk89q.commandbook.commands;
 
 import java.util.Map;
+import java.util.logging.Logger;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import com.sk89q.commandbook.CommandBookPlugin;
@@ -37,8 +38,13 @@ public class MessageCommands {
     public static void me(CommandContext args, CommandBookPlugin plugin,
             CommandSender sender) throws CommandException {
         
+        String name = plugin.toName(sender);
+        String msg = args.getJoinedStrings(0);
+        
+        Logger.getLogger("Minecraft").info("<" + name + ">: " + msg);
+        
         plugin.getServer().broadcastMessage(
-                "* " + plugin.toName(sender) + " " + args.getJoinedStrings(0));
+                "* " + name + " " + msg);
     }
     
     @Command(aliases = {"say"},
@@ -47,6 +53,11 @@ public class MessageCommands {
     @CommandPermissions({"commandbook.say"})
     public static void say(CommandContext args, CommandBookPlugin plugin,
             CommandSender sender) throws CommandException {
+        
+        String name = plugin.toColoredName(sender, ChatColor.WHITE);
+        String msg = args.getJoinedStrings(0);
+        
+        Logger.getLogger("Minecraft").info("<" + name + ">: " + msg);
         
         plugin.getServer().broadcastMessage(
                 "<" + plugin.toColoredName(sender, ChatColor.WHITE)
