@@ -21,6 +21,7 @@ package com.sk89q.commandbook;
 
 import static com.sk89q.commandbook.CommandBookUtil.replaceColorMacros;
 import static com.sk89q.commandbook.CommandBookUtil.sendMessage;
+import java.util.regex.Pattern;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerListener;
@@ -33,6 +34,9 @@ import org.bukkit.event.player.PlayerLoginEvent.Result;
  * @author sk89q
  */
 public class CommandBookPlayerListener extends PlayerListener {
+    
+    protected final static Pattern namePattern = Pattern.compile(
+            "^[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_]{1,16}$");
     
     protected CommandBookPlugin plugin;
     
@@ -50,6 +54,13 @@ public class CommandBookPlayerListener extends PlayerListener {
      */
     @Override
     public void onPlayerLogin(PlayerLoginEvent event) {
+        Player player = event.getPlayer();
+        
+        if (plugin.verifyNameFormat && !namePattern.matcher(player.getName()).matches()) {
+            event.disallow(Result.KICK_OTHER, "Invalid player name detected!");
+            return;
+        }
+        
         try {
             if (plugin.getBanDatabase().isBannedName(event.getPlayer().getName())
                     || plugin.getBanDatabase().isBannedAddress(

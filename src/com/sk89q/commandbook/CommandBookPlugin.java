@@ -89,60 +89,22 @@ public class CommandBookPlugin extends JavaPlugin {
     protected CommandsManager<CommandSender> commands;
     
     /**
-     * Allowed list of items IDs.
-     */
-    protected Set<Integer> allowedItems;
-    
-    /**
-     * Disallowed list of items IDs.
-     */
-    protected Set<Integer> disallowedItems;
-    
-    /**
-     * List of configurable item names.
-     */
-    protected Map<String, Integer> itemNames;
-    
-    /**
-     * Manage of kits.
-     */
-    protected KitManager kits;
-    
-    /**
-     * Holds various preprogrammed messages such as rules and help.
-     */
-    protected Map<String, String> messages = new HashMap<String, String>();
-    
-    /**
-     * Stores the last user that was messaged per-user, which is used for
-     * the /r command for quick replying.
-     */
-    protected Map<String, String> msgTargets = new HashMap<String, String>();
-    
-    /**
-     * List of frozen player names.
-     */
-    protected Set<String> frozen = new HashSet<String>();
-    
-    /**
-     * Ban database.
+     * Bans database.
      */
     protected BanDatabase bans;
     
-    /**
-     * Ban message.
-     */
+    protected boolean verifyNameFormat;
+    protected Set<Integer> allowedItems;
+    protected Set<Integer> disallowedItems;
+    protected Map<String, Integer> itemNames;
+    protected KitManager kits;
     protected String banMessage;
-    
-    /**
-     * Whether to give ops permissions.
-     */
     protected boolean opPermissions;
-    
-    /**
-     * Use display names.
-     */
     protected boolean useDisplayNames;
+
+    protected Map<String, String> messages = new HashMap<String, String>();
+    protected Map<String, String> msgTargets = new HashMap<String, String>();
+    protected Set<String> frozen = new HashSet<String>();
 
     /**
      * Called when the plugin is enabled. This is where configuration is loaded,
@@ -291,6 +253,8 @@ public class CommandBookPlugin extends JavaPlugin {
         useDisplayNames = config.getBoolean("use-display-names", true);
         
         banMessage = config.getString("bans.message", "You were banned.");
+        
+        verifyNameFormat = config.getBoolean("verify-name-format", true);
     }
     
     /**
