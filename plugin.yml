@@ -54,7 +54,7 @@ commands:
         description: Teleport to a location
         usage: /<command> [target] <destination>
     bring:
-        aliases: tphere, summon, s
+        aliases: [tphere, summon, s]
         description: Bring a player to you
         usage: /<command> <target>
     put:
