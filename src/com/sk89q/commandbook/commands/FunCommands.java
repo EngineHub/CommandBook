@@ -24,6 +24,7 @@ import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.CreatureType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import com.sk89q.commandbook.CommandBookPlugin;
@@ -64,7 +65,7 @@ public class FunCommands {
         }
         
         for (int i = 0; i < count; i++) {
-            Creature creature = loc.getWorld().spawnCreature(loc, type);
+            LivingEntity creature = loc.getWorld().spawnCreature(loc, type);
             if (args.hasFlag('d')) {
                 creature.setHealth(1);
             }

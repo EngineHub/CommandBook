@@ -24,10 +24,8 @@ import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import com.sk89q.commandbook.CommandBookPlugin;
-import com.sk89q.minecraft.util.commands.Command;
-import com.sk89q.minecraft.util.commands.CommandContext;
-import com.sk89q.minecraft.util.commands.CommandException;
-import com.sk89q.minecraft.util.commands.CommandPermissions;
+import com.sk89q.minecraft.util.commands.*;
+import static com.sk89q.commandbook.BukkitLegacy.*;
 
 public class TeleportCommands {
     
@@ -40,7 +38,7 @@ public class TeleportCommands {
         
         Player player = plugin.checkPlayer(sender);
         // Teleport the player!
-        player.teleportTo(player.getWorld().getSpawnLocation());
+        teleportPlayer(player, player.getWorld().getSpawnLocation());
     }
     
     @Command(aliases = {"teleport"},
@@ -67,7 +65,7 @@ public class TeleportCommands {
         }
 
         for (Player player : targets) {
-            player.teleportTo(loc);
+            teleportPlayer(player, loc);
             
             // Tell the user
             if (player.equals(sender)) {
@@ -101,7 +99,7 @@ public class TeleportCommands {
         boolean included = false;
 
         for (Player player : targets) {
-            player.teleportTo(loc);
+            teleportPlayer(player, loc);
             
             // Tell the user
             if (player.equals(sender)) {
@@ -138,7 +136,7 @@ public class TeleportCommands {
             Location playerLoc = player.getLocation();
             loc.setPitch(playerLoc.getPitch());
             loc.setYaw(playerLoc.getYaw());
-            player.teleportTo(loc);
+            teleportPlayer(player, loc);
             
             // Tell the user
             if (player.equals(sender)) {

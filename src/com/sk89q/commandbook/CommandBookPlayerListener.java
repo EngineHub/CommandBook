@@ -23,10 +23,11 @@ import static com.sk89q.commandbook.CommandBookUtil.replaceColorMacros;
 import static com.sk89q.commandbook.CommandBookUtil.sendMessage;
 import java.util.regex.Pattern;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 /**
  * Handler for player events.
@@ -77,7 +78,7 @@ public class CommandBookPlayerListener extends PlayerListener {
      * Called on player join.
      */
     @Override
-    public void onPlayerJoin(PlayerEvent event) {
+    public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         
         // Show the MOTD.
@@ -101,7 +102,7 @@ public class CommandBookPlayerListener extends PlayerListener {
      * Called on player disconnect.
      */
     @Override
-    public void onPlayerQuit(PlayerEvent event) {
+    public void onPlayerQuit(PlayerQuitEvent event) {
         plugin.getMessageTargets().remove(plugin.toUniqueName(event.getPlayer()));
     }
     
