@@ -1,3 +1,6 @@
+1.2.1:
+- Updated for latest Bukkit / 1.4.
+
 1.2:
 - Added new macros: %online%, %players% (list of players), %cname%
     (colored player name where applicable), %id% (unadulterated name).
