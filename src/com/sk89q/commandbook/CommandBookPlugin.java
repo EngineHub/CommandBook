@@ -372,7 +372,9 @@ public class CommandBookPlugin extends JavaPlugin {
     public void checkAllowedItem(CommandSender sender, int id)
             throws CommandException {
         
-        if (id < 1 || (id > 27 && id < 35) || id == 36
+        if (id < 1 || id == 29
+                || (id > 30 && id < 35)
+                || id == 36
                 || (id > 95 && id < 256)
                 || (id > 357 && id < 2256)
                 || id > 2257) {
