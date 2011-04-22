@@ -93,14 +93,14 @@ public class CommandBookPlugin extends JavaPlugin {
      */
     protected BanDatabase bans;
     
-    protected boolean verifyNameFormat;
-    protected Set<Integer> allowedItems;
-    protected Set<Integer> disallowedItems;
-    protected Map<String, Integer> itemNames;
-    protected KitManager kits;
-    protected String banMessage;
-    protected boolean opPermissions;
-    protected boolean useDisplayNames;
+    public boolean verifyNameFormat;
+    public Set<Integer> allowedItems;
+    public Set<Integer> disallowedItems;
+    public Map<String, Integer> itemNames;
+    public KitManager kits;
+    public String banMessage;
+    public boolean opPermissions;
+    public boolean useDisplayNames;
 
     protected Map<String, String> messages = new HashMap<String, String>();
     protected Map<String, String> msgTargets = new HashMap<String, String>();

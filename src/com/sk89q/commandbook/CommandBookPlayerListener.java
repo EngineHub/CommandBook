@@ -28,6 +28,8 @@ import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.event.player.PlayerQuitEvent;
+import com.sk89q.commandbook.events.MOTDSendEvent;
+import com.sk89q.commandbook.events.OnlineListSendEvent;
 
 /**
  * Handler for player events.
@@ -85,6 +87,9 @@ public class CommandBookPlayerListener extends PlayerListener {
         String motd = plugin.getMessage("motd");
         
         if (motd != null) {
+            plugin.getServer().getPluginManager().callEvent(
+                    new MOTDSendEvent(player));
+            
             sendMessage(player,
                     replaceColorMacros(
                     plugin.replaceMacros(
@@ -93,6 +98,9 @@ public class CommandBookPlayerListener extends PlayerListener {
         
         // Show the online list
         if (plugin.getConfiguration().getBoolean("online-on-join", true)) {
+            plugin.getServer().getPluginManager().callEvent(
+                    new OnlineListSendEvent(player));
+            
             CommandBookUtil.sendOnlineList(
                     plugin.getServer().getOnlinePlayers(), player);
         }

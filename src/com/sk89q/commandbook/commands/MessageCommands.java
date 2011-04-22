@@ -23,7 +23,11 @@ import java.util.Map;
 import java.util.logging.Logger;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerChatEvent;
 import com.sk89q.commandbook.CommandBookPlugin;
+import com.sk89q.commandbook.events.CommandSenderMessageEvent;
+import com.sk89q.commandbook.events.SharedMessageEvent;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
@@ -40,11 +44,13 @@ public class MessageCommands {
         
         String name = plugin.toName(sender);
         String msg = args.getJoinedStrings(0);
+
+        plugin.getServer().getPluginManager().callEvent(
+                new SharedMessageEvent(name + " " + msg));
         
         Logger.getLogger("Minecraft").info("<" + name + ">: " + msg);
         
-        plugin.getServer().broadcastMessage(
-                "* " + name + " " + msg);
+        plugin.getServer().broadcastMessage("* " + name + " " + msg);
     }
     
     @Command(aliases = {"say"},
@@ -56,6 +62,17 @@ public class MessageCommands {
         
         String name = plugin.toColoredName(sender, ChatColor.WHITE);
         String msg = args.getJoinedStrings(0);
+        
+        if (sender instanceof Player) {
+            PlayerChatEvent event = new PlayerChatEvent((Player) sender, msg);
+            plugin.getServer().getPluginManager().callEvent(event);
+            if (event.isCancelled()) {
+                return;
+            }
+        }
+
+        plugin.getServer().getPluginManager().callEvent(
+                new CommandSenderMessageEvent(sender, msg));
         
         Logger.getLogger("Minecraft").info("<" + name + ">: " + msg);
         

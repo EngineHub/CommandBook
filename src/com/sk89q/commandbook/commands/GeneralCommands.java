@@ -30,6 +30,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import com.sk89q.commandbook.CommandBookPlugin;
 import com.sk89q.commandbook.CommandBookUtil;
+import com.sk89q.commandbook.events.MOTDSendEvent;
+import com.sk89q.commandbook.events.OnlineListSendEvent;
 import com.sk89q.minecraft.util.commands.*;
 import static com.sk89q.commandbook.CommandBookUtil.*;
 
@@ -120,6 +122,9 @@ public class GeneralCommands {
         
         StringBuilder out = new StringBuilder();
         Player[] online = plugin.getServer().getOnlinePlayers();
+
+        plugin.getServer().getPluginManager().callEvent(
+                new OnlineListSendEvent(sender));
         
         // This applies mostly to the console, so there might be 0 players
         // online if that's the case!
@@ -305,6 +310,9 @@ public class GeneralCommands {
         if (motd == null) {
             sender.sendMessage(ChatColor.RED + "MOTD not configured in CommandBook yet!");
         } else {
+            plugin.getServer().getPluginManager().callEvent(
+                    new MOTDSendEvent(sender));
+            
             sendMessage(sender,
                     replaceColorMacros(
                     plugin.replaceMacros(

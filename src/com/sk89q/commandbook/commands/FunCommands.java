@@ -22,7 +22,6 @@ import java.util.Random;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Creature;
 import org.bukkit.entity.CreatureType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -94,6 +93,9 @@ public class FunCommands {
         // Detect arguments based on the number of arguments provided
         if (args.argsLength() == 0) {
             targets = plugin.matchPlayers(plugin.checkPlayer(sender));
+            
+            // Check permissions!
+            plugin.checkPermission(sender, "commandbook.slap");
         } else if (args.argsLength() == 1) {            
             targets = plugin.matchPlayers(sender, args.getString(0));
             
