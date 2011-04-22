@@ -20,6 +20,12 @@ commands:
     barrage:
         description: Send a barrage of arrows
         usage: /<command> [-s] [target]
+    thor:
+        description: Give Thor's hammer
+        usage: /<command> [target]
+    unthor:
+        description: Revoke Thor's hammer
+        usage: /<command> [target]
     rocket:
         description: Rocket a player
         usage: /<command> [-s] [-h] [target]

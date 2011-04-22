@@ -22,7 +22,12 @@ package com.sk89q.commandbook;
 import static com.sk89q.commandbook.CommandBookUtil.replaceColorMacros;
 import static com.sk89q.commandbook.CommandBookUtil.sendMessage;
 import java.util.regex.Pattern;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerLoginEvent;
@@ -107,11 +112,42 @@ public class CommandBookPlayerListener extends PlayerListener {
     }
 
     /**
+     * Called when a player interacts.
+     */
+    @Override
+    public void onPlayerInteract(PlayerInteractEvent event) {
+        Player player = event.getPlayer();
+        
+        if (plugin.isThor(player)) {
+            Material held = player.getItemInHand().getType();
+            
+            if (held != Material.DIAMOND_PICKAXE
+                    && held != Material.IRON_PICKAXE
+                    && held != Material.GOLD_PICKAXE
+                    && held != Material.STONE_PICKAXE
+                    && held != Material.WOOD_PICKAXE) {
+                return;
+            }
+            
+            if (event.getAction() == Action.LEFT_CLICK_AIR) {
+                Block block = player.getTargetBlock(null, 300);
+                if (block != null) {
+                    player.getWorld().strikeLightning(block.getLocation());
+                }
+            } else if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
+                Block block = event.getClickedBlock();
+                player.getWorld().strikeLightning(block.getLocation());
+            }
+        }
+    }
+
+    /**
      * Called on player disconnect.
      */
     @Override
     public void onPlayerQuit(PlayerQuitEvent event) {
         plugin.getMessageTargets().remove(plugin.toUniqueName(event.getPlayer()));
+        plugin.setThor(event.getPlayer(), false);
     }
     
 }

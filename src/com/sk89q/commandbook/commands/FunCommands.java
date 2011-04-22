@@ -361,4 +361,98 @@ public class FunCommands {
         }
     }
     
+    @Command(aliases = {"thor"},
+            usage = "[target]", desc = "Give a player Thor power", flags = "",
+            min = 0, max = 1)
+    @CommandPermissions({"commandbook.thor"})
+    public static void thor(CommandContext args, CommandBookPlugin plugin,
+            CommandSender sender) throws CommandException {
+
+        Iterable<Player> targets = null;
+        boolean included = false;
+        
+        // Detect arguments based on the number of arguments provided
+        if (args.argsLength() == 0) {
+            targets = plugin.matchPlayers(plugin.checkPlayer(sender));
+            
+            // Check permissions!
+            plugin.checkPermission(sender, "commandbook.thor");
+        } else if (args.argsLength() == 1) {            
+            targets = plugin.matchPlayers(sender, args.getString(0));
+            
+            // Check permissions!
+            plugin.checkPermission(sender, "commandbook.thor.other");
+        }
+
+        for (final Player player : targets) {
+            plugin.setThor(player, true);
+            
+            // Tell the user
+            if (player.equals(sender)) {
+                player.sendMessage(ChatColor.YELLOW + "You've been given Thor's hammer (use any pickaxe)!");
+                
+                // Keep track of this
+                included = true;
+            } else {
+                player.sendMessage(ChatColor.YELLOW + "You've been given Thor's hammer by "
+                        + plugin.toName(sender) + ".");
+                
+            }
+        }
+        
+        // The player didn't get anything, then we need to send the
+        // user a message so s/he know that something is indeed working
+        if (!included && args.hasFlag('s')) {
+            sender.sendMessage(ChatColor.YELLOW.toString() + "Players given Thor's hammer.");
+        }
+        
+    }
+    
+    @Command(aliases = {"unthor"},
+            usage = "[target]", desc = "Revoke a player's Thor power", flags = "",
+            min = 0, max = 1)
+    @CommandPermissions({"commandbook.thor"})
+    public static void unthor(CommandContext args, CommandBookPlugin plugin,
+            CommandSender sender) throws CommandException {
+
+        Iterable<Player> targets = null;
+        boolean included = false;
+        
+        // Detect arguments based on the number of arguments provided
+        if (args.argsLength() == 0) {
+            targets = plugin.matchPlayers(plugin.checkPlayer(sender));
+            
+            // Check permissions!
+            plugin.checkPermission(sender, "commandbook.thor");
+        } else if (args.argsLength() == 1) {            
+            targets = plugin.matchPlayers(sender, args.getString(0));
+            
+            // Check permissions!
+            plugin.checkPermission(sender, "commandbook.thor.other");
+        }
+
+        for (final Player player : targets) {
+            plugin.setThor(player, false);
+            
+            // Tell the user
+            if (player.equals(sender)) {
+                player.sendMessage(ChatColor.YELLOW + "You've lost Thor's hammer!");
+                
+                // Keep track of this
+                included = true;
+            } else {
+                player.sendMessage(ChatColor.YELLOW + "Thor's hammer has been revoked from you by "
+                        + plugin.toName(sender) + ".");
+                
+            }
+        }
+        
+        // The player didn't get anything, then we need to send the
+        // user a message so s/he know that something is indeed working
+        if (!included && args.hasFlag('s')) {
+            sender.sendMessage(ChatColor.YELLOW.toString() + "Thor's hammer revokved from players.");
+        }
+        
+    }
+    
 }

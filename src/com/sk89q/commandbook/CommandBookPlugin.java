@@ -104,6 +104,7 @@ public class CommandBookPlugin extends JavaPlugin {
 
     protected Map<String, String> messages = new HashMap<String, String>();
     protected Map<String, String> msgTargets = new HashMap<String, String>();
+    protected Set<String> thors = new HashSet<String>();
     protected Set<String> frozen = new HashSet<String>();
 
     /**
@@ -168,6 +169,7 @@ public class CommandBookPlugin extends JavaPlugin {
 
         registerEvent(Event.Type.PLAYER_LOGIN, playerListener);
         registerEvent(Event.Type.PLAYER_JOIN, playerListener);
+        registerEvent(Event.Type.PLAYER_INTERACT, playerListener);
         registerEvent(Event.Type.PLAYER_QUIT, playerListener);
     }
 
@@ -1110,6 +1112,30 @@ public class CommandBookPlugin extends JavaPlugin {
         }
         
         return message;
+    }
+    
+    /**
+     * Gets Thor state.
+     * 
+     * @param player
+     * @return
+     */
+    public boolean isThor(Player player) {
+        return thors.contains(player.getName());
+    }
+    
+    /**
+     * Sets Thor state.
+     * 
+     * @param player
+     * @param isThor
+     */
+    public void setThor(Player player, boolean isThor) {
+        if (isThor) {
+            thors.add(player.getName());
+        } else {
+            thors.remove(player.getName());
+        }
     }
 
     /**
