@@ -1,3 +1,10 @@
+1.3:
+- Updated for MC 1.5.
+- Added /shock to shock someone with thunder.
+- Added /weather to change the weather.
+- Added /thunder to change the thunder state.
+- Added /thor and /unthor to give Thor's hammer.
+
 1.2.1:
 - Updated for latest Bukkit / 1.4.
 
