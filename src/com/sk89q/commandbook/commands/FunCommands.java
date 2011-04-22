@@ -279,4 +279,86 @@ public class FunCommands {
         }
     }
     
+    @Command(aliases = {"shock"},
+            usage = "[target]", desc = "Shock a player", flags = "ksa",
+            min = 0, max = 1)
+    @CommandPermissions({"commandbook.shock"})
+    public static void shock(CommandContext args, CommandBookPlugin plugin,
+            CommandSender sender) throws CommandException {
+
+        Iterable<Player> targets = null;
+        boolean included = false;
+        int count = 0;
+        
+        // Detect arguments based on the number of arguments provided
+        if (args.argsLength() == 0) {
+            targets = plugin.matchPlayers(plugin.checkPlayer(sender));
+            
+            // Check permissions!
+            plugin.checkPermission(sender, "commandbook.shock");
+        } else if (args.argsLength() == 1) {            
+            targets = plugin.matchPlayers(sender, args.getString(0));
+            
+            // Check permissions!
+            plugin.checkPermission(sender, "commandbook.shock.other");
+        }
+
+        for (final Player player : targets) {
+            count++;
+            
+            // Area effect
+            if (args.hasFlag('a')) {
+                final Location origLoc = player.getLocation();
+                
+                for (int i = 0; i < 10; i++) {
+                    plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+                        @Override
+                        public void run() {
+                            Location loc = origLoc.clone();
+                            loc.setX(loc.getX() + random.nextDouble() * 20 - 10);
+                            loc.setZ(loc.getZ() + random.nextDouble() * 20 - 10);
+                            player.getWorld().strikeLightning(loc);
+                        }
+                    }, Math.max(0, i * 3 + random.nextInt(10) - 5));
+                }
+            } else {
+                player.getWorld().strikeLightning(player.getLocation());
+            }
+            
+            if (args.hasFlag('k')) {
+                player.setHealth(0);
+            }
+
+            if (args.hasFlag('s')) {
+                // Tell the user
+                if (player.equals(sender)) {
+                    player.sendMessage(ChatColor.YELLOW + "Shocked!");
+                    
+                    // Keep track of this
+                    included = true;
+                } else {
+                    player.sendMessage(ChatColor.YELLOW + "You've been shocked by "
+                            + plugin.toName(sender) + ".");
+                    
+                }
+            } else {
+                if (count < 6) {
+                    plugin.getServer().broadcastMessage(
+                            ChatColor.YELLOW + plugin.toName(sender)
+                            + " shocked " + plugin.toName(player));
+                } else if (count == 6) {
+                    plugin.getServer().broadcastMessage(
+                            ChatColor.YELLOW + plugin.toName(sender)
+                            + " shocked more people...");
+                }
+            }
+        }
+        
+        // The player didn't get anything, then we need to send the
+        // user a message so s/he know that something is indeed working
+        if (!included && args.hasFlag('s')) {
+            sender.sendMessage(ChatColor.YELLOW.toString() + "Players shocked.");
+        }
+    }
+    
 }

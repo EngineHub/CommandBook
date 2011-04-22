@@ -530,4 +530,116 @@ public class GeneralCommands {
     public static void debug(CommandContext args, CommandBookPlugin plugin,
             CommandSender sender) throws CommandException {
     }
+    
+    @Command(aliases = {"weather"},
+            usage = "<'stormy'|'sunny'> [duration] [world]", desc = "Change the world weather",
+            min = 1, max = 3)
+    @CommandPermissions({"commandbook.weather"})
+    public static void weather(CommandContext args, CommandBookPlugin plugin,
+            CommandSender sender) throws CommandException {
+        
+        World world;
+        String weatherStr = args.getString(0);
+        int duration = -1;
+
+        if (args.argsLength() == 1) {
+            world = plugin.checkPlayer(sender).getWorld();
+        } else if (args.argsLength() == 2) {
+            world = plugin.checkPlayer(sender).getWorld();
+            duration = args.getInteger(1);
+        } else { // A world was specified!
+            world = plugin.matchWorld(sender, args.getString(2));
+            duration = args.getInteger(1);
+        }
+        
+        if (weatherStr.equalsIgnoreCase("stormy")
+                || weatherStr.equalsIgnoreCase("rainy")
+                || weatherStr.equalsIgnoreCase("snowy")
+                || weatherStr.equalsIgnoreCase("rain")
+                || weatherStr.equalsIgnoreCase("snow")
+                || weatherStr.equalsIgnoreCase("on")) {
+            
+            world.setStorm(true);
+            
+            if (duration > 0) {
+                world.setWeatherDuration(duration * 20);
+            }
+            
+            plugin.getServer().broadcastMessage(ChatColor.YELLOW
+                    + plugin.toName(sender) + " has started on a storm on '"
+                    + world.getName() + "'.");
+            
+            // Tell console, since console won't get the broadcast message.
+            if (!(sender instanceof Player)) {
+                sender.sendMessage("Stormy weather enabled.");
+            }
+            
+        } else if (weatherStr.equalsIgnoreCase("clear")
+                || weatherStr.equalsIgnoreCase("sunny")
+                || weatherStr.equalsIgnoreCase("snowy")
+                || weatherStr.equalsIgnoreCase("rain")
+                || weatherStr.equalsIgnoreCase("snow")
+                || weatherStr.equalsIgnoreCase("off")) {
+            
+            world.setStorm(false);
+            
+            if (duration > 0) {
+                world.setWeatherDuration(duration * 20);
+            }
+            
+            plugin.getServer().broadcastMessage(ChatColor.YELLOW
+                    + plugin.toName(sender) + " has stopped a storm on '"
+                    + world.getName() + "'.");
+            
+            // Tell console, since console won't get the broadcast message.
+            if (!(sender instanceof Player)) {
+                sender.sendMessage("Stormy weather disabled.");
+            }
+            
+        } else {
+            throw new CommandException("Unknown weather state! Acceptable states: sunny or stormy");
+        }
+    }
+    
+    @Command(aliases = {"thunder"},
+            usage = "<'on'|'off'> [duration] [world]", desc = "Change the thunder state",
+            min = 1, max = 3)
+    @CommandPermissions({"commandbook.weather.thunder"})
+    public static void thunder(CommandContext args, CommandBookPlugin plugin,
+            CommandSender sender) throws CommandException {
+        
+        World world;
+        String weatherStr = args.getString(0);
+        int duration = -1;
+
+        if (args.argsLength() == 1) {
+            world = plugin.checkPlayer(sender).getWorld();
+        } else if (args.argsLength() == 2) {
+            world = plugin.checkPlayer(sender).getWorld();
+            duration = args.getInteger(1);
+        } else { // A world was specified!
+            world = plugin.matchWorld(sender, args.getString(2));
+            duration = args.getInteger(1);
+        }
+        
+        if (weatherStr.equalsIgnoreCase("on")) {
+            world.setThundering(true);
+            
+            if (duration > 0) {
+                world.setThunderDuration(duration * 20);
+            }
+            
+            sender.sendMessage(ChatColor.YELLOW + "Thunder enabled.");
+        } else if (weatherStr.equalsIgnoreCase("off")) {
+            world.setThundering(false);
+            
+            if (duration > 0) {
+                world.setThunderDuration(duration * 20);
+            }
+
+            sender.sendMessage(ChatColor.YELLOW + "Thunder disabled.");
+        } else {
+            throw new CommandException("Unknown thunder state! Acceptable states: on or off");
+        }
+    }
 }

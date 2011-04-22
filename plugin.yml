@@ -14,6 +14,9 @@ commands:
     slap:
         description: Slap a player
         usage: /<command> [-s] [-h|-v] [-d] [target]
+    shock:
+        description: Shock a player
+        usage: /<command> [-s] [-k] [-a] [target]
     barrage:
         description: Send a barrage of arrows
         usage: /<command> [-s] [target]
@@ -64,6 +67,12 @@ commands:
     time:
         description: Set the time of your current world
         usage: /<command> [world] <time|"current">
+    weather:
+        description: Change the weather
+        usage: /<command> <'stormy'|'sunny'> [duration] [world]
+    thunder:
+        description: Set the thunder state
+        usage: /<command> <'on'|'off'> [duration] [world]
     msg:
         aliases: [message, whisper, pm, tell]
         description: Send a private message to a user
