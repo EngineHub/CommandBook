@@ -155,6 +155,11 @@ public class CommandBookPlugin extends JavaPlugin {
         
         // Register events
         registerEvents();
+        
+        // Register a timer for removing sessions every minute
+        getServer().getScheduler().scheduleAsyncRepeatingTask(
+                this, new SessionChecker(this),
+                SessionChecker.CHECK_FREQUENCY, SessionChecker.CHECK_FREQUENCY);
 
         // The permissions resolver has some hooks of its own
         (new PermissionsResolverServerListener(perms)).register(this);
@@ -1107,35 +1112,34 @@ public class CommandBookPlugin extends JavaPlugin {
     /**
      * Get a session.
      * 
-     * @param name 
+     * @param user 
      * @return
      */
-    public CommandBookSession getSession(String name) {
-        CommandBookSession session = sessions.get(name);
-        if (session != null) {
+    public CommandBookSession getSession(CommandSender user) {
+        synchronized (sessions) {
+            String key;
+            
+            if (user instanceof Player) {
+                key = ((Player) user).getName();
+            } else {
+                key = CommandBookSession.CONSOLE_NAME;
+            }
+            
+            CommandBookSession session = sessions.get(key);
+            if (session != null) {
+                return session;
+            }
+            session = new CommandBookSession();
+            sessions.put(key, session);
             return session;
         }
-        session = new CommandBookSession();
-        sessions.put(name, session);
-        return session;
     }
     
     /**
-     * Get a session.
-     * 
-     * @param player 
+     * Get sessions.
      * @return
      */
-    public CommandBookSession getSession(Player player) {
-        return getSession(player.getName());
-    }
-    
-    /**
-     * Forget a player.
-     * 
-     * @param player
-     */
-    public void forgetPlayer(Player player) {
-        sessions.remove(player.getName());
+    public Map<String, CommandBookSession> getSessions() {
+        return sessions;
     }
 }

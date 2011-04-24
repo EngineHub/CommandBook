@@ -87,6 +87,9 @@ public class CommandBookPlayerListener extends PlayerListener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         
+        // Trigger the session
+        plugin.getSession(player).handleReconnect();
+        
         // Show the MOTD.
         String motd = plugin.getMessage("motd");
         
@@ -145,7 +148,7 @@ public class CommandBookPlayerListener extends PlayerListener {
      */
     @Override
     public void onPlayerQuit(PlayerQuitEvent event) {
-        plugin.forgetPlayer(event.getPlayer());
+        plugin.getSession(event.getPlayer()).handleDisconnect();
     }
     
 }
