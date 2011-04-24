@@ -18,3 +18,4 @@ item-names:
     ice: 79
 # Makes /time and /weather broadcast a message
 broadcast-changes: true
+console-say-format: `r[Console] %s

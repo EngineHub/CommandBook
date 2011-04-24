@@ -19,6 +19,7 @@
 
 package com.sk89q.commandbook.commands;
 
+import static com.sk89q.commandbook.CommandBookUtil.replaceColorMacros;
 import java.util.logging.Logger;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -85,9 +86,15 @@ public class MessageCommands {
         
         Logger.getLogger("Minecraft").info("<" + name + ">: " + msg);
         
-        plugin.getServer().broadcastMessage(
-                "<" + plugin.toColoredName(sender, ChatColor.WHITE)
-                + "> " + args.getJoinedStrings(0));
+        if (sender instanceof Player) {
+            plugin.getServer().broadcastMessage(
+                    "<" + plugin.toColoredName(sender, ChatColor.WHITE)
+                    + "> " + args.getJoinedStrings(0));
+        } else {
+            plugin.getServer().broadcastMessage(
+                    replaceColorMacros(plugin.consoleSayFormat).replace(
+                            "%s", args.getJoinedStrings(0)));
+        }
     }
     
     @Command(aliases = {"msg"},

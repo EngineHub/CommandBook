@@ -102,6 +102,7 @@ public class CommandBookPlugin extends JavaPlugin {
     public String banMessage;
     public boolean opPermissions;
     public boolean useDisplayNames;
+    public String consoleSayFormat;
 
     protected Map<String, String> messages = new HashMap<String, String>();
     protected Map<String, UserSession> sessions =
@@ -262,11 +263,10 @@ public class CommandBookPlugin extends JavaPlugin {
         
         opPermissions = config.getBoolean("op-permissions", true);
         useDisplayNames = config.getBoolean("use-display-names", true);
-        
         banMessage = config.getString("bans.message", "You were banned.");
-        
         verifyNameFormat = config.getBoolean("verify-name-format", true);
         broadcastChanges = config.getBoolean("broadcast-changes", true);
+        consoleSayFormat = config.getString("console-say-format", "`r[Console] %s");
     }
     
     /**
