@@ -5,36 +5,6 @@ commands:
     cmdbook:
         description: CommandBook commands
         usage: /<command> <arguments...>
-    broadcast:
-        description: Broadcast a message
-        usage: /<command> <msg...>
-    say:
-        description: Say a message
-        usage: /<command> <msg...>
-    me:
-        description: Say an action message
-        usage: /<command> <msg...>
-    slap:
-        description: Slap a player
-        usage: /<command> [-s] [-h|-v] [-d] [target]
-    shock:
-        description: Shock a player
-        usage: /<command> [-s] [-k] [-a] [target]
-    barrage:
-        description: Send a barrage of arrows
-        usage: /<command> [-s] [target]
-    
-    thor:
-        description: Give Thor's hammer
-        usage: /<command> [target]
-    unthor:
-        description: Revoke Thor's hammer
-        usage: /<command> [target]
-        _parent: thor
-    
-    rocket:
-        description: Rocket a player
-        usage: /<command> [-s] [-h] [target]
     item:
         aliases: [item, i]
         description: Create an item
@@ -42,6 +12,7 @@ commands:
     give:
         description: Give an item
         usage: /<command> [-d] <target> <item[:data]> [amount]
+        _parent: item
     who:
         aliases: [list, playerlist, online, players]
         description: Get the list of players
@@ -52,41 +23,15 @@ commands:
     rules:
         description: Show the rules
         usage: /<command>
-    whois:
-        description: Tell information about a user
-        usage: /<command> [target]
-    setspawn:
-        description: Set the spawn location
-        usage: /<command> [location]
-    spawn:
-        description: Teleport to spawn
-        usage: /<command>
-    spawnmob:
-        description: Spawn a mob
-        usage: /<command> [-d] [-i] [-r] <mob> [count] [location]
-    teleport:
-        aliases: tp
-        description: Teleport to a location
-        usage: /<command> [target] <destination>
-    call:
-        description: Request a teleport from someone
-        usage: /<command> <target>
-    bring:
-        aliases: [tphere, summon, s]
-        description: Bring a player to you
-        usage: /<command> <target>
-    put:
-        aliases: place
-        description: Place a player at the location you are looking at
-        usage: /<command> <target>
-    
+    kit:
+        description: Get a kit (or list kits)
+        usage: /<command> <kit> [target]
     more:
         description: Expand stack size
         usage: /<command> [-a] [-i] [target]
     time:
         description: Set the time of your current world
         usage: /<command> [world] <time|"current">
-    
     weather:
         description: Change the weather
         usage: /<command> <'stormy'|'sunny'> [duration] [world]
@@ -94,27 +39,58 @@ commands:
         description: Set the thunder state
         usage: /<command> <'on'|'off'> [duration] [world]
         _parent: weather
-    
-    msg:
-        aliases: [message, whisper, pm, tell]
-        description: Send a private message to a user
-        usage: /<command> <target> <message...>
-    reply:
-        aliases: r
-        description: Reply to the last user
-        usage: /<command> <message...>
-        _parent: msg
+    setspawn:
+        description: Set the spawn location
+        usage: /<command> [location]
+    spawnmob:
+        description: Spawn a mob
+        usage: /<command> [-d] [-i] [-r] <mob> [count] [location]
     
     whereami:
         aliases: [getpos, pos, where]
         description: Get your current location
         usage: /<command> [target]
+        _category: player
+    whois:
+        description: Tell information about a user
+        usage: /<command> [target]
+        _category: player
     compass:
         description: Get your compass direction
         usage: /<command> [target]
+        _category: player
     clear:
         description: Clear your inventory
         usage: /<command> [-a] [target]
+        _category: player
+    thor:
+        description: Give Thor's hammer
+        usage: /<command> [target]
+        _category: player
+    unthor:
+        description: Revoke Thor's hammer
+        usage: /<command> [target]
+        _parent: thor
+        _category: player
+    rocket:
+        description: Rocket a player
+        usage: /<command> [-s] [-h] [target]
+        _category: player
+    slap:
+        description: Slap a player
+        usage: /<command> [-s] [-h|-v] [-d] [target]
+        _category: player
+    shock:
+        description: Shock a player
+        usage: /<command> [-s] [-k] [-a] [target]
+        _category: player
+    barrage:
+        description: Send a barrage of arrows
+        usage: /<command> [-s] [target]
+        _category: player
+    debug:
+        description: Get server information
+        usage: /<command> ...
     ping:
         description: Get back a dummy reply
         usage: /<command>
@@ -122,11 +98,69 @@ commands:
         description: Get back a dummy reply
         usage: /<command>
         _parent: pong
+        
+    teleport:
+        aliases: tp
+        description: Teleport to a location
+        usage: /<command> [target] <destination>
+        _category: teleport
+    call:
+        description: Request a teleport from someone
+        usage: /<command> <target>
+        _category: player
+        _category: teleport
+    bring:
+        aliases: [tphere, summon, s]
+        description: Bring a player to you
+        usage: /<command> <target>
+        _category: teleport
+    put:
+        aliases: place
+        description: Place a player at the location you are looking at
+        usage: /<command> <target>
+        _category: teleport
+    spawn:
+        description: Teleport to spawn
+        usage: /<command>
+        _category: teleport
+    
+    broadcast:
+        description: Broadcast a message
+        usage: /<command> <msg...>
+        _category: messaging
+    say:
+        description: Say a message
+        usage: /<command> <msg...>
+        _category: messaging
+    me:
+        description: Say an action message
+        usage: /<command> <msg...>
+        _category: messaging
+    msg:
+        aliases: [message, whisper, pm, tell]
+        description: Send a private message to a user
+        usage: /<command> <target> <message...>
+        _category: messaging
+    reply:
+        aliases: r
+        description: Reply to the last user
+        usage: /<command> <message...>
+        _parent: msg
+        _category: messaging
+    mute:
+        description: Mute a player
+        usage: /<command> <target>
+        _category: messaging
+    unmute:
+        description: Unute a player
+        usage: /<command> <target>
+        _parent: mute
+        _category: messaging
     
     kick:
         description: Kick a player by name
         usage: /<command> <target> [reason...]
-    
+        _component: bans
     ban:
         description: Ban a player by name
         usage: /<command> <target> [reason...]
@@ -143,18 +177,3 @@ commands:
         description: Ban save/load commands
         usage: /<command> ...
         _component: bans
-    
-    mute:
-        description: Mute a player
-        usage: /<command> <target>
-    unmute:
-        description: Unute a player
-        usage: /<command> <target>
-        _parent: mute
-    
-    kit:
-        description: Get a kit (or list kits)
-        usage: /<command> <kit> [target]
-    debug:
-        description: Get server information
-        usage: /<command> ...
