@@ -28,6 +28,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.blocks.BlockType;
+import com.sk89q.worldedit.blocks.ItemType;
 
 /**
  * Utility methods for CommandBook, borrowed from Tetsuuuu (the plugin
@@ -365,6 +366,29 @@ public class CommandBookUtil {
     public static void sendMessage(CommandSender sender, String message) {
         for (String line : message.split("\n")) {
             sender.sendMessage(line.replaceAll("[\r\n]", ""));
+        }
+    }
+    
+    /**
+     * Expand a stack of items.
+     * 
+     * @param item
+     * @param infinite
+     */
+    public static void expandStack(ItemStack item, boolean infinite) {
+        if (item == null || item.getAmount() == 0 || item.getTypeId() <= 0) {
+            return;
+        }
+        
+        if (ItemType.shouldNotStack(item.getTypeId())
+                || ItemType.usesDamageValue(item.getTypeId())) {
+            return;
+        }
+        
+        if (infinite) {
+            item.setAmount(-1);
+        } else {
+            item.setAmount(64);
         }
     }
 }

@@ -73,6 +73,9 @@ commands:
         aliases: place
         description: Place a player at the location you are looking at
         usage: /<command> <target>
+    more:
+        description: Expand stack size
+        usage: /<command> [-a] [-i] [target]
     time:
         description: Set the time of your current world
         usage: /<command> [world] <time|"current">

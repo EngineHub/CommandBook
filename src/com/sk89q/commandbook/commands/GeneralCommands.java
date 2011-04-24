@@ -33,6 +33,7 @@ import com.sk89q.commandbook.CommandBookUtil;
 import com.sk89q.commandbook.events.MOTDSendEvent;
 import com.sk89q.commandbook.events.OnlineListSendEvent;
 import com.sk89q.minecraft.util.commands.*;
+import com.sk89q.worldedit.blocks.ItemType;
 import static com.sk89q.commandbook.CommandBookUtil.*;
 
 public class GeneralCommands {
@@ -450,7 +451,7 @@ public class GeneralCommands {
     }
     
     @Command(aliases = {"clear"},
-            usage = "[-a] [target]", desc = "Clear your inventory",
+            usage = "[target]", desc = "Clear your inventory",
             flags = "a", min = 0, max = 1)
     @CommandPermissions({"commandbook.clear"})
     public static void clear(CommandContext args, CommandBookPlugin plugin,
@@ -646,6 +647,65 @@ public class GeneralCommands {
             sender.sendMessage(ChatColor.YELLOW + "Thunder disabled.");
         } else {
             throw new CommandException("Unknown thunder state! Acceptable states: on or off");
+        }
+    }
+    
+    @Command(aliases = {"more"},
+            usage = "[player]", desc = "Gets more of an item",
+            flags = "ai", min = 0, max = 1)
+    @CommandPermissions({"commandbook.more"})
+    public static void more(CommandContext args, CommandBookPlugin plugin,
+            CommandSender sender) throws CommandException {
+
+        Iterable<Player> targets = null;
+        boolean moreAll = args.hasFlag('a');
+        boolean infinite = args.hasFlag('i');
+        if (infinite) {
+            plugin.checkPermission(sender, "commandbook.more.infinite");
+        }
+        boolean included = false;
+        
+        if (args.argsLength() == 0) {
+            targets = plugin.matchPlayers(plugin.checkPlayer(sender));
+        // A different player
+        } else {
+            targets = plugin.matchPlayers(sender, args.getString(0));
+            
+            // Make sure that this player can 'more' other players!
+            plugin.checkPermission(sender, "commandbook.more.other");
+        }
+        
+        for (Player player : targets) {
+            Inventory inventory = player.getInventory();
+            
+            if (moreAll) {
+                for (int i = 0; i < 39; i++) {
+                    expandStack(inventory.getItem(i), infinite);
+                }
+            } else {
+                expandStack(player.getItemInHand(), infinite);
+            }
+        
+            // Tell the user about the given item
+            if (player.equals(sender)) {
+                player.sendMessage(ChatColor.YELLOW
+                        + "Your item(s) has been expanded in stack size.");
+                
+                // Keep track of this
+                included = true;
+            } else {
+                player.sendMessage(ChatColor.YELLOW
+                        + "Your item(s) has been expanded in stack size by "
+                        + plugin.toName(sender));
+                
+            }
+        }
+        
+        // The player didn't receive any items, then we need to send the
+        // user a message so s/he know that something is indeed working
+        if (!included) {
+            sender.sendMessage(ChatColor.YELLOW
+                    + "Stack sizes increased.");
         }
     }
 }
