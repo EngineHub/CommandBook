@@ -93,6 +93,11 @@ public class CommandBookPlugin extends JavaPlugin {
      */
     protected BanDatabase bans;
     
+    /**
+     * Time lock manager.
+     */
+    protected TimeLockManager timeLockManager;
+    
     public boolean verifyNameFormat;
     public boolean broadcastChanges;
     public Set<Integer> allowedItems;
@@ -137,6 +142,9 @@ public class CommandBookPlugin extends JavaPlugin {
         // Setup kits
         kits = new FlatFileKitsManager(new File(getDataFolder(), "kits.txt"), this);
         kits.load();
+        
+        // Setup the time locker
+        timeLockManager = new TimeLockManager(this);
         
         // Prepare permissions
         perms = new PermissionsResolverManager(
@@ -1085,6 +1093,15 @@ public class CommandBookPlugin extends JavaPlugin {
      */
     public String getBanMessage() {
         return banMessage;
+    }
+    
+    /**
+     * Get the time lock manager.
+     * 
+     * @return
+     */
+    public TimeLockManager getTimeLockManager() {
+        return timeLockManager;
     }
     
     /**
