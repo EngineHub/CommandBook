@@ -22,10 +22,12 @@ package com.sk89q.commandbook;
 import static com.sk89q.commandbook.CommandBookUtil.replaceColorMacros;
 import static com.sk89q.commandbook.CommandBookUtil.sendMessage;
 import java.util.regex.Pattern;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerListener;
@@ -77,6 +79,18 @@ public class CommandBookPlayerListener extends PlayerListener {
             }
         } catch (NullPointerException e) {
             // Bug in CraftBukkit
+        }
+    }
+
+    /**
+     * Called on player chat.
+     */
+    @Override
+    public void onPlayerChat(PlayerChatEvent event) {
+        if (plugin.getAdminSession(event.getPlayer()).isMute()) {
+            event.getPlayer().sendMessage(ChatColor.RED + "You are muted.");
+            event.setCancelled(true);
+            return;
         }
     }
     
@@ -149,6 +163,7 @@ public class CommandBookPlayerListener extends PlayerListener {
     @Override
     public void onPlayerQuit(PlayerQuitEvent event) {
         plugin.getSession(event.getPlayer()).handleDisconnect();
+        plugin.getAdminSession(event.getPlayer()).handleDisconnect();
     }
     
 }

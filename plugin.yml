@@ -118,6 +118,12 @@ commands:
     bans:
         description: Ban save/load commands
         usage: /<command> ...
+    mute:
+        description: Mute a player
+        usage: /<command> <target>
+    unmute:
+        description: Unute a player
+        usage: /<command> <target>
     kit:
         description: Get a kit (or list kits)
         usage: /<command> <kit> [target]

@@ -35,14 +35,18 @@ public class SessionChecker implements Runnable {
 
     @Override
     public void run() {
-        Map<String, CommandBookSession> sessions = plugin.getSessions();
-        synchronized (sessions) {
-            Iterator<Entry<String, CommandBookSession>> it =
+        cleanUpSessions(plugin.getSessions());
+        cleanUpSessions(plugin.getAdminSessions());
+    }
+    
+    public <T extends PersistentSession> void cleanUpSessions(Map<String, T> map) {
+        synchronized (map) {
+            Iterator<Entry<String, UserSession>> it =
                     plugin.getSessions().entrySet().iterator();
             
             while (it.hasNext()) {
-                Entry<String, CommandBookSession> entry = it.next();
-                if (entry.getKey().equals(CommandBookSession.CONSOLE_NAME)) continue;
+                Entry<String, UserSession> entry = it.next();
+                if (entry.getKey().equals(UserSession.CONSOLE_NAME)) continue;
                 Player player = plugin.getServer().getPlayer(entry.getKey());
                 if (player != null && player.isOnline()) continue;
                 

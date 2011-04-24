@@ -21,7 +21,7 @@ package com.sk89q.commandbook;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class CommandBookSession {
+public class UserSession implements PersistentSession {
 
     public static final String CONSOLE_NAME = "#console";
     private static final int MAX_AGE = 600000;

@@ -103,8 +103,10 @@ public class CommandBookPlugin extends JavaPlugin {
     public boolean useDisplayNames;
 
     protected Map<String, String> messages = new HashMap<String, String>();
-    protected Map<String, CommandBookSession> sessions =
-        new HashMap<String, CommandBookSession>();
+    protected Map<String, UserSession> sessions =
+        new HashMap<String, UserSession>();
+    protected Map<String, AdministrativeSession> adminSessions =
+        new HashMap<String, AdministrativeSession>();
 
     /**
      * Called when the plugin is enabled. This is where configuration is loaded,
@@ -175,6 +177,7 @@ public class CommandBookPlugin extends JavaPlugin {
         registerEvent(Event.Type.PLAYER_JOIN, playerListener);
         registerEvent(Event.Type.PLAYER_INTERACT, playerListener);
         registerEvent(Event.Type.PLAYER_QUIT, playerListener);
+        registerEvent(Event.Type.PLAYER_CHAT, playerListener);
     }
 
     /**
@@ -1115,21 +1118,21 @@ public class CommandBookPlugin extends JavaPlugin {
      * @param user 
      * @return
      */
-    public CommandBookSession getSession(CommandSender user) {
+    public UserSession getSession(CommandSender user) {
         synchronized (sessions) {
             String key;
             
             if (user instanceof Player) {
                 key = ((Player) user).getName();
             } else {
-                key = CommandBookSession.CONSOLE_NAME;
+                key = UserSession.CONSOLE_NAME;
             }
             
-            CommandBookSession session = sessions.get(key);
+            UserSession session = sessions.get(key);
             if (session != null) {
                 return session;
             }
-            session = new CommandBookSession();
+            session = new UserSession();
             sessions.put(key, session);
             return session;
         }
@@ -1137,9 +1140,39 @@ public class CommandBookPlugin extends JavaPlugin {
     
     /**
      * Get sessions.
+     * 
      * @return
      */
-    public Map<String, CommandBookSession> getSessions() {
+    public Map<String, UserSession> getSessions() {
         return sessions;
+    }
+    
+    /**
+     * Get a session.
+     * 
+     * @param user 
+     * @return
+     */
+    public AdministrativeSession getAdminSession(Player user) {
+        synchronized (adminSessions) {
+            String key = user.getName();
+            
+            AdministrativeSession session = adminSessions.get(key);
+            if (session != null) {
+                return session;
+            }
+            session = new AdministrativeSession();
+            adminSessions.put(key, session);
+            return session;
+        }
+    }
+    
+    /**
+     * Get sessions.
+     * 
+     * @return
+     */
+    public Map<String, AdministrativeSession> getAdminSessions() {
+        return adminSessions;
     }
 }

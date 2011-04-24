@@ -77,6 +77,40 @@ public class ModerationCommands {
         sender.sendMessage(ChatColor.YELLOW + "You've unfrozen "
                 + plugin.toName(player));
     }*/
+    
+    @Command(aliases = {"mute"},
+            usage = "<target>", desc = "Mute a player",
+            min = 1, max = 1)
+    @CommandPermissions({"commandbook.mute"})
+    public static void mute(CommandContext args, CommandBookPlugin plugin,
+            CommandSender sender) throws CommandException {
+        
+        Player player = plugin.matchSinglePlayer(sender, args.getString(0));
+
+        plugin.getAdminSession(player).setMute(true);
+
+        player.sendMessage(ChatColor.YELLOW + "You've been muted by "
+                + plugin.toName(sender));
+        sender.sendMessage(ChatColor.YELLOW + "You've muted "
+                + plugin.toName(player));
+    }
+    
+    @Command(aliases = {"unmute"},
+            usage = "<target>", desc = "Unmute a player",
+            min = 1, max = 1)
+    @CommandPermissions({"commandbook.mute"})
+    public static void unmute(CommandContext args, CommandBookPlugin plugin,
+            CommandSender sender) throws CommandException {
+        
+        Player player = plugin.matchSinglePlayer(sender, args.getString(0));
+
+        plugin.getAdminSession(player).setMute(false);
+
+        player.sendMessage(ChatColor.YELLOW + "You've been unmuted by "
+                + plugin.toName(sender));
+        sender.sendMessage(ChatColor.YELLOW + "You've unmuted "
+                + plugin.toName(player));
+    }
 
     @Command(aliases = {"kick"},
             usage = "<target> [reason...]", desc = "Kick a user",
