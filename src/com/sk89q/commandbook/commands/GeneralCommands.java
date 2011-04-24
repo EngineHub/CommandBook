@@ -33,7 +33,6 @@ import com.sk89q.commandbook.CommandBookUtil;
 import com.sk89q.commandbook.events.MOTDSendEvent;
 import com.sk89q.commandbook.events.OnlineListSendEvent;
 import com.sk89q.minecraft.util.commands.*;
-import com.sk89q.worldedit.blocks.ItemType;
 import static com.sk89q.commandbook.CommandBookUtil.*;
 
 public class GeneralCommands {
