@@ -1,3 +1,17 @@
+1.4
+- Added /call to request a teleport.
+- Added /time -l to lock the time.
+- Added a default item stack size setting.
+- Added /broadcast to broadcast a message in red font (customizable0.
+- Added /more [-i] [-a].
+- Added an option to change the format of /say when console uses it.
+- Added broadcast-changes setting which allows you to disable the time change
+    and weather change broadcast messages.
+- Add /mute and /unmute.
+- Changed /msg to reply to the last person (with a 1 second grace).
+- Fixed bans (I think).
+- Fixed permissions not loading (for alternate WEPIF permissions systems).
+
 1.3:
 - Updated for MC 1.5.
 - Added /shock to shock someone with thunder.
