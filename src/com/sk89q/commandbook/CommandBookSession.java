@@ -24,7 +24,7 @@ import org.bukkit.entity.Player;
 public class CommandBookSession {
 
     public static final String CONSOLE_NAME = "#console";
-    private static final int MAX_AGE = 3600000;
+    private static final int MAX_AGE = 600000;
     private static final int RECONNECT_GRACE = 60000;
 
     private long lastUpdate = 0;
