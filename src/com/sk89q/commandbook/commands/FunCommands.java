@@ -23,6 +23,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.CreatureType;
+import org.bukkit.entity.Creeper;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -39,7 +40,7 @@ public class FunCommands {
     
     @Command(aliases = {"spawnmob"},
             usage = "<mob> [count] [location]", desc = "Spawn a mob",
-            flags = "dir",
+            flags = "dirp",
             min = 1, max = 3)
     @CommandPermissions({"commandbook.spawnmob"})
     public static void spawnMob(CommandContext args, CommandBookPlugin plugin,
@@ -73,6 +74,9 @@ public class FunCommands {
             }
             if (args.hasFlag('r')) {
                 creature.setVelocity(new Vector(0, 2, 0));
+            }
+            if (args.hasFlag('p') && creature instanceof Creeper) {
+                ((Creeper) creature).setPowered(true);
             }
         }
         
