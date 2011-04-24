@@ -104,6 +104,7 @@ public class CommandBookPlugin extends JavaPlugin {
     public boolean useDisplayNames;
     public String consoleSayFormat;
     public String broadcastFormat;
+    public int defaultItemStackSize;
 
     protected Map<String, String> messages = new HashMap<String, String>();
     protected Map<String, UserSession> sessions =
@@ -269,6 +270,7 @@ public class CommandBookPlugin extends JavaPlugin {
         broadcastChanges = config.getBoolean("broadcast-changes", true);
         consoleSayFormat = config.getString("console-say-format", "<`r*Console`w> %s");
         broadcastFormat = config.getString("broadcast-format", "`r[Broadcast] %s");
+        defaultItemStackSize = config.getInt("default-item-stack-size", 1);
     }
     
     /**

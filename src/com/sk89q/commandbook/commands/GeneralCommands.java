@@ -54,7 +54,7 @@ public class GeneralCommands {
             CommandSender sender) throws CommandException {
         
         ItemStack item = null;
-        int amt = 1;
+        int amt = plugin.defaultItemStackSize;
         Iterable<Player> targets = null;
 
         // How this command handles parameters depends on how many there
@@ -92,7 +92,7 @@ public class GeneralCommands {
             CommandSender sender) throws CommandException {
         
         ItemStack item = null;
-        int amt = 1;
+        int amt = plugin.defaultItemStackSize;
         Iterable<Player> targets = null;
 
         // How this command handles parameters depends on how many there
