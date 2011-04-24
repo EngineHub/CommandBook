@@ -29,7 +29,7 @@ import com.sk89q.minecraft.util.commands.*;
 public class TeleportCommands {
     
     @Command(aliases = {"spawn"},
-            usage = "", desc = "Teleport to spawn",
+            usage = "[player]", desc = "Teleport to spawn",
             min = 0, max = 0)
     @CommandPermissions({"commandbook.spawn"})
     public static void spawn(CommandContext args, CommandBookPlugin plugin,
@@ -86,12 +86,47 @@ public class TeleportCommands {
         }
     }
     
+    @Command(aliases = {"call"},
+            usage = "<target>", desc = "Request a teleport",
+            min = 1, max = 1)
+    @CommandPermissions({"commandbook.call"})
+    public static void requestTeleport(CommandContext args, CommandBookPlugin plugin,
+            CommandSender sender) throws CommandException {
+
+        Player player = plugin.checkPlayer(sender);
+        Player target = plugin.matchSinglePlayer(sender, args.getString(0));
+        
+        plugin.getSession(player).checkLastTeleportRequest(target);
+        plugin.getSession(target).addBringable(player);
+        
+        sender.sendMessage(ChatColor.YELLOW.toString() + "Teleport request sent.");
+        target.sendMessage(ChatColor.AQUA + "**TELEPORT** " + plugin.toName(sender)
+                + " requests a teleport! Use /bring <name> to accept.");
+    }
+    
     @Command(aliases = {"bring"},
             usage = "<target>", desc = "Bring a player to you",
             min = 1, max = 1)
-    @CommandPermissions({"commandbook.teleport.other"})
     public static void bring(CommandContext args, CommandBookPlugin plugin,
             CommandSender sender) throws CommandException {
+        
+        if (!plugin.hasPermission(sender, "commandbook.teleport.other")) {
+            Player player = plugin.checkPlayer(sender);
+            Player target = plugin.matchSinglePlayer(sender, args.getString(0));
+            
+            if (plugin.getSession(player).isBringable(target)) {
+                sender.sendMessage(ChatColor.YELLOW + "Player teleported.");
+                target.sendMessage(ChatColor.YELLOW + "Your teleport request to "
+                        + plugin.toName(sender) + " was accepted.");
+                target.teleport(player);
+            } else {
+                throw new CommandException("That person didn't request a " +
+                		"teleport (recently) and you don't have " +
+                		"permission to teleport anyone.");
+            }
+            
+            return;
+        }
 
         Iterable<Player> targets = plugin.matchPlayers(sender, args.getString(0));
         Location loc = plugin.checkPlayer(sender).getLocation();

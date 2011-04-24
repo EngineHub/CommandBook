@@ -65,6 +65,9 @@ commands:
         aliases: tp
         description: Teleport to a location
         usage: /<command> [target] <destination>
+    call:
+        description: Call for a teleport
+        usage: /<command> <target>
     bring:
         aliases: [tphere, summon, s]
         description: Bring a player to you

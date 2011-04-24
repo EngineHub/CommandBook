@@ -18,19 +18,26 @@
 
 package com.sk89q.commandbook;
 
+import java.util.HashMap;
+import java.util.Map;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import com.sk89q.minecraft.util.commands.CommandException;
 
 public class UserSession implements PersistentSession {
 
     public static final String CONSOLE_NAME = "#console";
     private static final int MAX_AGE = 600000;
     private static final int RECONNECT_GRACE = 60000;
+    private static final int BRINGABLE_TIME = 300000;
+    private static final int TP_REQUEST_WAIT_TIME = 30000;
 
     private long lastUpdate = 0;
     private String lastRecipient = null;
     private long lastRecipientTime = 0;
     private boolean hasThor = false;
+    private Map<String, Long> bringable = new HashMap<String, Long>();
+    private Map<String, Long> teleportRequests = new HashMap<String, Long>();
     
     public boolean isRecent() {
         return (System.currentTimeMillis() - lastUpdate) < MAX_AGE;
@@ -39,6 +46,7 @@ public class UserSession implements PersistentSession {
     public void handleReconnect() {
         if ((System.currentTimeMillis() - lastUpdate) >= RECONNECT_GRACE) {
             lastRecipient = null;
+            bringable = new HashMap<String, Long>();
         }
     }
     
@@ -76,5 +84,31 @@ public class UserSession implements PersistentSession {
     public void setHasThor(boolean hasThor) {
         this.hasThor = hasThor;
     }
+    
+    public void addBringable(Player player) {
+        bringable.put(player.getName(), System.currentTimeMillis());
+    }
+    
+    public void removeBringable(Player player) {
+        bringable.put(player.getName(), System.currentTimeMillis());
+    }
 
+    public boolean isBringable(Player player) {
+        long now = System.currentTimeMillis();
+        Long time = bringable.remove(player.getName());
+        if (time != null && (now - time) < BRINGABLE_TIME) {
+            return true;
+        }
+        return false;
+    }
+
+    public void checkLastTeleportRequest(Player target) throws CommandException {
+        long now = System.currentTimeMillis();
+        Long time = teleportRequests.remove(target.getName());
+        if (time != null && (now - time) < TP_REQUEST_WAIT_TIME) {
+            throw new CommandException("Wait a bit before asking again.");
+        }
+        teleportRequests.put(target.getName(), now);
+    }
+    
 }
