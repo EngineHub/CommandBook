@@ -1,4 +1,10 @@
-1.4
+1.4.1;
+- Added /spawnmob -p to spawn powered creepers.
+- Added check against Bukkit for item validity too so that if there is a
+    Minecraft update, you can use new items without having to necessarily
+    update CommandBook.
+
+1.4:
 - Added /call to request a teleport.
 - Added /time -l to lock the time.
 - Added a default item stack size setting.
