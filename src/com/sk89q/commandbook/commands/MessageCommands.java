@@ -41,6 +41,11 @@ public class MessageCommands {
     public static void me(CommandContext args, CommandBookPlugin plugin,
             CommandSender sender) throws CommandException {
         
+        if (sender instanceof Player && plugin.getAdminSession((Player) sender).isMute()) {
+            sender.sendMessage(ChatColor.RED + "You are muted.");
+            return;
+        }
+        
         String name = plugin.toName(sender);
         String msg = args.getJoinedStrings(0);
 
@@ -58,6 +63,11 @@ public class MessageCommands {
     @CommandPermissions({"commandbook.say"})
     public static void say(CommandContext args, CommandBookPlugin plugin,
             CommandSender sender) throws CommandException {
+        
+        if (sender instanceof Player && plugin.getAdminSession((Player) sender).isMute()) {
+            sender.sendMessage(ChatColor.RED + "You are muted.");
+            return;
+        }
         
         String name = plugin.toColoredName(sender, ChatColor.WHITE);
         String msg = args.getJoinedStrings(0);
