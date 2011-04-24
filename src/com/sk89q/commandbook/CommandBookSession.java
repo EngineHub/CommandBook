@@ -19,8 +19,9 @@
 package com.sk89q.commandbook;
 
 public class CommandBookSession {
-    
+
     private String lastRecipient = null;
+    private long lastRecipientTime = 0;
     private boolean hasThor = false;
     
     public String getLastRecipient() {
@@ -28,12 +29,15 @@ public class CommandBookSession {
     }
     
     public void setLastRecipient(String target) {
-        this.lastRecipient = target;
+        lastRecipient = target;
     }
     
     public void setNewLastRecipient(String target) {
-        if (lastRecipient == null) {
-            this.lastRecipient = target;
+        long now = System.currentTimeMillis();
+        
+        if (lastRecipient == null || (now - lastRecipientTime) > 1000) {
+            lastRecipient = target;
+            lastRecipientTime = now;
         }
     }
     
