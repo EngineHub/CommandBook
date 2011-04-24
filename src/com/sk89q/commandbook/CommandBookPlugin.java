@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.block.Block;
@@ -402,7 +403,9 @@ public class CommandBookPlugin extends JavaPlugin {
                 || (id > 95 && id < 256)
                 || (id > 357 && id < 2256)
                 || id > 2257) {
-            throw new CommandException("Non-existent item specified.");
+            if (Material.getMaterial(id) == null) {
+                throw new CommandException("Non-existent item specified.");
+            }
         }
 
         // Check if the user has an override
