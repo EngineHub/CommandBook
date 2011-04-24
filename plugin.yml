@@ -5,6 +5,9 @@ commands:
     cmdbook:
         description: CommandBook commands
         usage: /<command> <arguments...>
+    broadcast:
+        description: Broadcast a message
+        usage: /<command> <msg...>
     say:
         description: Say a message
         usage: /<command> <msg...>

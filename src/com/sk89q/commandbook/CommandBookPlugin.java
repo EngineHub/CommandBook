@@ -103,6 +103,7 @@ public class CommandBookPlugin extends JavaPlugin {
     public boolean opPermissions;
     public boolean useDisplayNames;
     public String consoleSayFormat;
+    public String broadcastFormat;
 
     protected Map<String, String> messages = new HashMap<String, String>();
     protected Map<String, UserSession> sessions =
@@ -266,7 +267,8 @@ public class CommandBookPlugin extends JavaPlugin {
         banMessage = config.getString("bans.message", "You were banned.");
         verifyNameFormat = config.getBoolean("verify-name-format", true);
         broadcastChanges = config.getBoolean("broadcast-changes", true);
-        consoleSayFormat = config.getString("console-say-format", "`r[Console] %s");
+        consoleSayFormat = config.getString("console-say-format", "<`r*Console`w> %s");
+        broadcastFormat = config.getString("broadcast-format", "`r[Broadcast] %s");
     }
     
     /**

@@ -18,6 +18,7 @@
 
 package com.sk89q.commandbook.commands;
 
+import static com.sk89q.commandbook.CommandBookUtil.replaceColorMacros;
 import java.util.logging.Logger;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -32,6 +33,18 @@ import com.sk89q.minecraft.util.commands.NestedCommand;
 public class ModerationCommands {
 
     protected static final Logger logger = Logger.getLogger("Minecraft.CommandBook");
+    
+    @Command(aliases = {"broadcast"},
+            usage = "<message...>", desc = "Broadcast a message",
+            min = 1, max = -1)
+    @CommandPermissions({"commandbook.broadcast"})
+    public static void broadcast(CommandContext args, CommandBookPlugin plugin,
+            CommandSender sender) throws CommandException {
+    
+        plugin.getServer().broadcastMessage(
+                replaceColorMacros(plugin.broadcastFormat).replace(
+                        "%s", args.getJoinedStrings(0)));
+    }
 
     /*@Command(aliases = {"freeze"},
             usage = "<target>", desc = "Freeze a player",
