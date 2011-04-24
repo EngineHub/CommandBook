@@ -138,6 +138,7 @@ public class CommandBookPlugin extends JavaPlugin {
         // Prepare permissions
         perms = new PermissionsResolverManager(
                 getConfiguration(), getServer(), getDescription().getName(), logger);
+        perms.load();
         
         // Register the commands that we want to use
         final CommandBookPlugin plugin = this;
