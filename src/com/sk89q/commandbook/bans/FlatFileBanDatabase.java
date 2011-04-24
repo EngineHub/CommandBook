@@ -100,7 +100,7 @@ public class FlatFileBanDatabase implements BanDatabase {
         boolean successful = true;
         
         try {
-            bannedNames = readList(namesFile);
+            bannedNames = readLowercaseList(namesFile);
             logger.info("CommandBook: " + bannedNames.size() + " banned name(s) loaded.");
         } catch (IOException e) {
             bannedNames = new HashSet<String>();
@@ -129,7 +129,7 @@ public class FlatFileBanDatabase implements BanDatabase {
      * @return
      * @throws IOException
      */
-    protected synchronized Set<String> readList(File file) throws IOException {
+    protected synchronized Set<String> readLowercaseList(File file) throws IOException {
         FileInputStream input = null;
         Set<String> list = new HashSet<String>();
         
@@ -143,7 +143,7 @@ public class FlatFileBanDatabase implements BanDatabase {
                 line = line.trim();
                 
                 if (line.length() > 0) {
-                    list.add(line.trim());
+                    list.add(line.toLowerCase().trim());
                 }
             }
         } catch (FileNotFoundException e) {
@@ -211,7 +211,7 @@ public class FlatFileBanDatabase implements BanDatabase {
     }
 
     public synchronized boolean isBannedName(String name) {
-        return bannedNames.contains(name.trim());
+        return bannedNames.contains(name.toLowerCase().trim());
     }
 
     public synchronized boolean isBannedAddress(InetAddress address) {
