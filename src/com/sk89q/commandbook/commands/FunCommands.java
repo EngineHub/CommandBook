@@ -385,7 +385,7 @@ public class FunCommands {
         }
 
         for (final Player player : targets) {
-            plugin.setThor(player, true);
+            plugin.getSession(player).setHasThor(true);
             
             // Tell the user
             if (player.equals(sender)) {
@@ -432,7 +432,7 @@ public class FunCommands {
         }
 
         for (final Player player : targets) {
-            plugin.setThor(player, false);
+            plugin.getSession(player).setHasThor(false);
             
             // Tell the user
             if (player.equals(sender)) {

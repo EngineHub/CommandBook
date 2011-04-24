@@ -19,7 +19,6 @@
 
 package com.sk89q.commandbook.commands;
 
-import java.util.Map;
 import java.util.logging.Logger;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -94,9 +93,6 @@ public class MessageCommands {
         String message = args.getJoinedStrings(1);
         String senderUName = plugin.toUniqueName(sender);
         String receiverUName = plugin.toUniqueName(receiver);
-        
-        // We'll be using this
-        Map<String, String> memory = plugin.getMessageTargets();
 
         receiver.sendMessage(ChatColor.GRAY + "(From "
                 + plugin.toName(sender) + "): "
@@ -106,14 +102,12 @@ public class MessageCommands {
                 + plugin.toName(receiver) + "): "
                 + ChatColor.WHITE + message);
         
-        memory.put(senderUName, receiverUName);
+        plugin.getSession(senderUName).setLastRecipient(receiverUName);
         
         // If the receiver hasn't had any player talk to them yet or hasn't
         // send a message, then we add it to the receiver's last message target
         // so s/he can /reply easily
-        if (!memory.containsKey(receiverUName)) {
-            memory.put(receiverUName, senderUName);
-        }
+        plugin.getSession(receiverUName).setNewLastRecipient(senderUName);
     }
 
     @Command(aliases = {"reply"},
@@ -126,13 +120,12 @@ public class MessageCommands {
         String message = args.getJoinedStrings(0);
         String senderUName = plugin.toUniqueName(sender);
         CommandSender receiver;
-
-        Map<String, String> memory = plugin.getMessageTargets();
         
-        if (memory.containsKey(senderUName)) {
+        String lastRecipient = plugin.getSession(senderUName).getLastRecipient();
+        
+        if (lastRecipient != null) {
             // This will throw errors as needed
-            receiver = plugin.matchPlayerOrConsole(sender,
-                    memory.get(senderUName));
+            receiver = plugin.matchPlayerOrConsole(sender, lastRecipient);
         } else {
             sender.sendMessage(ChatColor.RED + "You haven't messaged anyone.");
             return;
@@ -151,8 +144,6 @@ public class MessageCommands {
         // If the receiver hasn't had any player talk to them yet or hasn't
         // send a message, then we add it to the receiver's last message target
         // so s/he can /reply easily
-        if (!memory.containsKey(receiverUName)) {
-            memory.put(receiverUName, senderUName);
-        }
+        plugin.getSession(receiverUName).setNewLastRecipient(senderUName);
     }
 }

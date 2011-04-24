@@ -103,9 +103,8 @@ public class CommandBookPlugin extends JavaPlugin {
     public boolean useDisplayNames;
 
     protected Map<String, String> messages = new HashMap<String, String>();
-    protected Map<String, String> msgTargets = new HashMap<String, String>();
-    protected Set<String> thors = new HashSet<String>();
-    protected Set<String> frozen = new HashSet<String>();
+    protected Map<String, CommandBookSession> sessions =
+        new HashMap<String, CommandBookSession>();
 
     /**
      * Called when the plugin is enabled. This is where configuration is loaded,
@@ -1047,15 +1046,6 @@ public class CommandBookPlugin extends JavaPlugin {
     }
     
     /**
-     * Get a map of message targets.
-     * 
-     * @return
-     */
-    public Map<String, String> getMessageTargets() {
-        return msgTargets;
-    }
-    
-    /**
      * Get the ban database.
      * 
      * @return
@@ -1115,55 +1105,37 @@ public class CommandBookPlugin extends JavaPlugin {
     }
     
     /**
-     * Gets Thor state.
+     * Get a session.
      * 
-     * @param player
+     * @param name 
      * @return
      */
-    public boolean isThor(Player player) {
-        return thors.contains(player.getName());
+    public CommandBookSession getSession(String name) {
+        CommandBookSession session = sessions.get(name);
+        if (session != null) {
+            return session;
+        }
+        session = new CommandBookSession();
+        sessions.put(name, session);
+        return session;
     }
     
     /**
-     * Sets Thor state.
+     * Get a session.
      * 
-     * @param player
-     * @param isThor
+     * @param player 
+     * @return
      */
-    public void setThor(Player player, boolean isThor) {
-        if (isThor) {
-            thors.add(player.getName());
-        } else {
-            thors.remove(player.getName());
-        }
+    public CommandBookSession getSession(Player player) {
+        return getSession(player.getName());
     }
-
+    
     /**
-     * Freeze a player.
+     * Forget a player.
      * 
      * @param player
      */
-    public void freezePlayer(Player player) {
-        frozen.add(player.getName());
-    }
-
-    /**
-     * Unfreeze a player.
-     * 
-     * @param player
-     * @return 
-     */
-    public boolean unfreezePlayer(Player player) {
-        return frozen.remove(player.getName());
-    }
-
-    /**
-     * Check if a player is frozen.
-     * 
-     * @param player
-     * @return 
-     */
-    public boolean isFrozen(Player player) {
-        return frozen.contains(player.getName());
+    public void forgetPlayer(Player player) {
+        sessions.remove(player.getName());
     }
 }

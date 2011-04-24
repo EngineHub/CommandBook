@@ -117,7 +117,7 @@ public class CommandBookPlayerListener extends PlayerListener {
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         
-        if (plugin.isThor(player)) {
+        if (plugin.getSession(player).hasThor()) {
             Material held = player.getItemInHand().getType();
             
             if (held != Material.DIAMOND_PICKAXE
@@ -145,8 +145,7 @@ public class CommandBookPlayerListener extends PlayerListener {
      */
     @Override
     public void onPlayerQuit(PlayerQuitEvent event) {
-        plugin.getMessageTargets().remove(plugin.toUniqueName(event.getPlayer()));
-        plugin.setThor(event.getPlayer(), false);
+        plugin.forgetPlayer(event.getPlayer());
     }
     
 }
