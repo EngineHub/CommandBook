@@ -16,3 +16,5 @@ allowed-items: []
 item-names:
     goldblock: 41
     ice: 79
+# Makes /time and /weather broadcast a message
+broadcast-changes: true

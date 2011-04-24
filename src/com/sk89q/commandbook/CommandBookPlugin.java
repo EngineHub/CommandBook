@@ -94,6 +94,7 @@ public class CommandBookPlugin extends JavaPlugin {
     protected BanDatabase bans;
     
     public boolean verifyNameFormat;
+    public boolean broadcastChanges;
     public Set<Integer> allowedItems;
     public Set<Integer> disallowedItems;
     public Map<String, Integer> itemNames;
@@ -264,6 +265,7 @@ public class CommandBookPlugin extends JavaPlugin {
         banMessage = config.getString("bans.message", "You were banned.");
         
         verifyNameFormat = config.getBoolean("verify-name-format", true);
+        broadcastChanges = config.getBoolean("broadcast-changes", true);
     }
     
     /**

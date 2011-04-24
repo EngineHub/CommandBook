@@ -286,14 +286,16 @@ public class GeneralCommands {
             }
         }
         
-        plugin.getServer().broadcastMessage(ChatColor.YELLOW
-                + plugin.toName(sender) + " set the time of '"
-                + world.getName() + "' to "
-                + CommandBookUtil.getTimeString(world.getTime()) + ".");
+        if (plugin.broadcastChanges) { 
+            plugin.getServer().broadcastMessage(ChatColor.YELLOW
+                    + plugin.toName(sender) + " set the time of '"
+                    + world.getName() + "' to "
+                    + CommandBookUtil.getTimeString(world.getTime()) + ".");
+        }
         
         // Tell console, since console won't get the broadcast message.
-        if (!(sender instanceof Player)) {
-            sender.sendMessage("Time set to "
+        if (!(sender instanceof Player) || !plugin.broadcastChanges) {
+            sender.sendMessage(ChatColor.YELLOW + "Time set to "
                     + CommandBookUtil.getTimeString(world.getTime()) + ".");
         }
     }
@@ -564,14 +566,16 @@ public class GeneralCommands {
             if (duration > 0) {
                 world.setWeatherDuration(duration * 20);
             }
-            
-            plugin.getServer().broadcastMessage(ChatColor.YELLOW
-                    + plugin.toName(sender) + " has started on a storm on '"
-                    + world.getName() + "'.");
+
+            if (plugin.broadcastChanges) { 
+                plugin.getServer().broadcastMessage(ChatColor.YELLOW
+                        + plugin.toName(sender) + " has started on a storm on '"
+                        + world.getName() + "'.");
+            }
             
             // Tell console, since console won't get the broadcast message.
-            if (!(sender instanceof Player)) {
-                sender.sendMessage("Stormy weather enabled.");
+            if (!(sender instanceof Player) || !plugin.broadcastChanges) {
+                sender.sendMessage(ChatColor.YELLOW + "Stormy weather enabled.");
             }
             
         } else if (weatherStr.equalsIgnoreCase("clear")
@@ -586,14 +590,16 @@ public class GeneralCommands {
             if (duration > 0) {
                 world.setWeatherDuration(duration * 20);
             }
-            
-            plugin.getServer().broadcastMessage(ChatColor.YELLOW
-                    + plugin.toName(sender) + " has stopped a storm on '"
-                    + world.getName() + "'.");
+
+            if (plugin.broadcastChanges) { 
+                plugin.getServer().broadcastMessage(ChatColor.YELLOW
+                        + plugin.toName(sender) + " has stopped a storm on '"
+                        + world.getName() + "'.");
+            }
             
             // Tell console, since console won't get the broadcast message.
-            if (!(sender instanceof Player)) {
-                sender.sendMessage("Stormy weather disabled.");
+            if (!(sender instanceof Player) || !plugin.broadcastChanges) {
+                sender.sendMessage(ChatColor.YELLOW + "Stormy weather disabled.");
             }
             
         } else {
