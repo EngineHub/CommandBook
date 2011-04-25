@@ -1,3 +1,6 @@
+1.4.2:
+- Fixed permission error in console if op permissions were turned off.
+
 1.4.1;
 - Added /spawnmob -p to spawn powered creepers.
 - Added check against Bukkit for item validity too so that if there is a
