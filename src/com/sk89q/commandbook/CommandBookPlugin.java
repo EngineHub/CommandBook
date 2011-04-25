@@ -361,6 +361,10 @@ public class CommandBookPlugin extends JavaPlugin {
      * @return 
      */
     public boolean hasPermission(CommandSender sender, String perm) {
+        if (!(sender instanceof Player)) {
+            return true;
+        }
+        
         if (sender.isOp() && opPermissions) {
             return true;
         }
