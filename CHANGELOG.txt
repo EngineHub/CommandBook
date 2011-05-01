@@ -1,3 +1,13 @@
+1.4.3:
+- Added tip about /clear -a when using /clear.
+- Added /clear -s to clear a single slot only.
+- Added item-permissions-only to force using item whitelist permissions.
+- Made /tp print world information if a player's world changed on teleport.
+- Added exact spawn setting (disabled by default). Currently this only
+    affects respawn.
+- Added multiple target support to /kick.
+- Added notice about verify-name-format in the console.
+
 1.4.2:
 - Fixed permission error in console if op permissions were turned off.
 
