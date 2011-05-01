@@ -31,7 +31,6 @@ public class TimeLocker implements Runnable {
         this.time = time;
     }
 
-    @Override
     public void run() {
         world.setFullTime(time);
     }

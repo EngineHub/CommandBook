@@ -33,7 +33,6 @@ public class SessionChecker implements Runnable {
         this.plugin = plugin;
     }
 
-    @Override
     public void run() {
         cleanUpSessions(plugin.getSessions());
         cleanUpSessions(plugin.getAdminSessions());

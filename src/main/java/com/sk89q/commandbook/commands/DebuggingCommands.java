@@ -55,7 +55,6 @@ public class DebuggingCommands {
         final long startTicks = world.getFullTime();
         
         Runnable task = new Runnable() {
-            @Override
             public void run() {
                 long now = System.currentTimeMillis();
                 long nowTicks = world.getFullTime();

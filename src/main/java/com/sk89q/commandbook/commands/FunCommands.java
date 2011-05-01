@@ -316,7 +316,6 @@ public class FunCommands {
                 
                 for (int i = 0; i < 10; i++) {
                     plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-                        @Override
                         public void run() {
                             Location loc = origLoc.clone();
                             loc.setX(loc.getX() + random.nextDouble() * 20 - 10);
