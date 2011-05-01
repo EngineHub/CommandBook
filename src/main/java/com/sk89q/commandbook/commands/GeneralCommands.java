@@ -506,8 +506,13 @@ public class GeneralCommands {
         
             // Tell the user about the given item
             if (player.equals(sender)) {
-                player.sendMessage(ChatColor.YELLOW
-                        + "Your inventory has been cleared.");
+                if (clearAll) {
+                    player.sendMessage(ChatColor.YELLOW
+                            + "Your inventory has been cleared.");
+                } else {
+                    player.sendMessage(ChatColor.YELLOW
+                            + "Your inventory has been cleared. Use -a to clear ALL.");
+                }
                 
                 // Keep track of this
                 included = true;
