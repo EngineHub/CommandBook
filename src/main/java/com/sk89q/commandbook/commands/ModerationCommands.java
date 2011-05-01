@@ -21,6 +21,7 @@ package com.sk89q.commandbook.commands;
 import static com.sk89q.commandbook.CommandBookUtil.replaceColorMacros;
 import java.util.logging.Logger;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import com.sk89q.commandbook.CommandBookPlugin;
@@ -131,17 +132,17 @@ public class ModerationCommands {
     @CommandPermissions({"commandbook.kick"})
     public static void kick(CommandContext args, CommandBookPlugin plugin,
             CommandSender sender) throws CommandException {
-        
-        Player player = plugin.matchSinglePlayer(sender, args.getString(0));
+
+        Iterable<Player> targets = plugin.matchPlayers(sender, args.getString(0));
         String message = args.argsLength() >= 2 ? args.getJoinedStrings(1)
                 : "Kicked!";
+
+        for (Player player : targets) {
+            player.kickPlayer(message);
+            plugin.getBanDatabase().logKick(player, sender, message);
+        }
         
-        player.kickPlayer(message);
-        
-        sender.sendMessage(ChatColor.YELLOW + player.getName()
-                + " (" + player.getDisplayName() + ChatColor.WHITE + ") kicked.");
-        
-        plugin.getBanDatabase().logKick(player, sender, message);
+        sender.sendMessage(ChatColor.YELLOW + "Player(s) kicked.");
     }
 
     @Command(aliases = {"ban"},
