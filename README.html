@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>CommandBoo ${version}</title>
+<style>
+body {
+  margin: 0;
+  padding: 20px;
+  background: #efefef;
+  color: #333;
+}
+#wrapper {
+  margin: 20px auto 20px auto;
+  width: 600px;
+  background: #fff;
+  padding: 40px;
+  border: 1px solid #fff;
+  border-radius: 10px;
+  -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;
+  box-shadow: 0 0 2px #999;
+}
+a img {
+  border: 0;
+}
+body, th, td, input {
+  font: 13px/17px "Lucida Grande", "Lucida Sans Unicode", Arial, Verdana, sans-serif;
+}
+a:link, a:visited {
+  color: #00688f;
+  text-decoration: underline;
+}
+a:hover, a:active {
+  color: #000;
+  border: 0;
+}
+h1 {
+  font: 170% "Trebuchet MS", Georgia, serif;
+  font-weight: bold;
+  color: #6b0c6a;
+  margin: 15px 0 5px 0;
+}
+h2 {
+  font: 130% "Trebuchet MS", Georgia, serif;
+  font-weight: bold;
+  color: #db0048;
+  margin: 50px 0 5px 0;
+    padding: 0 0 3px 0;
+    border-bottom: 1px solid #ccc;
+}
+.warning {
+  background: #fffedf;
+  padding: 8px;
+  border: 1px dashed #ccc;
+  border-radius: 4px;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  font-size: 90%;
+}
+.subtle {
+  color: #999;
+}
+</style>
+</head>
+<body>
+
+<div id="wrapper">
+
+<h1><img style="float: right; margin: 0 0 10px 10px" src="images/package.png" alt=""> CommandBook ${version}</h1>
+<p>Thanks for downloading CommandBook!</p>
+<h2>First Steps</h2>
+
+<p>Now, to begin, you want to:</p>
+<ol>
+  <li><strong>Install the plugin:</strong> Copy CommandBook.jar into your Bukkit server's &quot;plugins&quot; directory. If the folder doesn't exist, create it.</li>
+  <li><strong>Change the configuration:</strong> Run your server once (with CommandBook) and then edit the config.yml file that is generated inside &quot;plugins/CommandBook&quot;. Use <em>/cmdbook reload</em> in the console to reload the configuration.</li>
+  <li><strong>Setup permissions:</strong> Visit the <a href="http://wiki.sk89q.com/wiki/CommandBook">CommandBook wiki</a> to learn the permissions (and commands).</li>
+</ol>
+<p class="warning"><strong>Gotcha:</strong> You need to have <a href="http://www.sk89q.com/projects/worldedit/">WorldEdit</a> installed! It's used by CommandBook in a number of places. If you don't want to install the plugin, that's okay &mdash; just put WorldEdit.jar into your Bukkit root folder (outside of plugins/) and CommandBook will still be able use it.</p>
+<p>Be sure to:</p>
+<ul>
+  <li>Subscribe to <a href="http://minecraftnews.sk89q.com/">SK's Minecraft blog</a> for news about CommandBook</li>
+  <li>Submit bug reports and suggestions to the <a href="http://redmine.sk89q.com/projects/commandbook/issues">issue tracker</a></li>
+  <li>Check out the <a href="http://wiki.sk89q.com/wiki/CommandBook">CommandBook wiki</a></li>
+</ul>
+<h2>Advanced Usage</h2>
+<p>CommandBook is pretty simple (<strong>/time dawn</strong> will do what you expect), but there is a lot more under the hood to discover. For example, there's no <strong>/teleport-to-coordinates</strong> command, but <strong>/tp</strong> takes something called a &quot;location.&quot; Most other plugins simply assume that a location can <em>only</em> be a player name but CommandBook is smarter. A location can also mean the world's spawn location or a coordinate, so why limit yourself? Try these:</p>
+<ul>
+  <li>/tp 0,0,0</li>
+  <li>/tp #spawn</li>
+  </ul>
+<p><em>All</em> commands that use a location all use the same location processing, so #spawn will work for <em>every command</em> that takes a location. Cool, right?</p>
+<p>In a similar vein, commands that take a target  have advanced target processing code, giving you the ability to use crazy tricks like <strong>/rocket #near</strong> to rocket everyone near you (yourself included)!</p>
+<h2>Want to make CommandBook better?</h2>
+<p>CommandBook is entirely open source! You can download all of the plugin code to learn from it, modify it for your own self, or even contribute back!</p>
+<ul>
+  <li><a href="https://github.com/sk89q/commandbook">Download CommandBook code from GitHub</a></li>
+  <li>You can also <a href="http://www.sk89q.com/donate/">donate</a></li>
+  </ul>
+<p>The code is covered under the GNU General Public License v3.</p>
+<p class="subtle">Maven information: ${groupId}/${artifactId}/${version}</p>
+</div>
+</body>
+</html>
