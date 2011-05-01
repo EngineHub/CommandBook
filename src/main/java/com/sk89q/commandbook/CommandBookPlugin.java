@@ -284,7 +284,7 @@ public class CommandBookPlugin extends JavaPlugin {
         consoleSayFormat = config.getString("console-say-format", "<`r*Console`w> %s");
         broadcastFormat = config.getString("broadcast-format", "`r[Broadcast] %s");
         defaultItemStackSize = config.getInt("default-item-stack-size", 1);
-        exactSpawn = config.getBoolean("exact-spawn", true);
+        exactSpawn = config.getBoolean("exact-spawn", false);
     }
     
     /**
