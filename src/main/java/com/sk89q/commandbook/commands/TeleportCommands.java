@@ -64,6 +64,8 @@ public class TeleportCommands {
         }
 
         for (Player player : targets) {
+            Location oldLoc = player.getLocation();
+            
             player.teleport(loc);
             
             // Tell the user
@@ -73,9 +75,14 @@ public class TeleportCommands {
                 // Keep track of this
                 included = true;
             } else {
-                player.sendMessage(ChatColor.YELLOW + "You've been teleported by "
-                        + plugin.toName(sender) + ".");
-                
+                if (oldLoc.getWorld().equals(loc.getWorld())) {
+                    player.sendMessage(ChatColor.YELLOW + "You've been teleported by "
+                            + plugin.toName(sender) + ".");
+                } else {
+                    player.sendMessage(ChatColor.YELLOW + "You've been teleported by "
+                            + plugin.toName(sender) + " to world '"
+                            + loc.getWorld().getName() + "'.");
+                }
             }
         }
         
@@ -133,6 +140,8 @@ public class TeleportCommands {
         boolean included = false;
 
         for (Player player : targets) {
+            Location oldLoc = player.getLocation();
+            
             player.teleport(loc);
             
             // Tell the user
@@ -142,9 +151,14 @@ public class TeleportCommands {
                 // Keep track of this
                 included = true;
             } else {
-                player.sendMessage(ChatColor.YELLOW + "You've been teleported by "
-                        + plugin.toName(sender) + ".");
-                
+                if (oldLoc.getWorld().equals(loc.getWorld())) {
+                    player.sendMessage(ChatColor.YELLOW + "You've been teleported by "
+                            + plugin.toName(sender) + ".");
+                } else {
+                    player.sendMessage(ChatColor.YELLOW + "You've been teleported by "
+                            + plugin.toName(sender) + " to world '"
+                            + loc.getWorld().getName() + "'.");
+                }
             }
         }
         
@@ -167,6 +181,8 @@ public class TeleportCommands {
         boolean included = false;
 
         for (Player player : targets) {
+            Location oldLoc = player.getLocation();
+            
             Location playerLoc = player.getLocation();
             loc.setPitch(playerLoc.getPitch());
             loc.setYaw(playerLoc.getYaw());
@@ -179,9 +195,14 @@ public class TeleportCommands {
                 // Keep track of this
                 included = true;
             } else {
-                player.sendMessage(ChatColor.YELLOW + "You've been teleported by "
-                        + plugin.toName(sender) + ".");
-                
+                if (oldLoc.getWorld().equals(loc.getWorld())) {
+                    player.sendMessage(ChatColor.YELLOW + "You've been teleported by "
+                            + plugin.toName(sender) + ".");
+                } else {
+                    player.sendMessage(ChatColor.YELLOW + "You've been teleported by "
+                            + plugin.toName(sender) + " to world '"
+                            + loc.getWorld().getName() + "'.");
+                }
             }
         }
         
