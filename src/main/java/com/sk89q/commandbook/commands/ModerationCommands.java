@@ -21,7 +21,6 @@ package com.sk89q.commandbook.commands;
 import static com.sk89q.commandbook.CommandBookUtil.replaceColorMacros;
 import java.util.logging.Logger;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import com.sk89q.commandbook.CommandBookPlugin;
