@@ -1,0 +1,23 @@
+# Give ops all permissions
+op-permissions: true
+use-display-names: true
+online-on-join: true
+motd: |
+    Hello, `Y%name%`w.
+    The time now is `Y%time%`w and you're in world '%world%'.
+    `2This is the default CommandBook MOTD! Adjust it in config.yml.
+    `2See `bhttp://wiki.sk89q.com/wiki/CommandBook`2 for more configuration information and help!
+rules: |
+    - Be courteous and respect others.
+    - Don't use any tools to give you an unfair advantage.
+    `2This is the default CommandBook rules text! You can adjust it in config.yml.
+disallowed-items: []
+allowed-items: []
+item-names:
+    goldblock: 41
+    ice: 79
+# Makes /time and /weather broadcast a message
+broadcast-changes: true
+console-say-format: "<`r*Console`w> %s"
+broadcast-format: "`r[Broadcast] %s"
+default-item-stack-size: 1

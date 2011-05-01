@@ -1,6 +1,6 @@
 name: CommandBook
 main: com.sk89q.commandbook.CommandBookPlugin
-version: __VERSION_MACRO__
+version: "${project.version}"
 commands:
     cmdbook:
         description: CommandBook commands
