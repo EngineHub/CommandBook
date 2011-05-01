@@ -21,6 +21,7 @@ package com.sk89q.commandbook;
 
 import static com.sk89q.commandbook.CommandBookUtil.replaceColorMacros;
 import static com.sk89q.commandbook.CommandBookUtil.sendMessage;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -44,7 +45,7 @@ import com.sk89q.commandbook.events.OnlineListSendEvent;
  * @author sk89q
  */
 public class CommandBookPlayerListener extends PlayerListener {
-    
+    protected static final Logger logger = Logger.getLogger("Minecraft.CommandBook");
     protected final static Pattern namePattern = Pattern.compile(
             "^[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_]{1,16}$");
     
@@ -67,6 +68,8 @@ public class CommandBookPlayerListener extends PlayerListener {
         Player player = event.getPlayer();
         
         if (plugin.verifyNameFormat && !namePattern.matcher(player.getName()).matches()) {
+            logger.info("Name verification: " + player.getName() + " was kicked " +
+            		"for having an invalid name (to disable, turn off verify-name-format in CommandBook)");
             event.disallow(Result.KICK_OTHER, "Invalid player name detected!");
             return;
         }
