@@ -2,6 +2,7 @@
 op-permissions: true
 use-display-names: true
 online-on-join: true
+verify-name-format: true
 motd: |
     Hello, `Y%name%`w.
     The time now is `Y%time%`w and you're in world '%world%'.
