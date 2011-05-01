@@ -471,13 +471,14 @@ public class GeneralCommands {
     
     @Command(aliases = {"clear"},
             usage = "[target]", desc = "Clear your inventory",
-            flags = "a", min = 0, max = 1)
+            flags = "as", min = 0, max = 1)
     @CommandPermissions({"commandbook.clear"})
     public static void clear(CommandContext args, CommandBookPlugin plugin,
             CommandSender sender) throws CommandException {
         
         Iterable<Player> targets = null;
         boolean clearAll = args.hasFlag('a');
+        boolean clearSingle = args.hasFlag('s');
         boolean included = false;
         
         if (args.argsLength() == 0) {
@@ -493,14 +494,18 @@ public class GeneralCommands {
         for (Player player : targets) {
             Inventory inventory = player.getInventory();
             
-            for (int i = (clearAll ? 0 : 9); i < 36; i++) {
-                inventory.setItem(i, null);
-            }
-            
-            if (clearAll) {
-                // Armor slots
-                for (int i = 36; i <= 39; i++) {
+            if (clearSingle) {
+                player.setItemInHand(null);
+            } else {
+                for (int i = (clearAll ? 0 : 9); i < 36; i++) {
                     inventory.setItem(i, null);
+                }
+                
+                if (clearAll) {
+                    // Armor slots
+                    for (int i = 36; i <= 39; i++) {
+                        inventory.setItem(i, null);
+                    }
                 }
             }
         
