@@ -23,3 +23,4 @@ broadcast-changes: true
 console-say-format: "<`r*Console`w> %s"
 broadcast-format: "`r[Broadcast] %s"
 default-item-stack-size: 1
+exact-spawn: true

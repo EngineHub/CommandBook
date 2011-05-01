@@ -112,6 +112,7 @@ public class CommandBookPlugin extends JavaPlugin {
     public String consoleSayFormat;
     public String broadcastFormat;
     public int defaultItemStackSize;
+    public boolean exactSpawn;
 
     protected Map<String, String> messages = new HashMap<String, String>();
     protected Map<String, UserSession> sessions =
@@ -193,6 +194,7 @@ public class CommandBookPlugin extends JavaPlugin {
         registerEvent(Event.Type.PLAYER_INTERACT, playerListener);
         registerEvent(Event.Type.PLAYER_QUIT, playerListener);
         registerEvent(Event.Type.PLAYER_CHAT, playerListener);
+        registerEvent(Event.Type.PLAYER_RESPAWN, playerListener);
     }
 
     /**
@@ -282,6 +284,7 @@ public class CommandBookPlugin extends JavaPlugin {
         consoleSayFormat = config.getString("console-say-format", "<`r*Console`w> %s");
         broadcastFormat = config.getString("broadcast-format", "`r[Broadcast] %s");
         defaultItemStackSize = config.getInt("default-item-stack-size", 1);
+        exactSpawn = config.getBoolean("exact-spawn", true);
     }
     
     /**

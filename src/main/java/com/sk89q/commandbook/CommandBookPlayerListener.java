@@ -32,6 +32,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.event.player.PlayerQuitEvent;
 import com.sk89q.commandbook.events.MOTDSendEvent;
@@ -124,6 +125,18 @@ public class CommandBookPlayerListener extends PlayerListener {
             
             CommandBookUtil.sendOnlineList(
                     plugin.getServer().getOnlinePlayers(), player);
+        }
+    }
+    
+    /**
+     * Called on player respawn.
+     */
+    @Override
+    public void onPlayerRespawn(PlayerRespawnEvent event) {
+        Player player = event.getPlayer();
+        
+        if (plugin.exactSpawn) {
+            event.setRespawnLocation(player.getWorld().getSpawnLocation());
         }
     }
 
