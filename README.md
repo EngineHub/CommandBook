@@ -9,7 +9,7 @@ Compiling
 You need to have Maven installed (http://maven.apache.org). Once installed,
 simply run:
 
-    mvn package install
+    mvn clean package install
     
 Maven will automatically download dependencies for you. Note: For that to work,
 be sure to add Maven to your "PATH".
