@@ -11,6 +11,8 @@ rules: |
     - Be courteous and respect others.
     - Don't use any tools to give you an unfair advantage.
     `2This is the default CommandBook rules text! You can adjust it in config.yml.
+# Force use of commandbook.items.<id> permissions for allowed/disallowed items
+item-permissions-only: false
 disallowed-items: []
 allowed-items: []
 item-names:

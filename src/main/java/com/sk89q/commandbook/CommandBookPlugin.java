@@ -101,6 +101,7 @@ public class CommandBookPlugin extends JavaPlugin {
     
     public boolean verifyNameFormat;
     public boolean broadcastChanges;
+    public boolean useItemPermissionsOnly;
     public Set<Integer> allowedItems;
     public Set<Integer> disallowedItems;
     public Map<String, Integer> itemNames;
@@ -261,6 +262,7 @@ public class CommandBookPlugin extends JavaPlugin {
         config.load();
         
         // Load item disallow/allow lists
+        useItemPermissionsOnly = config.getBoolean("item-permissions-only", false);
         allowedItems = new HashSet<Integer>(
                 config.getIntList("allowed-items", null));
         disallowedItems = new HashSet<Integer>(
@@ -417,9 +419,17 @@ public class CommandBookPlugin extends JavaPlugin {
             return;
         }
 
+        boolean hasPermissions = hasPermission(sender, "commandbook.items." + id);
+        
         // Also check the permissions system
-        if (hasPermission(sender, "commandbook.items." + id)) {
+        if (hasPermissions) {
             return;
+        }
+        
+        if (useItemPermissionsOnly) {
+            if (!hasPermissions) {
+                throw new CommandException("That item is not allowed.");
+            }
         }
         
         if (allowedItems.size() > 0) {
