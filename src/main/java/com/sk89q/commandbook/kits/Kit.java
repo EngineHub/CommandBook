@@ -29,7 +29,7 @@ import org.bukkit.inventory.ItemStack;
  */
 public class Kit {
     
-    protected LinkedList<ItemStack> items = new LinkedList<ItemStack>();;
+    protected LinkedList<ItemStack> items = new LinkedList<ItemStack>();
     
     /**
      * Add an item to the kit.
@@ -47,7 +47,8 @@ public class Kit {
      */
     public void distribute(Player player) {
         for (ItemStack item : items) {
-            player.getInventory().addItem(item);
+            player.getInventory().addItem(new ItemStack(item.getType(),
+                    item.getAmount(), item.getDurability()));
         }
     }
     
