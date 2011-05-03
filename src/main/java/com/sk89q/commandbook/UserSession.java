@@ -19,7 +19,10 @@
 package com.sk89q.commandbook;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Queue;
+import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import com.sk89q.minecraft.util.commands.CommandException;
@@ -31,6 +34,7 @@ public class UserSession implements PersistentSession {
     private static final int RECONNECT_GRACE = 60000;
     private static final int BRINGABLE_TIME = 300000;
     private static final int TP_REQUEST_WAIT_TIME = 30000;
+    private static final int LOCATION_HISTORY_SIZE = 10;
 
     private long lastUpdate = 0;
     private String lastRecipient = null;
@@ -38,6 +42,7 @@ public class UserSession implements PersistentSession {
     private boolean hasThor = false;
     private Map<String, Long> bringable = new HashMap<String, Long>();
     private Map<String, Long> teleportRequests = new HashMap<String, Long>();
+    private LinkedList<Location> locationHistory = new LinkedList<Location>();
     
     public boolean isRecent() {
         return (System.currentTimeMillis() - lastUpdate) < MAX_AGE;
@@ -109,6 +114,25 @@ public class UserSession implements PersistentSession {
             throw new CommandException("Wait a bit before asking again.");
         }
         teleportRequests.put(target.getName(), now);
+    }
+    
+    public void rememberLocation(Location location) {
+        if (locationHistory.size() > 0 && locationHistory.peek().equals(location)) {
+            return;
+        }
+        
+        locationHistory.add(0, location);
+        while (locationHistory.size() > LOCATION_HISTORY_SIZE) {
+            locationHistory.poll();
+        }
+    }
+    
+    public void rememberLocation(Player player) {
+        rememberLocation(player.getLocation());
+    }
+    
+    public Location popLastLocation() {
+        return locationHistory.poll();
     }
     
 }

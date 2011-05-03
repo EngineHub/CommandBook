@@ -37,6 +37,7 @@ public class TeleportCommands {
         
         Player player = plugin.checkPlayer(sender);
         // Teleport the player!
+        plugin.getSession(player).rememberLocation(player);
         player.teleport(player.getWorld().getSpawnLocation());
     }
     
@@ -65,7 +66,8 @@ public class TeleportCommands {
 
         for (Player player : targets) {
             Location oldLoc = player.getLocation();
-            
+
+            plugin.getSession(player).rememberLocation(player);
             player.teleport(loc);
             
             // Tell the user
@@ -125,6 +127,7 @@ public class TeleportCommands {
                 sender.sendMessage(ChatColor.YELLOW + "Player teleported.");
                 target.sendMessage(ChatColor.YELLOW + "Your teleport request to "
                         + plugin.toName(sender) + " was accepted.");
+                plugin.getSession(target).rememberLocation(target);
                 target.teleport(player);
             } else {
                 throw new CommandException("That person didn't request a " +
@@ -141,7 +144,8 @@ public class TeleportCommands {
 
         for (Player player : targets) {
             Location oldLoc = player.getLocation();
-            
+
+            plugin.getSession(player).rememberLocation(player);
             player.teleport(loc);
             
             // Tell the user
@@ -186,6 +190,7 @@ public class TeleportCommands {
             Location playerLoc = player.getLocation();
             loc.setPitch(playerLoc.getPitch());
             loc.setYaw(playerLoc.getYaw());
+            plugin.getSession(player).rememberLocation(player);
             player.teleport(loc);
             
             // Tell the user
@@ -206,10 +211,26 @@ public class TeleportCommands {
             }
         }
         
-        // The player didn't receive any items, then we need to send the
-        // user a message so s/he know that something is indeed working
         if (!included) {
             sender.sendMessage(ChatColor.YELLOW.toString() + "Players teleported.");
+        }
+    }
+    
+    @Command(aliases = {"return"},
+            usage = "", desc = "Teleport back to your last location",
+            min = 0, max = 0)
+    @CommandPermissions({"commandbook.return"})
+    public static void ret(CommandContext args, CommandBookPlugin plugin,
+            CommandSender sender) throws CommandException {
+        
+        Player player = plugin.checkPlayer(sender);
+        Location lastLoc = plugin.getSession(player).popLastLocation();
+
+        if (lastLoc != null) {
+            player.teleport(lastLoc);
+            sender.sendMessage(ChatColor.YELLOW + "You've been returned.");
+        } else {
+            sender.sendMessage(ChatColor.RED + "There's no past location in your history.");
         }
     }
 }

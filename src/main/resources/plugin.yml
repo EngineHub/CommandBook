@@ -123,6 +123,11 @@ commands:
         description: Teleport to spawn
         usage: /<command>
         _category: teleport
+    return:
+        aliases: ret
+        description: Return back to your last location
+        usage: /<command>
+        _category: teleport
     
     broadcast:
         description: Broadcast a message
