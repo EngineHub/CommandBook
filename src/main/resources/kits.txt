@@ -8,7 +8,11 @@
 # so you can do step:wood if you want. If you want to specify an amount, enter
 # the number after a comma, like "wood,64".
 #
-[starter]
+# If you put <name>=# for a kit, then you can choose a "cool down" period
+# in seconds. Players have to wait that amount of time before they can
+# use that particular kit.
+#
+[starter=20]
 woodpick
 woodaxe
 woodshovel

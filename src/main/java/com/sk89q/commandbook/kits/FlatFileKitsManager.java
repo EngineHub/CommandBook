@@ -28,6 +28,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.bukkit.inventory.ItemStack;
 import com.sk89q.commandbook.CommandBookPlugin;
 
@@ -38,11 +40,13 @@ import com.sk89q.commandbook.CommandBookPlugin;
  */
 public class FlatFileKitsManager implements KitManager {
     
-    protected static final Logger logger = Logger.getLogger("Minecraft.CommandBook");
+    private static final Logger logger = Logger.getLogger("Minecraft.CommandBook");
+    private static final Pattern kitPattern =
+            Pattern.compile("^\\[([^\\]=]+)(?:= *([0-9]+) *)?\\]$");
     
-    protected CommandBookPlugin plugin;
-    protected File file;
-    protected Map<String, Kit> kits = new HashMap<String, Kit>();
+    private CommandBookPlugin plugin;
+    private File file;
+    private Map<String, Kit> kits = new HashMap<String, Kit>();
     
     /**
      * Construct the manager.
@@ -55,7 +59,7 @@ public class FlatFileKitsManager implements KitManager {
         this.file = file;
     }
     
-    public void load() {
+    public synchronized void load() {
         FileInputStream input = null;
         Map<String, Kit> kits = new HashMap<String, Kit>();
         
@@ -76,10 +80,24 @@ public class FlatFileKitsManager implements KitManager {
                 }
                 
                 // Match a kit's name
-                if (line.matches("^\\[[^\\]]+\\]$")) {
-                    String id = line.substring(1, line.length() - 1).trim().toLowerCase();
+                Matcher m = kitPattern.matcher(line);
+                
+                if (m.matches()) {
+                    String id = m.group(1).replace(" ", "").trim().toLowerCase();
                     kit = new Kit();
                     kits.put(id, kit);
+                    
+                    String coolDownTime = m.group(2);
+                    if (coolDownTime != null) {
+                        try {
+                            kit.setCoolDown((long) (Double.parseDouble(coolDownTime) * 1000));
+                        } catch (NumberFormatException e) {
+                            logger.warning("CommandBook: Invalid cool down for "
+                                    + line);
+                            continue;
+                        }
+                    }
+                    
                     continue;
                 }
                 
@@ -91,7 +109,7 @@ public class FlatFileKitsManager implements KitManager {
                 }
                 
                 String[] parts = line.split(",");
-                ItemStack item = plugin.getItem(parts[0]);
+                ItemStack item = plugin.getItem(parts[0].replace(" ", ""));
                 
                 if (item == null) {
                     logger.warning("CommandBook: Unknown kit item '" + item + "'");
@@ -128,12 +146,18 @@ public class FlatFileKitsManager implements KitManager {
         this.kits = kits;
     }
     
-    public Kit getKit(String id) {
+    public synchronized Kit getKit(String id) {
         return kits.get(id.toLowerCase());
     }
 
-    public Map<String, Kit> getKits() {
+    public synchronized Map<String, Kit> getKits() {
         return kits;
+    }
+    
+    public synchronized void flush() {
+        for (Kit kit : kits.values()) {
+            kit.flush();
+        }
     }
     
 }

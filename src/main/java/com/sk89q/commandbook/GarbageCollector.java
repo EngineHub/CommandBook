@@ -14,41 +14,22 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
+*/
 
-package com.sk89q.commandbook.kits;
+package com.sk89q.commandbook;
 
-import java.util.Map;
-
-/**
- * Manager for kits.
- * 
- * @author sk89q
- */
-public interface KitManager {
-
-    /**
-     * Load kits from file.
-     */
-    public void load();
-
-    /**
-     * Get a kit by name.
-     * 
-     * @param id
-     * @return
-     */
-    public Kit getKit(String id);
-
-    /**
-     * Get a list of kits.
-     * 
-     * @return
-     */
-    public Map<String, Kit> getKits();
+public class GarbageCollector implements Runnable {
     
-    /**
-     * Get rid of old information.
-     */
-    public void flush();
+    public static final long CHECK_FREQUENCY = 12000;
+    
+    private CommandBookPlugin plugin;
+    
+    public GarbageCollector(CommandBookPlugin plugin) {
+        this.plugin = plugin;
+    }
+
+    public void run() {
+        plugin.getKitManager().flush();
+    }
+
 }

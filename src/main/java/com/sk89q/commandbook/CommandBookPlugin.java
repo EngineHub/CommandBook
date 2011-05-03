@@ -174,10 +174,13 @@ public class CommandBookPlugin extends JavaPlugin {
         // Register events
         registerEvents();
         
-        // Register a timer for removing sessions every minute
+        // Cleanup
         getServer().getScheduler().scheduleAsyncRepeatingTask(
                 this, new SessionChecker(this),
                 SessionChecker.CHECK_FREQUENCY, SessionChecker.CHECK_FREQUENCY);
+        getServer().getScheduler().scheduleAsyncRepeatingTask(
+                this, new GarbageCollector(this),
+                GarbageCollector.CHECK_FREQUENCY, GarbageCollector.CHECK_FREQUENCY);
 
         // The permissions resolver has some hooks of its own
         (new PermissionsResolverServerListener(perms)).register(this);

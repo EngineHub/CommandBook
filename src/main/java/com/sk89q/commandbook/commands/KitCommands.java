@@ -95,17 +95,25 @@ public class KitCommands {
             plugin.checkPermission(sender, "commandbook.kit.kits." + id.replace(".", ""));
     
             for (Player player : targets) {
-                kit.distribute(player);
+                boolean success = kit.distribute(player);
                 
                 // Tell the user
                 if (player.equals(sender)) {
-                    player.sendMessage(ChatColor.YELLOW + "Kit '" + id + "' given!");
+                    if (success) {
+                        player.sendMessage(ChatColor.YELLOW + "Kit '" + id + "' given!");
+                    } else {
+                        player.sendMessage(ChatColor.RED + "You have to wait before you can get this kit again.");
+                    }
                     
                     included = true;
                 } else {
-                    player.sendMessage(ChatColor.YELLOW + "You've been given " +
-                            "the '" + id + "' kit by "
-                            + plugin.toName(sender) + ".");
+                    if (success) {
+                        player.sendMessage(ChatColor.YELLOW + "You've been given " +
+                                "the '" + id + "' kit by "
+                                + plugin.toName(sender) + ".");
+                    } else {
+                        player.sendMessage(ChatColor.RED + "A kit could not be given to you because it has been too soon.");
+                    }
                     
                 }
             }
