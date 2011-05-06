@@ -461,7 +461,7 @@ public class CommandBookPlugin extends JavaPlugin {
         if (sender instanceof Player) {
             return (Player) sender;
         } else {
-            throw new CommandException("A player is expected.");
+            throw new CommandException("A player context is required. (Specify a world or player if the command supports it.)");
         }
     }
     
