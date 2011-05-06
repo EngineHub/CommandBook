@@ -22,6 +22,7 @@ package com.sk89q.commandbook;
 import java.io.*;
 import java.util.*;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -72,6 +73,12 @@ public class CommandBookPlugin extends JavaPlugin {
      * Logger for messages.
      */
     protected static final Logger logger = Logger.getLogger("Minecraft.CommandBook");
+    
+    /**
+     * Pattern for 12-hour time.
+     */
+    private static final Pattern twelveHourTime
+        = Pattern.compile("^([0-9]+(?::[0-9]+)?)([apmAPM\\.]+)$");
     
     /**
      * Pattern for macros.
@@ -842,6 +849,95 @@ public class CommandBookPlugin extends JavaPlugin {
         }
         
         throw new CommandException("No world by that exact name found.");
+    }
+    
+    /**
+     * Parse a time string.
+     * 
+     * @param timeStr
+     * @return
+     * @throws CommandException
+     */
+    public int matchTime(String timeStr) throws CommandException {
+        Matcher matcher;
+        
+        try {
+            int time = Integer.parseInt(timeStr);
+            
+            // People tend to enter just a number of the hour
+            if (time <= 24) {
+                return ((time - 8) % 24) * 1000;
+            }
+            
+            return time;
+        } catch (NumberFormatException e) {
+            // Not an integer!
+        }
+        
+        // Tick time
+        if (timeStr.matches("^*[0-9]+$")) {
+            return Integer.parseInt(timeStr.substring(1));
+        
+        // Allow 24-hour time
+        } else if (timeStr.matches("^[0-9]+:[0-9]+$")) {
+            String[] parts = timeStr.split(":");
+            int hours = Integer.parseInt(parts[0]);
+            int mins = Integer.parseInt(parts[1]);
+            int n = (int) (((hours - 8) % 24) * 1000
+                + Math.round((mins % 60) / 60.0 * 1000));
+            return n;
+        
+        // Or perhaps 12-hour time
+        } else if ((matcher = twelveHourTime.matcher(timeStr)).matches()) {
+            String time = matcher.group(1);
+            String period = matcher.group(2);
+            int shift = 0;
+            
+            if (period.equalsIgnoreCase("am")
+                    || period.equalsIgnoreCase("a.m.")) {
+                shift = 0;
+            } else if (period.equalsIgnoreCase("pm")
+                    || period.equalsIgnoreCase("p.m.")) {
+                shift = 12;
+            } else {
+                throw new CommandException("'am' or 'pm' expected, got '"
+                        + period + "'.");
+            }
+            
+            String[] parts = time.split(":");
+            int hours = Integer.parseInt(parts[0]);
+            int mins = parts.length >= 2 ? Integer.parseInt(parts[1]) : 0;
+            int n = (int) ((((hours % 12) + shift - 8) % 24) * 1000
+                + (mins % 60) / 60.0 * 1000);
+            return n;
+        
+        // Or some shortcuts
+        } else if (timeStr.equalsIgnoreCase("dawn")) {
+            return (6 - 8 + 24) * 1000;
+        } else if (timeStr.equalsIgnoreCase("sunrise")) {
+            return (7 - 8 + 24) * 1000;
+        } else if (timeStr.equalsIgnoreCase("morning")) {
+            return (8 - 8 + 24) * 1000;
+        } else if (timeStr.equalsIgnoreCase("day")) {
+            return (8 - 8 + 24) * 1000;
+        } else if (timeStr.equalsIgnoreCase("midday")
+                || timeStr.equalsIgnoreCase("noon")) {
+            return (12 - 8 + 24) * 1000;
+        } else if (timeStr.equalsIgnoreCase("afternoon")) {
+            return (14 - 8 + 24) * 1000;
+        } else if (timeStr.equalsIgnoreCase("evening")) {
+            return (16 - 8 + 24) * 1000;
+        } else if (timeStr.equalsIgnoreCase("sunset")) {
+            return (21 - 8 + 24) * 1000;
+        } else if (timeStr.equalsIgnoreCase("dusk")) {
+            return (21 - 8 + 24) * 1000 + (int) (30 / 60.0 * 1000);
+        } else if (timeStr.equalsIgnoreCase("night")) {
+            return (22 - 8 + 24) * 1000;
+        } else if (timeStr.equalsIgnoreCase("midnight")) {
+            return (0 - 8 + 24) * 1000;
+        }
+        
+        throw new CommandException("Time input format unknown.");
     }
     
     /**

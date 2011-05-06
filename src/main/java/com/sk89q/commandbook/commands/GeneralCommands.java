@@ -19,8 +19,6 @@
 
 package com.sk89q.commandbook.commands;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -36,9 +34,6 @@ import com.sk89q.minecraft.util.commands.*;
 import static com.sk89q.commandbook.CommandBookUtil.*;
 
 public class GeneralCommands {
-    
-    private static Pattern twelveHourTime
-        = Pattern.compile("^([0-9]+(?::[0-9]+)?)([apmAPM\\.]+)$");
 
     @Command(aliases = {"cmdbook"}, desc = "CommandBook commands",
             flags = "d", min = 1, max = 3)
@@ -223,78 +218,7 @@ public class GeneralCommands {
 
         if (!onlyLock) {
             plugin.getTimeLockManager().unlock(world);
-            
-            try {
-                int time = Integer.parseInt(timeStr);
-                world.setTime(time);
-            } catch (NumberFormatException e) {
-                Matcher matcher;
-                
-                // Allow 24-hour time
-                if (timeStr.matches("^[0-9]+:[0-9]+$")) {
-                    String[] parts = timeStr.split(":");
-                    int hours = Integer.parseInt(parts[0]);
-                    int mins = Integer.parseInt(parts[1]);
-                    int n = (int) (((hours - 8) % 24) * 1000
-                        + Math.round((mins % 60) / 60.0 * 1000));
-                    world.setTime(n);
-                
-                // Or perhaps 12-hour time
-                } else if ((matcher = twelveHourTime.matcher(timeStr)).matches()) {
-                    String time = matcher.group(1);
-                    String period = matcher.group(2);
-                    int shift = 0;
-                    
-                    if (period.equalsIgnoreCase("am")
-                            || period.equalsIgnoreCase("a.m.")) {
-                        shift = 0;
-                    } else if (period.equalsIgnoreCase("pm")
-                            || period.equalsIgnoreCase("p.m.")) {
-                        shift = 12;
-                    } else {
-                        sender.sendMessage(ChatColor.RED + "'am' or 'pm' expected, got '"
-                                + period + "'.");
-                        return;
-                    }
-                    
-                    String[] parts = time.split(":");
-                    int hours = Integer.parseInt(parts[0]);
-                    int mins = parts.length >= 2 ? Integer.parseInt(parts[1]) : 0;
-                    int n = (int) ((((hours % 12) + shift - 8) % 24) * 1000
-                        + (mins % 60) / 60.0 * 1000);
-                    world.setTime(n);
-                
-                // Or some shortcuts
-                } else if (timeStr.equalsIgnoreCase("dawn")) {
-                    world.setTime((6 - 8 + 24) * 1000);
-                } else if (timeStr.equalsIgnoreCase("sunrise")) {
-                    world.setTime((7 - 8 + 24) * 1000);
-                } else if (timeStr.equalsIgnoreCase("morning")) {
-                    world.setTime((8 - 8 + 24) * 1000);
-                } else if (timeStr.equalsIgnoreCase("day")) {
-                    world.setTime((8 - 8 + 24) * 1000);
-                } else if (timeStr.equalsIgnoreCase("midday")
-                        || timeStr.equalsIgnoreCase("noon")) {
-                    world.setTime((12 - 8 + 24) * 1000);
-                } else if (timeStr.equalsIgnoreCase("afternoon")) {
-                    world.setTime((14 - 8 + 24) * 1000);
-                } else if (timeStr.equalsIgnoreCase("evening")) {
-                    world.setTime((16 - 8 + 24) * 1000);
-                } else if (timeStr.equalsIgnoreCase("sunset")) {
-                    world.setTime((21 - 8 + 24) * 1000);
-                } else if (timeStr.equalsIgnoreCase("dusk")) {
-                    world.setTime((21 - 8 + 24) * 1000 + (int) (30 / 60.0 * 1000));
-                } else if (timeStr.equalsIgnoreCase("night")) {
-                    world.setTime((22 - 8 + 24) * 1000);
-                } else if (timeStr.equalsIgnoreCase("midnight")) {
-                    world.setTime((0 - 8 + 24) * 1000);
-               
-                // Nothing found!
-                } else {
-                    sender.sendMessage(ChatColor.RED + "Time input format unknown.");
-                    return;
-                }
-            }
+            world.setTime(plugin.matchTime(timeStr));
         }
         
         String verb = "set";
