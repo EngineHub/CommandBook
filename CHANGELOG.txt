@@ -1,3 +1,25 @@
+1.5:
+- Fixed kits dwindling in size.
+- Added kit cooldowns. Put [kitname=#] where # is in seconds.
+- Added /return and /ret to teleport to your last location.
+- Fixed /more not expanding stacks of certain items.
+- Improved the player context error message.
+- Added world arguments to #spawn and x,y,z locations.
+    Example: /spawnmob Pig 1 0,64,50:#main
+- /time with an integer <= 24 will now assume that the integer represents an
+    hour, rather than a tick. Ticks can still be specified explicitly
+    with *<ticks>.
+- Added time lock setting that lets you lock a world's time on server load.
+-  Added online list display options.
+- Brought over the MIDI playing stuff I wrote for my server in February.
+    Tip: MIDI files should not be complex and should not rely on sustained
+    notes (as those can't be played in Minecraft correctly). High and low
+    notes will not play correctly.
+- New intro music: put intro.mid into plugins/CommandBook to have your server
+    play a MIDI file when a player joins. Use /intro to replay the music.
+- New /midi and /play to play a MIDI file in a plugins/CommandBook/midi/
+    directory (or midi/ as well).
+
 1.4.3:
 - Added tip about /clear -a when using /clear.
 - Added /clear -s to clear a single slot only.
