@@ -1,3 +1,6 @@
+1.5.1:
+- Fixed a bug with the JingleNote Manager.
+
 1.5:
 - Fixed kits dwindling in size.
 - Added kit cooldowns. Put [kitname=#] where # is in seconds.
