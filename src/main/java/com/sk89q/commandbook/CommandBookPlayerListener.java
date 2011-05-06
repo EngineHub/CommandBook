@@ -21,8 +21,14 @@ package com.sk89q.commandbook;
 
 import static com.sk89q.commandbook.CommandBookUtil.replaceColorMacros;
 import static com.sk89q.commandbook.CommandBookUtil.sendMessage;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import javax.sound.midi.InvalidMidiDataException;
+import javax.sound.midi.MidiUnavailableException;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -38,6 +44,7 @@ import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.event.player.PlayerQuitEvent;
 import com.sk89q.commandbook.events.MOTDSendEvent;
 import com.sk89q.commandbook.events.OnlineListSendEvent;
+import com.sk89q.jinglenote.MidiJingleSequencer;
 
 /**
  * Handler for player events.
@@ -128,6 +135,23 @@ public class CommandBookPlayerListener extends PlayerListener {
             
             CommandBookUtil.sendOnlineList(
                     plugin.getServer().getOnlinePlayers(), player, plugin);
+        }
+
+        try {
+            MidiJingleSequencer sequencer = new MidiJingleSequencer(
+                    new File(plugin.getDataFolder(), "intro.mid"));
+            plugin.getJingleNoteManager().play(player, sequencer, 2000);
+        } catch (MidiUnavailableException e) {
+            logger.log(Level.WARNING, "CommandBook: Failed to access MIDI: "
+                    + e.getMessage());
+        } catch (InvalidMidiDataException e) {
+            logger.log(Level.WARNING, "CommandBook: Failed to read intro MIDI file: "
+                    + e.getMessage());
+        } catch (FileNotFoundException e) {
+            logger.info("CommandBook: No intro.mid; not playing intro song.");
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "CommandBook: Failed to read intro MIDI file: "
+                    + e.getMessage());
         }
     }
     

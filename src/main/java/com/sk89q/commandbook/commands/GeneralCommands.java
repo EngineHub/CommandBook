@@ -19,6 +19,11 @@
 
 package com.sk89q.commandbook.commands;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import javax.sound.midi.InvalidMidiDataException;
+import javax.sound.midi.MidiUnavailableException;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -30,6 +35,7 @@ import com.sk89q.commandbook.CommandBookPlugin;
 import com.sk89q.commandbook.CommandBookUtil;
 import com.sk89q.commandbook.events.MOTDSendEvent;
 import com.sk89q.commandbook.events.OnlineListSendEvent;
+import com.sk89q.jinglenote.MidiJingleSequencer;
 import com.sk89q.minecraft.util.commands.*;
 import static com.sk89q.commandbook.CommandBookUtil.*;
 
@@ -264,6 +270,97 @@ public class GeneralCommands {
                     replaceColorMacros(
                     plugin.replaceMacros(
                     sender, motd)));
+        }
+    }
+    
+    @Command(aliases = {"intro"},
+            usage = "", desc = "Play the introduction song",
+            min = 0, max = 0)
+    @CommandPermissions({"commandbook.intro"})
+    public static void intro(CommandContext args, CommandBookPlugin plugin,
+            CommandSender sender) throws CommandException {
+
+        Player player = plugin.checkPlayer(sender);
+
+        try {
+            MidiJingleSequencer sequencer = new MidiJingleSequencer(
+                    new File(plugin.getDataFolder(), "intro.mid"));
+            plugin.getJingleNoteManager().play(player, sequencer, 0);
+            sender.sendMessage(ChatColor.YELLOW + "Playing intro.midi...");
+        } catch (MidiUnavailableException e) {
+            throw new CommandException("Failed to access MIDI: "
+                    + e.getMessage());
+        } catch (InvalidMidiDataException e) {
+            throw new CommandException("Failed to read intro MIDI file: "
+                    + e.getMessage());
+        } catch (FileNotFoundException e) {
+            throw new CommandException("No intro.mid is available.");
+        } catch (IOException e) {
+            throw new CommandException("Failed to read intro MIDI file: "
+                    + e.getMessage());
+        }
+    }
+    
+    @Command(aliases = {"midi"},
+            usage = "[midi]", desc = "Play a MIDI file",
+            min = 0, max = 1)
+    public static void midi(CommandContext args, CommandBookPlugin plugin,
+            CommandSender sender) throws CommandException {
+
+        Player player = plugin.checkPlayer(sender);
+        
+        if (args.argsLength() == 0) {
+            plugin.getJingleNoteManager().stop(player);
+            sender.sendMessage(ChatColor.YELLOW + "All music stopped.");
+            return;
+        }
+        
+        plugin.checkPermission(sender, "commandbook.midi");
+        
+        String filename = args.getString(0);
+        
+        if (!filename.matches("^[A-Za-z0-9 \\-_\\.~\\[\\]\\(\\$),]+$")) {
+            throw new CommandException("Invalid filename specified!");
+        }
+        
+        File[] trialPaths = {
+                new File(plugin.getDataFolder(), "midi/" + filename),
+                new File(plugin.getDataFolder(), "midi/" + filename + ".mid"),
+                new File(plugin.getDataFolder(), "midi/" + filename + ".midi"),
+                new File("midi", filename),
+                new File("midi", filename + ".mid"),
+                new File("midi", filename + ".midi"),
+                };
+        
+        File file = null;
+        
+        for (File f : trialPaths) {
+            if (f.exists()) {
+                file = f;
+                break;
+            }
+        }
+        
+        if (file == null) {
+            throw new CommandException("The specified MIDI file was not found.");
+        }
+        
+        try {
+            MidiJingleSequencer sequencer = new MidiJingleSequencer(file);
+            plugin.getJingleNoteManager().play(player, sequencer, 0);
+            sender.sendMessage(ChatColor.YELLOW + "Playing " + file.getName()
+                    + "... Use '/midi' to stop.");
+        } catch (MidiUnavailableException e) {
+            throw new CommandException("Failed to access MIDI: "
+                    + e.getMessage());
+        } catch (InvalidMidiDataException e) {
+            throw new CommandException("Failed to read intro MIDI file: "
+                    + e.getMessage());
+        } catch (FileNotFoundException e) {
+            throw new CommandException("The specified MIDI file was not found.");
+        } catch (IOException e) {
+            throw new CommandException("Failed to read intro MIDI file: "
+                    + e.getMessage());
         }
     }
     

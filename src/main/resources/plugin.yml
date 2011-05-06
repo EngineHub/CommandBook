@@ -20,6 +20,13 @@ commands:
     motd:
         description: Show the message of the day
         usage: /<command>
+    intro:
+        description: Replay the intro music
+        usage: /<command>
+    midi:
+        aliases: play
+        description: Play a MIDI file
+        usage: /<command> [midi]
     rules:
         description: Show the rules
         usage: /<command>

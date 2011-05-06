@@ -56,6 +56,7 @@ import com.sk89q.commandbook.commands.ModerationCommands;
 import com.sk89q.commandbook.commands.TeleportCommands;
 import com.sk89q.commandbook.kits.FlatFileKitsManager;
 import com.sk89q.commandbook.kits.KitManager;
+import com.sk89q.jinglenote.JingleNoteManager;
 import com.sk89q.minecraft.util.commands.*;
 import com.sk89q.worldedit.blocks.BlockID;
 import com.sk89q.worldedit.blocks.BlockType;
@@ -106,6 +107,11 @@ public class CommandBookPlugin extends JavaPlugin {
      * Time lock manager.
      */
     protected TimeLockManager timeLockManager;
+    
+    /**
+     * Jingle note manager.
+     */
+    protected JingleNoteManager jingleNoteManager;
     
     public boolean verifyNameFormat;
     public boolean broadcastChanges;
@@ -161,6 +167,9 @@ public class CommandBookPlugin extends JavaPlugin {
         // Setup kits
         kits = new FlatFileKitsManager(new File(getDataFolder(), "kits.txt"), this);
         kits.load();
+        
+        // Jingle note manager
+        jingleNoteManager = new JingleNoteManager();
         
         // Prepare permissions
         perms = new PermissionsResolverManager(
@@ -1284,6 +1293,15 @@ public class CommandBookPlugin extends JavaPlugin {
      */
     public Map<String, Integer> getLockedTimes() {
         return lockedTimes;
+    }
+    
+    /**
+     * Get the jingle note manager.
+     * 
+     * @return
+     */
+    public JingleNoteManager getJingleNoteManager() {
+        return jingleNoteManager;
     }
     
     /**
