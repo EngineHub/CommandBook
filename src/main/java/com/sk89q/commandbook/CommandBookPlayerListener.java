@@ -204,6 +204,7 @@ public class CommandBookPlayerListener extends PlayerListener {
     public void onPlayerQuit(PlayerQuitEvent event) {
         plugin.getSession(event.getPlayer()).handleDisconnect();
         plugin.getAdminSession(event.getPlayer()).handleDisconnect();
+        plugin.getJingleNoteManager().stop(event.getPlayer());
     }
     
 }
