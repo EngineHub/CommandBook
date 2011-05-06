@@ -714,10 +714,11 @@ public class CommandBookPlugin extends JavaPlugin {
             throws CommandException {
 
         // Handle coordinates
-        if (filter.matches("^[\\-0-9\\.]+,[\\-0-9\\.]+,[\\-0-9\\.]+$")) {
+        if (filter.matches("^[\\-0-9\\.]+,[\\-0-9\\.]+,[\\-0-9\\.]+(?:.+)?$")) {
             checkPermission(source, "commandbook.locations.coords");
             
-            String[] parts = filter.split(",");
+            String[] args = filter.split(":");
+            String[] parts = args[0].split(",");
             double x, y, z;
             
             try {
@@ -728,22 +729,31 @@ public class CommandBookPlugin extends JavaPlugin {
                 throw new CommandException("Coordinates expected numbers!");
             }
 
-            Player player = checkPlayer(source);
-            return new Location(player.getWorld(), x, y, z);
+            if (args.length > 1) {
+                return new Location(matchWorld(source, args[1]), x, y, z);
+            } else {
+                Player player = checkPlayer(source);
+                return new Location(player.getWorld(), x, y, z);
+            }
             
         // Handle special hash tag groups
         } else if (filter.charAt(0) == '#') {
             checkPermission(source, "commandbook.spawn");
+            
+            String[] args = filter.split(":");
 
             // Handle #world, which matches player of the same world as the
             // calling source
-            if (filter.equalsIgnoreCase("#spawn")) {
-                Player sourcePlayer = checkPlayer(source);
-
-                return sourcePlayer.getLocation().getWorld().getSpawnLocation();
+            if (args[0].equalsIgnoreCase("#spawn")) {
+                if (args.length > 1) {
+                    return matchWorld(source, args[1]).getSpawnLocation();
+                } else {
+                    Player sourcePlayer = checkPlayer(source);
+                    return sourcePlayer.getLocation().getWorld().getSpawnLocation();
+                }
 
             // Handle #target, which matches the player's target position
-            } else if (filter.equalsIgnoreCase("#target")) {
+            } else if (args[0].equalsIgnoreCase("#target")) {
                 Player player = checkPlayer(source);
                 Location playerLoc = player.getLocation();
                 Block targetBlock = player.getTargetBlock(null, 100);
