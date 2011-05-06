@@ -380,8 +380,7 @@ public class CommandBookUtil {
             return;
         }
         
-        if (ItemType.shouldNotStack(item.getTypeId())
-                || ItemType.usesDamageValue(item.getTypeId())) {
+        if (ItemType.shouldNotStack(item.getTypeId())) {
             return;
         }
         
