@@ -24,82 +24,88 @@ import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import com.sk89q.commandbook.CommandBookPlugin;
+import com.sk89q.commandbook.util.PlayerIteratorAction;
+import com.sk89q.commandbook.util.TeleportPlayerIterator;
 import com.sk89q.minecraft.util.commands.*;
 
 public class TeleportCommands {
     
     @Command(aliases = {"spawn"},
             usage = "[player]", desc = "Teleport to spawn",
-            min = 0, max = 0)
+            min = 0, max = 1)
     @CommandPermissions({"commandbook.spawn"})
-    public static void spawn(CommandContext args, CommandBookPlugin plugin,
+    public static void spawn(CommandContext args, final CommandBookPlugin plugin,
             CommandSender sender) throws CommandException {
+
+        Iterable<Player> targets = null;
         
-        Player player = plugin.checkPlayer(sender);
-        // Teleport the player!
-        plugin.getSession(player).rememberLocation(player);
-        player.teleport(player.getWorld().getSpawnLocation());
+        // Detect arguments based on the number of arguments provided
+        if (args.argsLength() == 1) {
+            targets = plugin.matchPlayers(sender, args.getString(0));
+            
+            // Check permissions!
+            plugin.checkPermission(sender, "commandbook.spawn.other");
+        } else {
+            targets = plugin.matchPlayers(plugin.checkPlayer(sender));
+        }
+        
+        (new PlayerIteratorAction(plugin, sender) {
+            
+            @Override
+            public void perform(Player player) {
+                player.teleport(player.getWorld().getSpawnLocation());
+            }
+            
+            @Override
+            public void onCaller(Player player) {
+                player.sendMessage(ChatColor.YELLOW + "Teleported to spawn.");
+            }
+            
+            @Override
+            public void onVictim(CommandSender sender, Player player) {
+                player.sendMessage(ChatColor.YELLOW + "Teleported to spawn by "
+                        + plugin.toName(sender) + ".");
+            }
+            
+            @Override
+            public void onInformMany(CommandSender sender, int affected) {
+                sender.sendMessage(ChatColor.YELLOW.toString()
+                        + affected + " teleported to spawn.");
+            }
+            
+        }).iterate(targets);
     }
     
     @Command(aliases = {"teleport"},
             usage = "[target] <destination>", desc = "Teleport to a location",
             min = 1, max = 2)
     @CommandPermissions({"commandbook.teleport"})
-    public static void teleport(CommandContext args, CommandBookPlugin plugin,
+    public static void teleport(CommandContext args, final CommandBookPlugin plugin,
             CommandSender sender) throws CommandException {
 
         Iterable<Player> targets = null;
-        Location loc = null;
-        boolean included = false;
+        final Location loc;
         
         // Detect arguments based on the number of arguments provided
         if (args.argsLength() == 1) {
             targets = plugin.matchPlayers(plugin.checkPlayer(sender));
             loc = plugin.matchLocation(sender, args.getString(0));
-        } else if (args.argsLength() == 2) {            
+        } else {            
             targets = plugin.matchPlayers(sender, args.getString(0));
             loc = plugin.matchLocation(sender, args.getString(1));
             
             // Check permissions!
             plugin.checkPermission(sender, "commandbook.teleport.other");
         }
-
-        for (Player player : targets) {
-            Location oldLoc = player.getLocation();
-
-            plugin.getSession(player).rememberLocation(player);
-            player.teleport(loc);
-            
-            // Tell the user
-            if (player.equals(sender)) {
-                player.sendMessage(ChatColor.YELLOW + "Teleported!");
-                
-                // Keep track of this
-                included = true;
-            } else {
-                if (oldLoc.getWorld().equals(loc.getWorld())) {
-                    player.sendMessage(ChatColor.YELLOW + "You've been teleported by "
-                            + plugin.toName(sender) + ".");
-                } else {
-                    player.sendMessage(ChatColor.YELLOW + "You've been teleported by "
-                            + plugin.toName(sender) + " to world '"
-                            + loc.getWorld().getName() + "'.");
-                }
-            }
-        }
         
-        // The player didn't receive any items, then we need to send the
-        // user a message so s/he know that something is indeed working
-        if (!included) {
-            sender.sendMessage(ChatColor.YELLOW.toString() + "Players teleported.");
-        }
+        (new TeleportPlayerIterator(plugin, sender, loc)).iterate(targets);
     }
     
     @Command(aliases = {"call"},
             usage = "<target>", desc = "Request a teleport",
             min = 1, max = 1)
     @CommandPermissions({"commandbook.call"})
-    public static void requestTeleport(CommandContext args, CommandBookPlugin plugin,
+    public static void requestTeleport(CommandContext args, final CommandBookPlugin plugin,
             CommandSender sender) throws CommandException {
 
         Player player = plugin.checkPlayer(sender);
@@ -116,7 +122,7 @@ public class TeleportCommands {
     @Command(aliases = {"bring"},
             usage = "<target>", desc = "Bring a player to you",
             min = 1, max = 1)
-    public static void bring(CommandContext args, CommandBookPlugin plugin,
+    public static void bring(CommandContext args, final CommandBookPlugin plugin,
             CommandSender sender) throws CommandException {
         
         if (!plugin.hasPermission(sender, "commandbook.teleport.other")) {
@@ -140,87 +146,40 @@ public class TeleportCommands {
 
         Iterable<Player> targets = plugin.matchPlayers(sender, args.getString(0));
         Location loc = plugin.checkPlayer(sender).getLocation();
-        boolean included = false;
-
-        for (Player player : targets) {
-            Location oldLoc = player.getLocation();
-
-            plugin.getSession(player).rememberLocation(player);
-            player.teleport(loc);
-            
-            // Tell the user
-            if (player.equals(sender)) {
-                player.sendMessage(ChatColor.YELLOW + "Teleported!");
-                
-                // Keep track of this
-                included = true;
-            } else {
-                if (oldLoc.getWorld().equals(loc.getWorld())) {
-                    player.sendMessage(ChatColor.YELLOW + "You've been teleported by "
-                            + plugin.toName(sender) + ".");
-                } else {
-                    player.sendMessage(ChatColor.YELLOW + "You've been teleported by "
-                            + plugin.toName(sender) + " to world '"
-                            + loc.getWorld().getName() + "'.");
-                }
-            }
-        }
         
-        // The player didn't receive any items, then we need to send the
-        // user a message so s/he know that something is indeed working
-        if (!included) {
-            sender.sendMessage(ChatColor.YELLOW.toString() + "Players teleported.");
-        }
+        (new TeleportPlayerIterator(plugin, sender, loc)).iterate(targets);
     }
     
     @Command(aliases = {"put"},
             usage = "<target>", desc = "Put a player at where you are looking",
             min = 1, max = 1)
     @CommandPermissions({"commandbook.teleport.other"})
-    public static void put(CommandContext args, CommandBookPlugin plugin,
+    public static void put(CommandContext args, final CommandBookPlugin plugin,
             CommandSender sender) throws CommandException {
 
         Iterable<Player> targets = plugin.matchPlayers(sender, args.getString(0));
         Location loc = plugin.matchLocation(sender, "#target");
-        boolean included = false;
-
-        for (Player player : targets) {
-            Location oldLoc = player.getLocation();
-            
-            Location playerLoc = player.getLocation();
-            loc.setPitch(playerLoc.getPitch());
-            loc.setYaw(playerLoc.getYaw());
-            plugin.getSession(player).rememberLocation(player);
-            player.teleport(loc);
-            
-            // Tell the user
-            if (player.equals(sender)) {
-                player.sendMessage(ChatColor.YELLOW + "Teleported!");
-                
-                // Keep track of this
-                included = true;
-            } else {
-                if (oldLoc.getWorld().equals(loc.getWorld())) {
-                    player.sendMessage(ChatColor.YELLOW + "You've been teleported by "
-                            + plugin.toName(sender) + ".");
-                } else {
-                    player.sendMessage(ChatColor.YELLOW + "You've been teleported by "
-                            + plugin.toName(sender) + " to world '"
-                            + loc.getWorld().getName() + "'.");
-                }
-            }
-        }
         
-        if (!included) {
-            sender.sendMessage(ChatColor.YELLOW.toString() + "Players teleported.");
-        }
+        (new TeleportPlayerIterator(plugin, sender, loc) {
+            @Override
+            public void perform(Player player) {
+                oldLoc = player.getLocation();
+                
+                Location playerLoc = player.getLocation();
+                loc.setPitch(playerLoc.getPitch());
+                loc.setYaw(playerLoc.getYaw());
+                plugin.getSession(player).rememberLocation(player);
+                player.teleport(loc);
+            }
+            
+        }).iterate(targets);
     }
     
     @Command(aliases = {"return"},
             usage = "", desc = "Teleport back to your last location",
             min = 0, max = 0)
     @CommandPermissions({"commandbook.return"})
-    public static void ret(CommandContext args, CommandBookPlugin plugin,
+    public static void ret(CommandContext args, final CommandBookPlugin plugin,
             CommandSender sender) throws CommandException {
         
         Player player = plugin.checkPlayer(sender);
