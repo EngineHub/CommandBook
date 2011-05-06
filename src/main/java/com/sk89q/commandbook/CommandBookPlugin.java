@@ -229,6 +229,7 @@ public class CommandBookPlugin extends JavaPlugin {
      * temporary data occurs here.
      */
     public void onDisable() {
+        jingleNoteManager.stopAll();
     }
     
     /**
