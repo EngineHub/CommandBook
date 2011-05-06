@@ -39,6 +39,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.Listener;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.player.PlayerListener;
+import org.bukkit.event.world.WorldListener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.config.Configuration;
@@ -125,7 +126,9 @@ public class CommandBookPlugin extends JavaPlugin {
     protected Map<String, UserSession> sessions =
         new HashMap<String, UserSession>();
     protected Map<String, AdministrativeSession> adminSessions =
-        new HashMap<String, AdministrativeSession>();
+        new HashMap<String, AdministrativeSession>();;
+    protected Map<String, Integer> lockedTimes =
+        new HashMap<String, Integer>();
 
     /**
      * Called when the plugin is enabled. This is where configuration is loaded,
@@ -142,6 +145,9 @@ public class CommandBookPlugin extends JavaPlugin {
         createDefaultConfiguration("config.yml");
         createDefaultConfiguration("kits.txt");
         
+        // Setup the time locker
+        timeLockManager = new TimeLockManager(this);
+        
         // Load configuration
         populateConfiguration();
         
@@ -152,9 +158,6 @@ public class CommandBookPlugin extends JavaPlugin {
         // Setup kits
         kits = new FlatFileKitsManager(new File(getDataFolder(), "kits.txt"), this);
         kits.load();
-        
-        // Setup the time locker
-        timeLockManager = new TimeLockManager(this);
         
         // Prepare permissions
         perms = new PermissionsResolverManager(
@@ -198,6 +201,7 @@ public class CommandBookPlugin extends JavaPlugin {
      */
     protected void registerEvents() {
         PlayerListener playerListener = new CommandBookPlayerListener(this);
+        WorldListener worldListener = new CommandBookWorldListener(this);
 
         registerEvent(Event.Type.PLAYER_LOGIN, playerListener);
         registerEvent(Event.Type.PLAYER_JOIN, playerListener);
@@ -205,6 +209,7 @@ public class CommandBookPlugin extends JavaPlugin {
         registerEvent(Event.Type.PLAYER_QUIT, playerListener);
         registerEvent(Event.Type.PLAYER_CHAT, playerListener);
         registerEvent(Event.Type.PLAYER_RESPAWN, playerListener);
+        registerEvent(Event.Type.WORLD_LOAD, worldListener);
     }
 
     /**
@@ -269,6 +274,7 @@ public class CommandBookPlugin extends JavaPlugin {
     /**
      * Loads the configuration.
      */
+    @SuppressWarnings("unchecked")
     public void populateConfiguration() {
         Configuration config = getConfiguration();
         config.load();
@@ -295,6 +301,37 @@ public class CommandBookPlugin extends JavaPlugin {
         broadcastFormat = config.getString("broadcast-format", "`r[Broadcast] %s");
         defaultItemStackSize = config.getInt("default-item-stack-size", 1);
         exactSpawn = config.getBoolean("exact-spawn", false);
+        
+        Object timeLocks = config.getProperty("time-lock");
+        
+        if (timeLocks != null && timeLocks instanceof Map) {
+            for (Map.Entry<String, Object> entry : ((Map<String, Object>) timeLocks).entrySet()) {
+                int time = 0;
+                
+                try {
+                    time = matchTime(String.valueOf(entry.getValue()));
+                } catch (CommandException e) {
+                    logger.warning("CommandBook: Time lock: Failed to parse time '"
+                            + entry.getValue() + "'");
+                }
+                
+                lockedTimes.put(entry.getKey(), time);
+                
+                World world = getServer().getWorld(entry.getKey());
+                
+                if (world == null) {
+                    logger.info("CommandBook: Could not time-lock unknown world '"
+                            + entry.getKey() + "'");
+                    continue;
+                }
+                
+                world.setTime(time);
+                timeLockManager.lock(world);
+                logger.info("CommandBook: Time locked to '"
+                        + CommandBookUtil.getTimeString(time) + "' for world '"
+                        + world.getName() + "'");
+            }
+        }
     }
     
     /**
@@ -1231,6 +1268,15 @@ public class CommandBookPlugin extends JavaPlugin {
      */
     public TimeLockManager getTimeLockManager() {
         return timeLockManager;
+    }
+    
+    /**
+     * Get locked times.
+     * 
+     * @return
+     */
+    public Map<String, Integer> getLockedTimes() {
+        return lockedTimes;
     }
     
     /**
