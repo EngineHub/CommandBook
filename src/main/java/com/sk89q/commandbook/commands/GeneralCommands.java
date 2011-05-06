@@ -115,7 +115,6 @@ public class GeneralCommands {
     public static void who(CommandContext args, CommandBookPlugin plugin,
             CommandSender sender) throws CommandException {
         
-        StringBuilder out = new StringBuilder();
         Player[] online = plugin.getServer().getOnlinePlayers();
 
         plugin.getServer().getPluginManager().callEvent(
@@ -134,16 +133,18 @@ public class GeneralCommands {
 
         // For filtered queries, we say something a bit different
         if (filter == null) {
-            out.append(ChatColor.GRAY + "Online (");
-            out.append(ChatColor.GRAY + "" + online.length);
-            out.append(ChatColor.GRAY + "): ");
-            out.append(ChatColor.WHITE);
-        } else {
-            out.append(ChatColor.GRAY + "Found players (out of ");
-            out.append(ChatColor.GRAY + "" + online.length);
-            out.append(ChatColor.GRAY + "): ");
-            out.append(ChatColor.WHITE);
+            CommandBookUtil.sendOnlineList(
+                    plugin.getServer().getOnlinePlayers(), sender, plugin);
+            return;
+            
         }
+        
+        StringBuilder out = new StringBuilder();
+        
+        out.append(ChatColor.GRAY + "Found players (out of ");
+        out.append(ChatColor.GRAY + "" + online.length);
+        out.append(ChatColor.GRAY + "): ");
+        out.append(ChatColor.WHITE);
         
         // To keep track of commas
         boolean first = true;

@@ -18,6 +18,11 @@
 
 package com.sk89q.commandbook;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -94,8 +99,11 @@ public class CommandBookUtil {
      * 
      * @param online
      * @param sender
+     * @param plugin 
      */
-    public static void sendOnlineList(Player[] online, CommandSender sender) {
+    public static void sendOnlineList(Player[] online, CommandSender sender,
+            CommandBookPlugin plugin) {
+        
         StringBuilder out = new StringBuilder();
         
         // This applies mostly to the console, so there might be 0 players
@@ -106,24 +114,78 @@ public class CommandBookUtil {
         }
         
         out.append(ChatColor.GRAY + "Online (");
-        out.append(ChatColor.GRAY + "" + online.length);
-        out.append(ChatColor.GRAY + "): ");
+        out.append(online.length);
+        if (plugin.playersListMaxPlayers) {
+            out.append("/");
+            out.append(plugin.getServer().getMaxPlayers());
+        }
+        out.append("): ");
         out.append(ChatColor.WHITE);
         
-        // To keep track of commas
-        boolean first = true;
-        
-        for (Player player : online) {
-            if (!first) {
-                out.append(", ");
+        if (plugin.playersListGroupedNames) {
+            Map<String, List<Player>> groups = new HashMap<String, List<Player>>();
+            
+            for (Player player : online) {
+                String[] playerGroups = plugin.getPermissionsResolver().getGroups(
+                        player.getName());
+                String group = playerGroups.length > 0 ? playerGroups[0] : "Default";
+                
+                if (groups.containsKey(group)) {
+                    groups.get(group).add(player);
+                } else {
+                    List<Player> list = new ArrayList<Player>();
+                    list.add(player);
+                    groups.put(group, list);
+                }
             }
             
-            out.append(player.getName());
+            for (Entry<String, List<Player>> entry : groups.entrySet()) {
+                out.append("\n");
+                out.append(ChatColor.WHITE + entry.getKey());
+                out.append(": ");
+                
+                // To keep track of commas
+                boolean first = true;
+                
+                for (Player player : entry.getValue()) {
+                    if (!first) {
+                        out.append(", ");
+                    }
+                    
+                    if (plugin.playersListColoredNames) {
+                        out.append(player.getDisplayName() + ChatColor.WHITE);
+                    } else {
+                        out.append(player.getName());
+                    }
+                    
+                    first = false;
+                }
+            }
             
-            first = false;
+        } else {
+            // To keep track of commas
+            boolean first = true;
+            
+            for (Player player : online) {
+                if (!first) {
+                    out.append(", ");
+                }
+                
+                if (plugin.playersListColoredNames) {
+                    out.append(player.getDisplayName() + ChatColor.WHITE);
+                } else {
+                    out.append(player.getName());
+                }
+                
+                first = false;
+            }
         }
         
-        sender.sendMessage(out.toString());
+        String[] lines = out.toString().split("\n");
+        
+        for (String line : lines) {
+            sender.sendMessage(line);
+        }
     }
     
     /**

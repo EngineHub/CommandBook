@@ -127,7 +127,7 @@ public class CommandBookPlayerListener extends PlayerListener {
                     new OnlineListSendEvent(player));
             
             CommandBookUtil.sendOnlineList(
-                    plugin.getServer().getOnlinePlayers(), player);
+                    plugin.getServer().getOnlinePlayers(), player, plugin);
         }
     }
     

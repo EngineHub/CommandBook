@@ -121,6 +121,9 @@ public class CommandBookPlugin extends JavaPlugin {
     public String broadcastFormat;
     public int defaultItemStackSize;
     public boolean exactSpawn;
+    public boolean playersListColoredNames;
+    public boolean playersListGroupedNames;
+    public boolean playersListMaxPlayers;
 
     protected Map<String, String> messages = new HashMap<String, String>();
     protected Map<String, UserSession> sessions =
@@ -291,6 +294,10 @@ public class CommandBookPlugin extends JavaPlugin {
         // Load messages
         messages.put("motd", config.getString("motd", null));
         messages.put("rules", config.getString("rules", null));
+
+        playersListColoredNames = config.getBoolean("online-list.colored-names", false);
+        playersListGroupedNames = config.getBoolean("online-list.grouped-names", false);
+        playersListMaxPlayers = config.getBoolean("online-list.show-max-players", true);
         
         opPermissions = config.getBoolean("op-permissions", true);
         useDisplayNames = config.getBoolean("use-display-names", true);
@@ -1373,5 +1380,14 @@ public class CommandBookPlugin extends JavaPlugin {
      */
     public Map<String, AdministrativeSession> getAdminSessions() {
         return adminSessions;
+    }
+
+    /**
+     * Get the permissions resolver.
+     * 
+     * @return
+     */
+    public PermissionsResolverManager getPermissionsResolver() {
+        return perms;
     }
 }
