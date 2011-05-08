@@ -32,4 +32,4 @@ default-item-stack-size: 1
 exact-spawn: false
 time-lock:
     # Example time lock:
-    
+    #world: 3am
