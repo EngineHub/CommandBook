@@ -403,7 +403,7 @@ public class GeneralCommands {
         Location pos = player.getLocation();
         
         sender.sendMessage(ChatColor.YELLOW +
-                String.format("You are in the world: " + plugin.checkPlayer(sender).getWorld().getName()));
+                "You are in the world: " + plugin.checkPlayer(sender).getWorld().getName());
         sender.sendMessage(ChatColor.YELLOW +
                 String.format("You're at: (%.4f, %.4f, %.4f)",
                         pos.getX(), pos.getY(), pos.getZ()));
