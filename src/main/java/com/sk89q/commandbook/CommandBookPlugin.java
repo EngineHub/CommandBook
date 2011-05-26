@@ -471,10 +471,10 @@ public class CommandBookPlugin extends JavaPlugin {
             throws CommandException {
         
         if (id < 1 || id == 29
-                || (id > 30 && id < 35)
+                || (id > 32 && id < 35)
                 || id == 36
-                || (id > 95 && id < 256)
-                || (id > 357 && id < 2256)
+                || (id > 96 && id < 256)
+                || (id > 358 && id < 2256)
                 || id > 2257) {
             if (Material.getMaterial(id) == null) {
                 throw new CommandException("Non-existent item specified.");
@@ -881,6 +881,15 @@ public class CommandBookPlugin extends JavaPlugin {
 
                 throw new CommandException("No nether world found.");
 
+            // #skylands for the first skylands world
+            } else if (filter.equalsIgnoreCase("#skylands")) {
+                for (World world : worlds) {
+                    if (world.getEnvironment() == Environment.SKYLANDS) {
+                        return world;
+                    }
+                }
+
+                throw new CommandException("No skylands world found.");
             // Handle getting a world from a player
             } else if (filter.matches("^#player$")) {
                 String parts[] = filter.split(":", 2);
