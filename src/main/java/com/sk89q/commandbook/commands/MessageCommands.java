@@ -117,6 +117,9 @@ public class MessageCommands {
                 + plugin.toName(receiver) + "): "
                 + ChatColor.WHITE + message);
         
+        System.out.println(plugin.toName(sender) + " told "
+                + plugin.toName(receiver) + ": " + message);
+        
         plugin.getSession(sender).setLastRecipient(receiver);
         
         // If the receiver hasn't had any player talk to them yet or hasn't
@@ -152,6 +155,8 @@ public class MessageCommands {
         sender.sendMessage(ChatColor.GRAY + "(To "
                 + plugin.toName(receiver) + "): "
                 + ChatColor.WHITE + message);
+        System.out.println(plugin.toName(sender) + " told "
+                + plugin.toName(receiver) + ": " + message);
         
         // If the receiver hasn't had any player talk to them yet or hasn't
         // send a message, then we add it to the receiver's last message target
