@@ -880,7 +880,7 @@ public class CommandBookPlugin extends JavaPlugin {
                 }
 
                 throw new CommandException("No nether world found.");
-            /*
+
             // #skylands for the first skylands world
             } else if (filter.equalsIgnoreCase("#skylands")) {
                 for (World world : worlds) {
@@ -890,7 +890,7 @@ public class CommandBookPlugin extends JavaPlugin {
                 }
 
                 throw new CommandException("No skylands world found.");
-            */
+
             // Handle getting a world from a player
             } else if (filter.matches("^#player$")) {
                 String parts[] = filter.split(":", 2);

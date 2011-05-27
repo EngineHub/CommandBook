@@ -232,25 +232,7 @@ public class ModerationCommands {
     @CommandPermissions({"commandbook.bans.unban"})
     public static void unban(CommandContext args, CommandBookPlugin plugin,
             CommandSender sender) throws CommandException {
-        
-        String message = args.argsLength() >= 2 ? args.getJoinedStrings(1)
-                : "Unbanned!";
-        
-        String banName = args.getString(0)
-                    .replace("\r", "")
-                    .replace("\n", "")
-                    .replace("\0", "")
-                    .replace("\b", "");
-        
-        if (plugin.getBanDatabase().unbanName(banName, sender, message)) {
-            sender.sendMessage(ChatColor.YELLOW + banName + " unbanned.");
-            
-            if (!plugin.getBanDatabase().save()) {
-                sender.sendMessage(ChatColor.RED + "Bans database failed to save. See console.");
-            }
-        } else {
-            sender.sendMessage(ChatColor.RED + banName + " was not banned.");
-        }
+    	sender.sendMessage("Try /pardon <target> [reason...] instead!");
     }
     
     @Command(aliases = {"pardon"},

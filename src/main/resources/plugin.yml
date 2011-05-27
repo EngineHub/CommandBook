@@ -178,8 +178,8 @@ commands:
         usage: /<command> <target> [reason...]
         _component: bans
     unban:
-        description: Unban a player by name
-        usage: /<command> <target> [reason...]
+        description: Use /pardon <target> [reason...]
+        usage: /<command>
         _component: bans
     pardon:
         description: Unban a player by name
