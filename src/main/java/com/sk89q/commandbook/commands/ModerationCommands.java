@@ -253,11 +253,11 @@ public class ModerationCommands {
         }
     }
     
-    @Command(aliases = {"pardonme"},
+    @Command(aliases = {"pardon"},
             usage = "<target>", desc = "Unban a user",
             min = 1, max = -1)
     @CommandPermissions({"commandbook.bans.unban"})
-    public static void pardonme(CommandContext args, CommandBookPlugin plugin,
+    public static void pardon(CommandContext args, CommandBookPlugin plugin,
             CommandSender sender) throws CommandException {
         
         String message = args.argsLength() >= 2 ? args.getJoinedStrings(1)
