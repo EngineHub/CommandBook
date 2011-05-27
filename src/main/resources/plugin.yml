@@ -181,6 +181,10 @@ commands:
         description: Unban a player by name
         usage: /<command> <target> [reason...]
         _component: bans
+    pardonme:
+        description: Unban a player by name
+        usage: /<command> <target> [reason...]
+        _component: bans
     isbanned:
         description: Checks if a player's name is banned
         usage: /<command> <target>
