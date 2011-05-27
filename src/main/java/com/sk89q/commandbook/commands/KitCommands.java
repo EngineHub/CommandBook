@@ -80,6 +80,8 @@ public class KitCommands {
             boolean included = false;
             
             if (args.argsLength() == 2) {
+                plugin.checkPermission(sender, "commandbook.kit.other");
+                
                 targets = plugin.matchPlayers(sender, args.getString(1));
             } else {
                 targets = plugin.matchPlayers(plugin.checkPlayer(sender));
