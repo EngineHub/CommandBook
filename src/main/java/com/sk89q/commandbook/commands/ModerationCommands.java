@@ -225,21 +225,12 @@ public class ModerationCommands {
             sender.sendMessage(ChatColor.RED + "Bans database failed to save. See console.");
         }
     }
-*/
+*/    
     @Command(aliases = {"unban"},
             usage = "<target>", desc = "Unban a user",
             min = 1, max = -1)
     @CommandPermissions({"commandbook.bans.unban"})
     public static void unban(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
-    	sender.sendMessage("Try /pardon <target> [reason...] instead!");
-    }
-    
-    @Command(aliases = {"pardon"},
-            usage = "<target>", desc = "Unban a user",
-            min = 1, max = -1)
-    @CommandPermissions({"commandbook.bans.unban"})
-    public static void pardon(CommandContext args, CommandBookPlugin plugin,
             CommandSender sender) throws CommandException {
         
         String message = args.argsLength() >= 2 ? args.getJoinedStrings(1)
