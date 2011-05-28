@@ -226,7 +226,7 @@ public class ModerationCommands {
         }
     }
 */    
-    @Command(aliases = {"unban", "pardon"},
+    @Command(aliases = {"unban"},
             usage = "<target>", desc = "Unban a user",
             min = 1, max = -1)
     @CommandPermissions({"commandbook.bans.unban"})

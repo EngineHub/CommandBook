@@ -34,7 +34,9 @@ import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 
 public class MessageCommands {
-    
+
+	protected static final Logger logger = Logger.getLogger("Minecraft.CommandBook");
+	
     @Command(aliases = {"me"},
             usage = "<message...>", desc = "Send an action message",
             min = 1, max = -1)
@@ -120,6 +122,9 @@ public class MessageCommands {
         System.out.println(plugin.toName(sender) + " told "
                 + plugin.toName(receiver) + ": " + message);
         
+        logger.info(plugin.toName(sender) + " told "
+                + plugin.toName(receiver) + ": " + message);
+        
         plugin.getSession(sender).setLastRecipient(receiver);
         
         // If the receiver hasn't had any player talk to them yet or hasn't
@@ -155,7 +160,8 @@ public class MessageCommands {
         sender.sendMessage(ChatColor.GRAY + "(To "
                 + plugin.toName(receiver) + "): "
                 + ChatColor.WHITE + message);
-        System.out.println(plugin.toName(sender) + " told "
+        
+        logger.info(plugin.toName(sender) + " told "
                 + plugin.toName(receiver) + ": " + message);
         
         // If the receiver hasn't had any player talk to them yet or hasn't
