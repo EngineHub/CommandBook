@@ -24,6 +24,7 @@ import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.CreatureType;
 import org.bukkit.entity.Creeper;
+import org.bukkit.entity.Sheep;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -39,9 +40,9 @@ public class FunCommands {
     protected static Random random = new Random();
     
     @Command(aliases = {"spawnmob"},
-            usage = "<mob> [count] [location]", desc = "Spawn a mob",
-            flags = "dirp",
-            min = 1, max = 3)
+            usage = "<mob> [count] [location] [color]", desc = "Spawn a mob",
+            flags = "dirpc",
+            min = 1, max = 4)
     @CommandPermissions({"commandbook.spawnmob"})
     public static void spawnMob(CommandContext args, CommandBookPlugin plugin,
             CommandSender sender) throws CommandException {
@@ -77,6 +78,9 @@ public class FunCommands {
             }
             if (args.hasFlag('p') && creature instanceof Creeper) {
                 ((Creeper) creature).setPowered(true);
+            }
+            if (args.hasFlag('c') && creature instanceof Sheep && args.argsLength() >= 4) {
+                ((Sheep) creature).setColor(plugin.matchDyeColor(args.getString(3)));
             }
         }
         

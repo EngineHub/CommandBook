@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.bukkit.ChatColor;
+import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -1250,6 +1251,25 @@ public class CommandBookPlugin extends JavaPlugin {
         }
     }
     
+    /**
+     * Attempt to match a dye color for sheep wool.
+     *
+     * @param match
+     * @return
+     * @throws CommandException
+     */
+    public DyeColor matchDyeColor(String filter) throws CommandException {
+        if (filter.equalsIgnoreCase("random")) {
+            return DyeColor.getByData((byte) new Random().nextInt(15));
+        }
+        try {
+            DyeColor match = DyeColor.valueOf(filter.toUpperCase());
+            if (match != null) {
+                return match;
+            }
+        } catch (IllegalArgumentException e) {}
+        throw new CommandException("Unknown dye color name of '" + filter + "'.");
+    }
     /**
      * Get preprogrammed messages.
      * 
