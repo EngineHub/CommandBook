@@ -114,6 +114,7 @@ public class CommandBookPlugin extends JavaPlugin {
      */
     protected JingleNoteManager jingleNoteManager;
     
+    public boolean disableMidi;
     public boolean verifyNameFormat;
     public boolean broadcastChanges;
     public boolean useItemPermissionsOnly;
@@ -313,12 +314,17 @@ public class CommandBookPlugin extends JavaPlugin {
         opPermissions = config.getBoolean("op-permissions", true);
         useDisplayNames = config.getBoolean("use-display-names", true);
         banMessage = config.getString("bans.message", "You were banned.");
+        disableMidi = config.getBoolean("disable-midi", false);
         verifyNameFormat = config.getBoolean("verify-name-format", true);
         broadcastChanges = config.getBoolean("broadcast-changes", true);
         consoleSayFormat = config.getString("console-say-format", "<`r*Console`w> %s");
         broadcastFormat = config.getString("broadcast-format", "`r[Broadcast] %s");
         defaultItemStackSize = config.getInt("default-item-stack-size", 1);
         exactSpawn = config.getBoolean("exact-spawn", false);
+        
+        if (disableMidi) {
+            logger.info("CommandBook: MIDI support is disabled.");
+        }
         
         Object timeLocks = config.getProperty("time-lock");
         
@@ -1254,7 +1260,7 @@ public class CommandBookPlugin extends JavaPlugin {
     /**
      * Attempt to match a dye color for sheep wool.
      *
-     * @param match
+     * @param filter
      * @return
      * @throws CommandException
      */

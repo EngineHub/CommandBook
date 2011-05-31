@@ -281,6 +281,10 @@ public class GeneralCommands {
             CommandSender sender) throws CommandException {
 
         Player player = plugin.checkPlayer(sender);
+        
+        if (plugin.disableMidi) {
+            throw new CommandException("MIDI support is disabled.");
+        }
 
         try {
             MidiJingleSequencer sequencer = new MidiJingleSequencer(
