@@ -12,6 +12,7 @@ import java.util.Map;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import com.sk89q.commandbook.CommandBookPlugin;
 import com.sk89q.worldedit.blocks.BlockType;
 
 /**
@@ -25,6 +26,15 @@ public class JingleNoteManager {
      */
     protected Map<String, JingleNotePlayer> instances
             = new HashMap<String, JingleNotePlayer>();
+    
+    /**
+     * Plugin.
+     */
+    private CommandBookPlugin plugin;
+    
+    public JingleNoteManager(CommandBookPlugin plugin) {
+        this.plugin = plugin;
+    }
     
     public void play(Player player, JingleSequencer sequencer, int delay) {
         String name = player.getName();
@@ -44,7 +54,7 @@ public class JingleNoteManager {
         }
         
         JingleNotePlayer notePlayer = new JingleNotePlayer(
-                player, loc, sequencer, delay);
+                plugin, player, loc, sequencer, delay);
         Thread thread = new Thread(notePlayer);
         thread.setName("JingleNotePlayer for " + player.getName());
         thread.start();

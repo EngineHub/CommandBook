@@ -171,7 +171,7 @@ public class CommandBookPlugin extends JavaPlugin {
         kits.load();
         
         // Jingle note manager
-        jingleNoteManager = new JingleNoteManager();
+        jingleNoteManager = new JingleNoteManager(this);
         
         // Prepare permissions
         perms = new PermissionsResolverManager(
