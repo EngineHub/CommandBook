@@ -122,6 +122,33 @@ public class GeneralCommands {
             CommandSender sender) throws CommandException {
         
         Player[] online = plugin.getServer().getOnlinePlayers();
+        
+        // Some crappy wrappers uses this to detect if the server is still
+        // running, even though this is a very unreliable way to do it
+        if (!(sender instanceof Player) && plugin.crappyWrapperCompat) {
+            StringBuilder out = new StringBuilder();
+            
+            out.append("Connected players: ");
+            
+            // To keep track of commas
+            boolean first = true;
+            
+            // Now go through the list of players and find any matching players
+            // (in case of a filter), and create the list of players.
+            for (Player player : online) {
+                if (!first) {
+                    out.append(", ");
+                }
+                
+                out.append(player.getName());
+                
+                first = false;
+            }
+            
+            sender.sendMessage(out.toString());
+            
+            return;
+        }
 
         plugin.getServer().getPluginManager().callEvent(
                 new OnlineListSendEvent(sender));

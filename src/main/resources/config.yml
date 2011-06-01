@@ -30,6 +30,8 @@ broadcast-format: "`r[Broadcast] %s"
 default-item-stack-size: 1
 # As of writing, this does NOT fix spawning on first join (yet)
 exact-spawn: false
+# This makes CommandBook compatible with poorly written server wrappers
+crappy-wrapper-compat: true
 time-lock:
     # Example time lock:
     #world: 3am

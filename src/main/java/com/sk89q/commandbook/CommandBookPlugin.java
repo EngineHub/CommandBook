@@ -132,6 +132,7 @@ public class CommandBookPlugin extends JavaPlugin {
     public boolean playersListColoredNames;
     public boolean playersListGroupedNames;
     public boolean playersListMaxPlayers;
+    public boolean crappyWrapperCompat;
 
     protected Map<String, String> messages = new HashMap<String, String>();
     protected Map<String, UserSession> sessions =
@@ -321,9 +322,16 @@ public class CommandBookPlugin extends JavaPlugin {
         broadcastFormat = config.getString("broadcast-format", "`r[Broadcast] %s");
         defaultItemStackSize = config.getInt("default-item-stack-size", 1);
         exactSpawn = config.getBoolean("exact-spawn", false);
+        crappyWrapperCompat = config.getBoolean("crappy-wrapper-compat", true);
         
         if (disableMidi) {
             logger.info("CommandBook: MIDI support is disabled.");
+        }
+        
+        if (crappyWrapperCompat) {
+            logger.info("CommandBook: Maximum wrapper compatibility is enabled. " +
+            		"Some features have been disabled to be compatible with " +
+            		"poorly written server wrappers.");
         }
         
         Object timeLocks = config.getProperty("time-lock");
