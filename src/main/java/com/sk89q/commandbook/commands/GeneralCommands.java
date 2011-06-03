@@ -240,6 +240,7 @@ public class GeneralCommands {
             
             // We want to lock to the current time
             if (!args.hasFlag('l')) {
+                plugin.checkPermission(sender, "commandbook.time.check");
                 sender.sendMessage(ChatColor.YELLOW
                         + "Time: " + CommandBookUtil.getTimeString(world.getTime()));
                 return;
