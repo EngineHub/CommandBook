@@ -1,3 +1,15 @@
+1.5.2:
+- Updated for MC 1.6.
+- Added support for commandbook.kit.other as a permission.
+- Added ability to color sheep with /spawnmob (thanks to wizjany).
+- Added current world to whereami (thanks to Richard McCormack).
+- Added compatibility with poorly written server wrappers.
+- Added "disable-midi" configuration. Removed the "no intro.mid" message.
+- Added permission to check time (thanks to wizjany).
+- Fixed unload issue with the JingleNote manager.
+- Fixed thread safety issue with the JingleNote manager.
+- Fixed air being a spawnable item.
+
 1.5.1:
 - Fixed a bug with the JingleNote Manager.
 
