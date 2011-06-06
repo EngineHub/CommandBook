@@ -496,8 +496,11 @@ public class GeneralCommands {
                 + "Entity ID #: " + player.getEntityId());
         sender.sendMessage(ChatColor.YELLOW
                 + "Current vehicle: " + player.getVehicle());
-        sender.sendMessage(ChatColor.YELLOW
-                + "Address: " + player.getAddress().toString());
+        
+        if (plugin.hasPermission(sender, "commandbook.ip-address")) {
+            sender.sendMessage(ChatColor.YELLOW
+                    + "Address: " + player.getAddress().toString());
+        }
     }
     
     @Command(aliases = {"setspawn"},
