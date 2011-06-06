@@ -16,13 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.sk89q.commandbook.warps;
+package com.sk89q.commandbook.commands;
 
-import org.bukkit.World;
+public class HomeManagementCommands {
 
-public interface WarpsManagerFactory {
-
-    public WarpsManager createManager();
-    public WarpsManager createManager(World castWorld);
-    
 }

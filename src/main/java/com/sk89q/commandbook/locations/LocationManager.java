@@ -14,66 +14,61 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
+*/
 
-package com.sk89q.commandbook.warps;
+package com.sk89q.commandbook.locations;
 
 import java.io.IOException;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
-/**
- * Manager for kits.
- * 
- * @author sk89q
- */
-public interface WarpsManager {
+public interface LocationManager<T> {
     
     /**
-     * Set this warps manager to be for one world only.
+     * Set this manager to be for one world only.
      * 
      * @param world
      */
     public void castWorld(World world);
 
     /**
-     * Load warps from file.
+     * Load from file.
      * 
      * @throws IOException 
      */
     public void load() throws IOException;
 
     /**
-     * Save warps to file.
+     * Save  to file.
      * 
      * @throws IOException 
      */
     public void save() throws IOException;
 
     /**
-     * Get a warp by name.
+     * Get by name.
      * 
      * @param id
      * @return
      */
-    public Warp getWarp(String id);
+    public T get(String id);
     
     /**
-     * Create a warp.
+     * Create a location.
      * 
      * @param id
      * @param loc
      * @param player
      * @return
      */
-    public Warp createWarp(String id, Location loc, Player player);
+    public T create(String id, Location loc, Player player);
 
     /**
-     * Removes a warp.
+     * Removes a location.
      * 
      * @param id
      * @return whether it was removed
      */
-    public boolean removeWarp(String id);
+    public boolean remove(String id);
 }

@@ -51,9 +51,12 @@ import com.sk89q.commandbook.bans.FlatFileBanDatabase;
 import com.sk89q.commandbook.commands.*;
 import com.sk89q.commandbook.kits.FlatFileKitsManager;
 import com.sk89q.commandbook.kits.KitManager;
+import com.sk89q.commandbook.locations.FlatFileLocationsManager;
+import com.sk89q.commandbook.locations.LocationManager;
+import com.sk89q.commandbook.locations.LocationManagerFactory;
+import com.sk89q.commandbook.locations.RootLocationManager;
+import com.sk89q.commandbook.locations.NamedLocation;
 import com.sk89q.jinglenote.JingleNoteManager;
-import com.sk89q.commandbook.warps.FlatFileWarpsManager;
-import com.sk89q.commandbook.warps.RootWarpsManager;
 import com.sk89q.minecraft.util.commands.*;
 import com.sk89q.worldedit.blocks.BlockID;
 import com.sk89q.worldedit.blocks.BlockType;
@@ -101,9 +104,14 @@ public class CommandBookPlugin extends JavaPlugin {
     protected BanDatabase bans;
     
     /**
-     * Warps database;
+     * Warps database.
      */
-    protected RootWarpsManager warps;
+    protected RootLocationManager<NamedLocation> warps;
+    
+    /**
+     * Homes database.
+     */
+    protected RootLocationManager<NamedLocation> homes;
     
     /**
      * Time lock manager.
@@ -197,6 +205,7 @@ public class CommandBookPlugin extends JavaPlugin {
         commands.register(ModerationCommands.class);
         commands.register(KitCommands.class);
         commands.register(WarpCommands.class);
+        commands.register(HomeCommands.class);
         
         // Register events
         registerEvents();
@@ -325,9 +334,16 @@ public class CommandBookPlugin extends JavaPlugin {
         defaultItemStackSize = config.getInt("default-item-stack-size", 1);
         exactSpawn = config.getBoolean("exact-spawn", false);
         crappyWrapperCompat = config.getBoolean("crappy-wrapper-compat", true);
-        
-        warps = new RootWarpsManager(new FlatFileWarpsManager.Factory(getDataFolder(), this),
+
+        LocationManagerFactory<LocationManager<NamedLocation>> warpsFactory =
+                new FlatFileLocationsManager.WarpsFactory(getDataFolder(), this);
+        warps = new RootLocationManager<NamedLocation>(warpsFactory,
                 config.getBoolean("per-world-warps", false));
+
+        LocationManagerFactory<LocationManager<NamedLocation>> homesFactory =
+                new FlatFileLocationsManager.HomesFactory(getDataFolder(), this);
+        homes = new RootLocationManager<NamedLocation>(homesFactory,
+                config.getBoolean("per-world-homes", false));
         
         if (disableMidi) {
             logger.info("CommandBook: MIDI support is disabled.");
@@ -1313,8 +1329,17 @@ public class CommandBookPlugin extends JavaPlugin {
      * 
      * @return
      */
-    public RootWarpsManager getWarpsManager() {
+    public RootLocationManager<NamedLocation> getWarpsManager() {
         return warps;
+    }
+    
+    /**
+     * Get the root homes manager.
+     * 
+     * @return
+     */
+    public RootLocationManager<NamedLocation> getHomesManager() {
+        return homes;
     }
     
     /**

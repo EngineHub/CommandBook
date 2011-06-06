@@ -23,9 +23,8 @@ import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import com.sk89q.commandbook.CommandBookPlugin;
+import com.sk89q.commandbook.locations.NamedLocation;
 import com.sk89q.commandbook.util.TeleportPlayerIterator;
-import com.sk89q.commandbook.warps.RootWarpsManager;
-import com.sk89q.commandbook.warps.Warp;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
@@ -42,28 +41,28 @@ public class WarpCommands {
             CommandSender sender) throws CommandException {
 
         Iterable<Player> targets = null;
-        Warp warp = null;
+        NamedLocation warp = null;
         Location loc = null;
         
         // Detect arguments based on the number of arguments provided
         if (args.argsLength() == 1) {
             Player player = plugin.checkPlayer(sender);
             targets = plugin.matchPlayers(player);
-            warp = plugin.getWarpsManager().getWarp(player.getWorld(), args.getString(0));
+            warp = plugin.getWarpsManager().get(player.getWorld(), args.getString(0));
         } else if (args.argsLength() == 2) {            
             targets = plugin.matchPlayers(sender, args.getString(0));
             if (plugin.getWarpsManager().isPerWorld()) {
                 Player player = plugin.checkPlayer(sender);
-                warp = plugin.getWarpsManager().getWarp(player.getWorld(), args.getString(1));
+                warp = plugin.getWarpsManager().get(player.getWorld(), args.getString(1));
             } else {
-                warp = plugin.getWarpsManager().getWarp(null, args.getString(1));
+                warp = plugin.getWarpsManager().get(null, args.getString(1));
             }
             
             // Check permissions!
             plugin.checkPermission(sender, "commandbook.warp.teleport.other");
         } else if (args.argsLength() == 3) {            
             targets = plugin.matchPlayers(sender, args.getString(1));
-            warp = plugin.getWarpsManager().getWarp(
+            warp = plugin.getWarpsManager().get(
                     plugin.matchWorld(sender, args.getString(0)), args.getString(2));
             
             // Check permissions!
@@ -97,9 +96,7 @@ public class WarpCommands {
             loc = plugin.matchLocation(sender, args.getString(1));
         }
         
-        RootWarpsManager warpsManager = plugin.getWarpsManager();
-        
-        warpsManager.createWarp(warpName, loc, player);
+        plugin.getWarpsManager().create(warpName, loc, player);
         
         sender.sendMessage(ChatColor.YELLOW + "Warp '" + warpName + "' created.");
     }

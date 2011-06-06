@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.sk89q.commandbook.warps;
+package com.sk89q.commandbook.locations;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -26,21 +26,21 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
-public class RootWarpsManager {
+public class RootLocationManager<T> {
     
     private static final Logger logger = Logger.getLogger("Minecraft.CommandBook");
 
-    private WarpsManager rootManager;
-    private Map<String, WarpsManager> managers;
-    private WarpsManagerFactory factory;
+    private LocationManager<T> rootManager;
+    private Map<String, LocationManager<T>> managers;
+    private LocationManagerFactory<LocationManager<T>> factory;
     private boolean perWorld;
     
-    public RootWarpsManager(WarpsManagerFactory factory, boolean perWorld) {
+    public RootLocationManager(LocationManagerFactory<LocationManager<T>> factory, boolean perWorld) {
         this.factory = factory;
         this.perWorld = perWorld;
         
         if (perWorld) {
-            managers = new HashMap<String, WarpsManager>();
+            managers = new HashMap<String, LocationManager<T>>();
         } else {
             rootManager = factory.createManager();
             
@@ -52,8 +52,8 @@ public class RootWarpsManager {
         }
     }
     
-    private WarpsManager getManager(World world) {
-        WarpsManager manager = managers.get(world.getName());
+    private LocationManager<T> getManager(World world) {
+        LocationManager<T> manager = managers.get(world.getName());
         
         if (manager != null) {
             return manager;
@@ -72,41 +72,41 @@ public class RootWarpsManager {
         return manager;
     }
     
-    public Warp getWarp(World world, String id) {
+    public T get(World world, String id) {
         if (perWorld) {
-            return getManager(world).getWarp(id);
+            return getManager(world).get(id);
         } else {
-            return rootManager.getWarp(id);
+            return rootManager.get(id);
         }
     }
     
-    public Warp createWarp(String id, Location loc, Player player) {
+    public T create(String id, Location loc, Player player) {
         if (perWorld) {
-            WarpsManager manager = getManager(loc.getWorld());
-            Warp ret = manager.createWarp(id, loc, player);
+            LocationManager<T> manager = getManager(loc.getWorld());
+            T ret = manager.create(id, loc, player);
             save(manager);
             return ret;
         } else {
-            Warp ret = rootManager.createWarp(id, loc, player);
+            T ret = rootManager.create(id, loc, player);
             save(rootManager);
             return ret;
         }
     }
     
-    public boolean removeWarp(World world, String id) {
+    public boolean remove(World world, String id) {
         if (perWorld) {
-            WarpsManager manager = getManager(world);
-            boolean ret = getManager(world).removeWarp(id);
+            LocationManager<T> manager = getManager(world);
+            boolean ret = getManager(world).remove(id);
             save(manager);
             return ret;
         } else {
-            boolean ret = rootManager.removeWarp(id);
+            boolean ret = rootManager.remove(id);
             save(rootManager);
             return ret;
         }
     }
     
-    private void save(WarpsManager manager) {
+    private void save(LocationManager<T> manager) {
         try {
             manager.save();
         } catch (IOException e) {

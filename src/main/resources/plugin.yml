@@ -145,6 +145,24 @@ commands:
         description: Set a warp
         usage: /<command> <warp> [location]
         _category: warps
+    warps:
+        description: Warp management commands
+        usage: /<command>
+        _category: warps
+        
+    home:
+        description: Teleport to home
+        usage: /<command> [[[world]] [target]] [owner]
+        _category: homes
+    sethome:
+        aliases: createhome
+        description: Set home
+        usage: /<command> [location] [owner]
+        _category: homes
+    homes:
+        description: Home management commands
+        usage: /<command>
+        _category: homes
     
     broadcast:
         description: Broadcast a message

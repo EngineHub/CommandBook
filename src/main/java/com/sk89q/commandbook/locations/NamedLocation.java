@@ -16,19 +16,19 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.sk89q.commandbook.warps;
+package com.sk89q.commandbook.locations;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-public class Warp {
+public class NamedLocation {
 
     private String name;
     private String creatorName;
     private String worldName;
     private Location loc;
 
-    public Warp(String name, Location loc) {
+    public NamedLocation(String name, Location loc) {
         this.name = name;
         this.loc = loc;
     }

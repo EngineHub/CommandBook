@@ -36,3 +36,4 @@ time-lock:
     # Example time lock:
     #world: 3am
 per-world-warps: false
+per-world-homes: false
