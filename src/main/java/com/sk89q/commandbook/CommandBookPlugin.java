@@ -48,16 +48,12 @@ import com.sk89q.bukkit.migration.PermissionsResolverManager;
 import com.sk89q.bukkit.migration.PermissionsResolverServerListener;
 import com.sk89q.commandbook.bans.BanDatabase;
 import com.sk89q.commandbook.bans.FlatFileBanDatabase;
-import com.sk89q.commandbook.commands.DebuggingCommands;
-import com.sk89q.commandbook.commands.FunCommands;
-import com.sk89q.commandbook.commands.GeneralCommands;
-import com.sk89q.commandbook.commands.KitCommands;
-import com.sk89q.commandbook.commands.MessageCommands;
-import com.sk89q.commandbook.commands.ModerationCommands;
-import com.sk89q.commandbook.commands.TeleportCommands;
+import com.sk89q.commandbook.commands.*;
 import com.sk89q.commandbook.kits.FlatFileKitsManager;
 import com.sk89q.commandbook.kits.KitManager;
 import com.sk89q.jinglenote.JingleNoteManager;
+import com.sk89q.commandbook.warps.FlatFileWarpsManager;
+import com.sk89q.commandbook.warps.RootWarpsManager;
 import com.sk89q.minecraft.util.commands.*;
 import com.sk89q.worldedit.blocks.BlockID;
 import com.sk89q.worldedit.blocks.BlockType;
@@ -103,6 +99,11 @@ public class CommandBookPlugin extends JavaPlugin {
      * Bans database.
      */
     protected BanDatabase bans;
+    
+    /**
+     * Warps database;
+     */
+    protected RootWarpsManager warps;
     
     /**
      * Time lock manager.
@@ -195,6 +196,7 @@ public class CommandBookPlugin extends JavaPlugin {
         commands.register(DebuggingCommands.class);
         commands.register(ModerationCommands.class);
         commands.register(KitCommands.class);
+        commands.register(WarpCommands.class);
         
         // Register events
         registerEvents();
@@ -323,6 +325,9 @@ public class CommandBookPlugin extends JavaPlugin {
         defaultItemStackSize = config.getInt("default-item-stack-size", 1);
         exactSpawn = config.getBoolean("exact-spawn", false);
         crappyWrapperCompat = config.getBoolean("crappy-wrapper-compat", true);
+        
+        warps = new RootWarpsManager(new FlatFileWarpsManager.Factory(getDataFolder(), this),
+                config.getBoolean("per-world-warps", false));
         
         if (disableMidi) {
             logger.info("CommandBook: MIDI support is disabled.");
@@ -1301,6 +1306,15 @@ public class CommandBookPlugin extends JavaPlugin {
      */
     public BanDatabase getBanDatabase() {
         return bans;
+    }
+    
+    /**
+     * Get the root warps manager.
+     * 
+     * @return
+     */
+    public RootWarpsManager getWarpsManager() {
+        return warps;
     }
     
     /**

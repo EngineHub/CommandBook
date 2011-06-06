@@ -135,6 +135,16 @@ commands:
         description: Return back to your last location
         usage: /<command>
         _category: teleport
+        
+    warp:
+        description: Teleport to a warp
+        usage: /<command> [world] [target] <warp>
+        _category: warps
+    setwarp:
+        aliases: createwarp
+        description: Set a warp
+        usage: /<command> <warp> [location]
+        _category: warps
     
     broadcast:
         description: Broadcast a message

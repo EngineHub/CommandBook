@@ -35,3 +35,4 @@ crappy-wrapper-compat: true
 time-lock:
     # Example time lock:
     #world: 3am
+per-world-warps: false
