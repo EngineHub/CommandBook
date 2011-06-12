@@ -864,7 +864,9 @@ public class CommandBookPlugin extends JavaPlugin {
                     playerLoc.setZ(loc.getZ());
                     return CommandBookUtil.findFreePosition(playerLoc);
                 }
-            
+            // Handle #me, which is for when a location argument is required
+            } else if (args[0].equalsIgnoreCase("#me")) {
+                return checkPlayer(source).getLocation();
             } else {
                 throw new CommandException("Invalid group '" + filter + "'.");
             }
