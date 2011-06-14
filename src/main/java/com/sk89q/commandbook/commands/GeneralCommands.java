@@ -141,6 +141,7 @@ public class GeneralCommands {
                 }
                 
                 out.append(player.getName());
+                out.append("\u00a7f");
                 
                 first = false;
             }
