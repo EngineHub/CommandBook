@@ -141,7 +141,8 @@ public class GeneralCommands {
                 }
                 
                 out.append(player.getName());
-                
+                out.append(ChatColor.WHITE);
+
                 first = false;
             }
             
