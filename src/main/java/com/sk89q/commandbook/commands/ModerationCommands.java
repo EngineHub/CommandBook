@@ -135,13 +135,22 @@ public class ModerationCommands {
         Iterable<Player> targets = plugin.matchPlayers(sender, args.getString(0));
         String message = args.argsLength() >= 2 ? args.getJoinedStrings(1)
                 : "Kicked!";
-
+        
+        String broadcastPlayers = "";
         for (Player player : targets) {
             player.kickPlayer(message);
+            broadcastPlayers += player.getName() + " ";
             plugin.getBanDatabase().logKick(player, sender, message);
         }
         
+        
         sender.sendMessage(ChatColor.YELLOW + "Player(s) kicked.");
+        //Broadcast the Message
+        if (plugin.broadcastKicks) { 
+            plugin.getServer().broadcastMessage(ChatColor.YELLOW
+                    + plugin.toName(sender) + " has kicked " + broadcastPlayers
+                    + " - " + message);
+        }
     }
 
     @Command(aliases = {"ban"},
@@ -184,6 +193,13 @@ public class ModerationCommands {
             
             sender.sendMessage(ChatColor.YELLOW + banName
                     + " banned.");
+        }
+        
+        //Broadcast the Message
+        if (plugin.broadcastKicks) { 
+            plugin.getServer().broadcastMessage(ChatColor.YELLOW
+                    + plugin.toName(sender) + " has banned " + banName
+                    + " - " + message);
         }
         
         plugin.getBanDatabase().banName(banName, sender, message);

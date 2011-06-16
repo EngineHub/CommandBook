@@ -126,6 +126,8 @@ public class CommandBookPlugin extends JavaPlugin {
     public boolean disableMidi;
     public boolean verifyNameFormat;
     public boolean broadcastChanges;
+    public boolean broadcastKicks;
+    public boolean broadcastBans;
     public boolean useItemPermissionsOnly;
     public Set<Integer> allowedItems;
     public Set<Integer> disallowedItems;
@@ -329,6 +331,8 @@ public class CommandBookPlugin extends JavaPlugin {
         disableMidi = config.getBoolean("disable-midi", false);
         verifyNameFormat = config.getBoolean("verify-name-format", true);
         broadcastChanges = config.getBoolean("broadcast-changes", true);
+        broadcastBans = config.getBoolean("broadcast-bans", false);
+        broadcastKicks = config.getBoolean("broadcast-kicks", false);
         consoleSayFormat = config.getString("console-say-format", "<`r*Console`w> %s");
         broadcastFormat = config.getString("broadcast-format", "`r[Broadcast] %s");
         defaultItemStackSize = config.getInt("default-item-stack-size", 1);
