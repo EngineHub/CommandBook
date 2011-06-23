@@ -25,6 +25,9 @@ item-names:
     ice: 79
 # Makes /time and /weather broadcast a message
 broadcast-changes: true
+# Makes /kick and /ban broadcast a message
+broadcast-bans: false
+broadcast-kicks: false
 console-say-format: "<`r*Console`w> %s"
 broadcast-format: "`r[Broadcast] %s"
 default-item-stack-size: 1
