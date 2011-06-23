@@ -85,10 +85,11 @@ public class FunCommands {
         int count = Math.max(1, args.getInteger(1, 1));
         CreatureType type = plugin.matchCreatureType(sender, creatureName);
         CreatureType riderType = null;
-        if (hasRider) riderType = plugin.matchCreatureType(sender, riderName);
-        
+        if (hasRider) {
+            riderType = plugin.matchCreatureType(sender, riderName);
+            plugin.checkPermission(sender, "commandbook.spawnmob." + riderType.getName());
+        }
         plugin.checkPermission(sender, "commandbook.spawnmob." + type.getName());
-        plugin.checkPermission(sender, "commandbook.spawnmob." + riderType.getName());
         
         if ((hasRider ? count * 2 : count) > 10) {
             plugin.checkPermission(sender, "commandbook.spawnmob.many");
