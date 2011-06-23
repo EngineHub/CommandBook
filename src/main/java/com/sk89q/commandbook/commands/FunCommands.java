@@ -43,7 +43,7 @@ public class FunCommands {
     protected static Random random = new Random();
     
     @Command(aliases = {"spawnmob"},
-            usage = "<mob> [count] [location]", desc = "Spawn a mob",
+            usage = "<mob>[|rider] [count] [location]", desc = "Spawn a mob",
             flags = "dir",
             min = 1, max = 4)
     @CommandPermissions({"commandbook.spawnmob"})
@@ -58,84 +58,100 @@ public class FunCommands {
             loc = plugin.checkPlayer(sender).getLocation();
         }
 
-        String creatureInput = args.getString(0);
+        String[] creatureInput = args.getString(0).split("\\|");
+        boolean hasRider = creatureInput.length == 2;
         String creatureName = "";
+        String riderName = "";
         String specialType = "";
-        if (creatureName.contains(":")) {
-            String[] nameParts = creatureName.split(":");
+        String riderSpecialType = "";
+        if (creatureInput[0].contains(":")) {
+            String[] nameParts = creatureInput[0].split(":");
             creatureName = nameParts[0];
             specialType = nameParts[1].toLowerCase();
         } else {
-            creatureName = creatureInput;
+            creatureName = creatureInput[0];
         }
+
+        if (hasRider) {
+            if (creatureInput[1].contains(":")) {
+                String[] nameParts = creatureInput[1].split(":");
+                riderName = nameParts[0];
+                riderSpecialType = nameParts[1].toLowerCase();
+            } else {
+                riderName = creatureInput[1];
+            }
+        }
+
         int count = Math.max(1, args.getInteger(1, 1));
         CreatureType type = plugin.matchCreatureType(sender, creatureName);
+        CreatureType riderType = null;
+        if (hasRider) riderType = plugin.matchCreatureType(sender, riderName);
         
         plugin.checkPermission(sender, "commandbook.spawnmob." + type.getName());
         
-        if (count > 10) {
+        if ((hasRider ? count * 2 : count) > 10) {
             plugin.checkPermission(sender, "commandbook.spawnmob.many");
         }
-        
+
         for (int i = 0; i < count; i++) {
-            LivingEntity creature = loc.getWorld().spawnCreature(loc, type);
-            if (args.hasFlag('d')) {
-                creature.setHealth(1);
+            LivingEntity ridee = spawn(loc, type, specialType, args, sender, plugin);
+            if (hasRider) {
+                LivingEntity rider = spawn(loc, riderType, riderSpecialType, args, sender, plugin);
+                ridee.setPassenger(rider);
             }
-            if (args.hasFlag('i')) {
-                creature.setFireTicks(20 * 25);
-            }
-            if (args.hasFlag('r')) {
-                creature.setVelocity(new Vector(0, 2, 0));
-            }
-            if (!specialType.equals("")) {
-                if (creature instanceof Wolf) {
-                    if (specialType.matches("angry")) {
-                        ((Wolf) creature).setAngry(true);
-                        continue;
-                    } else if (specialType.matches("sit(ting)?")) {
-                        ((Wolf) creature).setSitting(true);
-                        continue;
-                    } else if (specialType.matches("tame(d)?") && sender instanceof Player) {
-                        ((Wolf) creature).setOwner(((Player) sender));
-                        continue;
-                    }
-                } else if (creature instanceof Creeper
-                        && specialType.matches("(power(ed)?|electric|lightning|shock(ed)?)")) {
-                    ((Creeper) creature).setPowered(true);
-                    continue;
-                } else if (creature instanceof Sheep) {
-                    if (specialType.matches("shear(ed)?")) {
-                        ((Sheep) creature).setSheared(true);
-                        continue;
-                    }
-                    ((Sheep) creature).setColor(plugin.matchDyeColor(specialType));
-                    continue;
-                } else if (creature instanceof Pig
-                        && specialType.matches("saddle(d)?")) {
-                    ((Pig) creature).setSaddle(true);
-                    continue;
-                } else if (creature instanceof Slime) {
-                    ((Slime) creature).setSize(Integer.parseInt(specialType));
-                    continue;
-                }
-            }
-            /*
-            if (args.hasFlag('p') && creature instanceof Creeper) {
-                ((Creeper) creature).setPowered(true);
-            }
-            if (args.hasFlag('t') && creature instanceof Wolf) {
-                ((Wolf) creature).setOwner(plugin.checkPlayer(sender));
-            }
-            if (args.hasFlag('c') && creature instanceof Sheep && args.argsLength() >= 4) {
-                ((Sheep) creature).setColor(plugin.matchDyeColor(args.getString(3)));
-            }
-            */
         }
-        
+
         sender.sendMessage(ChatColor.YELLOW + "" + count + " mob(s) spawned!");
     }
-    
+
+    private static LivingEntity spawn(Location loc, CreatureType type, String specialType,
+            CommandContext args, CommandSender sender, CommandBookPlugin plugin)
+            throws CommandException {
+        LivingEntity creature = loc.getWorld().spawnCreature(loc, type);
+        if (args.hasFlag('d')) {
+            creature.setHealth(1);
+        }
+        if (args.hasFlag('i')) {
+            creature.setFireTicks(20 * 25);
+        }
+        if (args.hasFlag('r')) {
+            creature.setVelocity(new Vector(0, 2, 0));
+        }
+        if (!specialType.equals("")) {
+            if (creature instanceof Wolf) {
+                if (specialType.matches("angry")) {
+                    ((Wolf) creature).setAngry(true);
+                    return creature;
+                } else if (specialType.matches("sit(ting)?")) {
+                    ((Wolf) creature).setSitting(true);
+                    return creature;
+                } else if (specialType.matches("tame(d)?") && sender instanceof Player) {
+                    ((Wolf) creature).setOwner(((Player) sender));
+                    return creature;
+                }
+            } else if (creature instanceof Creeper
+                    && specialType.matches("(power(ed)?|electric|lightning|shock(ed)?)")) {
+                ((Creeper) creature).setPowered(true);
+                return creature;
+            } else if (creature instanceof Sheep) {
+                if (specialType.matches("shear(ed)?")) {
+                    ((Sheep) creature).setSheared(true);
+                    return creature;
+                }
+                ((Sheep) creature).setColor(plugin.matchDyeColor(specialType));
+                return creature;
+            } else if (creature instanceof Pig
+                    && specialType.matches("saddle(d)?")) {
+                ((Pig) creature).setSaddle(true);
+                return creature;
+            } else if (creature instanceof Slime) {
+                ((Slime) creature).setSize(Integer.parseInt(specialType));
+                return creature;
+            }
+        }
+        return creature;
+    }
+
     @Command(aliases = {"slap"},
             usage = "[target]", desc = "Slap a player", flags = "hdvs",
             min = 0, max = 1)
