@@ -88,6 +88,7 @@ public class FunCommands {
         if (hasRider) riderType = plugin.matchCreatureType(sender, riderName);
         
         plugin.checkPermission(sender, "commandbook.spawnmob." + type.getName());
+        plugin.checkPermission(sender, "commandbook.spawnmob." + riderType.getName());
         
         if ((hasRider ? count * 2 : count) > 10) {
             plugin.checkPermission(sender, "commandbook.spawnmob.many");
