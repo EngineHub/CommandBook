@@ -28,6 +28,8 @@ import org.bukkit.entity.Sheep;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Wolf;
+import org.bukkit.entity.Pig;
+import org.bukkit.entity.Slime;
 import org.bukkit.util.Vector;
 import com.sk89q.commandbook.CommandBookPlugin;
 import com.sk89q.commandbook.CommandBookUtil;
@@ -41,8 +43,8 @@ public class FunCommands {
     protected static Random random = new Random();
     
     @Command(aliases = {"spawnmob"},
-            usage = "<mob> [count] [location] [color]", desc = "Spawn a mob",
-            flags = "dirptc",
+            usage = "<mob> [count] [location]", desc = "Spawn a mob",
+            flags = "dir",
             min = 1, max = 4)
     @CommandPermissions({"commandbook.spawnmob"})
     public static void spawnMob(CommandContext args, CommandBookPlugin plugin,
@@ -56,7 +58,16 @@ public class FunCommands {
             loc = plugin.checkPlayer(sender).getLocation();
         }
 
-        String creatureName = args.getString(0);
+        String creatureInput = args.getString(0);
+        String creatureName = "";
+        String specialType = "";
+        if (creatureName.contains(":")) {
+            String[] nameParts = creatureName.split(":");
+            creatureName = nameParts[0];
+            specialType = nameParts[1].toLowerCase();
+        } else {
+            creatureName = creatureInput;
+        }
         int count = Math.max(1, args.getInteger(1, 1));
         CreatureType type = plugin.matchCreatureType(sender, creatureName);
         
@@ -77,6 +88,39 @@ public class FunCommands {
             if (args.hasFlag('r')) {
                 creature.setVelocity(new Vector(0, 2, 0));
             }
+            if (!specialType.equals("")) {
+                if (creature instanceof Wolf) {
+                    if (specialType.matches("angry")) {
+                        ((Wolf) creature).setAngry(true);
+                        continue;
+                    } else if (specialType.matches("sit(ting)?")) {
+                        ((Wolf) creature).setSitting(true);
+                        continue;
+                    } else if (specialType.matches("tame(d)?") && sender instanceof Player) {
+                        ((Wolf) creature).setOwner(((Player) sender));
+                        continue;
+                    }
+                } else if (creature instanceof Creeper
+                        && specialType.matches("(power(ed)?|electric|lightning|shock(ed)?)")) {
+                    ((Creeper) creature).setPowered(true);
+                    continue;
+                } else if (creature instanceof Sheep) {
+                    if (specialType.matches("shear(ed)?")) {
+                        ((Sheep) creature).setSheared(true);
+                        continue;
+                    }
+                    ((Sheep) creature).setColor(plugin.matchDyeColor(specialType));
+                    continue;
+                } else if (creature instanceof Pig
+                        && specialType.matches("saddle(d)?")) {
+                    ((Pig) creature).setSaddle(true);
+                    continue;
+                } else if (creature instanceof Slime) {
+                    ((Slime) creature).setSize(Integer.parseInt(specialType));
+                    continue;
+                }
+            }
+            /*
             if (args.hasFlag('p') && creature instanceof Creeper) {
                 ((Creeper) creature).setPowered(true);
             }
@@ -86,6 +130,7 @@ public class FunCommands {
             if (args.hasFlag('c') && creature instanceof Sheep && args.argsLength() >= 4) {
                 ((Sheep) creature).setColor(plugin.matchDyeColor(args.getString(3)));
             }
+            */
         }
         
         sender.sendMessage(ChatColor.YELLOW + "" + count + " mob(s) spawned!");
