@@ -355,8 +355,8 @@ public class CommandBookPlugin extends JavaPlugin {
         
         if (crappyWrapperCompat) {
             logger.info("CommandBook: Maximum wrapper compatibility is enabled. " +
-            		"Some features have been disabled to be compatible with " +
-            		"poorly written server wrappers.");
+                    "Some features have been disabled to be compatible with " +
+                    "poorly written server wrappers.");
         }
         
         Object timeLocks = config.getProperty("time-lock");
@@ -510,11 +510,8 @@ public class CommandBookPlugin extends JavaPlugin {
     public void checkAllowedItem(CommandSender sender, int id)
             throws CommandException {
         
-        if (id < 1 || id == 29
-                || (id > 32 && id < 35)
-                || id == 36
-                || (id > 96 && id < 256)
-                || (id > 358 && id < 2256)
+        if (id < 1 || (id > 96 && id < 256)
+                || (id > 359 && id < 2256)
                 || id > 2257) {
             if (Material.getMaterial(id) == null) {
                 throw new CommandException("Non-existent item specified.");
