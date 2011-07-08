@@ -471,7 +471,28 @@ public class GeneralCommands {
                 String.format("Your direction: %s",
                         getCardinalDirection(player)));
     }
-    
+
+    @Command(aliases = {"biome"},
+            usage = "[player]", desc = "Get your current biome",
+            flags = "", min = 0, max = 1)
+    @CommandPermissions({"commandbook.biome"})
+    public static void biome(CommandContext args, CommandBookPlugin plugin,
+            CommandSender sender) throws CommandException {
+        
+        Player player;
+
+        if (args.argsLength() == 0) {
+            player = plugin.checkPlayer(sender);
+        } else {
+            plugin.checkPermission(sender, "commandbook.biome.other");
+            
+            player = plugin.matchSinglePlayer(sender, args.getString(0));
+        }
+
+        sender.sendMessage(ChatColor.YELLOW + player.getLocation().getBlock().getBiome().name().toLowerCase().replace("_"," ")+" biome.");
+
+    }
+
     @Command(aliases = {"whois"},
             usage = "[player]", desc = "Tell information about a player",
             flags = "", min = 0, max = 1)
