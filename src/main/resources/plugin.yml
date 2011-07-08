@@ -62,6 +62,10 @@ commands:
         description: Tell information about a user
         usage: /<command> [target]
         _category: player
+    biome:
+        description: Get a players current biome
+        usage: /<command> [target]
+        _category: player
     compass:
         description: Get your compass direction
         usage: /<command> [target]
