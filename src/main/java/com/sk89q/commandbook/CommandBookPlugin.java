@@ -1419,6 +1419,28 @@ public class CommandBookPlugin extends JavaPlugin {
             message = message.replace("%world%", world.getName());
         }
         
+        Pattern cmdPattern = Pattern.compile("%cmd:([^%]+)%");
+        Matcher matcher = cmdPattern.matcher(message);
+        try {
+            StringBuffer buff = new StringBuffer();
+            while (matcher.find()) {
+                Process p = new ProcessBuilder(matcher.group(1).split(" ")).start();
+                BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
+                String s;
+                StringBuilder build = new StringBuilder();
+                while ((s = stdInput.readLine()) != null) {
+                    build.append(s + " ");
+                }
+                stdInput.close();
+                build.delete(build.length() - 1, build.length());
+                matcher.appendReplacement(buff, build.toString());
+                p.destroy();
+            }
+            matcher.appendTail(buff);
+            message = buff.toString();
+        } catch (IOException e) {
+            sender.sendMessage(ChatColor.RED + "Error replacing macros: " + e.getMessage());
+        }
         return message;
     }
     
