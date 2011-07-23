@@ -31,6 +31,7 @@ import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiUnavailableException;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
@@ -154,6 +155,11 @@ public class CommandBookPlayerListener extends PlayerListener {
                         + e.getMessage());
             }
         }
+
+        World defaultWorld = plugin.getServer().getWorlds().get(0);
+        if (!new File(defaultWorld.getName() + File.separatorChar + "players" +
+                File.separatorChar + player.getName() + ".dat").exists() && plugin.exactSpawn)
+            player.teleport(defaultWorld.getSpawnLocation());
     }
     
     /**
@@ -163,7 +169,7 @@ public class CommandBookPlayerListener extends PlayerListener {
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
         
-        if (plugin.exactSpawn) {
+        if (plugin.exactSpawn && !event.isBedSpawn()) {
             event.setRespawnLocation(player.getWorld().getSpawnLocation());
         }
     }
