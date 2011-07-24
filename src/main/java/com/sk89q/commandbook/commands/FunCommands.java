@@ -353,10 +353,10 @@ public class FunCommands {
             sender.sendMessage(ChatColor.YELLOW.toString() + "Barrage attack sent.");
         }
     }
-    @Command(aliases = {"barragefire"},
-            usage = "[target]", desc = "Send a barrage of fireballs", flags = "s",
+    @Command(aliases = {"cannon"},
+            usage = "[target]", desc = "Send a attack of fireballs", flags = "s",
             min = 0, max = 1)
-    @CommandPermissions({"commandbook.barragefire"})
+    @CommandPermissions({"commandbook.cannon"})
     public static void barragefire(CommandContext args, CommandBookPlugin plugin,
             CommandSender sender) throws CommandException {
 
@@ -371,7 +371,7 @@ public class FunCommands {
             targets = plugin.matchPlayers(sender, args.getString(0));
             
             // Check permissions!
-            plugin.checkPermission(sender, "commandbook.barragefire.other");
+            plugin.checkPermission(sender, "commandbook.cannon.other");
         }
 
         for (Player player : targets) {
