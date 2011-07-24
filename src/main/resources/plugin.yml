@@ -218,6 +218,6 @@ commands:
         usage: /<command> ...
         _component: bans
     barragefire:
-        description: Ban save/load commands
+        description: Sends a fireball to a players head
         usage: /<command> ...
-        _component: bans
+        _component: player
