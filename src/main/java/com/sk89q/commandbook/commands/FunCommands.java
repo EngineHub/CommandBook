@@ -353,6 +353,64 @@ public class FunCommands {
             sender.sendMessage(ChatColor.YELLOW.toString() + "Barrage attack sent.");
         }
     }
+    @Command(aliases = {"barragefire"},
+            usage = "[target]", desc = "Send a barrage of fireballs", flags = "s",
+            min = 0, max = 1)
+    @CommandPermissions({"commandbook.barragefire"})
+    public static void barragefire(CommandContext args, CommandBookPlugin plugin,
+            CommandSender sender) throws CommandException {
+
+        Iterable<Player> targets = null;
+        boolean included = false;
+        int count = 0;
+        
+        // Detect arguments based on the number of arguments provided
+        if (args.argsLength() == 0) {
+            targets = plugin.matchPlayers(plugin.checkPlayer(sender));
+        } else if (args.argsLength() == 1) {            
+            targets = plugin.matchPlayers(sender, args.getString(0));
+            
+            // Check permissions!
+            plugin.checkPermission(sender, "commandbook.barragefire.other");
+        }
+
+        for (Player player : targets) {
+            double diff = (2 * Math.PI) / 24.0;
+            for (double a = 0; a < 2 * Math.PI; a += diff) {
+                CommandBookUtil.sendFireFromPlayer(player);
+            }
+
+            if (args.hasFlag('s')) {
+                // Tell the user
+                if (player.equals(sender)) {
+                    player.sendMessage(ChatColor.YELLOW + "Fireball attack!");
+                    
+                    // Keep track of this
+                    included = true;
+                } else {
+                    player.sendMessage(ChatColor.YELLOW + "Fireball attack from "
+                            + plugin.toName(sender) + ".");
+                    
+                }
+            } else {
+                if (count < 6) {
+                    plugin.getServer().broadcastMessage(
+                            ChatColor.YELLOW + plugin.toName(sender)
+                            + " used Fireball attack on " + plugin.toName(player));
+                } else if (count == 6) {
+                    plugin.getServer().broadcastMessage(
+                            ChatColor.YELLOW + plugin.toName(sender)
+                            + " used it more people...");
+                }
+            }
+        }
+        
+        // The player didn't receive any items, then we need to send the
+        // user a message so s/he know that something is indeed working
+        if (!included && args.hasFlag('s')) {
+            sender.sendMessage(ChatColor.YELLOW.toString() + "Fireball  attack sent.");
+        }
+    }
     
     @Command(aliases = {"shock"},
             usage = "[target]", desc = "Shock a player", flags = "ksa",

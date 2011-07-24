@@ -217,3 +217,7 @@ commands:
         description: Ban save/load commands
         usage: /<command> ...
         _component: bans
+    barragefire:
+        description: Ban save/load commands
+        usage: /<command> ...
+        _component: bans

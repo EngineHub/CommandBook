@@ -28,13 +28,13 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.CreatureType;
+import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.blocks.BlockType;
 import com.sk89q.worldedit.blocks.ItemType;
-
 /**
  * Utility methods for CommandBook, borrowed from Tetsuuuu (the plugin
  * for SK's server).
@@ -401,7 +401,14 @@ public class CommandBookUtil {
         loc.setZ(finalVecLoc.getZ());
         player.getWorld().spawnArrow(loc, dir, speed, spread);
     }
-    
+    public static void sendFireFromPlayer(Player player) 
+    {
+        Location loc = player.getEyeLocation();
+        loc.setX(loc.getX());
+        loc.setY(loc.getY());
+        loc.setZ(loc.getZ());
+        player.getWorld().spawn(loc, Fireball.class); 
+    }
     /**
      * Get a list of creature names.
      * 
