@@ -210,6 +210,7 @@ commands:
         usage: /<command> <target> [reason...]
         _component: bans
     unban:
+        aliases: pardon
         description: Unban a player by name
         usage: /<command> <target> [reason...]
         _component: bans
