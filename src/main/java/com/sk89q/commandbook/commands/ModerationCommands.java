@@ -241,7 +241,7 @@ public class ModerationCommands {
             sender.sendMessage(ChatColor.RED + "Bans database failed to save. See console.");
         }
     }
-*/
+*/    
     @Command(aliases = {"unban"},
             usage = "<target>", desc = "Unban a user",
             min = 1, max = -1)
@@ -268,6 +268,7 @@ public class ModerationCommands {
             sender.sendMessage(ChatColor.RED + banName + " was not banned.");
         }
     }
+    
 /*
     @Command(aliases = {"unbanip"},
             usage = "<target> [reason...]", desc = "Unban an IP address",
