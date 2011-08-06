@@ -14,6 +14,13 @@ simply run:
 Maven will automatically download dependencies for you. Note: For that to work,
 be sure to add Maven to your "PATH".
 
+Issue Tracker
+-------------
+
+The issue tracker can be found at
+http://redmine.sk89q.com/projects/commandbook/issues
+(we do not use GitHub's issue tracker).
+
 Contributing
 ------------
 
