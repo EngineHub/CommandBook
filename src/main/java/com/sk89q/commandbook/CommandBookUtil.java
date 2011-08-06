@@ -401,14 +401,25 @@ public class CommandBookUtil {
         loc.setZ(finalVecLoc.getZ());
         player.getWorld().spawnArrow(loc, dir, speed, spread);
     }
-    public static void sendFireFromPlayer(Player player) 
-    {
+
+    /**
+     * Send fireballs from a player eye level.
+     * 
+     * @param player
+     * @param amt number of fireballs to shoot (evenly spaced)
+     */
+    public static void sendFireballsFromPlayer(Player player, int amt) {
         Location loc = player.getEyeLocation();
-        loc.setX(loc.getX());
-        loc.setY(loc.getY());
-        loc.setZ(loc.getZ());
-        player.getWorld().spawn(loc, Fireball.class); 
+        final double tau = 2 * Math.PI;
+        double arc = tau / amt;
+        for (double a = 0; a < tau; a += arc) {
+            Vector dir = new Vector(Math.cos(a), 0, Math.sin(a));
+            Location spawn = loc.toVector().add(dir.multiply(2)).toLocation(loc.getWorld(), 0.0F, 0.0F);
+            Fireball fball = player.getWorld().spawn(spawn, Fireball.class);
+            fball.setDirection(dir.multiply(10));
+        }
     }
+
     /**
      * Get a list of creature names.
      * 

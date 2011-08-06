@@ -353,10 +353,11 @@ public class FunCommands {
             sender.sendMessage(ChatColor.YELLOW.toString() + "Barrage attack sent.");
         }
     }
-    @Command(aliases = {"cannon"},
+
+    @Command(aliases = {"firebarrage"},
             usage = "[target]", desc = "Send a attack of fireballs", flags = "s",
             min = 0, max = 1)
-    @CommandPermissions({"commandbook.cannon"})
+    @CommandPermissions({"commandbook.firebarrage"})
     public static void barragefire(CommandContext args, CommandBookPlugin plugin,
             CommandSender sender) throws CommandException {
 
@@ -367,18 +368,16 @@ public class FunCommands {
         // Detect arguments based on the number of arguments provided
         if (args.argsLength() == 0) {
             targets = plugin.matchPlayers(plugin.checkPlayer(sender));
-        } else if (args.argsLength() == 1) {            
+        } else if (args.argsLength() == 1) {
             targets = plugin.matchPlayers(sender, args.getString(0));
             
             // Check permissions!
-            plugin.checkPermission(sender, "commandbook.cannon.other");
+            plugin.checkPermission(sender, "commandbook.firebarrage.other");
         }
 
         for (Player player : targets) {
-            double diff = (2 * Math.PI) / 24.0;
-            for (double a = 0; a < 2 * Math.PI; a += diff) {
-                CommandBookUtil.sendFireFromPlayer(player);
-            }
+            // moved math to util because I felt like it
+            CommandBookUtil.sendFireballsFromPlayer(player, 8);
 
             if (args.hasFlag('s')) {
                 // Tell the user
@@ -408,7 +407,7 @@ public class FunCommands {
         // The player didn't receive any items, then we need to send the
         // user a message so s/he know that something is indeed working
         if (!included && args.hasFlag('s')) {
-            sender.sendMessage(ChatColor.YELLOW.toString() + "Fireball  attack sent.");
+            sender.sendMessage(ChatColor.YELLOW.toString() + "Fireball attack sent.");
         }
     }
     

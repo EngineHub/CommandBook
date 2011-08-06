@@ -95,6 +95,10 @@ commands:
         description: Send a barrage of arrows
         usage: /<command> [-s] [target]
         _category: player
+    firebarrage:
+        description: Sends a barrage of fireballs
+        usage: /<command> [-s] [target]
+        _category: player
     debug:
         description: Get server information
         usage: /<command> ...
@@ -217,7 +221,3 @@ commands:
         description: Ban save/load commands
         usage: /<command> ...
         _component: bans
-    cannon:
-        description: Sends a fireball to a players head
-        usage: /<command> ...
-        _component: player
