@@ -317,6 +317,9 @@ public class CommandBookUtil {
                 }
             }
             
+            // workaround for having inventory open while giving items (eg TMI mod)
+            player.updateInventory();
+            
             // Tell the user about the given item
             if (player.equals(sender)) {
                 player.sendMessage(ChatColor.YELLOW + "You've been given " + amtText + " "
