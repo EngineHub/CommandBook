@@ -520,12 +520,12 @@ public class FunCommands {
             
             // Tell the user
             if (player.equals(sender)) {
-                player.sendMessage(ChatColor.YELLOW + "You've been given Thor's hammer (use any pickaxe)!");
+                player.sendMessage(ChatColor.YELLOW + "You have been granted the mighty power of Thor's hammer!");
                 
                 // Keep track of this
                 included = true;
             } else {
-                player.sendMessage(ChatColor.YELLOW + "You've been given Thor's hammer by "
+                player.sendMessage(ChatColor.YELLOW + "You have been granted the might power of Thor's hammer by "
                         + plugin.toName(sender) + ".");
                 
             }
