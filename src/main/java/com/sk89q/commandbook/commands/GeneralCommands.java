@@ -818,25 +818,24 @@ public class GeneralCommands {
                     + "Stack sizes increased.");
         }
     }
-    
+
     @Command(aliases = {"afk"},
             usage = "", desc = "Set yourself as away",
             flags = "", min = 0, max = -1)
-    //@CommandPermissions({"commandbook.away"})
+    @CommandPermissions({"commandbook.away"})
     public static void afk(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
-            if(plugin.getAdminSession(plugin.checkPlayer(sender)).isIdle() == null){
-                try {
-                    sender.sendMessage(ChatColor.YELLOW + "Set as away. You will not receive any messages.");
-                    plugin.getAdminSession(plugin.checkPlayer(sender)).setIdle(args.getJoinedStrings(0));
-                }
-                catch(Exception noStatus) {
-                    plugin.getAdminSession(plugin.checkPlayer(sender)).setIdle("No status specified");
-                }
+                           CommandSender sender) throws CommandException {
+        Player player = plugin.checkPlayer(sender);
+        if (plugin.getAdminSession(player).isIdle() == null) {
+            if (args.argsLength() == 0) {
+                plugin.getAdminSession(plugin.checkPlayer(sender)).setIdle("No status specified");
+            } else {
+                plugin.getAdminSession(player).setIdle(args.getJoinedStrings(0));
             }
-            else {
-                sender.sendMessage(ChatColor.YELLOW + "You are no longer away.");
-                plugin.getAdminSession(plugin.checkPlayer(sender)).setIdle(null);
-            }
+            player.sendMessage(ChatColor.YELLOW + "Set as away. You will not receive any messages.");
+        } else {
+            player.sendMessage(ChatColor.YELLOW + "You are no longer away.");
+            plugin.getAdminSession(plugin.checkPlayer(sender)).setIdle(null);
+        }
     }
 }
