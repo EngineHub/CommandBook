@@ -24,7 +24,7 @@ public class AdministrativeSession implements PersistentSession {
     
     private long lastUpdate;
     private boolean isMute;
-    private boolean isIdle;
+    private String idleStatus;
     
     public boolean isRecent() {
         return (System.currentTimeMillis() - lastUpdate) < MAX_AGE;
@@ -42,11 +42,11 @@ public class AdministrativeSession implements PersistentSession {
         this.isMute = isMute;
     }
     
-    public boolean isIdle() {
-        return this.isIdle;
+    public String isIdle() {
+        return this.idleStatus;
     }
 
-    public void setIdle(boolean idle) {
-        this.isIdle = idle;
+    public void setIdle(String status) {
+        this.idleStatus = status;
     }
 }

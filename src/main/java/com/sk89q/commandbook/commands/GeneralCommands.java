@@ -821,21 +821,22 @@ public class GeneralCommands {
     
     @Command(aliases = {"afk"},
             usage = "", desc = "Set yourself as away",
-            flags = "", min = 0, max = 0)
-    @CommandPermissions({"commandbook.away"})
-    public static void idle(CommandContext args, CommandBookPlugin plugin,
+            flags = "", min = 0, max = -1)
+    //@CommandPermissions({"commandbook.away"})
+    public static void afk(CommandContext args, CommandBookPlugin plugin,
             CommandSender sender) throws CommandException {
-        if(sender instanceof Player) {
-            if(!plugin.getAdminSession((Player) sender).isIdle()){
-                sender.sendMessage(ChatColor.YELLOW +
-                        "Set as away. You will not receive any messages.");
-                plugin.getAdminSession((Player) sender).setIdle(true);
+            if(plugin.getAdminSession(plugin.checkPlayer(sender)).isIdle() == null){
+                try {
+                    sender.sendMessage(ChatColor.YELLOW + "Set as away. You will not receive any messages.");
+                    plugin.getAdminSession(plugin.checkPlayer(sender)).setIdle(args.getJoinedStrings(0));
+                }
+                catch(Exception noStatus) {
+                    plugin.getAdminSession(plugin.checkPlayer(sender)).setIdle("No status specified");
+                }
             }
             else {
-                sender.sendMessage(ChatColor.YELLOW +
-                        "You are no longer away.");
-                plugin.getAdminSession((Player) sender).setIdle(false);
+                sender.sendMessage(ChatColor.YELLOW + "You are no longer away.");
+                plugin.getAdminSession(plugin.checkPlayer(sender)).setIdle(null);
             }
-        }
     }
 }

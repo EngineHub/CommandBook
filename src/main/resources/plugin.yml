@@ -105,7 +105,7 @@ commands:
         _category: player
     afk:
         description: Set yourself as away
-        usage: /<command>
+        usage: /<command> [status]
         _category: player
     debug:
         description: Get server information

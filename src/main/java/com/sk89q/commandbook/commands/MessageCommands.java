@@ -112,8 +112,8 @@ public class MessageCommands {
                 plugin.matchPlayerOrConsole(sender, args.getString(0));
         String message = args.getJoinedStrings(1);
         
-        if (sender instanceof Player && plugin.getAdminSession((Player) receiver).isIdle()) {
-            sender.sendMessage(ChatColor.RED + plugin.toName(receiver) + " is idle.");
+        if (sender instanceof Player && !plugin.getAdminSession((Player) receiver).isIdle().equals(null)) {
+            sender.sendMessage(ChatColor.RED + plugin.toName(receiver) + " is idle. (" + plugin.getAdminSession((Player) receiver).isIdle() +")");
             return;
         }
         
@@ -156,8 +156,8 @@ public class MessageCommands {
             return;
         }
         
-        if (sender instanceof Player && plugin.getAdminSession((Player) receiver).isIdle()) {
-            sender.sendMessage(ChatColor.RED + plugin.toName(receiver) + " is currently idle.");
+        if (sender instanceof Player && !plugin.getAdminSession((Player) receiver).isIdle().equals(null)) {
+            sender.sendMessage(ChatColor.RED + plugin.toName(receiver) + " is idle. (" + plugin.getAdminSession((Player) receiver).isIdle() +")");
             return;
         }
         
