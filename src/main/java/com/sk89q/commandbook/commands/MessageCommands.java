@@ -106,14 +106,16 @@ public class MessageCommands {
     public static void msg(CommandContext args, CommandBookPlugin plugin,
             CommandSender sender) throws CommandException {
         
-    	
         // This will throw errors as needed
         CommandSender receiver =
                 plugin.matchPlayerOrConsole(sender, args.getString(0));
         String message = args.getJoinedStrings(1);
         
-        if (sender instanceof Player && plugin.getAdminSession((Player) receiver).isIdle() != null) {
-            sender.sendMessage(ChatColor.RED + plugin.toName(receiver) + " is idle. (" + plugin.getAdminSession((Player) receiver).isIdle() +")");
+        if (receiver instanceof Player && plugin.getAdminSession((Player) receiver).getIdleStatus() != null) {
+            String status = plugin.getAdminSession((Player) receiver).getIdleStatus();
+            sender.sendMessage(ChatColor.GRAY + plugin.toName(receiver) + " is afk. "
+                    + "They might not see your message."
+                    + (status.isEmpty() ? "" : " (" + status + ")"));
         }
         
         receiver.sendMessage(ChatColor.GRAY + "(From "
@@ -155,8 +157,11 @@ public class MessageCommands {
             return;
         }
         
-        if (sender instanceof Player && plugin.getAdminSession((Player) receiver).isIdle() != null) {
-            sender.sendMessage(ChatColor.RED + plugin.toName(receiver) + " is idle. (" + plugin.getAdminSession((Player) receiver).isIdle() +")");
+        if (receiver instanceof Player && plugin.getAdminSession((Player) receiver).getIdleStatus() != null) {
+            String status = plugin.getAdminSession((Player) receiver).getIdleStatus();
+            sender.sendMessage(ChatColor.GRAY + plugin.toName(receiver) + " is afk. "
+                    + "They might not see your message."
+                    + (status.isEmpty() ? "" : " (" + status + ")"));
         }
         
         receiver.sendMessage(ChatColor.GRAY + "(From "

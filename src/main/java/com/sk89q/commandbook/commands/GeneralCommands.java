@@ -824,18 +824,24 @@ public class GeneralCommands {
             flags = "", min = 0, max = -1)
     @CommandPermissions({"commandbook.away"})
     public static void afk(CommandContext args, CommandBookPlugin plugin,
-                           CommandSender sender) throws CommandException {
+            CommandSender sender) throws CommandException {
+
         Player player = plugin.checkPlayer(sender);
-        if (plugin.getAdminSession(player).isIdle() == null) {
-            if (args.argsLength() == 0) {
-                plugin.getAdminSession(plugin.checkPlayer(sender)).setIdle("No status specified");
-            } else {
-                plugin.getAdminSession(player).setIdle(args.getJoinedStrings(0));
+
+        if (plugin.getAdminSession(player).getIdleStatus() == null) {
+            String status = "";
+            if (args.argsLength() > 0) {
+                status = args.getJoinedStrings(0);
+                plugin.getAdminSession(player).setIdleStatus(status);
             }
-            player.sendMessage(ChatColor.YELLOW + "Set as away. You will not receive any messages.");
+
+            player.sendMessage(ChatColor.YELLOW
+                    + (status.isEmpty() ? "Set as away" : "Set away status to \"" + status + "\"")
+                    + ". To return, type /afk again.");
         } else {
             player.sendMessage(ChatColor.YELLOW + "You are no longer away.");
-            plugin.getAdminSession(plugin.checkPlayer(sender)).setIdle(null);
+            plugin.getAdminSession(player).setIdleStatus(null);
         }
     }
+
 }

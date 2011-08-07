@@ -42,11 +42,11 @@ public class AdministrativeSession implements PersistentSession {
         this.isMute = isMute;
     }
     
-    public String isIdle() {
+    public String getIdleStatus() {
         return this.idleStatus;
     }
 
-    public void setIdle(String status) {
+    public void setIdleStatus(String status) {
         this.idleStatus = status;
     }
 }
