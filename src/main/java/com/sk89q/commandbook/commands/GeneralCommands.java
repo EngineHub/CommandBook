@@ -818,4 +818,24 @@ public class GeneralCommands {
                     + "Stack sizes increased.");
         }
     }
+    
+    @Command(aliases = {"afk"},
+            usage = "", desc = "Set yourself as away",
+            flags = "", min = 0, max = 0)
+    @CommandPermissions({"commandbook.away"})
+    public static void idle(CommandContext args, CommandBookPlugin plugin,
+            CommandSender sender) throws CommandException {
+        if(sender instanceof Player) {
+            if(!plugin.getAdminSession((Player) sender).isIdle()){
+                sender.sendMessage(ChatColor.YELLOW +
+                        "Set as away. You will not receive any messages.");
+                plugin.getAdminSession((Player) sender).setIdle(true);
+            }
+            else {
+                sender.sendMessage(ChatColor.YELLOW +
+                        "You are no longer away.");
+                plugin.getAdminSession((Player) sender).setIdle(false);
+            }
+        }
+    }
 }

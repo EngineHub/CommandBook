@@ -103,6 +103,10 @@ commands:
         description: Sends a barrage of fireballs
         usage: /<command> [-s] [target]
         _category: player
+    afk:
+        description: Set yourself as away
+        usage: /<command>
+        _category: player
     debug:
         description: Get server information
         usage: /<command> ...

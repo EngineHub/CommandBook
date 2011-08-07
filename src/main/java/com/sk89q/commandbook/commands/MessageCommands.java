@@ -106,11 +106,17 @@ public class MessageCommands {
     public static void msg(CommandContext args, CommandBookPlugin plugin,
             CommandSender sender) throws CommandException {
         
+    	
         // This will throw errors as needed
         CommandSender receiver =
                 plugin.matchPlayerOrConsole(sender, args.getString(0));
         String message = args.getJoinedStrings(1);
-
+        
+        if (sender instanceof Player && plugin.getAdminSession((Player) receiver).isIdle()) {
+            sender.sendMessage(ChatColor.RED + plugin.toName(receiver) + " is idle.");
+            return;
+        }
+        
         receiver.sendMessage(ChatColor.GRAY + "(From "
                 + plugin.toName(sender) + "): "
                 + ChatColor.WHITE + message);
@@ -149,7 +155,12 @@ public class MessageCommands {
             sender.sendMessage(ChatColor.RED + "You haven't messaged anyone.");
             return;
         }
-
+        
+        if (sender instanceof Player && plugin.getAdminSession((Player) receiver).isIdle()) {
+            sender.sendMessage(ChatColor.RED + plugin.toName(receiver) + " is currently idle.");
+            return;
+        }
+        
         receiver.sendMessage(ChatColor.GRAY + "(From "
                 + plugin.toName(sender) + "): "
                 + ChatColor.WHITE + message);
