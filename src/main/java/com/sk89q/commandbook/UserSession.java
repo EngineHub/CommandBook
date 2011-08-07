@@ -39,6 +39,7 @@ public class UserSession implements PersistentSession {
     private String lastRecipient = null;
     private long lastRecipientTime = 0;
     private boolean hasThor = false;
+    private String idleStatus = null;
     private Map<String, Long> bringable = new HashMap<String, Long>();
     private Map<String, Long> teleportRequests = new HashMap<String, Long>();
     private LinkedList<Location> locationHistory = new LinkedList<Location>();
@@ -134,4 +135,12 @@ public class UserSession implements PersistentSession {
         return locationHistory.poll();
     }
     
+    public String getIdleStatus() {
+        return this.idleStatus;
+    }
+
+    public void setIdleStatus(String status) {
+        this.idleStatus = status;
+    }
+
 }

@@ -828,11 +828,11 @@ public class GeneralCommands {
 
         Player player = plugin.checkPlayer(sender);
 
-        if (plugin.getAdminSession(player).getIdleStatus() == null) {
+        if (plugin.getSession(player).getIdleStatus() == null) {
             String status = "";
             if (args.argsLength() > 0) {
                 status = args.getJoinedStrings(0);
-                plugin.getAdminSession(player).setIdleStatus(status);
+                plugin.getSession(player).setIdleStatus(status);
             }
 
             player.sendMessage(ChatColor.YELLOW
@@ -840,7 +840,7 @@ public class GeneralCommands {
                     + ". To return, type /afk again.");
         } else {
             player.sendMessage(ChatColor.YELLOW + "You are no longer away.");
-            plugin.getAdminSession(player).setIdleStatus(null);
+            plugin.getSession(player).setIdleStatus(null);
         }
     }
 

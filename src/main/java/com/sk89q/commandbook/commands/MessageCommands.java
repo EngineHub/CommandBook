@@ -111,8 +111,8 @@ public class MessageCommands {
                 plugin.matchPlayerOrConsole(sender, args.getString(0));
         String message = args.getJoinedStrings(1);
         
-        if (receiver instanceof Player && plugin.getAdminSession((Player) receiver).getIdleStatus() != null) {
-            String status = plugin.getAdminSession((Player) receiver).getIdleStatus();
+        if (receiver instanceof Player && plugin.getSession((Player) receiver).getIdleStatus() != null) {
+            String status = plugin.getSession((Player) receiver).getIdleStatus();
             sender.sendMessage(ChatColor.GRAY + plugin.toName(receiver) + " is afk. "
                     + "They might not see your message."
                     + (status.isEmpty() ? "" : " (" + status + ")"));
@@ -157,8 +157,8 @@ public class MessageCommands {
             return;
         }
         
-        if (receiver instanceof Player && plugin.getAdminSession((Player) receiver).getIdleStatus() != null) {
-            String status = plugin.getAdminSession((Player) receiver).getIdleStatus();
+        if (receiver instanceof Player && plugin.getSession((Player) receiver).getIdleStatus() != null) {
+            String status = plugin.getSession((Player) receiver).getIdleStatus();
             sender.sendMessage(ChatColor.GRAY + plugin.toName(receiver) + " is afk. "
                     + "They might not see your message."
                     + (status.isEmpty() ? "" : " (" + status + ")"));
