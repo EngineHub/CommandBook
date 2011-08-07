@@ -23,6 +23,8 @@ allowed-items: []
 item-names:
     goldblock: 41
     ice: 79
+# Allows use of custom items for Thor's hammer. Use brackets [] regardless of the amount of items.
+thor-hammer-items: [278, 285, 257, 270]
 # Makes /time and /weather broadcast a message
 broadcast-changes: true
 # Makes /kick and /ban broadcast a message

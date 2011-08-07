@@ -182,13 +182,7 @@ public class CommandBookPlayerListener extends PlayerListener {
         Player player = event.getPlayer();
         
         if (plugin.getSession(player).hasThor()) {
-            Material held = player.getItemInHand().getType();
-            
-            if (held != Material.DIAMOND_PICKAXE
-                    && held != Material.IRON_PICKAXE
-                    && held != Material.GOLD_PICKAXE
-                    && held != Material.STONE_PICKAXE
-                    && held != Material.WOOD_PICKAXE) {
+            if (!plugin.thorItems.contains(player.getItemInHand().getTypeId())) {
                 return;
             }
             

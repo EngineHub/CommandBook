@@ -132,6 +132,7 @@ public class CommandBookPlugin extends JavaPlugin {
     public Set<Integer> allowedItems;
     public Set<Integer> disallowedItems;
     public Map<String, Integer> itemNames;
+    public Set<Integer> thorItems;
     public KitManager kits;
     public String banMessage;
     public boolean opPermissions;
@@ -338,6 +339,8 @@ public class CommandBookPlugin extends JavaPlugin {
         defaultItemStackSize = config.getInt("default-item-stack-size", 1);
         exactSpawn = config.getBoolean("exact-spawn", false);
         crappyWrapperCompat = config.getBoolean("crappy-wrapper-compat", true);
+        thorItems = new HashSet<Integer>(config.getIntList(
+                "thor-hammer-items", Arrays.asList(new Integer[]{278, 285, 257, 270})));
 
         LocationManagerFactory<LocationManager<NamedLocation>> warpsFactory =
                 new FlatFileLocationsManager.WarpsFactory(getDataFolder(), this);
