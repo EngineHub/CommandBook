@@ -247,6 +247,7 @@ public class CommandBookPlugin extends JavaPlugin {
      */
     public void onDisable() {
         jingleNoteManager.stopAll();
+        this.getServer().getScheduler().cancelTasks(this);
     }
     
     /**
