@@ -140,7 +140,7 @@ public class GeneralCommands {
                     out.append(", ");
                 }
                 
-                out.append(player.getName());
+                out.append(plugin.useDisplayNames ? player.getDisplayName() : player.getName());
                 out.append(ChatColor.WHITE);
 
                 first = false;
