@@ -24,6 +24,7 @@ import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.CreatureType;
 import org.bukkit.entity.Creeper;
+import org.bukkit.entity.PigZombie;
 import org.bukkit.entity.Sheep;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -148,6 +149,13 @@ public class FunCommands {
                 return creature;
             } else if (creature instanceof Slime) {
                 ((Slime) creature).setSize(Integer.parseInt(specialType));
+                return creature;
+            } else if (creature instanceof PigZombie) {
+                if (specialType.matches("angry")) {
+                    ((PigZombie) creature).setAngry(true);
+                    return creature;
+                }
+                ((PigZombie) creature).setAnger(Integer.parseInt(specialType));
                 return creature;
             }
         }
