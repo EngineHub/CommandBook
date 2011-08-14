@@ -517,7 +517,7 @@ public class CommandBookPlugin extends JavaPlugin {
         if (id < 1 || (id > 96 && id < 256)
                 || (id > 359 && id < 2256)
                 || id > 2257) {
-            if (Material.getMaterial(id) == null) {
+            if (Material.getMaterial(id) == null || id == 0) {
                 throw new CommandException("Non-existent item specified.");
             }
         }
