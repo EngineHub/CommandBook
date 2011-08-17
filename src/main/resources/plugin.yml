@@ -230,3 +230,6 @@ commands:
         description: Ban save/load commands
         usage: /<command> ...
         _component: bans
+    playertime:
+        description: Set the time of specific players
+        usage: /<command> [-rsw] [filter] <time|"current">

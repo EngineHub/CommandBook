@@ -279,6 +279,54 @@ public class GeneralCommands {
                     + CommandBookUtil.getTimeString(world.getTime()) + ".");
         }
     }
+
+
+    @Command(aliases = {"playertime"},
+            usage = "[filter] <time|\"current\">", desc = "Get/change a player's time",
+            flags = "rsw", min = 0, max = 2)
+    public static void playertime(CommandContext args, CommandBookPlugin plugin,
+                                  CommandSender sender) throws CommandException {
+        Iterable<Player> players;
+        String timeStr = "current";
+        if (args.argsLength() < 2) {
+            if (args.argsLength() == 1) {
+                timeStr = args.getString(0);
+            }
+            players = plugin.matchPlayers(plugin.checkPlayer(sender));
+        } else {
+            players = plugin.matchPlayers(sender, args.getString(0));
+            timeStr = args.getString(1);
+            plugin.checkPermission(sender, "commandbook.time.player.other");
+        }
+        if (args.hasFlag('r')) {
+            for (Player player : players) {
+                player.resetPlayerTime();
+                if (!args.hasFlag('s'))
+                    player.sendMessage(ChatColor.YELLOW +
+                            "Your time was reset to world time");
+            }
+            sender.sendMessage(ChatColor.YELLOW + "Player times reset");
+            return;
+        }
+        if (timeStr.equalsIgnoreCase("current")
+                || timeStr.equalsIgnoreCase("cur")
+                || timeStr.equalsIgnoreCase("now")) {
+
+            plugin.checkPermission(sender, "commandbook.time.player.check");
+            sender.sendMessage(ChatColor.YELLOW
+                    + "Player Time: " + CommandBookUtil.getTimeString(plugin.matchSinglePlayer(sender,
+                    args.getString(0, plugin.checkPlayer(sender).getName())).getPlayerTime()));
+            return;
+        }
+        for (Player player : players) {
+            if (!player.equals(sender)) {
+                plugin.checkPermission(sender, "commandbook.time.player.other");
+                player.sendMessage(ChatColor.YELLOW + "Your time set to " + CommandBookUtil.getTimeString(player.getPlayerTime()));
+            }
+            player.setPlayerTime(args.hasFlag('w') ? Integer.parseInt(timeStr) : plugin.matchTime(timeStr), args.hasFlag('w'));
+        }
+        sender.sendMessage(ChatColor.YELLOW + "Player times set to " + CommandBookUtil.getTimeString(plugin.matchTime(timeStr)));
+    }
     
     @Command(aliases = {"motd"},
             usage = "", desc = "Show the message of the day",
