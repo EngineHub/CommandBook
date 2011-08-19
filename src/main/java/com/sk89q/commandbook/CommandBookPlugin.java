@@ -63,6 +63,7 @@ import com.sk89q.worldedit.blocks.BlockType;
 import com.sk89q.worldedit.blocks.ClothColor;
 import com.sk89q.worldedit.blocks.ItemType;
 import static com.sk89q.commandbook.CommandBookUtil.*;
+import com.sk89q.commandbook.locations.WrappedSpawnManager;
 
 /**
  * Base plugin class for CommandBook.
@@ -122,6 +123,11 @@ public class CommandBookPlugin extends JavaPlugin {
      * Jingle note manager.
      */
     protected JingleNoteManager jingleNoteManager;
+
+    /**
+     * Spawn pitch and yaw storage
+     */
+    private WrappedSpawnManager spawns;
     
     public boolean disableMidi;
     public boolean verifyNameFormat;
@@ -238,6 +244,7 @@ public class CommandBookPlugin extends JavaPlugin {
         registerEvent(Event.Type.PLAYER_QUIT, playerListener);
         registerEvent(Event.Type.PLAYER_CHAT, playerListener);
         registerEvent(Event.Type.PLAYER_RESPAWN, playerListener);
+        registerEvent(Event.Type.PLAYER_TELEPORT, playerListener);
         registerEvent(Event.Type.WORLD_LOAD, worldListener);
     }
 
@@ -393,6 +400,7 @@ public class CommandBookPlugin extends JavaPlugin {
                         + world.getName() + "'");
             }
         }
+        spawns = new WrappedSpawnManager(new File(getDataFolder(), "spawns.yml"));
     }
     
     /**
@@ -1519,5 +1527,9 @@ public class CommandBookPlugin extends JavaPlugin {
      */
     public PermissionsResolverManager getPermissionsResolver() {
         return perms;
+    }
+
+    public WrappedSpawnManager getSpawnManager() {
+        return spawns;
     }
 }

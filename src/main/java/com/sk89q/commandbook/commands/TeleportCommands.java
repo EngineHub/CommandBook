@@ -53,9 +53,9 @@ public class TeleportCommands {
             
             @Override
             public void perform(Player player) {
-                player.teleport(player.getWorld().getSpawnLocation());
+                player.teleport(plugin.getSpawnManager().getWorldSpawn(player.getWorld()));
             }
-            
+
             @Override
             public void onCaller(Player player) {
                 player.sendMessage(ChatColor.YELLOW + "Teleported to spawn.");

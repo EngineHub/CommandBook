@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiUnavailableException;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -46,6 +46,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import com.sk89q.commandbook.events.MOTDSendEvent;
 import com.sk89q.commandbook.events.OnlineListSendEvent;
 import com.sk89q.jinglenote.MidiJingleSequencer;
+import org.bukkit.event.player.PlayerTeleportEvent;
 
 /**
  * Handler for player events.
@@ -159,7 +160,7 @@ public class CommandBookPlayerListener extends PlayerListener {
         World defaultWorld = plugin.getServer().getWorlds().get(0);
         if (!new File(defaultWorld.getName() + File.separatorChar + "players" +
                 File.separatorChar + player.getName() + ".dat").exists() && plugin.exactSpawn)
-            player.teleport(defaultWorld.getSpawnLocation());
+            player.teleport(plugin.getSpawnManager().getWorldSpawn(player.getWorld()));
     }
     
     /**
@@ -170,7 +171,7 @@ public class CommandBookPlayerListener extends PlayerListener {
         Player player = event.getPlayer();
         
         if (plugin.exactSpawn && !event.isBedSpawn()) {
-            event.setRespawnLocation(player.getWorld().getSpawnLocation());
+            event.setRespawnLocation(plugin.getSpawnManager().getWorldSpawn(player.getWorld()));
         }
     }
 
@@ -206,6 +207,13 @@ public class CommandBookPlayerListener extends PlayerListener {
         plugin.getSession(event.getPlayer()).handleDisconnect();
         plugin.getAdminSession(event.getPlayer()).handleDisconnect();
         plugin.getJingleNoteManager().stop(event.getPlayer());
+    }
+
+    @Override
+    public void onPlayerTeleport(PlayerTeleportEvent event) {
+        Location loc = event.getTo();
+        if (loc.equals(loc.getWorld().getSpawnLocation()))
+            event.setTo(plugin.getSpawnManager().getWorldSpawn(loc.getWorld()));
     }
     
 }

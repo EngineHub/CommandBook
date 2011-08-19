@@ -49,6 +49,7 @@ public class CommandBookCommands {
         plugin.populateConfiguration();
         plugin.getBanDatabase().load();
         plugin.getKitManager().load();
+        plugin.getSpawnManager().load();
         
         sender.sendMessage(ChatColor.YELLOW
                 + "CommandBook's configuration has been reloaded.");

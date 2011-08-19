@@ -592,7 +592,7 @@ public class GeneralCommands {
             world = loc.getWorld();
         }
 
-        world.setSpawnLocation(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
+        plugin.getSpawnManager().setWorldSpawn(loc);
 
         sender.sendMessage(ChatColor.YELLOW +
                 "Spawn location of '" + world.getName() + "' set!");
