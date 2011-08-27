@@ -775,7 +775,7 @@ public class CommandBookPlugin extends JavaPlugin {
         // as that may be the wrong player)
         if (players.hasNext()) {
             throw new CommandException("More than one player found! " +
-            		"Use @<name> for exact matching.");
+                    "Use @<name> for exact matching.");
         }
         
         return match;
@@ -877,6 +877,44 @@ public class CommandBookPlugin extends JavaPlugin {
                     playerLoc.setZ(loc.getZ());
                     return CommandBookUtil.findFreePosition(playerLoc);
                 }
+            // Handle #home and #warp, which matches a player's home or a warp point
+            } else if (args[0].equalsIgnoreCase("#home")
+                    || args[0].equalsIgnoreCase("#warp")) {
+                String type = args[0].substring(1);
+                checkPermission(source, "commandbook.locations." + type);
+                RootLocationManager<NamedLocation> manager = type.equalsIgnoreCase("warp")
+                                                             ? getWarpsManager()
+                                                             : getHomesManager();
+                if (args.length == 1) {
+                    if (type.equalsIgnoreCase("warp")) {
+                        throw new CommandException("Please specify a warp name.");
+                    }
+                    // source player home
+                    Player ply = checkPlayer(source);
+                    NamedLocation loc = manager.get(ply.getWorld(), ply.getName());
+                    if (loc == null) {
+                        throw new CommandException("You have not set your home yet.");
+                    }
+                    return loc.getLocation();
+                } else if (args.length == 2) {
+                    if (source instanceof Player) {
+                        Player player = (Player) source;
+                        NamedLocation loc = manager.get(player.getWorld(), args[1]);
+                        if (loc != null && !(loc.getCreatorName().equalsIgnoreCase(player.getName()))) {
+                            checkPermission(source, "commandbook.locations." + type + ".other");
+                        }
+                    }
+                    return getManagedLocation(manager, checkPlayer(source).getWorld(), args[1]);
+                } else if (args.length == 3) {
+                    if (source instanceof Player) {
+                        Player player = (Player) source;
+                        NamedLocation loc = manager.get(matchWorld(source, args[2]), args[1]);
+                        if (loc != null && !(loc.getCreatorName().equalsIgnoreCase(player.getName()))) {
+                            checkPermission(source, "commandbook.locations." + type + ".other");
+                        }
+                    }
+                    return getManagedLocation(manager, matchWorld(source, args[2]), args[1]);
+                }
             // Handle #me, which is for when a location argument is required
             } else if (args[0].equalsIgnoreCase("#me")) {
                 return checkPlayer(source).getLocation();
@@ -893,6 +931,22 @@ public class CommandBookPlugin extends JavaPlugin {
         }
         
         return players.get(0).getLocation();
+    }
+
+    /**
+     * Get a location from a location manager.
+     * 
+     * @param manager RootLocationManager to look in
+     * @param world
+     * @param id name of the location
+     * @return a Bukkit location
+     * @throws CommandException if the location by said id does not exist
+     */
+    public Location getManagedLocation(RootLocationManager<NamedLocation> manager,
+            World world, String id) throws CommandException {
+        NamedLocation loc = manager.get(world, id);
+        if (loc == null) throw new CommandException("A location by that name could not be found.");
+        return loc.getLocation();
     }
     
     /**
