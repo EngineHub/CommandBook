@@ -269,10 +269,12 @@ public class CommandBookUtil {
      * @throws CommandException
      */
     public static void giveItem(CommandSender sender, ItemStack item, int amt,
-            Iterable<Player> targets, CommandBookPlugin plugin, boolean drop)
+            Iterable<Player> targets, CommandBookPlugin plugin, boolean drop, boolean overrideStackSize)
             throws CommandException {
         
         boolean included = false; // Is the command sender also receiving items?
+
+        int maxStackSize = overrideStackSize ? 64 : item.getType().getMaxStackSize();
         
         plugin.checkAllowedItem(sender, item.getTypeId());
         
@@ -282,10 +284,12 @@ public class CommandBookUtil {
         } else if (amt == -1) {
             // Check to see if the player can give infinite items
             plugin.checkPermission(sender, "commandbook.give.infinite");
-        } else if (amt > 64) {
+        } else if (overrideStackSize) {
+            plugin.checkPermission(sender, "commandbook.give.overridestacksize");
+        } else if (amt > maxStackSize) {
             // Check to see if the player can give stacks
             plugin.checkPermission(sender, "commandbook.give.stacks");
-        } else if (amt > 64 * 5) {
+        } else if (amt > maxStackSize * 5) {
             plugin.checkPermission(sender, "commandbook.give.stacks.unlimited");
             
             // Check to see if the player can give stacks of this size
@@ -300,7 +304,7 @@ public class CommandBookUtil {
             
             // Give individual stacks
             while (left > 0 || amt == -1) {
-                int givenAmt = Math.min(64, left);
+                int givenAmt = Math.min(maxStackSize, left);
                 item.setAmount(givenAmt);
                 left -= givenAmt;
                 
@@ -458,10 +462,12 @@ public class CommandBookUtil {
      * @param item
      * @param infinite
      */
-    public static void expandStack(ItemStack item, boolean infinite) {
+    public static void expandStack(ItemStack item, boolean infinite, boolean overrideStackSize) {
         if (item == null || item.getAmount() == 0 || item.getTypeId() <= 0) {
             return;
         }
+        
+        int stackSize = overrideStackSize ? 64 : item.getType().getMaxStackSize();
         
         if (ItemType.shouldNotStack(item.getTypeId())) {
             return;
@@ -469,8 +475,8 @@ public class CommandBookUtil {
         
         if (infinite) {
             item.setAmount(-1);
-        } else {
-            item.setAmount(64);
+        } else if (item.getAmount() < stackSize){
+            item.setAmount(stackSize);
         }
     }
 }

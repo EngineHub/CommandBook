@@ -49,7 +49,7 @@ public class GeneralCommands {
     
     @Command(aliases = {"item"},
             usage = "[target] <item[:data]> [amount]", desc = "Give an item",
-            flags = "d", min = 1, max = 3)
+            flags = "do", min = 1, max = 3)
     @CommandPermissions({"commandbook.give"})
     public static void item(CommandContext args, CommandBookPlugin plugin,
             CommandSender sender) throws CommandException {
@@ -82,12 +82,12 @@ public class GeneralCommands {
             plugin.checkPermission(sender, "commandbook.give.other");
         }
         
-        giveItem(sender, item, amt, targets, plugin, args.hasFlag('d'));
+        giveItem(sender, item, amt, targets, plugin, args.hasFlag('d'), args.hasFlag('o'));
     }
     
     @Command(aliases = {"give"},
             usage = "[-d] <target> <item[:data]> [amount]", desc = "Give an item",
-            flags = "d", min = 2, max = 3)
+            flags = "do", min = 2, max = 3)
     @CommandPermissions({"commandbook.give.other"})
     public static void give(CommandContext args, CommandBookPlugin plugin,
             CommandSender sender) throws CommandException {
@@ -111,7 +111,7 @@ public class GeneralCommands {
             amt = args.getInteger(2);
         }
         
-        giveItem(sender, item, amt, targets, plugin, args.hasFlag('d'));
+        giveItem(sender, item, amt, targets, plugin, args.hasFlag('d'), args.hasFlag('o'));
     }
     
     @Command(aliases = {"who"},
@@ -810,7 +810,7 @@ public class GeneralCommands {
     
     @Command(aliases = {"more"},
             usage = "[player]", desc = "Gets more of an item",
-            flags = "ai", min = 0, max = 1)
+            flags = "aio", min = 0, max = 1)
     @CommandPermissions({"commandbook.more"})
     public static void more(CommandContext args, CommandBookPlugin plugin,
             CommandSender sender) throws CommandException {
@@ -818,9 +818,13 @@ public class GeneralCommands {
         Iterable<Player> targets = null;
         boolean moreAll = args.hasFlag('a');
         boolean infinite = args.hasFlag('i');
+        boolean overrideStackSize = args.hasFlag('o');
         if (infinite) {
             plugin.checkPermission(sender, "commandbook.more.infinite");
+        } else if (overrideStackSize) {
+
         }
+
         boolean included = false;
         
         if (args.argsLength() == 0) {
@@ -838,10 +842,10 @@ public class GeneralCommands {
             
             if (moreAll) {
                 for (int i = 0; i < 39; i++) {
-                    expandStack(inventory.getItem(i), infinite);
+                    expandStack(inventory.getItem(i), infinite, overrideStackSize);
                 }
             } else {
-                expandStack(player.getItemInHand(), infinite);
+                expandStack(player.getItemInHand(), infinite, overrideStackSize);
             }
         
             // Tell the user about the given item
