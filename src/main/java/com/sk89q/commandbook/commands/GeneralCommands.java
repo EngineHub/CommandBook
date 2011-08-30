@@ -822,7 +822,7 @@ public class GeneralCommands {
         if (infinite) {
             plugin.checkPermission(sender, "commandbook.more.infinite");
         } else if (overrideStackSize) {
-
+            plugin.checkPermission(sender, "commandbook.override.maxstacksize");
         }
 
         boolean included = false;

@@ -125,13 +125,12 @@ public class FlatFileBanDatabase implements BanDatabase {
 
     public synchronized boolean unload() {
         for (Handler handler : auditLogger.getHandlers()) {
-            if (!(handler instanceof FileHandler)) {
-                continue;
+            if (handler instanceof FileHandler) {
+                handler.flush();
+                handler.close();
+                auditLogger.removeHandler(handler);
+                return true;
             }
-            handler.flush();
-            handler.close();
-            auditLogger.removeHandler(handler);
-            return true;
         }
         return false;
     }

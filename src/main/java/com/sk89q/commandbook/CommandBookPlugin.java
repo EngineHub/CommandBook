@@ -352,12 +352,12 @@ public class CommandBookPlugin extends JavaPlugin {
                 "thor-hammer-items", Arrays.asList(new Integer[]{278, 285, 257, 270})));
 
         LocationManagerFactory<LocationManager<NamedLocation>> warpsFactory =
-                new FlatFileLocationsManager.LocationsFactory(getDataFolder(), this, "warps");
+                new FlatFileLocationsManager.LocationsFactory(getDataFolder(), this, "Warps");
         warps = new RootLocationManager<NamedLocation>(warpsFactory,
                 config.getBoolean("per-world-warps", false));
 
         LocationManagerFactory<LocationManager<NamedLocation>> homesFactory =
-                new FlatFileLocationsManager.LocationsFactory(getDataFolder(), this, "homes");
+                new FlatFileLocationsManager.LocationsFactory(getDataFolder(), this, "Homes");
         homes = new RootLocationManager<NamedLocation>(homesFactory,
                 config.getBoolean("per-world-homes", false));
         

@@ -137,8 +137,8 @@ public class TeleportCommands {
                 target.teleport(player);
             } else {
                 throw new CommandException("That person didn't request a " +
-                		"teleport (recently) and you don't have " +
-                		"permission to teleport anyone.");
+                        "teleport (recently) and you don't have " +
+                        "permission to teleport anyone.");
             }
             
             return;

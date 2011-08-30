@@ -274,7 +274,7 @@ public class CommandBookUtil {
         
         boolean included = false; // Is the command sender also receiving items?
 
-        int maxStackSize = overrideStackSize ? 64 : item.getType().getMaxStackSize();
+        int maxStackSize = overrideStackSize ? 64 : item.getMaxStackSize();
         
         plugin.checkAllowedItem(sender, item.getTypeId());
         
@@ -285,17 +285,17 @@ public class CommandBookUtil {
             // Check to see if the player can give infinite items
             plugin.checkPermission(sender, "commandbook.give.infinite");
         } else if (overrideStackSize) {
-            plugin.checkPermission(sender, "commandbook.give.overridestacksize");
-        } else if (amt > maxStackSize) {
+            plugin.checkPermission(sender, "commandbook.override.maxstacksize");
+        } else if (amt > maxStackSize * 5) {
+            // Check to see if the player can give stacks of this size
+            if (!plugin.hasPermission(sender, "commandbook.give.stacks.unlimited")) {
+                throw new CommandException("More than 5 stacks is too excessive.");
+            }
+        } else if (amt > maxStackSize /* && amt < max * 5 */) {
             // Check to see if the player can give stacks
             plugin.checkPermission(sender, "commandbook.give.stacks");
-        } else if (amt > maxStackSize * 5) {
-            plugin.checkPermission(sender, "commandbook.give.stacks.unlimited");
-            
-            // Check to see if the player can give stacks of this size
-            throw new CommandException("More than 5 stacks is too excessive.");
         }
-        
+
         // Get a nice amount name
         String amtText = amt == -1 ? "an infinite stack of" : String.valueOf(amt);
         
@@ -467,9 +467,9 @@ public class CommandBookUtil {
             return;
         }
         
-        int stackSize = overrideStackSize ? 64 : item.getType().getMaxStackSize();
+        int stackSize = overrideStackSize ? 64 : item.getMaxStackSize();
         
-        if (ItemType.shouldNotStack(item.getTypeId())) {
+        if (item.getMaxStackSize() == 1) {
             return;
         }
         

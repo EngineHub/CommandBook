@@ -68,9 +68,10 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
         Map<String, NamedLocation> locs = new HashMap<String, NamedLocation>();
         
         file.getParentFile().mkdirs();
-        if (!file.exists())
+        if (!file.exists()) {
             file.createNewFile();
-        
+        }
+
         try {
             input = new FileInputStream(file);
             InputStreamReader streamReader = new InputStreamReader(input, "utf-8");
@@ -80,7 +81,7 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
             String[] line;
             while ((line = csv.readNext()) != null) {
                 if (line.length < 7) {
-                    logger.warning("CommandBook: " + (Character.toUpperCase(type.charAt(0)) + type.substring(1)) + " data file has an invalid line with < 7 fields");
+                    logger.warning("CommandBook: " + type + " data file has an invalid line with < 7 fields");
                 } else {
                     try {
                         String name = line[0].trim().replace(" ", "");
@@ -116,7 +117,7 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
                         warp.setCreatorName(creator);
                         locs.put(name.toLowerCase(), warp);
                     } catch (NumberFormatException e) {
-                        logger.warning("CommandBook: " + (Character.toUpperCase(type.charAt(0)) + type.substring(1)) + " data file has an invalid line with non-numeric numeric fields");
+                        logger.warning("CommandBook: " + type + " data file has an invalid line with non-numeric numeric fields");
                     }
                 }
             }
@@ -124,10 +125,10 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
             this.locs = locs;
             
             if (castWorld != null) {
-                logger.warning("CommandBook: " + locs.size() + " " + (Character.toUpperCase(type.charAt(0)) + type.substring(1)) + "(s) loaded for "
+                logger.warning("CommandBook: " + locs.size() + " " + type + "(s) loaded for "
                         + castWorld.getName());
             } else {
-                logger.warning("CommandBook: " + locs.size() + " " + (Character.toUpperCase(type.charAt(0)) + type.substring(1)) + "(s) loaded");
+                logger.warning("CommandBook: " + locs.size() + " " + type + "(s) loaded");
             }
         } finally {
             if (input != null) {
@@ -208,16 +209,16 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
         public LocationsFactory(File rootDir, CommandBookPlugin plugin, String type) {
             this.rootDir = rootDir;
             this.plugin = plugin;
-            this.type = type.toLowerCase();
+            this.type = type;
         }
 
         public LocationManager<NamedLocation> createManager() {
-            return new FlatFileLocationsManager(new File(rootDir, type + ".csv"), plugin, type);
+            return new FlatFileLocationsManager(new File(rootDir, type.toLowerCase() + ".csv"), plugin, type);
         }
 
         public LocationManager<NamedLocation> createManager(World castWorld) {
             return new FlatFileLocationsManager(
-                    new File(rootDir, type + File.separator + castWorld.getName() + ".csv"), plugin, type);
+                    new File(rootDir, type.toLowerCase() + File.separator + castWorld.getName() + ".csv"), plugin, type);
         }
     }
 
