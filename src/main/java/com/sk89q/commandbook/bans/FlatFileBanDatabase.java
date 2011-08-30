@@ -35,6 +35,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
@@ -73,7 +74,7 @@ public class FlatFileBanDatabase implements BanDatabase {
         try {
             FileHandler handler = new FileHandler(
                     (new File(dataDirectory, "bans.%g.%u.log")).getAbsolutePath()
-                    .replace("\\", "/"));
+                    .replace("\\", "/"), true);
             
             handler.setFormatter(new Formatter() {
                 private SimpleDateFormat dateFormat =
@@ -120,6 +121,19 @@ public class FlatFileBanDatabase implements BanDatabase {
         }
 */
         return successful;
+    }
+
+    public synchronized boolean unload() {
+        for (Handler handler : auditLogger.getHandlers()) {
+            if (!(handler instanceof FileHandler)) {
+                continue;
+            }
+            handler.flush();
+            handler.close();
+            auditLogger.removeHandler(handler);
+            return true;
+        }
+        return false;
     }
     
     /**

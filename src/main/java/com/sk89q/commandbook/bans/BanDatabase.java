@@ -41,6 +41,13 @@ public interface BanDatabase {
      * @return whether the operation was fully successful
      */
     public boolean save();
+
+    /**
+     * Unloads the database
+     *
+     * @return whether the operation was fully successful
+     */
+    public boolean unload();
     
     /**
      * Checks if a player's name is banned.
