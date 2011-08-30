@@ -36,7 +36,7 @@ import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
 import com.sk89q.commandbook.CommandBookPlugin;
 
-public class FlatFileLocationsManager implements WarpsManager, HomesManager {
+public class FlatFileLocationsManager implements LocationManager<NamedLocation> {
     
     private static final Logger logger = Logger.getLogger("Minecraft.CommandBook");
     
@@ -44,19 +44,19 @@ public class FlatFileLocationsManager implements WarpsManager, HomesManager {
     private World castWorld;
     private File file;
     private Map<String, NamedLocation> locs = new HashMap<String, NamedLocation>();
-    private boolean forHomes = false;
+    private String type;
     
     /**
      * Construct the manager.
      * 
      * @param plugin
-     * @param file 
-     * @param forHomes 
+     * @param file
+     * @param type
      */
-    public FlatFileLocationsManager(File file, CommandBookPlugin plugin, boolean forHomes) {
+    public FlatFileLocationsManager(File file, CommandBookPlugin plugin, String type) {
         this.plugin = plugin;
         this.file = file;
-        this.forHomes = forHomes;
+        this.type = type;
     }
 
     public void castWorld(World world) {
@@ -68,6 +68,8 @@ public class FlatFileLocationsManager implements WarpsManager, HomesManager {
         Map<String, NamedLocation> locs = new HashMap<String, NamedLocation>();
         
         file.getParentFile().mkdirs();
+        if (!file.exists())
+            file.createNewFile();
         
         try {
             input = new FileInputStream(file);
@@ -78,7 +80,7 @@ public class FlatFileLocationsManager implements WarpsManager, HomesManager {
             String[] line;
             while ((line = csv.readNext()) != null) {
                 if (line.length < 7) {
-                    logger.warning("CommandBook: " + (forHomes ? "Homes" : "Warps") + " data file has an invalid line with < 7 fields");
+                    logger.warning("CommandBook: " + (Character.toUpperCase(type.charAt(0)) + type.substring(1)) + " data file has an invalid line with < 7 fields");
                 } else {
                     try {
                         String name = line[0].trim().replace(" ", "");
@@ -114,7 +116,7 @@ public class FlatFileLocationsManager implements WarpsManager, HomesManager {
                         warp.setCreatorName(creator);
                         locs.put(name.toLowerCase(), warp);
                     } catch (NumberFormatException e) {
-                        logger.warning("CommandBook: " + (forHomes ? "Homes" : "Warps") + " data file has an invalid line with non-numeric numeric fields");
+                        logger.warning("CommandBook: " + (Character.toUpperCase(type.charAt(0)) + type.substring(1)) + " data file has an invalid line with non-numeric numeric fields");
                     }
                 }
             }
@@ -122,10 +124,10 @@ public class FlatFileLocationsManager implements WarpsManager, HomesManager {
             this.locs = locs;
             
             if (castWorld != null) {
-                logger.warning("CommandBook: " + locs.size() + " " + (forHomes ? "homes" : "warps") + "(s) loaded for "
+                logger.warning("CommandBook: " + locs.size() + " " + (Character.toUpperCase(type.charAt(0)) + type.substring(1)) + "(s) loaded for "
                         + castWorld.getName());
             } else {
-                logger.warning("CommandBook: " + locs.size() + " " + (forHomes ? "homes" : "warps") + "(s) loaded");
+                logger.warning("CommandBook: " + locs.size() + " " + (Character.toUpperCase(type.charAt(0)) + type.substring(1)) + "(s) loaded");
             }
         } finally {
             if (input != null) {
@@ -196,47 +198,27 @@ public class FlatFileLocationsManager implements WarpsManager, HomesManager {
         }
         return warp;
     }
-    
-    public static class WarpsFactory implements WarpsManagerFactory {
+
+    public static class LocationsFactory implements LocationManagerFactory<LocationManager<NamedLocation>> {
 
         private CommandBookPlugin plugin;
         public File rootDir;
-        
-        public WarpsFactory(File rootDir, CommandBookPlugin plugin) {
+        private String type;
+
+        public LocationsFactory(File rootDir, CommandBookPlugin plugin, String type) {
             this.rootDir = rootDir;
             this.plugin = plugin;
+            this.type = type.toLowerCase();
         }
 
-        public WarpsManager createManager() {
-            return new FlatFileLocationsManager(new File(rootDir, "warps.csv"), plugin, false);
+        public LocationManager<NamedLocation> createManager() {
+            return new FlatFileLocationsManager(new File(rootDir, type + ".csv"), plugin, type);
         }
 
-        public WarpsManager createManager(World castWorld) {
+        public LocationManager<NamedLocation> createManager(World castWorld) {
             return new FlatFileLocationsManager(
-                    new File(rootDir, "warps/" + castWorld.getName() + ".csv"), plugin, false);
+                    new File(rootDir, type + File.separator + castWorld.getName() + ".csv"), plugin, type);
         }
-        
-    }
-    
-    public static class HomesFactory implements HomesManagerFactory {
-
-        private CommandBookPlugin plugin;
-        public File rootDir;
-        
-        public HomesFactory(File rootDir, CommandBookPlugin plugin) {
-            this.rootDir = rootDir;
-            this.plugin = plugin;
-        }
-
-        public HomesManager createManager() {
-            return new FlatFileLocationsManager(new File(rootDir, "homes.csv"), plugin, true);
-        }
-
-        public HomesManager createManager(World castWorld) {
-            return new FlatFileLocationsManager(
-                    new File(rootDir, "homes/" + castWorld.getName() + ".csv"), plugin, true);
-        }
-        
     }
 
 }
