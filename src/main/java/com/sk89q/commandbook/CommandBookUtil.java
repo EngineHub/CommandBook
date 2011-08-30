@@ -274,7 +274,7 @@ public class CommandBookUtil {
         
         boolean included = false; // Is the command sender also receiving items?
 
-        int maxStackSize = overrideStackSize ? 64 : item.getMaxStackSize();
+        int maxStackSize = overrideStackSize ? 64 : item.getType().getMaxStackSize();
         
         plugin.checkAllowedItem(sender, item.getTypeId());
         
@@ -467,9 +467,9 @@ public class CommandBookUtil {
             return;
         }
         
-        int stackSize = overrideStackSize ? 64 : item.getMaxStackSize();
+        int stackSize = overrideStackSize ? 64 : item.getType().getMaxStackSize();
         
-        if (item.getMaxStackSize() == 1) {
+        if (item.getType().getMaxStackSize() == 1) {
             return;
         }
         
