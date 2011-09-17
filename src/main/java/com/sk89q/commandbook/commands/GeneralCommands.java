@@ -289,6 +289,7 @@ public class GeneralCommands {
         Iterable<Player> players;
         String timeStr = "current";
         if (args.argsLength() < 2) {
+            plugin.checkPermission(sender, "commandbook.time.player");
             if (args.argsLength() == 1) {
                 timeStr = args.getString(0);
             }
@@ -322,6 +323,8 @@ public class GeneralCommands {
             if (!player.equals(sender)) {
                 plugin.checkPermission(sender, "commandbook.time.player.other");
                 player.sendMessage(ChatColor.YELLOW + "Your time set to " + CommandBookUtil.getTimeString(player.getPlayerTime()));
+            } else {
+                plugin.checkPermission(sender, "commandbook.time.player");
             }
             player.setPlayerTime(args.hasFlag('w') ? Integer.parseInt(timeStr) : plugin.matchTime(timeStr), args.hasFlag('w'));
         }
