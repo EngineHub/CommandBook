@@ -103,7 +103,7 @@ public class HomeCommands {
             homeName = player.getName();
             loc = player.getLocation();
         } else if (args.argsLength() == 1) {
-            homeName = args.getString(1);
+            homeName = args.getString(0);
             player = plugin.checkPlayer(sender);
             loc = player.getLocation();
             
