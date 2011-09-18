@@ -24,6 +24,7 @@ import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.CreatureType;
 import org.bukkit.entity.Creeper;
+import org.bukkit.entity.Enderman;
 import org.bukkit.entity.PigZombie;
 import org.bukkit.entity.Sheep;
 import org.bukkit.entity.LivingEntity;
@@ -31,6 +32,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Wolf;
 import org.bukkit.entity.Pig;
 import org.bukkit.entity.Slime;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 import com.sk89q.commandbook.CommandBookPlugin;
 import com.sk89q.commandbook.CommandBookUtil;
@@ -66,7 +68,7 @@ public class FunCommands {
         String specialType = "";
         String riderSpecialType = "";
         if (creatureInput[0].contains(":")) {
-            String[] nameParts = creatureInput[0].split(":");
+            String[] nameParts = creatureInput[0].split(":", 2);
             creatureName = nameParts[0];
             specialType = nameParts[1].toLowerCase();
         } else {
@@ -75,7 +77,7 @@ public class FunCommands {
 
         if (hasRider) {
             if (creatureInput[1].contains(":")) {
-                String[] nameParts = creatureInput[1].split(":");
+                String[] nameParts = creatureInput[1].split(":", 2);
                 riderName = nameParts[0];
                 riderSpecialType = nameParts[1].toLowerCase();
             } else {
@@ -156,6 +158,11 @@ public class FunCommands {
                     return creature;
                 }
                 ((PigZombie) creature).setAnger(Integer.parseInt(specialType));
+                return creature;
+            } else if (creature instanceof Enderman) {
+                ItemStack item = plugin.getItem(specialType);
+                if (item == null) return creature;
+                ((Enderman) creature).setCarriedMaterial(item.getData());
                 return creature;
             }
         }
