@@ -54,9 +54,7 @@ public class MessageCommands {
 
         plugin.getServer().getPluginManager().callEvent(
                 new SharedMessageEvent(name + " " + msg));
-        
-        Logger.getLogger("Minecraft").info("<" + name + ">: " + msg);
-        
+
         plugin.getServer().broadcastMessage("* " + name + " " + msg);
     }
     
@@ -85,9 +83,7 @@ public class MessageCommands {
 
         plugin.getServer().getPluginManager().callEvent(
                 new CommandSenderMessageEvent(sender, msg));
-        
-        Logger.getLogger("Minecraft").info("<" + name + ">: " + msg);
-        
+
         if (sender instanceof Player) {
             plugin.getServer().broadcastMessage(
                     "<" + plugin.toColoredName(sender, ChatColor.WHITE)
