@@ -27,6 +27,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.CreatureType;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
@@ -399,14 +400,15 @@ public class CommandBookUtil {
      * @param spread
      */
     public static void sendArrowFromPlayer(Player player,
-            Vector dir, float speed, float spread) {
+            Vector dir, float speed) {
         Location loc = player.getEyeLocation();
         Vector actualDir = dir.clone().normalize();
         Vector finalVecLoc = loc.toVector().add(actualDir.multiply(2));
         loc.setX(finalVecLoc.getX());
         loc.setY(finalVecLoc.getY());
         loc.setZ(finalVecLoc.getZ());
-        player.getWorld().spawnArrow(loc, dir, speed, spread);
+        Arrow arrow = player.getWorld().spawn(loc, Arrow.class);
+        arrow.setVelocity(dir.multiply(speed));
     }
 
     /**

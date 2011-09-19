@@ -316,7 +316,7 @@ public class FunCommands {
         // Detect arguments based on the number of arguments provided
         if (args.argsLength() == 0) {
             targets = plugin.matchPlayers(plugin.checkPlayer(sender));
-        } else if (args.argsLength() == 1) {            
+        } else if (args.argsLength() == 1) {
             targets = plugin.matchPlayers(sender, args.getString(0));
             
             // Check permissions!
@@ -327,7 +327,7 @@ public class FunCommands {
             double diff = (2 * Math.PI) / 24.0;
             for (double a = 0; a < 2 * Math.PI; a += diff) {
                 Vector vel = new Vector(Math.cos(a), 0, Math.sin(a));
-                CommandBookUtil.sendArrowFromPlayer(player, vel, 2, 12);
+                CommandBookUtil.sendArrowFromPlayer(player, vel, 2);
             }
 
             if (args.hasFlag('s')) {
