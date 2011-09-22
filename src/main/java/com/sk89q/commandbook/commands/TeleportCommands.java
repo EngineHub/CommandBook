@@ -133,7 +133,6 @@ public class TeleportCommands {
                 sender.sendMessage(ChatColor.YELLOW + "Player teleported.");
                 target.sendMessage(ChatColor.YELLOW + "Your teleport request to "
                         + plugin.toName(sender) + " was accepted.");
-                plugin.getSession(target).rememberLocation(target);
                 target.teleport(player);
             } else {
                 throw new CommandException("That person didn't request a " +
@@ -168,7 +167,6 @@ public class TeleportCommands {
                 Location playerLoc = player.getLocation();
                 loc.setPitch(playerLoc.getPitch());
                 loc.setYaw(playerLoc.getYaw());
-                plugin.getSession(player).rememberLocation(player);
                 player.teleport(loc);
             }
             
@@ -186,6 +184,7 @@ public class TeleportCommands {
         Location lastLoc = plugin.getSession(player).popLastLocation();
 
         if (lastLoc != null) {
+            plugin.getSession(player).setIgnoreLocation(lastLoc);
             player.teleport(lastLoc);
             sender.sendMessage(ChatColor.YELLOW + "You've been returned.");
         } else {

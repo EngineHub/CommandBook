@@ -38,7 +38,6 @@ public class TeleportPlayerIterator extends PlayerIteratorAction {
     @Override
     public void perform(Player player) {
         oldLoc = player.getLocation();
-        plugin.getSession(player).rememberLocation(player);
         player.teleport(loc);
     }
     

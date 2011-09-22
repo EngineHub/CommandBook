@@ -43,6 +43,7 @@ public class UserSession implements PersistentSession {
     private Map<String, Long> bringable = new HashMap<String, Long>();
     private Map<String, Long> teleportRequests = new HashMap<String, Long>();
     private LinkedList<Location> locationHistory = new LinkedList<Location>();
+    private Location ignoreTeleportLocation;
     
     public boolean isRecent() {
         return (System.currentTimeMillis() - lastUpdate) < MAX_AGE;
@@ -143,4 +144,11 @@ public class UserSession implements PersistentSession {
         this.idleStatus = status;
     }
 
+    public void setIgnoreLocation(Location loc) {
+        this.ignoreTeleportLocation = loc;
+    }
+
+    public Location getIgnoreLocation() {
+        return ignoreTeleportLocation;
+    }
 }

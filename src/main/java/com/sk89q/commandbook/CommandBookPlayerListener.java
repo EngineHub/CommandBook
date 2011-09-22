@@ -78,7 +78,7 @@ public class CommandBookPlayerListener extends PlayerListener {
         
         if (plugin.verifyNameFormat && !namePattern.matcher(player.getName()).matches()) {
             logger.info("Name verification: " + player.getName() + " was kicked " +
-            		"for having an invalid name (to disable, turn off verify-name-format in CommandBook)");
+                    "for having an invalid name (to disable, turn off verify-name-format in CommandBook)");
             event.disallow(Result.KICK_OTHER, "Invalid player name detected!");
             return;
         }
@@ -169,7 +169,7 @@ public class CommandBookPlayerListener extends PlayerListener {
     @Override
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
-        
+        plugin.getSession(player).rememberLocation(player);
         if (plugin.exactSpawn && !event.isBedSpawn()) {
             event.setRespawnLocation(plugin.getSpawnManager().getWorldSpawn(player.getWorld()));
         }
@@ -212,8 +212,18 @@ public class CommandBookPlayerListener extends PlayerListener {
     @Override
     public void onPlayerTeleport(PlayerTeleportEvent event) {
         Location loc = event.getTo();
-        if (loc.equals(loc.getWorld().getSpawnLocation()))
+        Player player = event.getPlayer();
+        if (event.isCancelled()) {
+            return;
+        }
+        if (loc == plugin.getSession(player).getIgnoreLocation()) {
+            plugin.getSession(player).setIgnoreLocation(null);
+            return;
+        }
+        plugin.getSession(event.getPlayer()).rememberLocation(event.getPlayer());
+        if (loc.equals(loc.getWorld().getSpawnLocation())) {
             event.setTo(plugin.getSpawnManager().getWorldSpawn(loc.getWorld()));
+        }
     }
     
 }
