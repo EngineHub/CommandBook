@@ -56,7 +56,7 @@ public class HomeCommands {
             
             // Check permissions!
             plugin.checkPermission(sender, "commandbook.home.other");
-        } else if (args.argsLength() == 2) {            
+        } else if (args.argsLength() == 2) {
             targets = plugin.matchPlayers(sender, args.getString(0));
             if (plugin.getHomesManager().isPerWorld()) {
                 Player player = plugin.checkPlayer(sender);
@@ -68,7 +68,7 @@ public class HomeCommands {
             // Check permissions!
             plugin.checkPermission(sender, "commandbook.home.teleport.other");
             plugin.checkPermission(sender, "commandbook.home.other");
-        } else if (args.argsLength() == 3) {            
+        } else if (args.argsLength() == 3) {
             targets = plugin.matchPlayers(sender, args.getString(1));
             home = plugin.getHomesManager().get(
                     plugin.matchWorld(sender, args.getString(0)), args.getString(2));

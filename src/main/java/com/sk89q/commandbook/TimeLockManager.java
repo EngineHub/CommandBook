@@ -42,7 +42,7 @@ public class TimeLockManager {
         long time = world.getFullTime();
         unlock(world);
         int id = plugin.getServer().getScheduler().scheduleSyncRepeatingTask(
-                plugin, new TimeLocker(world, time), 20, 20);
+                plugin, new TimeLocker(world, time), 20, plugin.timeLockDelay);
         tasks.put(world.getName(), id);
     }
 

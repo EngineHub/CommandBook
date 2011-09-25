@@ -33,7 +33,6 @@ import org.bukkit.World.Environment;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.CreatureType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -45,7 +44,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.config.Configuration;
 import com.sk89q.bukkit.migration.PermissionsResolverManager;
-import com.sk89q.bukkit.migration.PermissionsResolverServerListener;
 import com.sk89q.commandbook.bans.BanDatabase;
 import com.sk89q.commandbook.bans.FlatFileBanDatabase;
 import com.sk89q.commandbook.commands.*;
@@ -151,6 +149,7 @@ public class CommandBookPlugin extends JavaPlugin {
     public boolean playersListGroupedNames;
     public boolean playersListMaxPlayers;
     public boolean crappyWrapperCompat;
+    public int timeLockDelay;
 
     protected Map<String, String> messages = new HashMap<String, String>();
     protected Map<String, UserSession> sessions =
@@ -193,8 +192,7 @@ public class CommandBookPlugin extends JavaPlugin {
         jingleNoteManager = new JingleNoteManager(this);
         
         // Prepare permissions
-        perms = new PermissionsResolverManager(
-                getConfiguration(), getServer(), getDescription().getName(), logger);
+        perms = new PermissionsResolverManager(this, getDescription().getName(), logger);
         perms.load();
         
         // Register the commands that we want to use
@@ -226,9 +224,6 @@ public class CommandBookPlugin extends JavaPlugin {
         getServer().getScheduler().scheduleAsyncRepeatingTask(
                 this, new GarbageCollector(this),
                 GarbageCollector.CHECK_FREQUENCY, GarbageCollector.CHECK_FREQUENCY);
-
-        // The permissions resolver has some hooks of its own
-        (new PermissionsResolverServerListener(perms)).register(this);
     }
     
     /**
@@ -350,6 +345,7 @@ public class CommandBookPlugin extends JavaPlugin {
         crappyWrapperCompat = config.getBoolean("crappy-wrapper-compat", true);
         thorItems = new HashSet<Integer>(config.getIntList(
                 "thor-hammer-items", Arrays.asList(new Integer[]{278, 285, 257, 270})));
+        timeLockDelay = config.getInt("time-lock-delay", 20);
 
         LocationManagerFactory<LocationManager<NamedLocation>> warpsFactory =
                 new FlatFileLocationsManager.LocationsFactory(getDataFolder(), this, "Warps");
@@ -424,7 +420,7 @@ public class CommandBookPlugin extends JavaPlugin {
                     
                     // Check if the item ID is a number
                     if (entry.getValue() instanceof Integer) {
-                        itemNames.put(name, (Integer) entry.getValue());        
+                        itemNames.put(name, (Integer) entry.getValue());
                     }
                 }
             } catch (ClassCastException e) {
@@ -493,7 +489,8 @@ public class CommandBookPlugin extends JavaPlugin {
         
         // Invoke the permissions resolver
         if (sender instanceof Player) {
-            return perms.hasPermission(((Player) sender).getName(), perm);
+            Player player = (Player) sender;
+            return perms.hasPermission(player.getWorld().getName(), player.getName(), perm);
         }
         
         return false;
@@ -522,13 +519,9 @@ public class CommandBookPlugin extends JavaPlugin {
      */
     public void checkAllowedItem(CommandSender sender, int id)
             throws CommandException {
-        
-        if (id < 1 || (id > 96 && id < 256)
-                || (id > 359 && id < 2256)
-                || id > 2257) {
-            if (Material.getMaterial(id) == null || id == 0) {
-                throw new CommandException("Non-existent item specified.");
-            }
+
+        if (Material.getMaterial(id) == null || id == 0) {
+            throw new CommandException("Non-existent item specified.");
         }
 
         // Check if the user has an override

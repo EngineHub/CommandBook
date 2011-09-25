@@ -40,5 +40,6 @@ crappy-wrapper-compat: true
 time-lock:
     # Example time lock:
     #world: 3am
+time-lock-delay: 20
 per-world-warps: false
 per-world-homes: false
