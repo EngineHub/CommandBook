@@ -5,43 +5,73 @@ commands:
     cmdbook:
         description: CommandBook commands
         usage: /<command> <arguments...>
-    item:
-        aliases: [item, i]
-        description: Create an item
-        usage: /<command> [-d] [target] <item[:data]> [amount]
-    give:
-        description: Give an item
-        usage: /<command> [-d] <target> <item[:data]> [amount]
-        _parent: item
+    motd:
+        description: Show the message of the day
+        usage: /<command>
+        _category: server
+    rules:
+        description: Show the rules
+        usage: /<command>
+        _category: server
     who:
         aliases: [list, playerlist, online, players]
         description: Get the list of players
         usage: /<command> [filter]
-    motd:
-        description: Show the message of the day
+        _category: server
+    debug:
+        description: Get server information
+        usage: /<command> ...
+        _category: server
+    ping:
+        description: Get back a dummy reply
         usage: /<command>
-    intro:
-        description: Replay the intro music
+        _category: server
+    pong:
+        description: Get back a dummy reply
         usage: /<command>
+        _parent: pong
+        _category: server
+
+    item:
+        aliases: [item, i]
+        description: Create an item
+        usage: /<command> [-d] [target] <item[:data]> [amount]
+        _category: items
+    give:
+        description: Give an item
+        usage: /<command> [-d] <target> <item[:data]> [amount]
+        _parent: item
+        _category: items
+    kit:
+        description: Get a kit (or list kits)
+        usage: /<command> <kit> [target]
+        _category: items
+    more:
+        description: Expand stack size
+        usage: /<command> [-a] [-i] [target]
+        _category: items
+
     midi:
         aliases: play
         description: Play a MIDI file
         usage: /<command> [midi]
-    rules:
-        description: Show the rules
+    intro:
+        description: Replay the intro music
         usage: /<command>
-    kit:
-        description: Get a kit (or list kits)
-        usage: /<command> <kit> [target]
-    more:
-        description: Expand stack size
-        usage: /<command> [-a] [-i] [target]
+        _parent: midi
+
     time:
         description: Set the time of your current world
         usage: /<command> [world] <time|"current">
+    playertime:
+        description: Set the time of specific players
+        usage: /<command> [-rsw] [filter] <time|"current">
+        _parent: time
+
     weather:
         description: Change the weather
         usage: /<command> <'stormy'|'sunny'> [duration] [world]
+        _category: world
     thunder:
         description: Set the thunder state
         usage: /<command> <'on'|'off'> [duration] [world]
@@ -49,10 +79,11 @@ commands:
     setspawn:
         description: Set the spawn location
         usage: /<command> [location]
+        _category: world
     spawnmob:
         description: Spawn a mob
         usage: /<command> [-d] [-i] [-r] <mob> [count] [location]
-    
+
     whereami:
         aliases: [getpos, pos, where]
         description: Get your current location
@@ -103,21 +134,7 @@ commands:
         description: Sends a barrage of fireballs
         usage: /<command> [-s] [target]
         _category: player
-    afk:
-        description: Set yourself as away
-        usage: /<command> [status]
-        _category: player
-    debug:
-        description: Get server information
-        usage: /<command> ...
-    ping:
-        description: Get back a dummy reply
-        usage: /<command>
-    pong:
-        description: Get back a dummy reply
-        usage: /<command>
-        _parent: pong
-        
+
     teleport:
         aliases: tp
         description: Teleport to a location
@@ -147,7 +164,7 @@ commands:
         description: Return back to your last location
         usage: /<command>
         _category: teleport
-        
+
     warp:
         description: Teleport to a warp
         usage: /<command> [world] [target] <warp>
@@ -161,7 +178,7 @@ commands:
         description: Warp management commands
         usage: /<command>
         _category: warps
-        
+
     home:
         description: Teleport to home
         usage: /<command> [[[world]] [target]] [owner]
@@ -175,7 +192,7 @@ commands:
         description: Home management commands
         usage: /<command>
         _category: homes
-    
+
     broadcast:
         description: Broadcast a message
         usage: /<command> <msg...>
@@ -199,16 +216,21 @@ commands:
         usage: /<command> <message...>
         _parent: msg
         _category: messaging
+    afk:
+        aliases: away
+        description: Set yourself as away
+        usage: /<command> [status]
+        _category: messaging
     mute:
         description: Mute a player
         usage: /<command> <target>
         _category: messaging
     unmute:
-        description: Unute a player
+        description: Unmute a player
         usage: /<command> <target>
         _parent: mute
         _category: messaging
-    
+
     kick:
         description: Kick a player by name
         usage: /<command> <target> [reason...]
@@ -230,6 +252,3 @@ commands:
         description: Ban save/load commands
         usage: /<command> ...
         _component: bans
-    playertime:
-        description: Set the time of specific players
-        usage: /<command> [-rsw] [filter] <time|"current">
