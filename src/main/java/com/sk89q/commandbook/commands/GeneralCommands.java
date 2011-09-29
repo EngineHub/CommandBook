@@ -274,7 +274,7 @@ public class GeneralCommands {
         }
         
         // Tell console, since console won't get the broadcast message.
-        if (!(sender instanceof Player) || !plugin.broadcastChanges) {
+        if (!plugin.broadcastChanges) {
             sender.sendMessage(ChatColor.YELLOW + "Time " + verb + " to "
                     + CommandBookUtil.getTimeString(world.getTime()) + ".");
         }
@@ -736,7 +736,7 @@ public class GeneralCommands {
             }
             
             // Tell console, since console won't get the broadcast message.
-            if (!(sender instanceof Player) || !plugin.broadcastChanges) {
+            if (!plugin.broadcastChanges) {
                 sender.sendMessage(ChatColor.YELLOW + "Stormy weather enabled.");
             }
             
@@ -760,7 +760,7 @@ public class GeneralCommands {
             }
             
             // Tell console, since console won't get the broadcast message.
-            if (!(sender instanceof Player) || !plugin.broadcastChanges) {
+            if (!plugin.broadcastChanges) {
                 sender.sendMessage(ChatColor.YELLOW + "Stormy weather disabled.");
             }
             

@@ -21,9 +21,12 @@ package com.sk89q.commandbook;
 
 import java.io.*;
 import java.util.*;
+import java.util.jar.JarFile;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.zip.ZipEntry;
+
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.Location;
@@ -438,9 +441,17 @@ public class CommandBookPlugin extends JavaPlugin {
     protected void createDefaultConfiguration(String name) {
         File actual = new File(getDataFolder(), name);
         if (!actual.exists()) {
-            
+
             InputStream input =
-                    this.getClass().getResourceAsStream("/defaults/" + name);
+                    null;
+            try {
+                JarFile file = new JarFile(getFile());
+                ZipEntry copy = file.getEntry("defaults" + File.separator + name);
+                if (copy == null) throw new FileNotFoundException();
+                input = file.getInputStream(copy);
+            } catch (IOException e) {
+                logger.severe(getDescription().getName() + ": Unable to read default configuration: " + name);
+            }
             if (input != null) {
                 FileOutputStream output = null;
 
