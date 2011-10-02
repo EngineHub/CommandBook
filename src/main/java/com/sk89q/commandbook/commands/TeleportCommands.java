@@ -90,12 +90,18 @@ public class TeleportCommands {
         if (args.argsLength() == 1) {
             targets = plugin.matchPlayers(plugin.checkPlayer(sender));
             loc = plugin.matchLocation(sender, args.getString(0));
-        } else {            
+            if (!plugin.checkPlayer(sender).getLocation().getWorld().getName().equals(loc.getWorld().getName())) {
+                plugin.checkPermission(sender, loc.getWorld(), "commandbook.teleport");
+            }
+        } else {
             targets = plugin.matchPlayers(sender, args.getString(0));
             loc = plugin.matchLocation(sender, args.getString(1));
             
             // Check permissions!
             plugin.checkPermission(sender, "commandbook.teleport.other");
+            if (!plugin.checkPlayer(sender).getLocation().getWorld().getName().equals(loc.getWorld().getName())) {
+                plugin.checkPermission(sender, loc.getWorld(), "commandbook.teleport.other");
+            }
         }
         
         (new TeleportPlayerIterator(plugin, sender, loc)).iterate(targets);
@@ -110,10 +116,14 @@ public class TeleportCommands {
 
         Player player = plugin.checkPlayer(sender);
         Player target = plugin.matchSinglePlayer(sender, args.getString(0));
-        
+
+        if (!player.getWorld().getName().equals(target.getWorld().getName())) {
+            plugin.checkPermission(sender, player.getWorld(), "commandbook.call");
+        }
+
         plugin.getSession(player).checkLastTeleportRequest(target);
         plugin.getSession(target).addBringable(player);
-        
+
         sender.sendMessage(ChatColor.YELLOW.toString() + "Teleport request sent.");
         target.sendMessage(ChatColor.AQUA + "**TELEPORT** " + plugin.toName(sender)
                 + " requests a teleport! Use /bring <name> to accept.");
@@ -124,11 +134,11 @@ public class TeleportCommands {
             min = 1, max = 1)
     public static void bring(CommandContext args, final CommandBookPlugin plugin,
             CommandSender sender) throws CommandException {
-        
+
+        Player player = plugin.checkPlayer(sender);
         if (!plugin.hasPermission(sender, "commandbook.teleport.other")) {
-            Player player = plugin.checkPlayer(sender);
             Player target = plugin.matchSinglePlayer(sender, args.getString(0));
-            
+
             if (plugin.getSession(player).isBringable(target)) {
                 sender.sendMessage(ChatColor.YELLOW + "Player teleported.");
                 target.sendMessage(ChatColor.YELLOW + "Your teleport request to "
@@ -139,14 +149,25 @@ public class TeleportCommands {
                         "teleport (recently) and you don't have " +
                         "permission to teleport anyone.");
             }
-            
+
             return;
         }
 
         Iterable<Player> targets = plugin.matchPlayers(sender, args.getString(0));
-        Location loc = plugin.checkPlayer(sender).getLocation();
-        
-        (new TeleportPlayerIterator(plugin, sender, loc)).iterate(targets);
+        Location loc = player.getLocation();
+
+        (new TeleportPlayerIterator(plugin, sender, loc) {
+            @Override
+            public void perform(Player player) {
+                if (!player.getWorld().getName().equals(((Player) sender).getWorld().getName())) {
+                    if (!plugin.hasPermission(sender, player.getWorld(), "commandbook.teleport.other")) {
+                        return;
+                    }
+                }
+                oldLoc = player.getLocation();
+                player.teleport(loc);
+            }
+        }).iterate(targets);
     }
     
     @Command(aliases = {"put"},

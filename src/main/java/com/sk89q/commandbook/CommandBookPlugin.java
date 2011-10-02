@@ -493,20 +493,28 @@ public class CommandBookPlugin extends JavaPlugin {
         if (!(sender instanceof Player)) {
             return true;
         }
-        
+
+        return hasPermission(sender, ((Player) sender).getWorld(), perm);
+    }
+
+    public boolean hasPermission(CommandSender sender, World world, String perm) {
+        if (!(sender instanceof Player)) {
+            return true;
+        }
+
         if (sender.isOp() && opPermissions) {
             return true;
         }
-        
+
         // Invoke the permissions resolver
         if (sender instanceof Player) {
             Player player = (Player) sender;
-            return perms.hasPermission(player.getWorld().getName(), player.getName(), perm);
+            return perms.hasPermission(world.getName(), player.getName(), perm);
         }
-        
+
         return false;
     }
-    
+
     /**
      * Checks permissions and throws an exception if permission is not met.
      * 
@@ -521,6 +529,13 @@ public class CommandBookPlugin extends JavaPlugin {
         }
     }
     
+    public void checkPermission(CommandSender sender, World world, String perm)
+            throws CommandPermissionsException {
+        if (!hasPermission(sender, world, perm)) {
+            throw new CommandPermissionsException();
+        }
+    }
+
     /**
      * Checks to see if a user can use an item.
      * 
