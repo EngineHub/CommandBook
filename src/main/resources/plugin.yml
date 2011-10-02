@@ -168,30 +168,30 @@ commands:
     warp:
         description: Teleport to a warp
         usage: /<command> [world] [target] <warp>
-        _category: warps
+        _component: warps
     setwarp:
         aliases: createwarp
         description: Set a warp
         usage: /<command> <warp> [location]
-        _category: warps
+        _component: warps
     warps:
         description: Warp management commands
         usage: /<command>
-        _category: warps
+        _component: warps
 
     home:
         description: Teleport to home
         usage: /<command> [[[world]] [target]] [owner]
-        _category: homes
+        _component: homes
     sethome:
         aliases: createhome
         description: Set home
         usage: /<command> [location] [owner]
-        _category: homes
+        _component: homes
     homes:
         description: Home management commands
         usage: /<command>
-        _category: homes
+        _component: homes
 
     broadcast:
         description: Broadcast a message
