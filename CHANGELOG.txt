@@ -1,3 +1,28 @@
+1.6:
+- Added basic warps and homes support
+- Added option to broadcast kicks and bans
+- Added %cmd:<command>% macro, replacing output of the command (run by console)
+- Added /firebarrage command (like arrow /barrage, with fireballs)
+- Added /afk command to warn players that you are away when messaging you
+- Added /biome command to output the current biome you are in
+- Added /playertime command to set a player's percieved time
+- Spawnmob command now supports setting additional data on several mobs
+    (saddled pigs, tamed wolves, colored sheep, etc)
+- Spawnmob command now supports riders
+- Custom items can now be used with the /thor command (setting in config)
+- Any command that takes a location can now be pointed to a #warp or #home
+- Item commands now obey max stack sizes (-o to override)
+- Time locks can now be put on a configurable delay if you are having trouble
+    with redstone or water physics
+- Teleportation commands will also check the target world if the permissions
+    provider support multi-world permissions
+- The /return command will now handle all player teleports, including death
+- Fixed exact respawn issues with beds and first join (hopefully)
+- Fixed items not showing up in inventory after using give commands
+    in certain cases
+Thanks to contributions by:
+wizjany, zml2008, sleaker, famerdave, ivals, TexasGamer, and o0c
+
 1.5.2:
 - Updated for MC 1.6.
 - Added support for commandbook.kit.other as a permission.
