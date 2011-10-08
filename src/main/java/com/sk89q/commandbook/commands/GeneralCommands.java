@@ -81,7 +81,10 @@ public class GeneralCommands {
             /// players!
             plugin.checkPermission(sender, "commandbook.give.other");
         }
-        
+
+        if (item == null) {
+            throw new CommandException("Something went wrong parsing the item info!");
+        }
         giveItem(sender, item, amt, targets, plugin, args.hasFlag('d'), args.hasFlag('o'));
     }
     
@@ -110,7 +113,10 @@ public class GeneralCommands {
             item = plugin.matchItem(sender, args.getString(1));
             amt = args.getInteger(2);
         }
-        
+
+        if (item == null) {
+            throw new CommandException("Something went wrong parsing the item info!");
+        }
         giveItem(sender, item, amt, targets, plugin, args.hasFlag('d'), args.hasFlag('o'));
     }
     
