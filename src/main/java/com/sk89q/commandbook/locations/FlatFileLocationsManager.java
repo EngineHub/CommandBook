@@ -125,10 +125,10 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
             this.locs = locs;
             
             if (castWorld != null) {
-                logger.warning("CommandBook: " + locs.size() + " " + type + "(s) loaded for "
+                logger.info("CommandBook: " + locs.size() + " " + type + "(s) loaded for "
                         + castWorld.getName());
             } else {
-                logger.warning("CommandBook: " + locs.size() + " " + type + "(s) loaded");
+                logger.info("CommandBook: " + locs.size() + " " + type + "(s) loaded");
             }
         } finally {
             if (input != null) {
