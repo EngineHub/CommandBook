@@ -118,6 +118,10 @@ commands:
         description: Rocket a player
         usage: /<command> [-s] [-h] [target]
         _category: player
+    burn:
+        description: Burn a player
+        usage: /<command> [-s] [-k|-h] [target]
+        _category: player
     slap:
         description: Slap a player
         usage: /<command> [-s] [-h|-v] [-d] [target]
@@ -172,6 +176,11 @@ commands:
     setwarp:
         aliases: createwarp
         description: Set a warp
+        usage: /<command> <warp> [location]
+        _component: warps
+    delwarp:
+        aliases: deletewarp
+        description: Delete a warp
         usage: /<command> <warp> [location]
         _component: warps
     warps:
@@ -252,3 +261,4 @@ commands:
         description: Ban save/load commands
         usage: /<command> ...
         _component: bans
+
