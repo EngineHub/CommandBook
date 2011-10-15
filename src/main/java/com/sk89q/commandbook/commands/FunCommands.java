@@ -169,6 +169,86 @@ public class FunCommands {
         return creature;
     }
     
+    @Command(aliases = {"slap"},
+            usage = "[target]", desc = "Slap a player", flags = "hdvs",
+            min = 0, max = 1)
+    @CommandPermissions({"commandbook.slap"})
+    public static void slap(CommandContext args, CommandBookPlugin plugin,
+            CommandSender sender) throws CommandException {
+
+        Iterable<Player> targets = null;
+        boolean included = false;
+        int count = 0;
+        
+        // Detect arguments based on the number of arguments provided
+        if (args.argsLength() == 0) {
+            targets = plugin.matchPlayers(plugin.checkPlayer(sender));
+            
+            // Check permissions!
+            plugin.checkPermission(sender, "commandbook.slap");
+        } else if (args.argsLength() == 1) {
+            targets = plugin.matchPlayers(sender, args.getString(0));
+            
+            // Check permissions!
+            plugin.checkPermission(sender, "commandbook.slap.other");
+        }
+
+        for (Player player : targets) {
+            count++;
+            
+            if (args.hasFlag('v')) {
+                player.setVelocity(new Vector(
+                        random.nextDouble() * 10.0 - 5,
+                        random.nextDouble() * 10,
+                        random.nextDouble() * 10.0 - 5));
+            } else if (args.hasFlag('h')) {
+                player.setVelocity(new Vector(
+                        random.nextDouble() * 5.0 - 2.5,
+                        random.nextDouble() * 5,
+                        random.nextDouble() * 5.0 - 2.5));
+            } else {
+                player.setVelocity(new Vector(
+                        random.nextDouble() * 2.0 - 1,
+                        random.nextDouble() * 1,
+                        random.nextDouble() * 2.0 - 1));
+            }
+            
+            if (args.hasFlag('d')) {
+                player.setHealth(player.getHealth() - 1);
+            }
+
+            if (args.hasFlag('s')) {
+                // Tell the user
+                if (player.equals(sender)) {
+                    player.sendMessage(ChatColor.YELLOW + "Slapped!");
+                    
+                    // Keep track of this
+                    included = true;
+                } else {
+                    player.sendMessage(ChatColor.YELLOW + "You've been slapped by "
+                            + plugin.toName(sender) + ".");
+                    
+                }
+            } else {
+                if (count < 6) {
+                    plugin.getServer().broadcastMessage(
+                            ChatColor.YELLOW + plugin.toName(sender)
+                            + " slapped " + plugin.toName(player));
+                } else if (count == 6) {
+                    plugin.getServer().broadcastMessage(
+                            ChatColor.YELLOW + plugin.toName(sender)
+                            + " slapped more people...");
+                }
+            }
+        }
+        
+        // The player didn't receive any items, then we need to send the
+        // user a message so s/he know that something is indeed working
+        if (!included && args.hasFlag('s')) {
+            sender.sendMessage(ChatColor.YELLOW.toString() + "Players slapped.");
+        }
+    }
+    
     @Command(aliases = {"burn"},
             usage = "[target]", desc = "Burn a player", flags = "khs",
             min = 0, max = 2)
