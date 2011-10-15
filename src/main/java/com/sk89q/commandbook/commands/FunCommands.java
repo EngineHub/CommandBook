@@ -168,12 +168,12 @@ public class FunCommands {
         }
         return creature;
     }
-
-    @Command(aliases = {"slap"},
-            usage = "[target]", desc = "Slap a player", flags = "hdvs",
-            min = 0, max = 1)
-    @CommandPermissions({"commandbook.slap"})
-    public static void slap(CommandContext args, CommandBookPlugin plugin,
+    
+    @Command(aliases = {"burn"},
+            usage = "[target]", desc = "Burn a player", flags = "khs",
+            min = 0, max = 2)
+    @CommandPermissions({"commandbook.burn"})
+    public static void burn(CommandContext args, CommandBookPlugin plugin,
             CommandSender sender) throws CommandException {
 
         Iterable<Player> targets = null;
@@ -185,47 +185,33 @@ public class FunCommands {
             targets = plugin.matchPlayers(plugin.checkPlayer(sender));
             
             // Check permissions!
-            plugin.checkPermission(sender, "commandbook.slap");
+            plugin.checkPermission(sender, "commandbook.burn");
         } else if (args.argsLength() == 1) {            
             targets = plugin.matchPlayers(sender, args.getString(0));
             
             // Check permissions!
-            plugin.checkPermission(sender, "commandbook.slap.other");
+            plugin.checkPermission(sender, "commandbook.burn.other");
         }
 
         for (Player player : targets) {
             count++;
             
-            if (args.hasFlag('v')) {
-                player.setVelocity(new Vector(
-                        random.nextDouble() * 10.0 - 5,
-                        random.nextDouble() * 10,
-                        random.nextDouble() * 10.0 - 5));
+            if (args.hasFlag('k')) {
+                player.setFireTicks(120 * 20);
             } else if (args.hasFlag('h')) {
-                player.setVelocity(new Vector(
-                        random.nextDouble() * 5.0 - 2.5,
-                        random.nextDouble() * 5,
-                        random.nextDouble() * 5.0 - 2.5));
+                player.setFireTicks(12 * 20);
             } else {
-                player.setVelocity(new Vector(
-                        random.nextDouble() * 2.0 - 1,
-                        random.nextDouble() * 1,
-                        random.nextDouble() * 2.0 - 1));
+                player.setFireTicks(5 * 20);
             }
-            
-            if (args.hasFlag('d')) {
-                player.setHealth(player.getHealth() - 1);
-            }
-
             if (args.hasFlag('s')) {
                 // Tell the user
                 if (player.equals(sender)) {
-                    player.sendMessage(ChatColor.YELLOW + "Slapped!");
+                    player.sendMessage(ChatColor.YELLOW + "Burned!");
                     
                     // Keep track of this
                     included = true;
                 } else {
-                    player.sendMessage(ChatColor.YELLOW + "You've been slapped by "
+                    player.sendMessage(ChatColor.YELLOW + "You've been burned by "
                             + plugin.toName(sender) + ".");
                     
                 }
@@ -233,11 +219,11 @@ public class FunCommands {
                 if (count < 6) {
                     plugin.getServer().broadcastMessage(
                             ChatColor.YELLOW + plugin.toName(sender)
-                            + " slapped " + plugin.toName(player));
+                            + " burned " + plugin.toName(player));
                 } else if (count == 6) {
                     plugin.getServer().broadcastMessage(
                             ChatColor.YELLOW + plugin.toName(sender)
-                            + " slapped more people...");
+                            + " burned more people...");
                 }
             }
         }
@@ -245,9 +231,10 @@ public class FunCommands {
         // The player didn't receive any items, then we need to send the
         // user a message so s/he know that something is indeed working
         if (!included && args.hasFlag('s')) {
-            sender.sendMessage(ChatColor.YELLOW.toString() + "Players slapped.");
+            sender.sendMessage(ChatColor.YELLOW.toString() + "Players burned.");
         }
     }
+    
     
     @Command(aliases = {"rocket"},
             usage = "[target]", desc = "Rocket a player", flags = "hs",
@@ -506,7 +493,7 @@ public class FunCommands {
             sender.sendMessage(ChatColor.YELLOW.toString() + "Players shocked.");
         }
     }
-    
+  
     @Command(aliases = {"thor"},
             usage = "[target]", desc = "Give a player Thor power", flags = "",
             min = 0, max = 1)
