@@ -20,6 +20,7 @@ package com.sk89q.commandbook.commands;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import com.sk89q.commandbook.CommandBookPlugin;
@@ -94,11 +95,32 @@ public class WarpCommands {
             loc = player.getLocation();
         } else {            
             loc = plugin.matchLocation(sender, args.getString(1));
-        }
+        }            
         
         plugin.getWarpsManager().create(warpName, loc, player);
         
         sender.sendMessage(ChatColor.YELLOW + "Warp '" + warpName + "' created.");
+    }
+    
+    @Command(aliases = {"delwarp"},
+            usage = "<warp> [world]", desc = "Delete a warp",
+            min = 1, max = 2)
+    @CommandPermissions({"commandbook.warp.delete"})
+    public static void delWarp(CommandContext args, CommandBookPlugin plugin,
+            CommandSender sender) throws CommandException {
+        String warpName = args.getString(0);
+        World world;
+        
+        // Get sender's world or specified world
+        if (args.argsLength() == 1) {
+            world = plugin.checkPlayer(sender).getWorld();
+        } else {
+            world = plugin.matchWorld(sender, args.getString(1));
+        }
+       
+        plugin.getWarpsManager().remove(world, warpName);
+        
+        sender.sendMessage(ChatColor.YELLOW + "Warp '" + warpName + "' deleted.");
     }
 
     @Command(aliases = {"warps"}, desc = "Warp management")
