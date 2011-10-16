@@ -90,7 +90,7 @@ public class TeleportCommands {
         if (args.argsLength() == 1) {
             targets = plugin.matchPlayers(plugin.checkPlayer(sender));
             loc = plugin.matchLocation(sender, args.getString(0));
-            if (!plugin.checkPlayer(sender).getLocation().getWorld().getName().equals(loc.getWorld().getName())) {
+            if (sender instanceof Player && ((Player) sender).getLocation().getWorld().getName().equals(loc.getWorld().getName())) {
                 plugin.checkPermission(sender, loc.getWorld(), "commandbook.teleport");
             }
         } else {
@@ -99,7 +99,7 @@ public class TeleportCommands {
             
             // Check permissions!
             plugin.checkPermission(sender, "commandbook.teleport.other");
-            if (!plugin.checkPlayer(sender).getLocation().getWorld().getName().equals(loc.getWorld().getName())) {
+            if (sender instanceof Player && ((Player) sender).getLocation().getWorld().getName().equals(loc.getWorld().getName())) {
                 plugin.checkPermission(sender, loc.getWorld(), "commandbook.teleport.other");
             }
         }
@@ -159,9 +159,11 @@ public class TeleportCommands {
         (new TeleportPlayerIterator(plugin, sender, loc) {
             @Override
             public void perform(Player player) {
-                if (!player.getWorld().getName().equals(((Player) sender).getWorld().getName())) {
-                    if (!plugin.hasPermission(sender, player.getWorld(), "commandbook.teleport.other")) {
-                        return;
+                if (sender instanceof Player) {
+                    if (!player.getWorld().getName().equals(((Player) sender).getWorld().getName())) {
+                        if (!plugin.hasPermission(sender, player.getWorld(), "commandbook.teleport.other")) {
+                            return;
+                        }
                     }
                 }
                 oldLoc = player.getLocation();
