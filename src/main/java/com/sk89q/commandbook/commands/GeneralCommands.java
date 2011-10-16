@@ -277,10 +277,7 @@ public class GeneralCommands {
                     + plugin.toName(sender) + " " + verb + " the time of '"
                     + world.getName() + "' to "
                     + CommandBookUtil.getTimeString(world.getTime()) + ".");
-        }
-        
-        // Tell console, since console won't get the broadcast message.
-        if (!plugin.broadcastChanges) {
+        } else {
             sender.sendMessage(ChatColor.YELLOW + "Time " + verb + " to "
                     + CommandBookUtil.getTimeString(world.getTime()) + ".");
         }
@@ -294,6 +291,8 @@ public class GeneralCommands {
                                   CommandSender sender) throws CommandException {
         Iterable<Player> players;
         String timeStr = "current";
+        boolean included = false;
+
         if (args.argsLength() < 2) {
             plugin.checkPermission(sender, "commandbook.time.player");
             if (args.argsLength() == 1) {
@@ -305,36 +304,47 @@ public class GeneralCommands {
             timeStr = args.getString(1);
             plugin.checkPermission(sender, "commandbook.time.player.other");
         }
+
         if (args.hasFlag('r')) {
             for (Player player : players) {
                 player.resetPlayerTime();
-                if (!args.hasFlag('s'))
-                    player.sendMessage(ChatColor.YELLOW +
-                            "Your time was reset to world time");
+                if (!args.hasFlag('s')) {
+                    player.sendMessage(ChatColor.YELLOW + "Your time was reset to world time");
+                }
+                if (sender instanceof Player && ((Player) sender).equals(player)) {
+                    included = true;
+                }
             }
-            sender.sendMessage(ChatColor.YELLOW + "Player times reset");
+            if (!included) {
+                sender.sendMessage(ChatColor.YELLOW + "Player times reset");
+            }
             return;
         }
+
         if (timeStr.equalsIgnoreCase("current")
                 || timeStr.equalsIgnoreCase("cur")
                 || timeStr.equalsIgnoreCase("now")) {
-
             plugin.checkPermission(sender, "commandbook.time.player.check");
             sender.sendMessage(ChatColor.YELLOW
                     + "Player Time: " + CommandBookUtil.getTimeString(plugin.matchSinglePlayer(sender,
                     args.getString(0, plugin.checkPlayer(sender).getName())).getPlayerTime()));
             return;
         }
+
         for (Player player : players) {
             if (!player.equals(sender)) {
                 plugin.checkPermission(sender, "commandbook.time.player.other");
                 player.sendMessage(ChatColor.YELLOW + "Your time set to " + CommandBookUtil.getTimeString(player.getPlayerTime()));
             } else {
                 plugin.checkPermission(sender, "commandbook.time.player");
+                player.sendMessage(ChatColor.YELLOW + "Your time set to " + CommandBookUtil.getTimeString(player.getPlayerTime()));
+                included = true;
             }
             player.setPlayerTime(args.hasFlag('w') ? Integer.parseInt(timeStr) : plugin.matchTime(timeStr), args.hasFlag('w'));
         }
-        sender.sendMessage(ChatColor.YELLOW + "Player times set to " + CommandBookUtil.getTimeString(plugin.matchTime(timeStr)));
+        if (!included) {
+            sender.sendMessage(ChatColor.YELLOW + "Player times set to " + CommandBookUtil.getTimeString(plugin.matchTime(timeStr)));
+        }
     }
     
     @Command(aliases = {"motd"},
