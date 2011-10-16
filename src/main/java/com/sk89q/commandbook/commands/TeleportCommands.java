@@ -99,7 +99,13 @@ public class TeleportCommands {
             
             // Check permissions!
             plugin.checkPermission(sender, "commandbook.teleport.other");
-            if (!plugin.checkPlayer(sender).getLocation().getWorld().getName().equals(loc.getWorld().getName())) {
+            Player playerSender = null;
+            try {
+            	playerSender = plugin.checkPlayer(sender);
+            } catch (CommandException e) {
+            	// assume it's from console, skip commandbook.teleport.other check. no need to log this?
+            }
+            if (playerSender != null && !playerSender.getLocation().getWorld().getName().equals(loc.getWorld().getName())) {
                 plugin.checkPermission(sender, loc.getWorld(), "commandbook.teleport.other");
             }
         }
