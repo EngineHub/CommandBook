@@ -251,7 +251,7 @@ public class FunCommands {
     
     @Command(aliases = {"burn"},
             usage = "[target]", desc = "Burn a player", flags = "khs",
-            min = 0, max = 2)
+            min = 0, max = 1)
     @CommandPermissions({"commandbook.burn"})
     public static void burn(CommandContext args, CommandBookPlugin plugin,
             CommandSender sender) throws CommandException {
