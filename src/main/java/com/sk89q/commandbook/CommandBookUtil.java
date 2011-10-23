@@ -408,6 +408,7 @@ public class CommandBookUtil {
         loc.setY(finalVecLoc.getY());
         loc.setZ(finalVecLoc.getZ());
         Arrow arrow = player.getWorld().spawn(loc, Arrow.class);
+        arrow.setShooter(player);
         arrow.setVelocity(dir.multiply(speed));
     }
 
@@ -425,6 +426,7 @@ public class CommandBookUtil {
             Vector dir = new Vector(Math.cos(a), 0, Math.sin(a));
             Location spawn = loc.toVector().add(dir.multiply(2)).toLocation(loc.getWorld(), 0.0F, 0.0F);
             Fireball fball = player.getWorld().spawn(spawn, Fireball.class);
+            fball.setShooter(player);
             fball.setDirection(dir.multiply(10));
         }
     }
