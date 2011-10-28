@@ -140,10 +140,14 @@ public class CommandBookPlayerListener extends PlayerListener {
         }
 
         if (!plugin.disableMidi) {
+            MidiJingleSequencer sequencer = null;
+            
             try {
-                MidiJingleSequencer sequencer = new MidiJingleSequencer(
-                        new File(plugin.getDataFolder(), "intro.mid"));
-                plugin.getJingleNoteManager().play(player, sequencer, 2000);
+                File file = new File(plugin.getDataFolder(), "intro.mid");
+                if (file.exists()) {
+                    sequencer = new MidiJingleSequencer(file);
+                    plugin.getJingleNoteManager().play(player, sequencer, 2000);
+                }
             } catch (MidiUnavailableException e) {
                 logger.log(Level.WARNING, "CommandBook: Failed to access MIDI: "
                         + e.getMessage());

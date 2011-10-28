@@ -58,10 +58,11 @@ public class JingleNotePlayer implements Runnable {
                     }
                 });
             }
-            
-            sequencer = null;
         } catch (InterruptedException e) {
             e.printStackTrace();
+        } finally {
+            sequencer.stop();
+            sequencer = null;
         }
     }
     

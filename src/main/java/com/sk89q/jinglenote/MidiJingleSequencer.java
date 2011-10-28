@@ -62,10 +62,21 @@ public class MidiJingleSequencer implements JingleSequencer {
             InvalidMidiDataException, IOException {
         this.midiFile = midiFile;
 
-        sequencer = MidiSystem.getSequencer(false);
-        sequencer.open();
-        Sequence seq = MidiSystem.getSequence(midiFile);
-        sequencer.setSequence(seq);
+        try {
+            sequencer = MidiSystem.getSequencer(false);
+            sequencer.open();
+            Sequence seq = MidiSystem.getSequence(midiFile);
+            sequencer.setSequence(seq);
+        } catch (MidiUnavailableException e) {
+            sequencer.close();
+            throw e;
+        } catch (InvalidMidiDataException e) {
+            sequencer.close();
+            throw e;
+        } catch (IOException e) {
+            sequencer.close();
+            throw e;
+        }
     }
     
     public void run(final JingleNotePlayer notePlayer)
@@ -115,7 +126,7 @@ public class MidiJingleSequencer implements JingleSequencer {
 
     public void stop() {
         if (sequencer != null) {
-            sequencer.stop();
+            sequencer.close();
         }
     }
 
