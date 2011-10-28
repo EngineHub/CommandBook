@@ -121,8 +121,8 @@ public class MessageCommands {
         sender.sendMessage(ChatColor.GRAY + "(To "
                 + plugin.toName(receiver) + "): "
                 + ChatColor.WHITE + message);
-        
-        logger.info("[CommandBook]" + plugin.toName(sender) + " told "
+
+        logger.info("(PM) " + plugin.toName(sender) + " -> "
             + plugin.toName(receiver) + ": " + message);
 
         plugin.getSession(sender).setLastRecipient(receiver);
@@ -168,7 +168,7 @@ public class MessageCommands {
                 + plugin.toName(receiver) + "): "
                 + ChatColor.WHITE + message);
 
-        logger.info("[CommandBook]" + plugin.toName(sender) + " told "
+        logger.info("(PM) " + plugin.toName(sender) + " -> "
             + plugin.toName(receiver) + ": " + message);
 
         // If the receiver hasn't had any player talk to them yet or hasn't
