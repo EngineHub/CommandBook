@@ -36,6 +36,7 @@ import org.bukkit.World.Environment;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.CreatureType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -491,18 +492,14 @@ public class CommandBookPlugin extends JavaPlugin {
      */
     public boolean hasPermission(CommandSender sender, String perm) {
         if (!(sender instanceof Player)) {
-            return true;
-        }
-
+            return ((sender.isOp() && (opPermissions || sender instanceof ConsoleCommandSender)) 
+                    || perms.hasPermission(sender.getName(), perm));
+        } 
         return hasPermission(sender, ((Player) sender).getWorld(), perm);
     }
 
     public boolean hasPermission(CommandSender sender, World world, String perm) {
-        if (!(sender instanceof Player)) {
-            return true;
-        }
-
-        if (sender.isOp() && opPermissions) {
+        if ((sender.isOp() && opPermissions) || sender instanceof ConsoleCommandSender) {
             return true;
         }
 
@@ -1174,8 +1171,10 @@ public class CommandBookPlugin extends JavaPlugin {
                     ? ((Player) sender).getDisplayName()
                     : ((Player) sender).getName();
             return ChatColor.stripColor(name);
-        } else {
+        } else if (sender instanceof ConsoleCommandSender){
             return "*Console*";
+        } else {
+            return sender.getName();
         }
     }
     
