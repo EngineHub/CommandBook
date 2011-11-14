@@ -253,6 +253,16 @@ commands:
         description: Unban a player by name
         usage: /<command> <target> [reason...]
         _component: bans
+    freeze:
+        aliases: freeze
+        description: Freeze a player by name
+        usage: /<command> [target]
+        _component: bans
+    unfreeze:
+        aliases: unfreeze
+        description: Thaw a player by name
+        usage: /<commnad> [target]
+        _component: bans
     isbanned:
         description: Checks if a player's name is banned
         usage: /<command> <target>
