@@ -31,7 +31,8 @@ import com.sk89q.minecraft.util.commands.*;
 public class TeleportCommands {
     
     @Command(aliases = {"spawn"},
-            usage = "[player]", desc = "Teleport to spawn",
+            usage = "[player]", desc = "Teleport to spawn", 
+            flags = "m",
             min = 0, max = 1)
     @CommandPermissions({"commandbook.spawn"})
     public static void spawn(CommandContext args, final CommandBookPlugin plugin,
@@ -49,31 +50,62 @@ public class TeleportCommands {
             targets = plugin.matchPlayers(plugin.checkPlayer(sender));
         }
         
-        (new PlayerIteratorAction(plugin, sender) {
+        if (args.hasFlag('m')) {
+      
+            (new PlayerIteratorAction(plugin, sender) {
             
-            @Override
-            public void perform(Player player) {
-                player.teleport(plugin.getSpawnManager().getWorldSpawn(player.getWorld()));
-            }
+                @Override
+                public void perform(Player player) {
+                    player.teleport(plugin.getSpawnManager().getWorldSpawn(plugin.getServer().getWorlds().get(0)));
+                }
 
-            @Override
-            public void onCaller(Player player) {
-                player.sendMessage(ChatColor.YELLOW + "Teleported to spawn.");
-            }
+                @Override
+                public void onCaller(Player player) {
+                    player.sendMessage(ChatColor.YELLOW + "Teleported to the main spawn.");
+                }
             
-            @Override
-            public void onVictim(CommandSender sender, Player player) {
-                player.sendMessage(ChatColor.YELLOW + "Teleported to spawn by "
-                        + plugin.toName(sender) + ".");
-            }
+                @Override
+                public void onVictim(CommandSender sender, Player player) {
+                    player.sendMessage(ChatColor.YELLOW + "Teleported to the main spawn by "
+                            + plugin.toName(sender) + ".");
+                }
             
-            @Override
-            public void onInformMany(CommandSender sender, int affected) {
-                sender.sendMessage(ChatColor.YELLOW.toString()
-                        + affected + " teleported to spawn.");
-            }
+                @Override
+                public void onInformMany(CommandSender sender, int affected) {
+                    sender.sendMessage(ChatColor.YELLOW.toString()
+                            + affected + " teleported to the main spawn.");
+                }
             
-        }).iterate(targets);
+            }).iterate(targets);
+        
+        } else {
+            
+            (new PlayerIteratorAction(plugin, sender) {
+            
+                @Override
+                public void perform(Player player) {
+                    player.teleport(plugin.getSpawnManager().getWorldSpawn(player.getWorld()));
+                }
+
+                @Override
+                public void onCaller(Player player) {
+                    player.sendMessage(ChatColor.YELLOW + "Teleported to spawn.");
+                }
+            
+                @Override
+                public void onVictim(CommandSender sender, Player player) {
+                    player.sendMessage(ChatColor.YELLOW + "Teleported to spawn by "
+                            + plugin.toName(sender) + ".");
+                }
+            
+                @Override
+                public void onInformMany(CommandSender sender, int affected) {
+                    sender.sendMessage(ChatColor.YELLOW.toString()
+                            + affected + " teleported to spawn.");
+                }
+            
+            }).iterate(targets);
+        }
     }
     
     @Command(aliases = {"teleport"},
