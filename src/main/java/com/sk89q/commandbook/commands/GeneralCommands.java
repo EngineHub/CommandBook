@@ -25,8 +25,8 @@ import java.io.IOException;
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiUnavailableException;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -216,74 +216,6 @@ public class GeneralCommands {
         sender.sendMessage(out.toString());
     }
     
-    @Command(aliases = {"time"},
-            usage = "[world] <time|\"current\">", desc = "Get/change the world time",
-            flags = "l", min = 0, max = 2)
-    public static void time(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
-        
-        World world;
-        String timeStr;
-        boolean onlyLock = false;
-
-        // Easy way to get the time
-        if (args.argsLength() == 0) {
-            world = plugin.checkPlayer(sender).getWorld();
-            timeStr = "current";
-        // If no world was specified, get the world from the sender, but
-        // fail if the sender isn't player
-        } else if (args.argsLength() == 1) {
-            world = plugin.checkPlayer(sender).getWorld();
-            timeStr = args.getString(0);
-        } else { // A world was specified!
-            world = plugin.matchWorld(sender, args.getString(0));
-            timeStr = args.getString(1);
-        }
-        
-        // Let the player get the time
-        if (timeStr.equalsIgnoreCase("current")
-                || timeStr.equalsIgnoreCase("cur")
-                || timeStr.equalsIgnoreCase("now")) {
-            
-            // We want to lock to the current time
-            if (!args.hasFlag('l')) {
-                plugin.checkPermission(sender, "commandbook.time.check");
-                sender.sendMessage(ChatColor.YELLOW
-                        + "Time: " + CommandBookUtil.getTimeString(world.getTime()));
-                return;
-            }
-            
-            onlyLock = true;
-        }
-        
-        plugin.checkPermission(sender, "commandbook.time");
-
-        if (!onlyLock) {
-            plugin.getTimeLockManager().unlock(world);
-            world.setTime(plugin.matchTime(timeStr));
-        }
-        
-        String verb = "set";
-        
-        // Locking
-        if (args.hasFlag('l')) {
-            plugin.checkPermission(sender, "commandbook.time.lock");
-            plugin.getTimeLockManager().lock(world);
-            verb = "locked";
-        }
-        
-        if (plugin.broadcastChanges) { 
-            plugin.getServer().broadcastMessage(ChatColor.YELLOW
-                    + plugin.toName(sender) + " " + verb + " the time of '"
-                    + world.getName() + "' to "
-                    + CommandBookUtil.getTimeString(world.getTime()) + ".");
-        } else {
-            sender.sendMessage(ChatColor.YELLOW + "Time " + verb + " to "
-                    + CommandBookUtil.getTimeString(world.getTime()) + ".");
-        }
-    }
-
-
     @Command(aliases = {"playertime"},
             usage = "[filter] <time|\"current\">", desc = "Get/change a player's time",
             flags = "rsw", min = 0, max = 2)
@@ -517,49 +449,6 @@ public class GeneralCommands {
         }
     }
     
-    @Command(aliases = {"compass"},
-            usage = "[player]", desc = "Show your current compass direction",
-            flags = "", min = 0, max = 1)
-    @CommandPermissions({"commandbook.whereami.compass.other"})
-    public static void compass(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
-
-        Player player;
-        
-        if (args.argsLength() == 0) {
-            player = plugin.checkPlayer(sender);
-        } else {
-            plugin.checkPermission(sender, "commandbook.whereami.other");
-            
-            player = plugin.matchSinglePlayer(sender, args.getString(0));
-        }
-
-        sender.sendMessage(ChatColor.YELLOW +
-                String.format("Your direction: %s",
-                        getCardinalDirection(player)));
-    }
-
-    @Command(aliases = {"biome"},
-            usage = "[player]", desc = "Get your current biome",
-            flags = "", min = 0, max = 1)
-    @CommandPermissions({"commandbook.biome"})
-    public static void biome(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
-        
-        Player player;
-
-        if (args.argsLength() == 0) {
-            player = plugin.checkPlayer(sender);
-        } else {
-            plugin.checkPermission(sender, "commandbook.biome.other");
-            
-            player = plugin.matchSinglePlayer(sender, args.getString(0));
-        }
-
-        sender.sendMessage(ChatColor.YELLOW + player.getLocation().getBlock().getBiome().name().toLowerCase().replace("_"," ")+" biome.");
-
-    }
-
     @Command(aliases = {"whois"},
             usage = "[player]", desc = "Tell information about a player",
             flags = "", min = 0, max = 1)
@@ -590,31 +479,6 @@ public class GeneralCommands {
             sender.sendMessage(ChatColor.YELLOW
                     + "Address: " + player.getAddress().toString());
         }
-    }
-    
-    @Command(aliases = {"setspawn"},
-            usage = "[location]", desc = "Change spawn location",
-            flags = "", min = 0, max = 1)
-    @CommandPermissions({"commandbook.setspawn"})
-    public static void setspawn(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
-        
-        World world;
-        Location loc;
-        
-        if (args.argsLength() == 0) {
-            Player player = plugin.checkPlayer(sender);
-            world = player.getWorld();
-            loc = player.getLocation();
-        } else {
-            loc = plugin.matchLocation(sender, args.getString(0));
-            world = loc.getWorld();
-        }
-
-        plugin.getSpawnManager().setWorldSpawn(loc);
-
-        sender.sendMessage(ChatColor.YELLOW +
-                "Spawn location of '" + world.getName() + "' set!");
     }
     
     @Command(aliases = {"clear"},
@@ -711,122 +575,6 @@ public class GeneralCommands {
             CommandSender sender) throws CommandException {
     }
     
-    @Command(aliases = {"weather"},
-            usage = "<'stormy'|'sunny'> [duration] [world]", desc = "Change the world weather",
-            min = 1, max = 3)
-    @CommandPermissions({"commandbook.weather"})
-    public static void weather(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
-        
-        World world;
-        String weatherStr = args.getString(0);
-        int duration = -1;
-
-        if (args.argsLength() == 1) {
-            world = plugin.checkPlayer(sender).getWorld();
-        } else if (args.argsLength() == 2) {
-            world = plugin.checkPlayer(sender).getWorld();
-            duration = args.getInteger(1);
-        } else { // A world was specified!
-            world = plugin.matchWorld(sender, args.getString(2));
-            duration = args.getInteger(1);
-        }
-        
-        if (weatherStr.equalsIgnoreCase("stormy")
-                || weatherStr.equalsIgnoreCase("rainy")
-                || weatherStr.equalsIgnoreCase("snowy")
-                || weatherStr.equalsIgnoreCase("rain")
-                || weatherStr.equalsIgnoreCase("snow")
-                || weatherStr.equalsIgnoreCase("on")) {
-            
-            world.setStorm(true);
-            
-            if (duration > 0) {
-                world.setWeatherDuration(duration * 20);
-            }
-
-            if (plugin.broadcastChanges) { 
-                plugin.getServer().broadcastMessage(ChatColor.YELLOW
-                        + plugin.toName(sender) + " has started on a storm on '"
-                        + world.getName() + "'.");
-            }
-            
-            // Tell console, since console won't get the broadcast message.
-            if (!plugin.broadcastChanges) {
-                sender.sendMessage(ChatColor.YELLOW + "Stormy weather enabled.");
-            }
-            
-        } else if (weatherStr.equalsIgnoreCase("clear")
-                || weatherStr.equalsIgnoreCase("sunny")
-                || weatherStr.equalsIgnoreCase("snowy")
-                || weatherStr.equalsIgnoreCase("rain")
-                || weatherStr.equalsIgnoreCase("snow")
-                || weatherStr.equalsIgnoreCase("off")) {
-            
-            world.setStorm(false);
-            
-            if (duration > 0) {
-                world.setWeatherDuration(duration * 20);
-            }
-
-            if (plugin.broadcastChanges) { 
-                plugin.getServer().broadcastMessage(ChatColor.YELLOW
-                        + plugin.toName(sender) + " has stopped a storm on '"
-                        + world.getName() + "'.");
-            }
-            
-            // Tell console, since console won't get the broadcast message.
-            if (!plugin.broadcastChanges) {
-                sender.sendMessage(ChatColor.YELLOW + "Stormy weather disabled.");
-            }
-            
-        } else {
-            throw new CommandException("Unknown weather state! Acceptable states: sunny or stormy");
-        }
-    }
-    
-    @Command(aliases = {"thunder"},
-            usage = "<'on'|'off'> [duration] [world]", desc = "Change the thunder state",
-            min = 1, max = 3)
-    @CommandPermissions({"commandbook.weather.thunder"})
-    public static void thunder(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
-        
-        World world;
-        String weatherStr = args.getString(0);
-        int duration = -1;
-
-        if (args.argsLength() == 1) {
-            world = plugin.checkPlayer(sender).getWorld();
-        } else if (args.argsLength() == 2) {
-            world = plugin.checkPlayer(sender).getWorld();
-            duration = args.getInteger(1);
-        } else { // A world was specified!
-            world = plugin.matchWorld(sender, args.getString(2));
-            duration = args.getInteger(1);
-        }
-        
-        if (weatherStr.equalsIgnoreCase("on")) {
-            world.setThundering(true);
-            
-            if (duration > 0) {
-                world.setThunderDuration(duration * 20);
-            }
-            
-            sender.sendMessage(ChatColor.YELLOW + "Thunder enabled.");
-        } else if (weatherStr.equalsIgnoreCase("off")) {
-            world.setThundering(false);
-            
-            if (duration > 0) {
-                world.setThunderDuration(duration * 20);
-            }
-
-            sender.sendMessage(ChatColor.YELLOW + "Thunder disabled.");
-        } else {
-            throw new CommandException("Unknown thunder state! Acceptable states: on or off");
-        }
-    }
-    
     @Command(aliases = {"more"},
             usage = "[player]", desc = "Gets more of an item",
             flags = "aio", min = 0, max = 1)
@@ -915,4 +663,75 @@ public class GeneralCommands {
         }
     }
 
+    @Command(aliases = {"gamemode"},
+            usage = "[player] [gamemode]", desc = "Change a player's gamemode",
+            flags = "c", min = 0, max = 2)
+    @CommandPermissions({"commandbook.gamemode"})
+    public static void gamemode(CommandContext args, CommandBookPlugin plugin,
+            CommandSender sender) throws CommandException {
+
+        Player player = null;
+        GameMode mode = null;
+        boolean change = false;
+
+        if (args.argsLength() == 0) { // check self
+            // check current player
+            plugin.checkPermission(sender, "commandbook.gamemode.check");
+            player = plugin.checkPlayer(sender);
+            mode = player.getGameMode();
+        } else {
+            if (args.hasFlag('c')) { //check other player
+                plugin.checkPermission(sender, "commandbook.gamemode.check.other");
+                player = plugin.matchSinglePlayer(sender, args.getString(0));
+                mode = player.getGameMode();
+            } else {
+                change = true;
+
+                // we're going to assume that the first arg of one is mode, but the first of two is player
+                // if they want to check another player, they should use -c instead, since we can't guess
+                // reliably whether (with a single arg) they meant a player or a mode
+                String modeString = null;
+                if (args.argsLength() == 1) { // self mode
+                    plugin.checkPermission(sender, "commandbook.gamemode.change");
+                    modeString = args.getString(0);
+                    player = plugin.checkPlayer(sender);
+                } else { // 2 - first is player, second mode
+                    plugin.checkPermission(sender, "commandbook.gamemode.change.other");
+                    player = plugin.matchSinglePlayer(sender, args.getString(0));
+                    modeString = args.getString(1);
+                }
+
+                if (modeString.equals("0") || modeString.equalsIgnoreCase("survival")) {
+                    mode = GameMode.SURVIVAL;
+                } else if (modeString.equals("1") || modeString.equalsIgnoreCase("creative")) {
+                    mode = GameMode.CREATIVE;
+                } else {
+                    throw new CommandException("Unrecognized gamemode " + modeString
+                            + ". Please use 'creative' (1) or 'surival' (0).");
+                }
+            }
+        }
+
+        if (player == null || mode == null) {
+            throw new CommandException("Something went wrong, please try again.");
+        }
+
+        String message = null;
+        if (change) {
+            if (player.getGameMode() == mode) {
+                message = " already had gamemode " + mode.toString();
+                change = false;
+            } else {
+                message = " changed to gamemode " + mode.toString();
+            }
+        } else {
+            message = " currently has gamemode " + mode.toString();
+        }
+        if (change) {
+            player.setGameMode(mode);
+        }
+        sender.sendMessage("Player " + (plugin.useDisplayNames ? player.getDisplayName() : player.getName())
+                + message + ".");
+        return;
+    }
 }

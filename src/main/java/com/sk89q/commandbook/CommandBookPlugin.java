@@ -217,6 +217,7 @@ public class CommandBookPlugin extends JavaPlugin {
         commands.register(KitCommands.class);
         commands.register(WarpCommands.class);
         commands.register(HomeCommands.class);
+        commands.register(WorldCommands.class);
         
         // Register events
         registerEvents();

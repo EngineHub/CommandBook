@@ -134,6 +134,10 @@ commands:
         description: Sends a barrage of fireballs
         usage: /<command> [-s] [target]
         _category: player
+    gamemode:
+        description: Check or change a player's game mode
+        usage: /<command> [-c] [player] [gamemode]
+        _category: player
 
     teleport:
         aliases: tp
