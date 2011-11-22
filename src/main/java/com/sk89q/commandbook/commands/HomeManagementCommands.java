@@ -28,6 +28,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 
+import java.util.List;
+
 public class HomeManagementCommands {
 
     @Command(
@@ -56,6 +58,42 @@ public class HomeManagementCommands {
 
         plugin.getHomesManager().remove(world, homeName);
         sender.sendMessage(ChatColor.YELLOW + "Home for " + homeName + " removed.");
+    }
+
+    private static final int PER_PAGE = 5;
+    @Command(
+            aliases = {"list", "show"},
+            usage = "[-w world] [page]",
+            desc = "List homes",
+            flags = "w:", min = 0, max = 1 )
+    @CommandPermissions({"commandbook.home.list"})
+    public static void list(CommandContext args, CommandBookPlugin plugin,
+        CommandSender sender) throws CommandException {
+        World world = null;
+        int page = args.getInteger(0, 1) - 1;
+        if (plugin.getWarpsManager().isPerWorld()) {
+            if (args.hasFlag('w')) {
+                world = plugin.matchWorld(sender, args.getFlag('w'));
+            } else {
+                world = plugin.checkPlayer(sender).getWorld();
+            }
+        }
+        List<NamedLocation> locations = plugin.getHomesManager().getLocations(world);
+        if (locations.size() == 0) throw new CommandException("No homes match!");
+
+        int maxPages = locations.size() / PER_PAGE;
+        if (page < 0 || page > maxPages) throw new CommandException(
+                "Unknown page selected! " + maxPages + " total pages.");
+        String defaultWorld = plugin.getServer().getWorlds().get(0).getName();
+        sender.sendMessage(ChatColor.YELLOW +
+                "Owner - World  - Location (page " + (page + 1) + "/" + (maxPages + 1) + ")");
+        for (int i = PER_PAGE * page; i < PER_PAGE * page + PER_PAGE  && i < locations.size(); i++) {
+            NamedLocation loc = locations.get(i);
+            sender.sendMessage(ChatColor.YELLOW.toString() + loc.getCreatorName()
+                    + " - " + (loc.getWorldName() == null ? defaultWorld : loc.getWorldName())
+                    + " - " + loc.getLocation().getBlockX() + "," + loc.getLocation().getBlockY()
+                    + "," + loc.getLocation().getBlockZ());
+        }
     }
 
 }

@@ -28,6 +28,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 
+import java.util.List;
+
 public class WarpManagementCommands {
 
     @Command(
@@ -55,5 +57,51 @@ public class WarpManagementCommands {
 
         plugin.getWarpsManager().remove(world, warpName);
         sender.sendMessage(ChatColor.YELLOW + "Warp " + warpName + " removed.");
+    }
+
+    private static final int PER_PAGE = 5;
+    @Command(
+            aliases = {"list", "show"},
+            usage = "[ -p owner] [-w world] [page]",
+            desc = "List warps",
+            flags = "p:w:", min = 0, max = 1 )
+    @CommandPermissions({"commandbook.warp.list"})
+    public static void list(CommandContext args, CommandBookPlugin plugin,
+        CommandSender sender) throws CommandException {
+        World world = null;
+        String owner = args.getFlag('p');
+        int page = args.getInteger(0, 1) - 1;
+        if (plugin.getWarpsManager().isPerWorld()) {
+            if (args.hasFlag('w')) {
+                world = plugin.matchWorld(sender, args.getFlag('w'));
+            } else {
+                world = plugin.checkPlayer(sender).getWorld();
+            }
+        }
+        List<NamedLocation> locations = plugin.getWarpsManager().getLocations(world);
+        for (int i = 0; i < locations.size(); i++) {
+            if (owner != null &&
+                    !locations.get(i).getCreatorName().equals(owner)) {
+                locations.remove(i);
+                i--;
+            }
+        }
+        if (locations.size() == 0) throw new CommandException("No warps match!");
+
+        int maxPages = locations.size() / PER_PAGE;
+        if (page < 0 || page > maxPages) throw new CommandException(
+                "Unknown page selected! " + maxPages + " total pages.");
+
+        sender.sendMessage(ChatColor.YELLOW +
+                "Name - Owner - World  - Location (page " + (page + 1) + "/" + (maxPages + 1) + ")");
+        String defaultWorld = plugin.getServer().getWorlds().get(0).getName();
+        for (int i = PER_PAGE * page; i < PER_PAGE * page + PER_PAGE  && i < locations.size(); i++) {
+            NamedLocation loc = locations.get(i);
+            sender.sendMessage(ChatColor.YELLOW.toString() + loc.getName()
+                    + " - " + loc.getCreatorName()
+                    + " - " + (loc.getWorldName() == null ? defaultWorld : loc.getWorldName())
+                    + " - " + loc.getLocation().getBlockX() + "," + loc.getLocation().getBlockY()
+                    + "," + loc.getLocation().getBlockZ());
+        }
     }
 }

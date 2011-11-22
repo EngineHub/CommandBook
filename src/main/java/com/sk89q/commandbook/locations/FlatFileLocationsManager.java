@@ -26,7 +26,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 import org.bukkit.Location;
@@ -186,6 +189,10 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
 
     public boolean remove(String id) {
         return locs.remove(id.toLowerCase()) != null;
+    }
+
+    public List<NamedLocation> getLocations() {
+        return new ArrayList<NamedLocation>(locs.values());
     }
 
     public NamedLocation create(String id, Location loc, Player player) {

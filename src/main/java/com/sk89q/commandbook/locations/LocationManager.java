@@ -19,6 +19,8 @@
 package com.sk89q.commandbook.locations;
 
 import java.io.IOException;
+import java.util.List;
+
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -71,4 +73,11 @@ public interface LocationManager<T> {
      * @return whether it was removed
      */
     public boolean remove(String id);
+
+    /**
+     * Gets all the locations that this location manager has.
+     *
+     * @return This location manager's locations.
+     */
+    public List<T> getLocations();
 }

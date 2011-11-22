@@ -20,6 +20,7 @@ package com.sk89q.commandbook.locations;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 import org.bukkit.Location;
@@ -111,6 +112,14 @@ public class RootLocationManager<T> {
             manager.save();
         } catch (IOException e) {
             logger.warning("Failed to save warps: " + e.getMessage());
+        }
+    }
+
+    public List<T> getLocations(World world) {
+        if (perWorld) {
+            return getManager(world).getLocations();
+        } else {
+            return rootManager.getLocations();
         }
     }
     
