@@ -296,8 +296,8 @@ public class GeneralCommands {
             
             sendMessage(sender,
                     replaceColorMacros(
-                    plugin.replaceMacros(
-                    sender, motd)));
+                            plugin.replaceMacros(
+                                    sender, motd)));
         }
     }
     
@@ -410,8 +410,8 @@ public class GeneralCommands {
         } else {
             sendMessage(sender,
                     replaceColorMacros(
-                    plugin.replaceMacros(
-                    sender, motd)));
+                            plugin.replaceMacros(
+                                    sender, motd)));
         }
     }
     
@@ -701,13 +701,15 @@ public class GeneralCommands {
                     modeString = args.getString(1);
                 }
 
-                if (modeString.equals("0") || modeString.equalsIgnoreCase("survival")) {
-                    mode = GameMode.SURVIVAL;
-                } else if (modeString.equals("1") || modeString.equalsIgnoreCase("creative")) {
-                    mode = GameMode.CREATIVE;
-                } else {
-                    throw new CommandException("Unrecognized gamemode " + modeString
-                            + ". Please use 'creative' (1) or 'surival' (0).");
+                try {
+                    mode = GameMode.valueOf(modeString.toUpperCase());
+                } catch (IllegalArgumentException e) {
+                    try {
+                        mode = GameMode.getByValue(Integer.parseInt(modeString));
+                    } catch (NumberFormatException ex) {}
+                }
+                if (mode == null) {
+                    throw new CommandException("Unrecognized gamemode: " + modeString + ".");
                 }
             }
         }
