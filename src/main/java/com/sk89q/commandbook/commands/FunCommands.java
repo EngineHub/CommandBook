@@ -249,6 +249,72 @@ public class FunCommands {
         }
     }
     
+    @Command(aliases = {"burn"},
+            usage = "[target]", desc = "Burn a player", flags = "khs",
+            min = 0, max = 1)
+    @CommandPermissions({"commandbook.burn"})
+    public static void burn(CommandContext args, CommandBookPlugin plugin,
+            CommandSender sender) throws CommandException {
+
+        Iterable<Player> targets = null;
+        boolean included = false;
+        int count = 0;
+        
+        // Detect arguments based on the number of arguments provided
+        if (args.argsLength() == 0) {
+            targets = plugin.matchPlayers(plugin.checkPlayer(sender));
+            
+            // Check permissions!
+            plugin.checkPermission(sender, "commandbook.burn");
+        } else if (args.argsLength() == 1) {            
+            targets = plugin.matchPlayers(sender, args.getString(0));
+            
+            // Check permissions!
+            plugin.checkPermission(sender, "commandbook.burn.other");
+        }
+
+        for (Player player : targets) {
+            count++;
+            
+            if (args.hasFlag('k')) {
+                player.setFireTicks(120 * 20);
+            } else if (args.hasFlag('h')) {
+                player.setFireTicks(12 * 20);
+            } else {
+                player.setFireTicks(5 * 20);
+            }
+            if (args.hasFlag('s')) {
+                // Tell the user
+                if (player.equals(sender)) {
+                    player.sendMessage(ChatColor.YELLOW + "Burned!");
+                    
+                    // Keep track of this
+                    included = true;
+                } else {
+                    player.sendMessage(ChatColor.YELLOW + "You've been burned by "
+                            + plugin.toName(sender) + ".");
+                    
+                }
+            } else {
+                if (count < 6) {
+                    plugin.getServer().broadcastMessage(
+                            ChatColor.YELLOW + plugin.toName(sender)
+                            + " burned " + plugin.toName(player));
+                } else if (count == 6) {
+                    plugin.getServer().broadcastMessage(
+                            ChatColor.YELLOW + plugin.toName(sender)
+                            + " burned more people...");
+                }
+            }
+        }
+        
+        // The player didn't receive any items, then we need to send the
+        // user a message so s/he know that something is indeed working
+        if (!included && args.hasFlag('s')) {
+            sender.sendMessage(ChatColor.YELLOW.toString() + "Players burned.");
+        }
+    }
+    
     @Command(aliases = {"rocket"},
             usage = "[target]", desc = "Rocket a player", flags = "hs",
             min = 0, max = 1)

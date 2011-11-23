@@ -122,6 +122,10 @@ commands:
         description: Slap a player
         usage: /<command> [-s] [-h|-v] [-d] [target]
         _category: player
+    burn:
+        description: Burn a player
+        usage: /<command> [-s] [-k|-h] [target]
+        _category: player
     shock:
         description: Shock a player
         usage: /<command> [-s] [-k] [-a] [target]
