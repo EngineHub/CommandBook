@@ -90,7 +90,7 @@ public class TeleportCommands {
         if (args.argsLength() == 1) {
             targets = plugin.matchPlayers(plugin.checkPlayer(sender));
             loc = plugin.matchLocation(sender, args.getString(0));
-            if (sender instanceof Player && ((Player) sender).getLocation().getWorld().getName().equals(loc.getWorld().getName())) {
+            if (sender instanceof Player && !((Player) sender).getLocation().getWorld().getName().equals(loc.getWorld().getName())) {
                 plugin.checkPermission(sender, loc.getWorld(), "commandbook.teleport");
             }
         } else {
@@ -99,7 +99,7 @@ public class TeleportCommands {
             
             // Check permissions!
             plugin.checkPermission(sender, "commandbook.teleport.other");
-            if (sender instanceof Player && ((Player) sender).getLocation().getWorld().getName().equals(loc.getWorld().getName())) {
+            if (sender instanceof Player && !((Player) sender).getLocation().getWorld().getName().equals(loc.getWorld().getName())) {
                 plugin.checkPermission(sender, loc.getWorld(), "commandbook.teleport.other");
             }
         }

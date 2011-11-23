@@ -77,6 +77,7 @@ public class HomeManagementCommands {
             } else {
                 world = plugin.checkPlayer(sender).getWorld();
             }
+            if (world == null) throw new CommandException("Error finding world to use!");
         }
         List<NamedLocation> locations = plugin.getHomesManager().getLocations(world);
         if (locations.size() == 0) throw new CommandException("No homes match!");

@@ -77,6 +77,7 @@ public class WarpManagementCommands {
             } else {
                 world = plugin.checkPlayer(sender).getWorld();
             }
+            if (world == null) throw new CommandException("Error finding world to use!");
         }
         List<NamedLocation> locations = plugin.getWarpsManager().getLocations(world);
         for (int i = 0; i < locations.size(); i++) {
