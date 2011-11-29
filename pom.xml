@@ -36,7 +36,7 @@
     <dependency>
       <groupId>org.bukkit</groupId>
       <artifactId>bukkit</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
+      <version>1.0.0-R1-SNAPSHOT</version>
     </dependency>
 
     <!-- Other dependencies -->
@@ -125,7 +125,7 @@
       <!-- Assembly -->
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
-        <version>2.2-beta-2</version>
+        <version>2.2-beta-2</version><!--$NO-MVN-MAN-VER$-->
         <configuration>
           <descriptor>${basedir}/src/main/assembly/default.xml</descriptor>
         </configuration>
@@ -135,7 +135,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-release-plugin</artifactId>
-        <version>2.1</version>
+        <version>2.1</version><!--$NO-MVN-MAN-VER$-->
         <configuration>
           <preparationGoals>assembly:assembly</preparationGoals>
           <goals>assembly:assembly</goals>

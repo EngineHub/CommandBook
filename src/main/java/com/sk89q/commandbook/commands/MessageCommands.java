@@ -35,15 +35,16 @@ import com.sk89q.minecraft.util.commands.CommandPermissions;
 
 public class MessageCommands {
 
-    protected static final Logger logger = Logger.getLogger("Minecraft.CommandBook");
+    private static final Logger logger = Logger.getLogger("Minecraft.CommandBook");
+    private CommandBookPlugin plugin;
+    
+    public MessageCommands(CommandBookPlugin plugin) {
+        this.plugin = plugin;
+    }
 
-    @Command(aliases = {"me"},
-            usage = "<message...>", desc = "Send an action message",
-            min = 1, max = -1)
+    @Command(aliases = {"me"}, usage = "<message...>", desc = "Send an action message", min = 1, max = -1)
     @CommandPermissions({"commandbook.say.me"})
-    public static void me(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
-        
+    public void me(CommandContext args, CommandSender sender) throws CommandException {
         if (sender instanceof Player && plugin.getAdminSession((Player) sender).isMute()) {
             sender.sendMessage(ChatColor.RED + "You are muted.");
             return;
@@ -58,19 +59,14 @@ public class MessageCommands {
         plugin.getServer().broadcastMessage("* " + name + " " + msg);
     }
     
-    @Command(aliases = {"say"},
-            usage = "<message...>", desc = "Send a message",
-            min = 1, max = -1)
+    @Command(aliases = {"say"}, usage = "<message...>", desc = "Send a message", min = 1, max = -1)
     @CommandPermissions({"commandbook.say"})
-    public static void say(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
-        
+    public void say(CommandContext args, CommandSender sender) throws CommandException {
         if (sender instanceof Player && plugin.getAdminSession((Player) sender).isMute()) {
             sender.sendMessage(ChatColor.RED + "You are muted.");
             return;
         }
         
-        String name = plugin.toColoredName(sender, ChatColor.WHITE);
         String msg = args.getJoinedStrings(0);
         
         if (sender instanceof Player) {
@@ -95,13 +91,9 @@ public class MessageCommands {
         }
     }
     
-    @Command(aliases = {"msg"},
-            usage = "<target> <message...>", desc = "Private message a user",
-            min = 2, max = -1)
+    @Command(aliases = {"msg"}, usage = "<target> <message...>", desc = "Private message a user", min = 2, max = -1)
     @CommandPermissions({"commandbook.msg"})
-    public static void msg(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
-        
+    public void msg(CommandContext args, CommandSender sender) throws CommandException {
         // This will throw errors as needed
         CommandSender receiver =
                 plugin.matchPlayerOrConsole(sender, args.getString(0));
@@ -133,13 +125,9 @@ public class MessageCommands {
         plugin.getSession(receiver).setNewLastRecipient(sender);
     }
 
-    @Command(aliases = {"reply"},
-            usage = "<message...>", desc = "Reply to last user",
-            min = 1, max = -1)
+    @Command(aliases = {"reply"}, usage = "<message...>", desc = "Reply to last user", min = 1, max = -1)
     @CommandPermissions({"commandbook.msg"})
-    public static void reply(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
-        
+    public void reply(CommandContext args, CommandSender sender) throws CommandException {
         String message = args.getJoinedStrings(0);
         CommandSender receiver;
         

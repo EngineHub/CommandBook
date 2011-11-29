@@ -32,14 +32,16 @@ import java.util.List;
 
 public class HomeManagementCommands {
 
-    @Command(
-            aliases = {"del", "delete", "remove", "rem"},
-            usage = "[homename] [world]",
-            desc = "Remove a home",
-            min = 0, max = 2 )
+    private CommandBookPlugin plugin;
+    
+    public HomeManagementCommands(CommandBookPlugin plugin) {
+        this.plugin = plugin;
+    }
+
+    @Command(aliases = {"del", "delete", "remove", "rem"},
+             usage = "[homename] [world]", desc = "Remove a home", min = 0, max = 2 )
     @CommandPermissions({"commandbook.home.remove"})
-    public static void remove(CommandContext args, CommandBookPlugin plugin,
-        CommandSender sender) throws CommandException {
+    public void remove(CommandContext args, CommandSender sender) throws CommandException {
         World world;
         String homeName = sender.getName();
         if (args.argsLength() == 2) {

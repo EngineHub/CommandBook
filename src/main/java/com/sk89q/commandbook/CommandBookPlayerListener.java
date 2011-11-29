@@ -131,7 +131,7 @@ public class CommandBookPlayerListener extends PlayerListener {
         }
         
         // Show the online list
-        if (plugin.getConfiguration().getBoolean("online-on-join", true)) {
+        if (plugin.listOnJoin) {
             plugin.getServer().getPluginManager().callEvent(
                     new OnlineListSendEvent(player));
             

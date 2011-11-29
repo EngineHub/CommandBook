@@ -28,14 +28,17 @@ import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 
 public class DebuggingCommands {
+    
+    private CommandBookPlugin plugin;
+    
+    public DebuggingCommands(CommandBookPlugin plugin) {
+        this.plugin = plugin;
+    }
 
-    @Command(aliases = {"clock"},
-            usage = "", desc = "Tests the clock rate of your server",
-            flags = "", min = 0, max = 1)
+    @Command(aliases = {"clock"}, usage = "", desc = "Tests the clock rate of your server",
+             flags = "", min = 0, max = 1)
     @CommandPermissions({"commandbook.debug.clock"})
-    public static void testClock(CommandContext args, CommandBookPlugin plugin,
-            final CommandSender sender) throws CommandException {
-        
+    public void testClock(CommandContext args, final CommandSender sender) throws CommandException {
         int expected = 5;
         
         if (args.argsLength() == 1) {
@@ -103,13 +106,10 @@ public class DebuggingCommands {
         plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, task, expectedTicks);
     }
     
-    @Command(aliases = {"info"},
-            usage = "", desc = "Get server information",
+    @Command(aliases = {"info"}, usage = "", desc = "Get server information",
             flags = "", min = 0, max = 0)
     @CommandPermissions({"commandbook.debug.info"})
-    public static void serverInfo(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
-        
+    public void serverInfo(CommandContext args, CommandSender sender) throws CommandException {
         Runtime rt = Runtime.getRuntime();
 
         sender.sendMessage(ChatColor.YELLOW

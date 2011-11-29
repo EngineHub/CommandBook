@@ -19,10 +19,11 @@
 package com.sk89q.commandbook.commands;
 
 import static com.sk89q.commandbook.CommandBookUtil.replaceColorMacros;
-import java.util.logging.Logger;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
 import com.sk89q.commandbook.CommandBookPlugin;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
@@ -32,15 +33,15 @@ import com.sk89q.minecraft.util.commands.NestedCommand;
 
 public class ModerationCommands {
 
-    protected static final Logger logger = Logger.getLogger("Minecraft.CommandBook");
+    private CommandBookPlugin plugin;
     
-    @Command(aliases = {"broadcast"},
-            usage = "<message...>", desc = "Broadcast a message",
-            min = 1, max = -1)
+    public ModerationCommands(CommandBookPlugin plugin) {
+        this.plugin = plugin;
+    }
+    
+    @Command(aliases = {"broadcast"}, usage = "<message...>", desc = "Broadcast a message", min = 1, max = -1)
     @CommandPermissions({"commandbook.broadcast"})
-    public static void broadcast(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
-    
+    public void broadcast(CommandContext args, CommandSender sender) throws CommandException {
         plugin.getServer().broadcastMessage(
                 replaceColorMacros(plugin.broadcastFormat).replace(
                         "%s", args.getJoinedStrings(0)));
@@ -108,13 +109,9 @@ public class ModerationCommands {
                 + plugin.toName(player));
     }
     
-    @Command(aliases = {"unmute"},
-            usage = "<target>", desc = "Unmute a player",
-            min = 1, max = 1)
+    @Command(aliases = {"unmute"}, usage = "<target>", desc = "Unmute a player", min = 1, max = 1)
     @CommandPermissions({"commandbook.mute"})
-    public static void unmute(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
-        
+    public void unmute(CommandContext args, CommandSender sender) throws CommandException {
         Player player = plugin.matchSinglePlayer(sender, args.getString(0));
 
         plugin.getAdminSession(player).setMute(false);
@@ -125,13 +122,9 @@ public class ModerationCommands {
                 + plugin.toName(player));
     }
 
-    @Command(aliases = {"kick"},
-            usage = "<target> [reason...]", desc = "Kick a user",
-            min = 1, max = -1)
+    @Command(aliases = {"kick"}, usage = "<target> [reason...]", desc = "Kick a user", min = 1, max = -1)
     @CommandPermissions({"commandbook.kick"})
-    public static void kick(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
-
+    public void kick(CommandContext args, CommandSender sender) throws CommandException {
         Iterable<Player> targets = plugin.matchPlayers(sender, args.getString(0));
         String message = args.argsLength() >= 2 ? args.getJoinedStrings(1)
                 : "Kicked!";
@@ -153,13 +146,9 @@ public class ModerationCommands {
         }
     }
 
-    @Command(aliases = {"ban"},
-            usage = "<target> [reason...]", desc = "Ban a user",
-            flags = "e", min = 1, max = -1)
+    @Command(aliases = {"ban"}, usage = "<target> [reason...]", desc = "Ban a user", flags = "e", min = 1, max = -1)
     @CommandPermissions({"commandbook.bans.ban"})
-    public static void ban(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
-        
+    public void ban(CommandContext args, CommandSender sender) throws CommandException {
         String banName;
         String message = args.argsLength() >= 2 ? args.getJoinedStrings(1)
                 : "Banned!";
@@ -242,13 +231,9 @@ public class ModerationCommands {
         }
     }
 */
-    @Command(aliases = {"unban"},
-            usage = "<target>", desc = "Unban a user",
-            min = 1, max = -1)
+    @Command(aliases = {"unban"}, usage = "<target>", desc = "Unban a user", min = 1, max = -1)
     @CommandPermissions({"commandbook.bans.unban"})
-    public static void unban(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
-        
+    public void unban(CommandContext args, CommandSender sender) throws CommandException {
         String message = args.argsLength() >= 2 ? args.getJoinedStrings(1)
                 : "Unbanned!";
         
@@ -295,13 +280,9 @@ public class ModerationCommands {
         }
     }
 */
-    @Command(aliases = {"isbanned"},
-            usage = "<target>", desc = "Check if a user is banned",
-            min = 1, max = 1)
+    @Command(aliases = {"isbanned"}, usage = "<target>", desc = "Check if a user is banned", min = 1, max = 1)
     @CommandPermissions({"commandbook.bans.isbanned"})
-    public static void isBanned(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
-        
+    public void isBanned(CommandContext args,  CommandSender sender) throws CommandException {
         String banName = args.getString(0)
                     .replace("\r", "")
                     .replace("\n", "")
@@ -317,7 +298,6 @@ public class ModerationCommands {
 
     @Command(aliases = {"bans"}, desc = "Ban management")
     @NestedCommand({BanCommands.class})
-    public static void bans(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
+    public void bans(CommandContext args, CommandBookPlugin plugin, CommandSender sender) throws CommandException {
     }
 }

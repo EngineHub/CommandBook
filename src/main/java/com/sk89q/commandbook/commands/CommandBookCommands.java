@@ -28,31 +28,27 @@ import com.sk89q.minecraft.util.commands.CommandPermissions;
 
 public class CommandBookCommands {
     
-    @Command(aliases = {"version"},
-            usage = "", desc = "CommandBook version information",
-            min = 0, max = 0)
-    public static void version(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
-        sender.sendMessage(ChatColor.YELLOW
-                + "CommandBook " + plugin.getDescription().getVersion());
-        sender.sendMessage(ChatColor.YELLOW
-                + "http://www.sk89q.com");
+    private CommandBookPlugin plugin;
+    
+    public CommandBookCommands(CommandBookPlugin plugin) {
+        this.plugin = plugin;
     }
     
-    @Command(aliases = {"reload"},
-            usage = "", desc = "Reload CommandBook's settings",
-            min = 0, max = 0)
+    @Command(aliases = {"version"}, usage = "", desc = "CommandBook version information", min = 0, max = 0)
+    public void version(CommandContext args, CommandSender sender) throws CommandException {
+        sender.sendMessage(ChatColor.YELLOW + "CommandBook " + plugin.getDescription().getVersion());
+        sender.sendMessage(ChatColor.YELLOW + "http://www.sk89q.com");
+    }
+    
+    @Command(aliases = {"reload"}, usage = "", desc = "Reload CommandBook's settings", min = 0, max = 0)
     @CommandPermissions({"commandbook.reload"})
-    public static void who(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
-        
+    public void who(CommandContext args, CommandSender sender) throws CommandException {
         plugin.populateConfiguration();
         plugin.getBanDatabase().load();
         plugin.getKitManager().load();
         plugin.getSpawnManager().load();
         
-        sender.sendMessage(ChatColor.YELLOW
-                + "CommandBook's configuration has been reloaded.");
+        sender.sendMessage(ChatColor.YELLOW + "CommandBook's configuration has been reloaded.");
     }
     
 }

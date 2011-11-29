@@ -29,14 +29,16 @@ import com.sk89q.commandbook.util.TeleportPlayerIterator;
 import com.sk89q.minecraft.util.commands.*;
 
 public class TeleportCommands {
-    
-    @Command(aliases = {"spawn"},
-            usage = "[player]", desc = "Teleport to spawn",
-            min = 0, max = 1)
-    @CommandPermissions({"commandbook.spawn"})
-    public static void spawn(CommandContext args, final CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
 
+    private CommandBookPlugin plugin;
+    
+    public TeleportCommands(CommandBookPlugin plugin) {
+        this.plugin = plugin;
+    }
+    
+    @Command(aliases = {"spawn"}, usage = "[player]", desc = "Teleport to spawn", min = 0, max = 1)
+    @CommandPermissions({"commandbook.spawn"})
+    public void spawn(CommandContext args, CommandSender sender) throws CommandException {
         Iterable<Player> targets = null;
         
         // Detect arguments based on the number of arguments provided
@@ -76,9 +78,8 @@ public class TeleportCommands {
         }).iterate(targets);
     }
     
-    @Command(aliases = {"teleport"},
-            usage = "[target] <destination>", desc = "Teleport to a location",
-            min = 1, max = 2)
+    @Command(aliases = {"teleport"}, usage = "[target] <destination>",
+             desc = "Teleport to a location", min = 1, max = 2)
     @CommandPermissions({"commandbook.teleport"})
     public static void teleport(CommandContext args, final CommandBookPlugin plugin,
             CommandSender sender) throws CommandException {
@@ -107,13 +108,9 @@ public class TeleportCommands {
         (new TeleportPlayerIterator(plugin, sender, loc)).iterate(targets);
     }
     
-    @Command(aliases = {"call"},
-            usage = "<target>", desc = "Request a teleport",
-            min = 1, max = 1)
+    @Command(aliases = {"call"}, usage = "<target>", desc = "Request a teleport", min = 1, max = 1)
     @CommandPermissions({"commandbook.call"})
-    public static void requestTeleport(CommandContext args, final CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
-
+    public void requestTeleport(CommandContext args, CommandSender sender) throws CommandException {
         Player player = plugin.checkPlayer(sender);
         Player target = plugin.matchSinglePlayer(sender, args.getString(0));
 
@@ -127,12 +124,8 @@ public class TeleportCommands {
                 + " requests a teleport! Use /bring <name> to accept.");
     }
     
-    @Command(aliases = {"bring"},
-            usage = "<target>", desc = "Bring a player to you",
-            min = 1, max = 1)
-    public static void bring(CommandContext args, final CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
-
+    @Command(aliases = {"bring"}, usage = "<target>", desc = "Bring a player to you", min = 1, max = 1)
+    public void bring(CommandContext args, CommandSender sender) throws CommandException {
         Player player = plugin.checkPlayer(sender);
         if (!plugin.hasPermission(sender, "commandbook.teleport.other")) {
             Player target = plugin.matchSinglePlayer(sender, args.getString(0));
@@ -170,13 +163,10 @@ public class TeleportCommands {
         }).iterate(targets);
     }
     
-    @Command(aliases = {"put"},
-            usage = "<target>", desc = "Put a player at where you are looking",
-            min = 1, max = 1)
+    @Command(aliases = {"put"}, usage = "<target>",
+             desc = "Put a player at where you are looking", min = 1, max = 1)
     @CommandPermissions({"commandbook.teleport.other"})
-    public static void put(CommandContext args, final CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
-
+    public void put(CommandContext args, CommandSender sender) throws CommandException {
         Iterable<Player> targets = plugin.matchPlayers(sender, args.getString(0));
         Location loc = plugin.matchLocation(sender, "#target");
         
@@ -194,13 +184,9 @@ public class TeleportCommands {
         }).iterate(targets);
     }
     
-    @Command(aliases = {"return"},
-            usage = "", desc = "Teleport back to your last location",
-            min = 0, max = 0)
+    @Command(aliases = {"return"}, usage = "", desc = "Teleport back to your last location", min = 0, max = 0)
     @CommandPermissions({"commandbook.return"})
-    public static void ret(CommandContext args, final CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
-        
+    public void ret(CommandContext args, CommandSender sender) throws CommandException {
         Player player = plugin.checkPlayer(sender);
         Location lastLoc = plugin.getSession(player).popLastLocation();
 

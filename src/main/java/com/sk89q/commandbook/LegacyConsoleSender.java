@@ -1,6 +1,7 @@
 package com.sk89q.commandbook;
 
 import java.util.Set;
+import java.util.logging.Logger;
 
 import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
@@ -15,6 +16,8 @@ import org.bukkit.plugin.Plugin;
  * @author sk89q
  */
 class LegacyConsoleSender implements CommandSender {
+    
+    private static final Logger logger = Logger.getLogger("Minecraft.CommandBook");
     private Server server;
     
     public LegacyConsoleSender(Server server) {
@@ -22,7 +25,7 @@ class LegacyConsoleSender implements CommandSender {
     }
     
     public void sendMessage(String message) {
-        CommandBookPlugin.logger.info(message);
+        logger.info(message);
     }
 
     public Server getServer() {

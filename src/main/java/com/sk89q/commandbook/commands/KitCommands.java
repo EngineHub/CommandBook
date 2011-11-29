@@ -29,13 +29,15 @@ import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 
 public class KitCommands {
+
+    private CommandBookPlugin plugin;
     
-    @Command(aliases = {"kit"},
-            usage = "<id> [target]", desc = "Get a kit",
-            flags = "", min = 0, max = 2)
-    public static void kit(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
-        
+    public KitCommands(CommandBookPlugin plugin) {
+        this.plugin = plugin;
+    }
+    
+    @Command(aliases = {"kit"}, usage = "<id> [target]", desc = "Get a kit", flags = "", min = 0, max = 2)
+    public void kit(CommandContext args, CommandSender sender) throws CommandException {
         // List kits
         if (args.argsLength() == 0) {
             plugin.checkPermission(sender, "commandbook.kit.list");

@@ -268,6 +268,7 @@ public class CommandBookUtil {
      * @param drop
      * @throws CommandException
      */
+    @SuppressWarnings("deprecation")
     public static void giveItem(CommandSender sender, ItemStack item, int amt,
             Iterable<Player> targets, CommandBookPlugin plugin, boolean drop, boolean overrideStackSize)
             throws CommandException {

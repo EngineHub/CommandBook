@@ -32,14 +32,16 @@ import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.minecraft.util.commands.NestedCommand;
 
 public class HomeCommands {
-    
-    @Command(aliases = {"home"},
-            usage = "[world] [target] [owner]", desc = "Teleport to a home",
-            min = 0, max = 3)
-    @CommandPermissions({"commandbook.home.teleport"})
-    public static void home(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
 
+    private CommandBookPlugin plugin;
+    
+    public HomeCommands(CommandBookPlugin plugin) {
+        this.plugin = plugin;
+    }
+    
+    @Command(aliases = {"home"}, usage = "[world] [target] [owner]", desc = "Teleport to a home", min = 0, max = 3)
+    @CommandPermissions({"commandbook.home.teleport"})
+    public void home(CommandContext args, CommandSender sender) throws CommandException {
         Iterable<Player> targets = null;
         NamedLocation home = null;
         Location loc = null;
@@ -87,12 +89,9 @@ public class HomeCommands {
         (new TeleportPlayerIterator(plugin, sender, loc)).iterate(targets);
     }
     
-    @Command(aliases = {"sethome"},
-            usage = "[owner] [location]", desc = "Set a home",
-            min = 0, max = 2)
+    @Command(aliases = {"sethome"}, usage = "[owner] [location]", desc = "Set a home", min = 0, max = 2)
     @CommandPermissions({"commandbook.home.set"})
-    public static void setHome(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
+    public void setHome(CommandContext args, CommandSender sender) throws CommandException {
         String homeName;
         Location loc;
         Player player = null;
@@ -124,8 +123,6 @@ public class HomeCommands {
 
     @Command(aliases = {"homes"}, desc = "Home management")
     @NestedCommand({HomeManagementCommands.class})
-    public static void homes(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
-        
+    public void homes(CommandContext args, CommandBookPlugin plugin, CommandSender sender) throws CommandException {
     }
 }

@@ -43,16 +43,17 @@ import com.sk89q.minecraft.util.commands.CommandPermissions;
 
 public class FunCommands {
     
-    protected static Random random = new Random();
+    private static Random random = new Random();
+    private CommandBookPlugin plugin;
     
-    @Command(aliases = {"spawnmob"},
-            usage = "<mob>[|rider] [count] [location]", desc = "Spawn a mob",
-            flags = "dir",
-            min = 1, max = 4)
+    public FunCommands(CommandBookPlugin plugin) {
+        this.plugin = plugin;
+    }
+    
+    @Command(aliases = {"spawnmob"}, usage = "<mob>[|rider] [count] [location]", desc = "Spawn a mob",
+            flags = "dir", min = 1, max = 4)
     @CommandPermissions({"commandbook.spawnmob"})
-    public static void spawnMob(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
-
+    public void spawnMob(CommandContext args, CommandSender sender) throws CommandException {
         Location loc;
 
         if (args.argsLength() >= 3) {
@@ -99,9 +100,9 @@ public class FunCommands {
         }
 
         for (int i = 0; i < count; i++) {
-            LivingEntity ridee = spawn(loc, type, specialType, args, sender, plugin);
+            LivingEntity ridee = spawn(loc, type, specialType, args, sender);
             if (hasRider) {
-                LivingEntity rider = spawn(loc, riderType, riderSpecialType, args, sender, plugin);
+                LivingEntity rider = spawn(loc, riderType, riderSpecialType, args, sender);
                 ridee.setPassenger(rider);
             }
         }
@@ -109,9 +110,8 @@ public class FunCommands {
         sender.sendMessage(ChatColor.YELLOW + "" + count + " mob(s) spawned!");
     }
 
-    private static LivingEntity spawn(Location loc, CreatureType type, String specialType,
-            CommandContext args, CommandSender sender, CommandBookPlugin plugin)
-            throws CommandException {
+    private LivingEntity spawn(Location loc, CreatureType type, String specialType,
+            CommandContext args, CommandSender sender) throws CommandException {
         LivingEntity creature = loc.getWorld().spawnCreature(loc, type);
         if (args.hasFlag('d')) {
             creature.setHealth(1);
@@ -169,13 +169,9 @@ public class FunCommands {
         return creature;
     }
 
-    @Command(aliases = {"slap"},
-            usage = "[target]", desc = "Slap a player", flags = "hdvs",
-            min = 0, max = 1)
+    @Command(aliases = {"slap"}, usage = "[target]", desc = "Slap a player", flags = "hdvs", min = 0, max = 1)
     @CommandPermissions({"commandbook.slap"})
-    public static void slap(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
-
+    public void slap(CommandContext args, CommandSender sender) throws CommandException {
         Iterable<Player> targets = null;
         boolean included = false;
         int count = 0;
@@ -249,13 +245,9 @@ public class FunCommands {
         }
     }
     
-    @Command(aliases = {"rocket"},
-            usage = "[target]", desc = "Rocket a player", flags = "hs",
-            min = 0, max = 1)
+    @Command(aliases = {"rocket"}, usage = "[target]", desc = "Rocket a player", flags = "hs", min = 0, max = 1)
     @CommandPermissions({"commandbook.rocket"})
-    public static void rocket(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
-
+    public void rocket(CommandContext args, CommandSender sender) throws CommandException {
         Iterable<Player> targets = null;
         boolean included = false;
         int count = 0;
@@ -309,13 +301,9 @@ public class FunCommands {
         }
     }
     
-    @Command(aliases = {"barrage"},
-            usage = "[target]", desc = "Send a barrage of arrows", flags = "s",
-            min = 0, max = 1)
+    @Command(aliases = {"barrage"}, usage = "[target]", desc = "Send a barrage of arrows", flags = "s", min = 0, max = 1)
     @CommandPermissions({"commandbook.barrage"})
-    public static void barrage(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
-
+    public static void barrage(CommandContext args, CommandBookPlugin plugin, CommandSender sender) throws CommandException {
         Iterable<Player> targets = null;
         boolean included = false;
         int count = 0;
@@ -369,12 +357,10 @@ public class FunCommands {
         }
     }
 
-    @Command(aliases = {"firebarrage"},
-            usage = "[target]", desc = "Send a attack of fireballs", flags = "s",
+    @Command(aliases = {"firebarrage"}, usage = "[target]", desc = "Send a attack of fireballs", flags = "s",
             min = 0, max = 1)
     @CommandPermissions({"commandbook.firebarrage"})
-    public static void barragefire(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
+    public void barragefire(CommandContext args, CommandSender sender) throws CommandException {
 
         Iterable<Player> targets = null;
         boolean included = false;
@@ -426,13 +412,9 @@ public class FunCommands {
         }
     }
     
-    @Command(aliases = {"shock"},
-            usage = "[target]", desc = "Shock a player", flags = "ksa",
-            min = 0, max = 1)
+    @Command(aliases = {"shock"}, usage = "[target]", desc = "Shock a player", flags = "ksa", min = 0, max = 1)
     @CommandPermissions({"commandbook.shock"})
-    public static void shock(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
-
+    public void shock(CommandContext args, CommandSender sender) throws CommandException {
         Iterable<Player> targets = null;
         boolean included = false;
         int count = 0;
@@ -507,13 +489,10 @@ public class FunCommands {
         }
     }
     
-    @Command(aliases = {"thor"},
-            usage = "[target]", desc = "Give a player Thor power", flags = "",
-            min = 0, max = 1)
+    @Command(aliases = {"thor"}, usage = "[target]", desc = "Give a player Thor power",
+            flags = "", min = 0, max = 1)
     @CommandPermissions({"commandbook.thor"})
-    public static void thor(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
-
+    public void thor(CommandContext args, CommandSender sender) throws CommandException {
         Iterable<Player> targets = null;
         boolean included = false;
         
@@ -551,16 +530,11 @@ public class FunCommands {
         if (!included && args.hasFlag('s')) {
             sender.sendMessage(ChatColor.YELLOW.toString() + "Players given Thor's hammer.");
         }
-        
     }
     
-    @Command(aliases = {"unthor"},
-            usage = "[target]", desc = "Revoke a player's Thor power", flags = "",
-            min = 0, max = 1)
+    @Command(aliases = {"unthor"}, usage = "[target]", desc = "Revoke a player's Thor power", flags = "", min = 0, max = 1)
     @CommandPermissions({"commandbook.thor"})
-    public static void unthor(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
-
+    public void unthor(CommandContext args, CommandSender sender) throws CommandException {
         Iterable<Player> targets = null;
         boolean included = false;
         
@@ -598,7 +572,6 @@ public class FunCommands {
         if (!included && args.hasFlag('s')) {
             sender.sendMessage(ChatColor.YELLOW.toString() + "Thor's hammer revokved from players.");
         }
-        
     }
     
 }

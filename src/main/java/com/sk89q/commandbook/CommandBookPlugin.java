@@ -20,6 +20,8 @@
 package com.sk89q.commandbook;
 
 import java.io.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.jar.JarFile;
 import java.util.logging.Logger;
@@ -72,65 +74,22 @@ import com.sk89q.commandbook.locations.WrappedSpawnManager;
  * 
  * @author sk89q
  */
-public class CommandBookPlugin extends JavaPlugin {
+@SuppressWarnings("deprecation")
+public final class CommandBookPlugin extends JavaPlugin {
     
-    /**
-     * Logger for messages.
-     */
-    protected static final Logger logger = Logger.getLogger("Minecraft.CommandBook");
+    private static final Logger logger = Logger.getLogger("Minecraft.CommandBook");
+    private static final Pattern TWELVE_HOUR_TIME = Pattern.compile("^([0-9]+(?::[0-9]+)?)([apmAPM\\.]+)$");
     
-    /**
-     * Pattern for 12-hour time.
-     */
-    private static final Pattern twelveHourTime
-        = Pattern.compile("^([0-9]+(?::[0-9]+)?)([apmAPM\\.]+)$");
-    
-    /**
-     * Pattern for macros.
-     */
-    protected static final Pattern macroPattern =
-            Pattern.compile("%([^% ]+)%");
-    
-    /**
-     * The permissions resolver in use.
-     */
     private PermissionsResolverManager perms;
-    
-    /**
-     * List of commands.
-     */
-    protected CommandsManager<CommandSender> commands;
-    
-    /**
-     * Bans database.
-     */
-    protected BanDatabase bans;
-    
-    /**
-     * Warps database.
-     */
-    protected RootLocationManager<NamedLocation> warps;
-    
-    /**
-     * Homes database.
-     */
-    protected RootLocationManager<NamedLocation> homes;
-    
-    /**
-     * Time lock manager.
-     */
-    protected TimeLockManager timeLockManager;
-    
-    /**
-     * Jingle note manager.
-     */
-    protected JingleNoteManager jingleNoteManager;
-
-    /**
-     * Spawn pitch and yaw storage
-     */
+    private CommandsManager<CommandSender> commands;
+    private BanDatabase bans;
+    private RootLocationManager<NamedLocation> warps;
+    private RootLocationManager<NamedLocation> homes;
+    private TimeLockManager timeLockManager;
+    private JingleNoteManager jingleNoteManager;
     private WrappedSpawnManager spawns;
     
+    public boolean listOnJoin;
     public boolean disableMidi;
     public boolean verifyNameFormat;
     public boolean broadcastChanges;
@@ -208,6 +167,23 @@ public class CommandBookPlugin extends JavaPlugin {
             }
         };
         
+        commands.setInjector(new Injector() {
+            public Object getInstance(Class<?> cls) throws InvocationTargetException,
+                    IllegalAccessException, InstantiationException {
+                Constructor<?> constr;
+                try {
+                    constr = cls.getConstructor(CommandBookPlugin.class);
+                } catch (SecurityException e) {
+                    e.printStackTrace();
+                    return null;
+                } catch (NoSuchMethodException e) {
+                    e.printStackTrace();
+                    return null;
+                }
+                return constr.newInstance(plugin);
+            }
+        });
+        
         commands.register(GeneralCommands.class);
         commands.register(FunCommands.class);
         commands.register(TeleportCommands.class);
@@ -265,7 +241,7 @@ public class CommandBookPlugin extends JavaPlugin {
     public boolean onCommand(CommandSender sender, Command cmd,
             String commandLabel, String[] args) {
         try {
-            commands.execute(cmd.getName(), args, sender, this, sender);
+            commands.execute(cmd.getName(), args, sender, sender);
         } catch (CommandPermissionsException e) {
             sender.sendMessage(ChatColor.RED + "You don't have permission.");
         } catch (MissingNestedCommandException e) {
@@ -313,7 +289,7 @@ public class CommandBookPlugin extends JavaPlugin {
     /**
      * Loads the configuration.
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked" })
     public void populateConfiguration() {
         Configuration config = getConfiguration();
         config.load();
@@ -335,6 +311,7 @@ public class CommandBookPlugin extends JavaPlugin {
         playersListGroupedNames = config.getBoolean("online-list.grouped-names", false);
         playersListMaxPlayers = config.getBoolean("online-list.show-max-players", true);
         
+        listOnJoin = getConfiguration().getBoolean("online-on-join", true);
         opPermissions = config.getBoolean("op-permissions", true);
         useDisplayNames = config.getBoolean("use-display-names", true);
         banMessage = config.getString("bans.message", "You were banned.");
@@ -408,7 +385,7 @@ public class CommandBookPlugin extends JavaPlugin {
     /**
      * Loads the item list.
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked" })
     protected void loadItemList() {
         Configuration config = getConfiguration();
         
@@ -1010,9 +987,9 @@ public class CommandBookPlugin extends JavaPlugin {
                 throw new CommandException("No nether world found.");
 
             // #skylands for the first skylands world
-            } else if (filter.equalsIgnoreCase("#skylands")) {
+            } else if (filter.equalsIgnoreCase("#skylands") || filter.equalsIgnoreCase("#theend") || filter.equalsIgnoreCase("#end")) {
                 for (World world : worlds) {
-                    if (world.getEnvironment() == Environment.SKYLANDS) {
+                    if (world.getEnvironment() == Environment.THE_END) {
                         return world;
                     }
                 }
@@ -1079,7 +1056,7 @@ public class CommandBookPlugin extends JavaPlugin {
             return n;
         
         // Or perhaps 12-hour time
-        } else if ((matcher = twelveHourTime.matcher(timeStr)).matches()) {
+        } else if ((matcher = TWELVE_HOUR_TIME.matcher(timeStr)).matches()) {
             String time = matcher.group(1);
             String period = matcher.group(2);
             int shift = 0;

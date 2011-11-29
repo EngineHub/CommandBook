@@ -27,34 +27,30 @@ import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 
 public class BanCommands {
+    
+    private CommandBookPlugin plugin;
+    
+    public BanCommands(CommandBookPlugin plugin) {
+        this.plugin = plugin;
+    }
 
-    @Command(aliases = {"load", "reload", "read"},
-            usage = "", desc = "Reload bans from disk",
-            min = 0, max = 0)
+    @Command(aliases = {"load", "reload", "read"}, usage = "", desc = "Reload bans from disk", min = 0, max = 0)
     @CommandPermissions({"commandbook.bans.load"})
-    public static void loadBans(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
-        
+    public void loadBans(CommandContext args, CommandSender sender) throws CommandException {
         if (plugin.getBanDatabase().load()) {
             sender.sendMessage(ChatColor.YELLOW + "Bans database reloaded.");
         } else {
-            sender.sendMessage(ChatColor.RED
-                    + "Bans database failed to load entirely. See server console.");
+            throw new CommandException("Bans database failed to load entirely. See server console.");
         }
     }
 
-    @Command(aliases = {"save", "write"},
-            usage = "", desc = "Save bans to disk",
-            min = 0, max = 0)
+    @Command(aliases = {"save", "write"}, usage = "", desc = "Save bans to disk", min = 0, max = 0)
     @CommandPermissions({"commandbook.bans.save"})
-    public static void saveBans(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
-        
+    public void saveBans(CommandContext args, CommandSender sender) throws CommandException {
         if (plugin.getBanDatabase().load()) {
             sender.sendMessage(ChatColor.YELLOW + "Bans database saved.");
         } else {
-            sender.sendMessage(ChatColor.RED
-                    + "Bans database failed to saved entirely. See server console.");
+            throw new CommandException("Bans database failed to saved entirely. See server console.");
         }
     }
 }

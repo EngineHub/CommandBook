@@ -32,14 +32,16 @@ import java.util.List;
 
 public class WarpManagementCommands {
 
-    @Command(
-            aliases = {"del", "delete", "remove", "rem"},
-            usage = "<warpname> [world]",
-            desc = "Remove a warp",
-            min = 1, max = 2 )
+    private CommandBookPlugin plugin;
+    
+    public WarpManagementCommands(CommandBookPlugin plugin) {
+        this.plugin = plugin;
+    }
+
+    @Command(aliases = {"del", "delete", "remove", "rem"}, usage = "<warpname> [world]",
+             desc = "Remove a warp", min = 1, max = 2 )
     @CommandPermissions({"commandbok.warp.remove"})
-    public static void remove(CommandContext args, CommandBookPlugin plugin,
-        CommandSender sender) throws CommandException {
+    public void remove(CommandContext args, CommandSender sender) throws CommandException {
         World world;
         String warpName = args.getString(0);
         if (args.argsLength() == 2) {
@@ -47,6 +49,7 @@ public class WarpManagementCommands {
         } else {
             world = plugin.checkPlayer(sender).getWorld();
         }
+        
         NamedLocation warp = plugin.getWarpsManager().get(world, warpName);
         if (warp == null) {
             throw new CommandException("No warp named " + warpName + " found for world " + world.getName());

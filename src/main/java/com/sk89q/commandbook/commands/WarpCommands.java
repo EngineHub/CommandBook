@@ -32,14 +32,16 @@ import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.minecraft.util.commands.NestedCommand;
 
 public class WarpCommands {
-    
-    @Command(aliases = {"warp"},
-            usage = "[world] [target] <warp>", desc = "Teleport to a warp",
-            min = 1, max = 3)
-    @CommandPermissions({"commandbook.warp.teleport"})
-    public static void warp(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
 
+    private CommandBookPlugin plugin;
+    
+    public WarpCommands(CommandBookPlugin plugin) {
+        this.plugin = plugin;
+    }
+    
+    @Command(aliases = {"warp"}, usage = "[world] [target] <warp>", desc = "Teleport to a warp", min = 1, max = 3)
+    @CommandPermissions({"commandbook.warp.teleport"})
+    public void warp(CommandContext args, CommandSender sender) throws CommandException {
         Iterable<Player> targets = null;
         NamedLocation warp = null;
         Location loc = null;
@@ -78,12 +80,9 @@ public class WarpCommands {
         (new TeleportPlayerIterator(plugin, sender, loc)).iterate(targets);
     }
     
-    @Command(aliases = {"setwarp"},
-            usage = "<warp> [location]", desc = "Set a warp",
-            min = 1, max = 2)
+    @Command(aliases = {"setwarp"}, usage = "<warp> [location]", desc = "Set a warp", min = 1, max = 2)
     @CommandPermissions({"commandbook.warp.set"})
-    public static void setWarp(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
+    public void setWarp(CommandContext args, CommandSender sender) throws CommandException {
         String warpName = args.getString(0);
         Location loc;
         Player player = null;
@@ -103,8 +102,6 @@ public class WarpCommands {
 
     @Command(aliases = {"warps"}, desc = "Warp management")
     @NestedCommand({WarpManagementCommands.class})
-    public static void warps(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
-        
+    public void warps(CommandContext args, CommandSender sender) throws CommandException {
     }
 }
