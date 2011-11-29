@@ -37,11 +37,16 @@ import com.sk89q.minecraft.util.commands.CommandPermissions;
 
 public class WorldCommands {
 
+    private CommandBookPlugin plugin;
+    
+    public WorldCommands(CommandBookPlugin plugin) {
+        this.plugin = plugin;
+    }
+
     @Command(aliases = {"time"},
             usage = "[world] <time|\"current\">", desc = "Get/change the world time",
             flags = "l", min = 0, max = 2)
-    public static void time(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
+    public void time(CommandContext args, CommandSender sender) throws CommandException {
         
         World world;
         String timeStr;
@@ -108,8 +113,7 @@ public class WorldCommands {
             usage = "[player]", desc = "Show your current compass direction",
             flags = "", min = 0, max = 1)
     @CommandPermissions({"commandbook.whereami.compass.other"})
-    public static void compass(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
+    public void compass(CommandContext args, CommandSender sender) throws CommandException {
     
         Player player;
         
@@ -130,8 +134,7 @@ public class WorldCommands {
             usage = "[player]", desc = "Get your current biome",
             flags = "", min = 0, max = 1)
     @CommandPermissions({"commandbook.biome"})
-    public static void biome(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
+    public void biome(CommandContext args, CommandSender sender) throws CommandException {
         
         Player player;
     
@@ -151,8 +154,7 @@ public class WorldCommands {
             usage = "[location]", desc = "Change spawn location",
             flags = "", min = 0, max = 1)
     @CommandPermissions({"commandbook.setspawn"})
-    public static void setspawn(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
+    public void setspawn(CommandContext args, CommandSender sender) throws CommandException {
         
         World world;
         Location loc;
@@ -176,8 +178,7 @@ public class WorldCommands {
             usage = "<'stormy'|'sunny'> [duration] [world]", desc = "Change the world weather",
             min = 1, max = 3)
     @CommandPermissions({"commandbook.weather"})
-    public static void weather(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
+    public void weather(CommandContext args, CommandSender sender) throws CommandException {
         
         World world;
         String weatherStr = args.getString(0);
@@ -250,8 +251,7 @@ public class WorldCommands {
             usage = "<'on'|'off'> [duration] [world]", desc = "Change the thunder state",
             min = 1, max = 3)
     @CommandPermissions({"commandbook.weather.thunder"})
-    public static void thunder(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
+    public void thunder(CommandContext args, CommandSender sender) throws CommandException {
         
         World world;
         String weatherStr = args.getString(0);

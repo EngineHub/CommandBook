@@ -40,6 +40,12 @@ import com.sk89q.minecraft.util.commands.*;
 import static com.sk89q.commandbook.CommandBookUtil.*;
 
 public class GeneralCommands {
+    
+    private CommandBookPlugin plugin;
+    
+    public GeneralCommands(CommandBookPlugin plugin) {
+        this.plugin = plugin;
+    }
 
     @Command(aliases = {"cmdbook"}, desc = "CommandBook commands",
             flags = "d", min = 1, max = 3)
@@ -51,9 +57,7 @@ public class GeneralCommands {
             usage = "[target] <item[:data]> [amount]", desc = "Give an item",
             flags = "do", min = 1, max = 3)
     @CommandPermissions({"commandbook.give"})
-    public static void item(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
-        
+    public void item(CommandContext args, CommandSender sender) throws CommandException {
         ItemStack item = null;
         int amt = plugin.defaultItemStackSize;
         Iterable<Player> targets = null;
@@ -92,9 +96,7 @@ public class GeneralCommands {
             usage = "[-d] <target> <item[:data]> [amount]", desc = "Give an item",
             flags = "do", min = 2, max = 3)
     @CommandPermissions({"commandbook.give.other"})
-    public static void give(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
-        
+    public void give(CommandContext args, CommandSender sender) throws CommandException {
         ItemStack item = null;
         int amt = plugin.defaultItemStackSize;
         Iterable<Player> targets = null;
@@ -124,9 +126,7 @@ public class GeneralCommands {
             usage = "[filter]", desc = "Get the list of online users",
             min = 0, max = 1)
     @CommandPermissions({"commandbook.who"})
-    public static void who(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
-        
+    public void who(CommandContext args, CommandSender sender) throws CommandException {
         Player[] online = plugin.getServer().getOnlinePlayers();
         
         // Some crappy wrappers uses this to detect if the server is still
@@ -219,8 +219,7 @@ public class GeneralCommands {
     @Command(aliases = {"playertime"},
             usage = "[filter] <time|\"current\">", desc = "Get/change a player's time",
             flags = "rsw", min = 0, max = 2)
-    public static void playertime(CommandContext args, CommandBookPlugin plugin,
-                                  CommandSender sender) throws CommandException {
+    public void playertime(CommandContext args, CommandSender sender) throws CommandException {
         Iterable<Player> players;
         String timeStr = "current";
         boolean included = false;
@@ -283,8 +282,7 @@ public class GeneralCommands {
             usage = "", desc = "Show the message of the day",
             min = 0, max = 0)
     @CommandPermissions({"commandbook.motd"})
-    public static void motd(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
+    public void motd(CommandContext args, CommandSender sender) throws CommandException {
         
         String motd = plugin.getMessage("motd");
         
@@ -305,8 +303,7 @@ public class GeneralCommands {
             usage = "", desc = "Play the introduction song",
             min = 0, max = 0)
     @CommandPermissions({"commandbook.intro"})
-    public static void intro(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
+    public void intro(CommandContext args, CommandBookPlugin plugin, CommandSender sender) throws CommandException {
 
         Player player = plugin.checkPlayer(sender);
         
@@ -336,9 +333,7 @@ public class GeneralCommands {
     @Command(aliases = {"midi"},
             usage = "[midi]", desc = "Play a MIDI file",
             min = 0, max = 1)
-    public static void midi(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
-
+    public void midi(CommandContext args, CommandSender sender) throws CommandException {
         Player player = plugin.checkPlayer(sender);
         
         if (args.argsLength() == 0) {
@@ -400,8 +395,7 @@ public class GeneralCommands {
             usage = "", desc = "Show the rules",
             min = 0, max = 0)
     @CommandPermissions({"commandbook.rules"})
-    public static void rules(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
+    public void rules(CommandContext args, CommandSender sender) throws CommandException {
         
         String motd = plugin.getMessage("rules");
         
@@ -419,8 +413,7 @@ public class GeneralCommands {
             usage = "[player]", desc = "Show your current location",
             flags = "", min = 0, max = 1)
     @CommandPermissions({"commandbook.whereami"})
-    public static void whereAmI(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
+    public void whereAmI(CommandContext args, CommandSender sender) throws CommandException {
         
         Player player;
         
@@ -453,8 +446,7 @@ public class GeneralCommands {
             usage = "[player]", desc = "Tell information about a player",
             flags = "", min = 0, max = 1)
     @CommandPermissions({"commandbook.whois"})
-    public static void whois(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
+    public void whois(CommandContext args, CommandSender sender) throws CommandException {
         
         Player player;
         
@@ -485,8 +477,7 @@ public class GeneralCommands {
             usage = "[target]", desc = "Clear your inventory",
             flags = "as", min = 0, max = 1)
     @CommandPermissions({"commandbook.clear"})
-    public static void clear(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
+    public void clear(CommandContext args, CommandSender sender) throws CommandException {
         
         Iterable<Player> targets = null;
         boolean clearAll = args.hasFlag('a');
@@ -552,18 +543,14 @@ public class GeneralCommands {
     @Command(aliases = {"ping"},
             usage = "", desc = "A dummy command",
             flags = "", min = 0, max = 0)
-    public static void ping(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
-        
-        sender.sendMessage(ChatColor.YELLOW +
-                "Pong!");
+    public void ping(CommandContext args, CommandSender sender) throws CommandException {
+        sender.sendMessage(ChatColor.YELLOW + "Pong!");
     }
     
     @Command(aliases = {"pong"},
             usage = "", desc = "A dummy command",
             flags = "", min = 0, max = 0)
-    public static void pong(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
+    public void pong(CommandContext args, CommandSender sender) throws CommandException {
         
         sender.sendMessage(ChatColor.YELLOW +
                 "I hear " + plugin.toName(sender) + " likes cute Asian boys.");
@@ -571,16 +558,14 @@ public class GeneralCommands {
     
     @Command(aliases = {"debug"}, desc = "Debugging commands")
     @NestedCommand({DebuggingCommands.class})
-    public static void debug(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
+    public void debug(CommandContext args, CommandSender sender) throws CommandException {
     }
     
     @Command(aliases = {"more"},
             usage = "[player]", desc = "Gets more of an item",
             flags = "aio", min = 0, max = 1)
     @CommandPermissions({"commandbook.more"})
-    public static void more(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
+    public void more(CommandContext args, CommandSender sender) throws CommandException {
 
         Iterable<Player> targets = null;
         boolean moreAll = args.hasFlag('a');
@@ -642,8 +627,7 @@ public class GeneralCommands {
             usage = "", desc = "Set yourself as away",
             flags = "", min = 0, max = -1)
     @CommandPermissions({"commandbook.away"})
-    public static void afk(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
+    public void afk(CommandContext args, CommandSender sender) throws CommandException {
 
         Player player = plugin.checkPlayer(sender);
 
@@ -667,8 +651,7 @@ public class GeneralCommands {
             usage = "[player] [gamemode]", desc = "Change a player's gamemode",
             flags = "c", min = 0, max = 2)
     @CommandPermissions({"commandbook.gamemode"})
-    public static void gamemode(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
+    public void gamemode(CommandContext args, CommandSender sender) throws CommandException {
 
         Player player = null;
         GameMode mode = null;
