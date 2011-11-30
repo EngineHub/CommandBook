@@ -481,4 +481,12 @@ public class CommandBookUtil {
             item.setAmount(stackSize);
         }
     }
+
+    public static World.Environment getSkylandsEnvironment() {
+        try {
+            return World.Environment.THE_END;
+        } catch (Throwable t) {
+            return World.Environment.getEnvironment(1);
+        }
+    }
 }

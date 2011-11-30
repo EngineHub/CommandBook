@@ -22,6 +22,7 @@ import java.util.Random;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Animals;
 import org.bukkit.entity.CreatureType;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Enderman;
@@ -45,13 +46,13 @@ public class FunCommands {
     
     private static Random random = new Random();
     private CommandBookPlugin plugin;
-    
+
     public FunCommands(CommandBookPlugin plugin) {
         this.plugin = plugin;
     }
     
     @Command(aliases = {"spawnmob"}, usage = "<mob>[|rider] [count] [location]", desc = "Spawn a mob",
-            flags = "dir", min = 1, max = 4)
+            flags = "dirb", min = 1, max = 4)
     @CommandPermissions({"commandbook.spawnmob"})
     public void spawnMob(CommandContext args, CommandSender sender) throws CommandException {
         Location loc;
@@ -121,6 +122,9 @@ public class FunCommands {
         }
         if (args.hasFlag('r')) {
             creature.setVelocity(new Vector(0, 2, 0));
+        }
+        if (args.hasFlag('b') && creature instanceof Animals) {
+            ((Animals) creature).setAge(-24000);
         }
         if (!specialType.equals("")) {
             if (creature instanceof Wolf) {

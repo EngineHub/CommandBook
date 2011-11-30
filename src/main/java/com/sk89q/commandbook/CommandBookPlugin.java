@@ -988,8 +988,9 @@ public final class CommandBookPlugin extends JavaPlugin {
 
             // #skylands for the first skylands world
             } else if (filter.equalsIgnoreCase("#skylands") || filter.equalsIgnoreCase("#theend") || filter.equalsIgnoreCase("#end")) {
+                Environment skylandsEnv = CommandBookUtil.getSkylandsEnvironment();
                 for (World world : worlds) {
-                    if (world.getEnvironment() == Environment.THE_END) {
+                    if (world.getEnvironment() == skylandsEnv) {
                         return world;
                     }
                 }
