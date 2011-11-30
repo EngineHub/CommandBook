@@ -81,8 +81,7 @@ public class TeleportCommands {
     @Command(aliases = {"teleport"}, usage = "[target] <destination>",
              desc = "Teleport to a location", min = 1, max = 2)
     @CommandPermissions({"commandbook.teleport"})
-    public static void teleport(CommandContext args, final CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
+    public void teleport(CommandContext args, CommandSender sender) throws CommandException {
 
         Iterable<Player> targets = null;
         final Location loc;
