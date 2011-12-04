@@ -1,6 +1,7 @@
 name: CommandBook
 main: com.sk89q.commandbook.CommandBookPlugin
 version: "${project.version}"
+softdepend: [WorldEdit]
 commands:
     cmdbook:
         description: CommandBook commands
