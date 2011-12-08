@@ -1241,8 +1241,7 @@ public final class CommandBookPlugin extends JavaPlugin {
                 return null;
             }
         }
-        
-        return new ItemStack(id, 1, (short)dmg, (byte)dmg);
+        return new ItemStack(id, 1, (short)dmg);
     }
     
     /**
@@ -1291,8 +1290,7 @@ public final class CommandBookPlugin extends JavaPlugin {
         if (dataName != null) {            
             dmg = matchItemData(id, dataName);
         }
-        
-        return new ItemStack(id, 1, (short)dmg, (byte)dmg);
+        return new ItemStack(id, 1, (short)dmg);
     }
     
     /**
