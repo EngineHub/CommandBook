@@ -40,7 +40,7 @@ public class WarpManagementCommands {
 
     @Command(aliases = {"del", "delete", "remove", "rem"}, usage = "<warpname> [world]",
              desc = "Remove a warp", min = 1, max = 2 )
-    @CommandPermissions({"commandbok.warp.remove"})
+    @CommandPermissions({"commandbook.warp.remove"})
     public void remove(CommandContext args, CommandSender sender) throws CommandException {
         World world;
         String warpName = args.getString(0);
