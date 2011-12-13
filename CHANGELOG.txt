@@ -1,3 +1,21 @@
+1.7
+- Added /gamemode command to change player game modes
+- Added commands to list and remove homes and warps
+- Updated for 1.0.1 changes
+- Allow spawning baby animals
+
+- Improved support for non-player and non-console command senders
+- Improved error handling
+- Cleaned output of several commands
+- Changed some unnecessary logger warnings to logger info's
+
+- Fixed configuration generation for Windows users
+- Fixed cross-world teleport permissions
+- Fixed thread leak in the MIDI handler
+- Fixed giving items with a damage value greater than 255
+
+Thanks to contributions by: wizjany, Turtle9598, and balr0g (aka armed_troop)
+
 1.6:
 - Added basic warps and homes support
 - Added option to broadcast kicks and bans
