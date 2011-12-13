@@ -63,14 +63,10 @@ public class WarpManagementCommands {
     }
 
     private static final int PER_PAGE = 5;
-    @Command(
-            aliases = {"list", "show"},
-            usage = "[ -p owner] [-w world] [page]",
-            desc = "List warps",
-            flags = "p:w:", min = 0, max = 1 )
+    @Command(aliases = {"list", "show"}, usage = "[ -p owner] [-w world] [page]",
+            desc = "List warps", flags = "p:w:", min = 0, max = 1 )
     @CommandPermissions({"commandbook.warp.list"})
-    public static void list(CommandContext args, CommandBookPlugin plugin,
-        CommandSender sender) throws CommandException {
+    public void list(CommandContext args, CommandSender sender) throws CommandException {
         World world = null;
         String owner = args.getFlag('p');
         int page = args.getInteger(0, 1) - 1;

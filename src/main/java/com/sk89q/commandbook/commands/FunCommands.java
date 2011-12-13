@@ -307,7 +307,7 @@ public class FunCommands {
     
     @Command(aliases = {"barrage"}, usage = "[target]", desc = "Send a barrage of arrows", flags = "s", min = 0, max = 1)
     @CommandPermissions({"commandbook.barrage"})
-    public static void barrage(CommandContext args, CommandBookPlugin plugin, CommandSender sender) throws CommandException {
+    public void barrage(CommandContext args, CommandSender sender) throws CommandException {
         Iterable<Player> targets = null;
         boolean included = false;
         int count = 0;

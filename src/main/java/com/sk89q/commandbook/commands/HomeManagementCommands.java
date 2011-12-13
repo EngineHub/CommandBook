@@ -63,14 +63,10 @@ public class HomeManagementCommands {
     }
 
     private static final int PER_PAGE = 5;
-    @Command(
-            aliases = {"list", "show"},
-            usage = "[-w world] [page]",
-            desc = "List homes",
+    @Command(aliases = {"list", "show"}, usage = "[-w world] [page]", desc = "List homes",
             flags = "w:", min = 0, max = 1 )
     @CommandPermissions({"commandbook.home.list"})
-    public static void list(CommandContext args, CommandBookPlugin plugin,
-        CommandSender sender) throws CommandException {
+    public void list(CommandContext args, CommandSender sender) throws CommandException {
         World world = null;
         int page = args.getInteger(0, 1) - 1;
         if (plugin.getWarpsManager().isPerWorld()) {

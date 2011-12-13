@@ -92,12 +92,9 @@ public class ModerationCommands {
                 + plugin.toName(player));
     }*/
     
-    @Command(aliases = {"mute"},
-            usage = "<target>", desc = "Mute a player",
-            min = 1, max = 1)
+    @Command(aliases = {"mute"}, usage = "<target>", desc = "Mute a player", min = 1, max = 1)
     @CommandPermissions({"commandbook.mute"})
-    public static void mute(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
+    public void mute(CommandContext args, CommandSender sender) throws CommandException {
         
         Player player = plugin.matchSinglePlayer(sender, args.getString(0));
 
@@ -298,6 +295,6 @@ public class ModerationCommands {
 
     @Command(aliases = {"bans"}, desc = "Ban management")
     @NestedCommand({BanCommands.class})
-    public void bans(CommandContext args, CommandBookPlugin plugin, CommandSender sender) throws CommandException {
+    public void bans() throws CommandException {
     }
 }

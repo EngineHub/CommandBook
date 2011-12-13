@@ -303,7 +303,7 @@ public class GeneralCommands {
             usage = "", desc = "Play the introduction song",
             min = 0, max = 0)
     @CommandPermissions({"commandbook.intro"})
-    public void intro(CommandContext args, CommandBookPlugin plugin, CommandSender sender) throws CommandException {
+    public void intro(CommandContext args, CommandSender sender) throws CommandException {
 
         Player player = plugin.checkPlayer(sender);
         

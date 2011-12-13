@@ -123,6 +123,6 @@ public class HomeCommands {
 
     @Command(aliases = {"homes"}, desc = "Home management")
     @NestedCommand({HomeManagementCommands.class})
-    public void homes(CommandContext args, CommandBookPlugin plugin, CommandSender sender) throws CommandException {
+    public void homes() throws CommandException {
     }
 }
