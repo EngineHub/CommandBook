@@ -692,30 +692,30 @@ public class GeneralCommands {
                     } catch (NumberFormatException ex) {}
                 }
                 if (mode == null) {
-                    throw new CommandException("Unrecognized gamemode: " + modeString + ".");
+                    throw new CommandException(ChatColor.RED + "Unrecognized gamemode: " + modeString + ".");
                 }
             }
         }
 
         if (player == null || mode == null) {
-            throw new CommandException("Something went wrong, please try again.");
+            throw new CommandException(ChatColor.RED + "Something went wrong, please try again.");
         }
 
         String message = null;
         if (change) {
             if (player.getGameMode() == mode) {
-                message = " already had gamemode " + mode.toString();
+                message = ChatColor.YELLOW + " already had gamemode " + mode.toString();
                 change = false;
             } else {
-                message = " changed to gamemode " + mode.toString();
+                message = ChatColor.YELLOW + " changed to gamemode " + mode.toString();
             }
         } else {
-            message = " currently has gamemode " + mode.toString();
+            message = ChatColor.YELLOW + " currently has gamemode " + mode.toString();
         }
         if (change) {
             player.setGameMode(mode);
         }
-        sender.sendMessage("Player " + (plugin.useDisplayNames ? player.getDisplayName() : player.getName())
+        sender.sendMessage(ChatColor.YELLOW + "Player " + (plugin.useDisplayNames ? player.getDisplayName() : player.getName())
                 + message + ".");
         return;
     }
