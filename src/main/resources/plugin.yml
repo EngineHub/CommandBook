@@ -136,6 +136,7 @@ commands:
         usage: /<command> [-s] [target]
         _category: player
     gamemode:
+        aliases: gm
         description: Check or change a player's game mode
         usage: /<command> [-c] [player] [gamemode]
         _category: player
