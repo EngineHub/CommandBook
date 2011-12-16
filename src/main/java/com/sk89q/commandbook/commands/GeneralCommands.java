@@ -715,8 +715,8 @@ public class GeneralCommands {
         if (change) {
             player.setGameMode(mode);
         }
-        sender.sendMessage("Player " + (plugin.useDisplayNames ? player.getDisplayName() : player.getName())
-                + message + ".");
+        sender.sendMessage(ChatColor.YELLOW + "Player " +
+                (plugin.useDisplayNames ? player.getDisplayName() : player.getName()) + ChatColor.YELLOW + message + ".");
         return;
     }
 }
