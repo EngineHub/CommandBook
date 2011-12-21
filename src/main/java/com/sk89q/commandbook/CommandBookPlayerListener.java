@@ -70,7 +70,7 @@ public class CommandBookPlayerListener extends PlayerListener {
     public CommandBookPlayerListener(CommandBookPlugin plugin) {
         this.plugin = plugin;
     }
-
+    
     /**
      * Called on player login.
      */
@@ -119,8 +119,8 @@ public class CommandBookPlayerListener extends PlayerListener {
 
         if (player.getVehicle() != null) return; // handled in vehicle listener
         if (event.getFrom().getBlockX() != event.getTo().getBlockX()
-            || event.getFrom().getBlockY() != event.getTo().getBlockY()
-            || event.getFrom().getBlockZ() != event.getTo().getBlockZ()) {
+                || event.getFrom().getBlockY() != event.getTo().getBlockY()
+                || event.getFrom().getBlockZ() != event.getTo().getBlockZ()) {
 
             Vector pt = new Vector(event.getTo().getBlockX(), event.getTo().getBlockY(), event.getTo().getBlockZ());
             
@@ -136,7 +136,7 @@ public class CommandBookPlayerListener extends PlayerListener {
                 return;}
             }
     }
-    
+  
     /**
      * Called on player join.
      */
