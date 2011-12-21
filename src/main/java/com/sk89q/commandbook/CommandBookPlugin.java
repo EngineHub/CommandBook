@@ -68,6 +68,7 @@ import com.sk89q.worldedit.blocks.ClothColor;
 import com.sk89q.worldedit.blocks.ItemType;
 import static com.sk89q.commandbook.CommandBookUtil.*;
 import com.sk89q.commandbook.locations.WrappedSpawnManager;
+import org.bukkit.event.vehicle.VehicleListener;
 
 /**
  * Base plugin class for CommandBook.
@@ -213,15 +214,18 @@ public final class CommandBookPlugin extends JavaPlugin {
     protected void registerEvents() {
         PlayerListener playerListener = new CommandBookPlayerListener(this);
         WorldListener worldListener = new CommandBookWorldListener(this);
+        VehicleListener vehicleListener = new CommandBookVehicleListener(this);
 
         registerEvent(Event.Type.PLAYER_LOGIN, playerListener);
         registerEvent(Event.Type.PLAYER_JOIN, playerListener);
         registerEvent(Event.Type.PLAYER_INTERACT, playerListener);
         registerEvent(Event.Type.PLAYER_QUIT, playerListener);
+        registerEvent(Event.Type.PLAYER_MOVE, playerListener);
         registerEvent(Event.Type.PLAYER_CHAT, playerListener);
         registerEvent(Event.Type.PLAYER_RESPAWN, playerListener);
         registerEvent(Event.Type.PLAYER_TELEPORT, playerListener);
         registerEvent(Event.Type.WORLD_LOAD, worldListener);
+        registerEvent(Event.Type.VEHICLE_MOVE, vehicleListener);
     }
 
     /**
