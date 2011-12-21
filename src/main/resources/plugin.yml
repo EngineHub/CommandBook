@@ -163,7 +163,7 @@ commands:
         _category: teleport
     spawn:
         description: Teleport to spawn
-        usage: /<command> [-m]
+        usage: /<command>
         _category: teleport
     return:
         aliases: ret
