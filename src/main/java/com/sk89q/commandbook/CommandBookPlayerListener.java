@@ -46,6 +46,8 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import com.sk89q.commandbook.events.MOTDSendEvent;
 import com.sk89q.commandbook.events.OnlineListSendEvent;
 import com.sk89q.jinglenote.MidiJingleSequencer;
+import com.sk89q.worldedit.Vector;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
 /**
@@ -105,6 +107,34 @@ public class CommandBookPlayerListener extends PlayerListener {
             event.setCancelled(true);
             return;
         }
+    }
+    
+    /**
+     * Called on player move.
+     */
+    
+    @Override
+    public void onPlayerMove (PlayerMoveEvent event) {
+        Player player = event.getPlayer();
+
+        if (player.getVehicle() != null) return; // handled in vehicle listener
+        if (event.getFrom().getBlockX() != event.getTo().getBlockX()
+            || event.getFrom().getBlockY() != event.getTo().getBlockY()
+            || event.getFrom().getBlockZ() != event.getTo().getBlockZ()) {
+
+            Vector pt = new Vector(event.getTo().getBlockX(), event.getTo().getBlockY(), event.getTo().getBlockZ());
+            
+            if (plugin.getAdminSession(player).isFrozen()) {
+                
+                player.sendMessage(ChatColor.RED + "You are frozen.");
+            
+                Location newLoc = event.getFrom();
+                newLoc.setX(newLoc.getBlockX() + 0.5);
+                newLoc.setY(newLoc.getBlockY());
+                newLoc.setZ(newLoc.getBlockZ() + 0.5);
+                event.setTo(newLoc);
+                return;}
+            }
     }
     
     /**

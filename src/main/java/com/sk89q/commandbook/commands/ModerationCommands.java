@@ -47,50 +47,36 @@ public class ModerationCommands {
                         "%s", args.getJoinedStrings(0)));
     }
 
-    /*@Command(aliases = {"freeze"},
+    @Command(aliases = {"freeze"},
             usage = "<target>", desc = "Freeze a player",
             min = 1, max = 1)
     @CommandPermissions({"commandbook.freeze"})
-    public static void freeze(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
+    public void freeze(CommandContext args, CommandSender sender) throws CommandException {
         
         Player player = plugin.matchSinglePlayer(sender, args.getString(0));
-        plugin.freezePlayer(player);
+        plugin.getAdminSession(player).setFrozen(true);
         
-        // Let's check if the player was frozen to begin with
-        if (plugin.isFrozen(player)) {
-            sender.sendMessage(ChatColor.RED + "That player is already frozen.");
-            return;
-        }
-
         player.sendMessage(ChatColor.YELLOW + "You've been frozen by "
                 + plugin.toName(sender));
         sender.sendMessage(ChatColor.YELLOW + "You've frozen "
                 + plugin.toName(player));
-    
+    }
 
     @Command(aliases = {"unfreeze"},
             usage = "<target>", desc = "unFreeze a player",
             min = 1, max = 1)
     @CommandPermissions({"commandbook.freeze.unfreeze"})
-    public static void unfreeze(CommandContext args, CommandBookPlugin plugin,
-            CommandSender sender) throws CommandException {
+    public void unfreeze(CommandContext args, CommandSender sender) throws CommandException {
         
         Player player = plugin.matchSinglePlayer(sender, args.getString(0));
-        
-        // Let's check if the player was frozen to begin with
-        if (!sender.isFrozen(player)) {
-            sender.sendMessage(ChatColor.RED + "That player is not frozen.");
-            return;
-        }
-        
-        plugin.unfreezePlayer(player);
+
+        plugin.getAdminSession(player).setFrozen(false);
 
         player.sendMessage(ChatColor.YELLOW + "You've been unfrozen by "
                 + plugin.toName(sender));
         sender.sendMessage(ChatColor.YELLOW + "You've unfrozen "
                 + plugin.toName(player));
-    }*/
+    }
     
     @Command(aliases = {"mute"}, usage = "<target>", desc = "Mute a player", min = 1, max = 1)
     @CommandPermissions({"commandbook.mute"})

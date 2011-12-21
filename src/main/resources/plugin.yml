@@ -163,7 +163,7 @@ commands:
         _category: teleport
     spawn:
         description: Teleport to spawn
-        usage: /<command>
+        usage: /<command> [-m]
         _category: teleport
     return:
         aliases: ret
@@ -236,7 +236,15 @@ commands:
         usage: /<command> <target>
         _parent: mute
         _category: messaging
-
+    freeze:
+        description: Freeze a player
+        usage: /<command> <target>
+        _category: player
+    unfreeze:
+        description: Unfreeze a player
+        usage: /<command> <target>
+        _parent: freeze
+        _category: player
     kick:
         description: Kick a player by name
         usage: /<command> <target> [reason...]

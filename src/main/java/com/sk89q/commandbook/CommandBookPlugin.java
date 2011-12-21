@@ -218,6 +218,7 @@ public final class CommandBookPlugin extends JavaPlugin {
         registerEvent(Event.Type.PLAYER_JOIN, playerListener);
         registerEvent(Event.Type.PLAYER_INTERACT, playerListener);
         registerEvent(Event.Type.PLAYER_QUIT, playerListener);
+        registerEvent(Event.Type.PLAYER_MOVE, playerListener);
         registerEvent(Event.Type.PLAYER_CHAT, playerListener);
         registerEvent(Event.Type.PLAYER_RESPAWN, playerListener);
         registerEvent(Event.Type.PLAYER_TELEPORT, playerListener);
