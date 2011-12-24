@@ -18,9 +18,9 @@
 
 package com.sk89q.commandbook.util;
 
+import com.sk89q.commandbook.CommandBook;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import com.sk89q.commandbook.CommandBookPlugin;
 
 /**
  * Performs an action over a list of players.
@@ -28,8 +28,7 @@ import com.sk89q.commandbook.CommandBookPlugin;
  * @author sk89q
  */
 public abstract class PlayerIteratorAction {
-    
-    protected CommandBookPlugin plugin;
+
     protected CommandSender sender;
     
     private boolean included;
@@ -37,12 +36,10 @@ public abstract class PlayerIteratorAction {
     
     /**
      * Construct the object.
-     * 
-     * @param plugin 
+     *
      * @param sender
      */
-    public PlayerIteratorAction(CommandBookPlugin plugin, CommandSender sender) {
-        this.plugin = plugin;
+    public PlayerIteratorAction(CommandSender sender) {
         this.sender = sender;
     }
     

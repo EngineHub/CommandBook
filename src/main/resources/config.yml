@@ -1,45 +1,8 @@
-# Give ops all permissions
+# These are the defaults for CommandBook's global configuration settings.
 op-permissions: true
 use-display-names: true
-online-on-join: true
-online-list:
-    colored-names: false
-    grouped-names: false
-    show-max-players: true
-verify-name-format: true
-motd: |
-    Hello, `Y%name%`w.
-    The time now is `Y%time%`w and you're in world '%world%'.
-    `2This is the default CommandBook MOTD! Adjust it in config.yml.
-    `2See `bhttp://wiki.sk89q.com/wiki/CommandBook`2 for more configuration information and help!
-rules: |
-    - Be courteous and respect others.
-    - Don't use any tools to give you an unfair advantage.
-    `2This is the default CommandBook rules text! You can adjust it in config.yml.
-# Force use of commandbook.items.<id> permissions for allowed/disallowed items
-item-permissions-only: false
-disallowed-items: []
-allowed-items: []
 item-names:
     goldblock: 41
     ice: 79
-# Allows use of custom items for Thor's hammer. Use brackets [] regardless of the amount of items.
-thor-hammer-items: [278, 285, 257, 270]
-# Makes /time and /weather broadcast a message
 broadcast-changes: true
-# Makes /kick and /ban broadcast a message
-broadcast-bans: false
-broadcast-kicks: false
-console-say-format: "<`r*Console`w> %s"
-broadcast-format: "`r[Broadcast] %s"
-default-item-stack-size: 1
-# As of writing, this does NOT fix spawning on first join (yet)
-exact-spawn: false
-# This makes CommandBook compatible with poorly written server wrappers
 crappy-wrapper-compat: true
-time-lock:
-    # Example time lock:
-    #world: 3am
-time-lock-delay: 20
-per-world-warps: false
-per-world-homes: false

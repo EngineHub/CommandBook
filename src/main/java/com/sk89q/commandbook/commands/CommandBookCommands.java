@@ -18,9 +18,9 @@
 
 package com.sk89q.commandbook.commands;
 
+import com.sk89q.commandbook.CommandBook;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
-import com.sk89q.commandbook.CommandBookPlugin;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
@@ -28,26 +28,26 @@ import com.sk89q.minecraft.util.commands.CommandPermissions;
 
 public class CommandBookCommands {
     
-    private CommandBookPlugin plugin;
-    
-    public CommandBookCommands(CommandBookPlugin plugin) {
-        this.plugin = plugin;
-    }
-    
     @Command(aliases = {"version"}, usage = "", desc = "CommandBook version information", min = 0, max = 0)
-    public void version(CommandContext args, CommandSender sender) throws CommandException {
-        sender.sendMessage(ChatColor.YELLOW + "CommandBook " + plugin.getDescription().getVersion());
+    public static void version(CommandContext args, CommandSender sender) throws CommandException {
+        sender.sendMessage(ChatColor.YELLOW + "CommandBook " + CommandBook.inst().getDescription().getVersion());
         sender.sendMessage(ChatColor.YELLOW + "http://www.sk89q.com");
     }
     
     @Command(aliases = {"reload"}, usage = "", desc = "Reload CommandBook's settings", min = 0, max = 0)
     @CommandPermissions({"commandbook.reload"})
-    public void who(CommandContext args, CommandSender sender) throws CommandException {
-        plugin.populateConfiguration();
-        plugin.getBanDatabase().load();
-        plugin.getKitManager().load();
-        plugin.getSpawnManager().load();
+    public static void reload(CommandContext args, CommandSender sender) throws CommandException {
+        CommandBook.inst().populateConfiguration();
+        CommandBook.inst().getComponentManager().reloadComponents();
         
+        sender.sendMessage(ChatColor.YELLOW + "CommandBook's configuration has been reloaded.");
+    }
+
+    @Command(aliases = {"save"}, usage = "", desc = "Save CommandBook's settings", min = 0, max = 0)
+    @CommandPermissions({"commandbook.save"})
+    public static void save(CommandContext args, CommandSender sender) throws CommandException {
+        CommandBook.inst().getGlobalConfiguration().save();
+
         sender.sendMessage(ChatColor.YELLOW + "CommandBook's configuration has been reloaded.");
     }
     

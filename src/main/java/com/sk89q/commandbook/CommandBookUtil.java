@@ -18,11 +18,14 @@
 
 package com.sk89q.commandbook;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import com.sk89q.commandbook.util.ItemUtil;
+import com.sk89q.commandbook.util.PlayerUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -35,6 +38,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.blocks.BlockType;
+
+import static com.sk89q.commandbook.util.PlayerUtil.toColoredName;
+import static com.sk89q.commandbook.util.PlayerUtil.toName;
+import static com.sk89q.commandbook.util.PlayerUtil.toUniqueName;
+
 /**
  * Utility methods for CommandBook, borrowed from Tetsuuuu (the plugin
  * for SK's server).
@@ -92,100 +100,6 @@ public class CommandBookUtil {
         return String.format("%02d:%02d (%d:%02d %s)",
                 hours, minutes, (hours % 12) == 0 ? 12 : hours % 12, minutes,
                 hours < 12 ? "am" : "pm");
-    }
-    
-    /**
-     * Send the online player list.
-     * 
-     * @param online
-     * @param sender
-     * @param plugin 
-     */
-    public static void sendOnlineList(Player[] online, CommandSender sender,
-            CommandBookPlugin plugin) {
-        
-        StringBuilder out = new StringBuilder();
-        
-        // This applies mostly to the console, so there might be 0 players
-        // online if that's the case!
-        if (online.length == 0) {
-            sender.sendMessage("0 players are online.");
-            return;
-        }
-        
-        out.append(ChatColor.GRAY + "Online (");
-        out.append(online.length);
-        if (plugin.playersListMaxPlayers) {
-            out.append("/");
-            out.append(plugin.getServer().getMaxPlayers());
-        }
-        out.append("): ");
-        out.append(ChatColor.WHITE);
-        
-        if (plugin.playersListGroupedNames) {
-            Map<String, List<Player>> groups = new HashMap<String, List<Player>>();
-            
-            for (Player player : online) {
-                String[] playerGroups = plugin.getPermissionsResolver().getGroups(
-                        player.getName());
-                String group = playerGroups.length > 0 ? playerGroups[0] : "Default";
-                
-                if (groups.containsKey(group)) {
-                    groups.get(group).add(player);
-                } else {
-                    List<Player> list = new ArrayList<Player>();
-                    list.add(player);
-                    groups.put(group, list);
-                }
-            }
-            
-            for (Entry<String, List<Player>> entry : groups.entrySet()) {
-                out.append("\n");
-                out.append(ChatColor.WHITE + entry.getKey());
-                out.append(": ");
-                
-                // To keep track of commas
-                boolean first = true;
-                
-                for (Player player : entry.getValue()) {
-                    if (!first) {
-                        out.append(", ");
-                    }
-                    
-                    if (plugin.playersListColoredNames) {
-                        out.append(player.getDisplayName() + ChatColor.WHITE);
-                    } else {
-                        out.append(player.getName());
-                    }
-                    
-                    first = false;
-                }
-            }
-            
-        } else {
-            // To keep track of commas
-            boolean first = true;
-            
-            for (Player player : online) {
-                if (!first) {
-                    out.append(", ");
-                }
-                
-                if (plugin.playersListColoredNames) {
-                    out.append(player.getDisplayName() + ChatColor.WHITE);
-                } else {
-                    out.append(player.getName());
-                }
-                
-                first = false;
-            }
-        }
-        
-        String[] lines = out.toString().split("\n");
-        
-        for (String line : lines) {
-            sender.sendMessage(line);
-        }
     }
     
     /**
@@ -264,37 +178,37 @@ public class CommandBookUtil {
      * @param item
      * @param amt
      * @param targets
-     * @param plugin
+     * @param component
      * @param drop
      * @throws CommandException
      */
     @SuppressWarnings("deprecation")
     public static void giveItem(CommandSender sender, ItemStack item, int amt,
-            Iterable<Player> targets, CommandBookPlugin plugin, boolean drop, boolean overrideStackSize)
+            Iterable<Player> targets, InventoryComponent component, boolean drop, boolean overrideStackSize)
             throws CommandException {
         
         boolean included = false; // Is the command sender also receiving items?
 
         int maxStackSize = overrideStackSize ? 64 : item.getType().getMaxStackSize();
         
-        plugin.checkAllowedItem(sender, item.getTypeId());
+        component.checkAllowedItem(sender, item.getTypeId());
         
         // Check for invalid amounts
         if (amt == 0 || amt < -1) {
             throw new CommandException("Invalid item amount!");
         } else if (amt == -1) {
             // Check to see if the player can give infinite items
-            plugin.checkPermission(sender, "commandbook.give.infinite");
+            CommandBook.inst().checkPermission(sender, "commandbook.give.infinite");
         } else if (overrideStackSize) {
-            plugin.checkPermission(sender, "commandbook.override.maxstacksize");
+            CommandBook.inst().checkPermission(sender, "commandbook.override.maxstacksize");
         } else if (amt > maxStackSize * 5) {
             // Check to see if the player can give stacks of this size
-            if (!plugin.hasPermission(sender, "commandbook.give.stacks.unlimited")) {
+            if (!CommandBook.inst().hasPermission(sender, "commandbook.give.stacks.unlimited")) {
                 throw new CommandException("More than 5 stacks is too excessive.");
             }
         } else if (amt > maxStackSize /* && amt < max * 5 */) {
             // Check to see if the player can give stacks
-            plugin.checkPermission(sender, "commandbook.give.stacks");
+            CommandBook.inst().checkPermission(sender, "commandbook.give.stacks");
         }
 
         // Get a nice amount name
@@ -328,15 +242,15 @@ public class CommandBookUtil {
             // Tell the user about the given item
             if (player.equals(sender)) {
                 player.sendMessage(ChatColor.YELLOW + "You've been given " + amtText + " "
-                        + plugin.toItemName(item.getTypeId()) + ".");
+                        + ItemUtil.toItemName(item.getTypeId()) + ".");
                 
                 // Keep track of this
                 included = true;
             } else {
                 player.sendMessage(ChatColor.YELLOW + "Given from "
-                        + plugin.toName(sender) + ": "
+                        + PlayerUtil.toName(sender) + ": "
                         + amtText + " "
-                        + plugin.toItemName(item.getTypeId()) + ".");
+                        + ItemUtil.toItemName(item.getTypeId()) + ".");
                 
             }
         }
@@ -345,7 +259,7 @@ public class CommandBookUtil {
         // user a message so s/he know that something is indeed working
         if (!included) {
             sender.sendMessage(ChatColor.YELLOW.toString() + amtText + " "
-                    + plugin.toItemName(item.getTypeId()) + " has been given.");
+                    + ItemUtil.toItemName(item.getTypeId()) + " has been given.");
         }
     }
 
@@ -397,7 +311,6 @@ public class CommandBookUtil {
      * @param player
      * @param dir
      * @param speed
-     * @param spread
      */
     public static void sendArrowFromPlayer(Player player,
             Vector dir, float speed) {
@@ -490,5 +403,59 @@ public class CommandBookUtil {
         } catch (Throwable t) {
             return World.Environment.getEnvironment(1);
         }
+    }
+
+    /**
+     * Replace macros in the text.
+     *
+     * @param sender
+     * @param message
+     * @return
+     */
+    public static String replaceMacros(CommandSender sender, String message) {
+        Player[] online = CommandBook.server().getOnlinePlayers();
+
+        message = message.replace("%name%", toName(sender));
+        message = message.replace("%cname%", toColoredName(sender, null));
+        message = message.replace("%id%", toUniqueName(sender));
+        message = message.replace("%online%", String.valueOf(online.length));
+
+        // Don't want to build the list unless we need to
+        if (message.contains("%players%")) {
+            message = message.replace("%players%",
+                    CommandBookUtil.getOnlineList(online));
+        }
+
+        if (sender instanceof Player) {
+            Player player = (Player) sender;
+            World world = player.getWorld();
+
+            message = message.replace("%time%", getTimeString(world.getTime()));
+            message = message.replace("%world%", world.getName());
+        }
+
+        final Pattern cmdPattern = Pattern.compile("%cmd:([^%]+)%");
+        final Matcher matcher = cmdPattern.matcher(message);
+        try {
+            StringBuffer buff = new StringBuffer();
+            while (matcher.find()) {
+                Process p = new ProcessBuilder(matcher.group(1).split(" ")).start();
+                BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
+                String s;
+                StringBuilder build = new StringBuilder();
+                while ((s = stdInput.readLine()) != null) {
+                    build.append(s + " ");
+                }
+                stdInput.close();
+                build.delete(build.length() - 1, build.length());
+                matcher.appendReplacement(buff, build.toString());
+                p.destroy();
+            }
+            matcher.appendTail(buff);
+            message = buff.toString();
+        } catch (IOException e) {
+            sender.sendMessage(ChatColor.RED + "Error replacing macros: " + e.getMessage());
+        }
+        return message;
     }
 }

@@ -30,8 +30,9 @@ import java.util.Map;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.sk89q.commandbook.CommandBook;
 import org.bukkit.inventory.ItemStack;
-import com.sk89q.commandbook.CommandBookPlugin;
 
 /**
  * Manages kits.
@@ -43,19 +44,16 @@ public class FlatFileKitsManager implements KitManager {
     private static final Logger logger = Logger.getLogger("Minecraft.CommandBook");
     private static final Pattern kitPattern =
             Pattern.compile("^\\[([^\\]=]+)(?:= *([0-9]+) *)?\\]$");
-    
-    private CommandBookPlugin plugin;
+
     private File file;
     private Map<String, Kit> kits = new HashMap<String, Kit>();
     
     /**
      * Construct the manager.
-     * 
-     * @param plugin
+     *
      * @param file 
      */
-    public FlatFileKitsManager(File file, CommandBookPlugin plugin) {
-        this.plugin = plugin;
+    public FlatFileKitsManager(File file) {
         this.file = file;
     }
     
@@ -109,7 +107,7 @@ public class FlatFileKitsManager implements KitManager {
                 }
                 
                 String[] parts = line.split(",");
-                ItemStack item = plugin.getItem(parts[0].replace(" ", ""));
+                ItemStack item = CommandBook.inst().getItem(parts[0].replace(" ", ""));
                 
                 if (item == null) {
                     logger.warning("CommandBook: Unknown kit item '" + item + "'");

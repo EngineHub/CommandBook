@@ -18,21 +18,31 @@
 
 package com.sk89q.commandbook.events;
 
+import com.sk89q.commandbook.events.core.CommandBookEvent;
+import com.sk89q.commandbook.events.core.HandlerList;
 import org.bukkit.command.CommandSender;
-import org.bukkit.event.Event;
 
-public class OnlineListSendEvent extends Event {
+public class OnlineListSendEvent extends CommandBookEvent {
     
     private static final long serialVersionUID = -2101268576268728497L;
     private CommandSender target;
 
     public OnlineListSendEvent(CommandSender target) {
-        super("CommandBook.OnlineListPreSendEvent");
         this.target = target;
     }
 
     public CommandSender getTarget() {
         return target;
+    }
+
+    private static final HandlerList handlers = new HandlerList();
+
+    public HandlerList getHandlers() {
+        return handlers;
+    }
+
+    public static HandlerList getHandlerList() {
+        return handlers;
     }
 
 }
