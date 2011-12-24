@@ -1,7 +1,7 @@
 package com.sk89q.commandbook.events.core;
 
-import com.zachsthings.narwhal.Narwhal;
-import com.zachsthings.narwhal.NarwhalRuntimeException;
+import com.sk89q.commandbook.CommandBook;
+import com.sk89q.commandbook.CommandBookRuntimeException;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
 import org.bukkit.event.Listener;
@@ -14,21 +14,21 @@ import java.lang.reflect.Method;
  */
 public class EventManager {
 
-    public void registerEvents(Listener listener) {
+    public void registerEvents(Listener listener, Object owner) {
         for (final Method method : listener.getClass().getMethods()) {
             method.setAccessible(true);
-            BukkitEvent event = method.getAnnotation(BukkitEvent.class);
-            EventListener registration = method.getAnnotation(EventListener.class);
-            if (event != null) {
+            if (method.isAnnotationPresent(BukkitEvent.class)) {
+                BukkitEvent event = method.getAnnotation(BukkitEvent.class);
                 Bukkit.getServer().getPluginManager().registerEvent(event.type(),
                         listener, new CommandBookEventExecutor(method),
-                        event.priority(), Narwhal.inst());
-            } else if (registration != null) {
+                        event.priority(), CommandBook.inst());
+            } else if (method.isAnnotationPresent(EventListener.class)) {
+                EventListener registration = method.getAnnotation(EventListener.class);
                 getEventListeners(getRegistrationClass(registration.event())).
-                        register(new RegisteredListener(listener,
+                        register(new CommandBookRegisteredListener(listener,
                                 new CommandBookEventExecutor(method),
                                 registration.priority(),
-                                Narwhal.inst()));
+                                owner));
             }
         }
     }
@@ -58,7 +58,7 @@ public class EventManager {
                     && clazz.getSuperclass().isAssignableFrom(CommandBookEvent.class)) {
                 return getRegistrationClass(clazz.getSuperclass().asSubclass(Event.class));
             } else {
-                throw new NarwhalRuntimeException("Unable to find handler list for event " + clazz.getName());
+                throw new CommandBookRuntimeException("Unable to find handler list for event " + clazz.getName());
             }
         }
     }
@@ -75,7 +75,7 @@ public class EventManager {
             method.setAccessible(true);
             return (HandlerList)method.invoke(null);
         } catch (Exception e) {
-            throw new NarwhalRuntimeException(e.toString());
+            throw new CommandBookRuntimeException(e.toString());
         }
     }
 }

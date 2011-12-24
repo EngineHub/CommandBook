@@ -47,6 +47,12 @@ public class BansComponent extends AbstractComponent implements Listener {
         bans.load();
 
     }
+
+    @Override
+    public void reload() {
+        getBanDatabase().load();
+        config = configure(new LocalConfiguration());
+    }
     
     @Override
     public void unload() {

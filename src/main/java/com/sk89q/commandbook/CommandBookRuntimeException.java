@@ -16,18 +16,19 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.commandbook.components;
-
-import com.sk89q.util.yaml.YAMLNode;
-import java.util.Collection;
+package com.sk89q.commandbook;
 
 /**
  * @author zml2008
  */
-public interface ComponentLoader {
-
-    public Collection<AbstractComponent> loadComponents();
+public class CommandBookRuntimeException extends RuntimeException {
+    private static final long serialVersionUID = -6408892128500052917L;
     
-    public YAMLNode getConfiguration(AbstractComponent component);
+    public CommandBookRuntimeException(String msg) {
+        super(msg);
+    }
     
+    public CommandBookRuntimeException(Throwable cause) {
+        super(cause);
+    }
 }

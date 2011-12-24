@@ -18,10 +18,16 @@
 
 package com.sk89q.commandbook.components;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.sk89q.commandbook.CommandBook;
+import com.sk89q.commandbook.config.ConfigUtil;
+import com.sk89q.minecraft.util.commands.CommandsManager;
+import com.sk89q.minecraft.util.commands.SimpleInjector;
+import com.sk89q.util.yaml.YAMLNode;
+import org.bukkit.command.CommandSender;
+
+import java.lang.reflect.Field;
+import java.util.*;
+import java.util.logging.Level;
 
 /**
  * @author zml2008
@@ -36,6 +42,46 @@ public class ComponentManager {
     }
 
     public boolean loadComponents() {
-        return false;
+        Collection<AbstractComponent> components = new ArrayList<AbstractComponent>();
+        for (ComponentLoader loader : loaders) {
+            for (AbstractComponent component : loader.loadComponents()) {
+                // Create a CommandsManager instance
+                CommandsManager<CommandSender> commands = new CommandsManager<CommandSender>() {
+                    @Override
+                    public boolean hasPermission(CommandSender sender, String perm) {
+                        return CommandBook.inst().hasPermission(sender, perm);
+                    }
+                };
+                commands.setInjector(new SimpleInjector(component));
+
+                YAMLNode componentConfig = loader.getConfiguration(component);
+
+                component.setUp(commands, componentConfig);
+            }
+        }
+        return true;
+    }
+
+    public void enableComponents() {
+        for (AbstractComponent component : registeredComponents.values()) {
+            for (Field field : component.getClass().getDeclaredFields()) {
+                field.setAccessible(true);
+                /*if (field.isAnnotationPresent(RequiredService.class)) {
+                    setFieldService(field, field.getType(), component);
+                }*/
+            }
+            CommandBook.logger().log(Level.FINEST, "CommandBook: Component " + component.getClass().getSimpleName() + " successfully enabled!");
+            component.initialize();
+        }
+
+    }
+
+    public <T> void setFieldService(Field field, Class<T> service, AbstractComponent component) {
+        T registration = CommandBook.server().getServicesManager().load(service);
+        try {
+            field.set(component, registration);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
     }
 }

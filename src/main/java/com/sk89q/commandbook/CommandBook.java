@@ -33,6 +33,7 @@ import java.util.zip.ZipEntry;
 import com.sk89q.commandbook.util.CommandRegistration;
 import com.sk89q.util.yaml.YAMLFormat;
 import com.sk89q.util.yaml.YAMLProcessor;
+import com.sk89q.wepif.PermissionsResolverManager;
 import org.bukkit.*;
 import org.bukkit.World.Environment;
 import org.bukkit.block.Block;
@@ -49,9 +50,6 @@ import org.bukkit.event.world.WorldListener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.config.Configuration;
-import com.sk89q.bukkit.migration.PermissionsResolverManager;
-import com.sk89q.commandbook.bans.BanDatabase;
-import com.sk89q.commandbook.bans.FlatFileBanDatabase;
 import com.sk89q.commandbook.commands.*;
 import com.sk89q.commandbook.kits.FlatFileKitsManager;
 import com.sk89q.commandbook.kits.KitManager;
@@ -81,8 +79,7 @@ public final class CommandBook extends JavaPlugin {
     private static final Pattern TWELVE_HOUR_TIME = Pattern.compile("^([0-9]+(?::[0-9]+)?)([apmAPM\\.]+)$");
     
     private static CommandBook instance;
-    
-    private PermissionsResolverManager perms;
+
     private CommandsManager<CommandSender> commands;
     private RootLocationManager<NamedLocation> warps;
     private RootLocationManager<NamedLocation> homes;
@@ -172,8 +169,7 @@ public final class CommandBook extends JavaPlugin {
         jingleNoteManager = new JingleNoteManager(this);
         
         // Prepare permissions
-        perms = new PermissionsResolverManager(this, getDescription().getName(), logger);
-        perms.load();
+        PermissionsResolverManager.initialize(this);
         
         // Register the commands that we want to use
         final CommandBook plugin = this;
@@ -493,7 +489,7 @@ public final class CommandBook extends JavaPlugin {
     public boolean hasPermission(CommandSender sender, String perm) {
         if (!(sender instanceof Player)) {
             return ((sender.isOp() && (opPermissions || sender instanceof ConsoleCommandSender)) 
-                    || perms.hasPermission(sender.getName(), perm));
+                    || PermissionsResolverManager.getInstance().hasPermission(sender.getName(), perm));
         } 
         return hasPermission(sender, ((Player) sender).getWorld(), perm);
     }
@@ -506,7 +502,7 @@ public final class CommandBook extends JavaPlugin {
         // Invoke the permissions resolver
         if (sender instanceof Player) {
             Player player = (Player) sender;
-            return perms.hasPermission(world.getName(), player.getName(), perm);
+            return PermissionsResolverManager.getInstance().hasPermission(world.getName(), player.getName(), perm);
         }
 
         return false;
@@ -1594,7 +1590,7 @@ public final class CommandBook extends JavaPlugin {
      * @return
      */
     public PermissionsResolverManager getPermissionsResolver() {
-        return perms;
+        return PermissionsResolverManager.getInstance();
     }
 
     public WrappedSpawnManager getSpawnManager() {

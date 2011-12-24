@@ -21,11 +21,7 @@ package com.sk89q.commandbook.events.core;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.plugin.RegisteredListener;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 /**
@@ -51,21 +47,21 @@ public class HandlerList {
      * unregister() and are automatically baked to the handlers array any
      * time they have changed.
      */
-    private final EnumMap<Priority, ArrayList<RegisteredListener>> handlerslots;
+    private final EnumMap<Priority, ArrayList<CommandBookRegisteredListener>> handlerSlots;
 
     /**
      * Whether the current HandlerList has been fully baked. When this is set
      * to false, the Map<EventPriority, List<RegisteredListener>> will be baked to RegisteredListener[][]
      * next time the event is called.
      *
-     * @see EventManager.callEvent()
+     * @see EventManager.callEvent(org.bukkit.event.Event)
      */
     private boolean baked = false;
 
     /**
      * List of all HandlerLists which have been created, for use in bakeAll()
      */
-    private static ArrayList<HandlerList> alllists = new ArrayList<HandlerList>();
+    private static ArrayList<HandlerList> allLists = new ArrayList<HandlerList>();
 
     /**
      * Bake all handler lists. Best used just after all normal event
@@ -73,15 +69,21 @@ public class HandlerList {
      * you're using fevents in a plugin system.
      */
     public static void bakeAll() {
-        for (HandlerList h : alllists) {
+        for (HandlerList h : allLists) {
             h.bake();
         }
     }
 
     public static void unregisterAll() {
-        for (HandlerList h : alllists) {
-            h.handlerslots.clear();
+        for (HandlerList h : allLists) {
+            h.handlerSlots.clear();
             h.baked = false;
+        }
+    }
+    
+    public static void unregisterAll(Object owner) {
+        for (HandlerList h : allLists) {
+            h.unregister(owner);
         }
     }
 
@@ -90,26 +92,26 @@ public class HandlerList {
      * The HandlerList is then added to meta-list for use in bakeAll()
      */
     public HandlerList() {
-        handlerslots = new EnumMap<Priority, ArrayList<RegisteredListener>>(Priority.class);
+        handlerSlots = new EnumMap<Priority, ArrayList<CommandBookRegisteredListener>>(Priority.class);
         for (Priority o : Priority.values()) {
-            handlerslots.put(o, new ArrayList<RegisteredListener>());
+            handlerSlots.put(o, new ArrayList<CommandBookRegisteredListener>());
         }
-        alllists.add(this);
+        allLists.add(this);
     }
 
     /**
      * Register a new listener in this handler list
      * @param listener listener to register
      */
-    void register(RegisteredListener listener) {
-        if (handlerslots.get(listener.getPriority()).contains(listener))
+    void register(CommandBookRegisteredListener listener) {
+        if (handlerSlots.get(listener.getPriority()).contains(listener))
             throw new IllegalStateException("This listener is already registered to priority " + listener.getPriority().toString());
         baked = false;
-        handlerslots.get(listener.getPriority()).add(listener);
+        handlerSlots.get(listener.getPriority()).add(listener);
     }
 
-    void registerAll(Collection<RegisteredListener> listeners) {
-        for (RegisteredListener listener : listeners) {
+    void registerAll(Collection<CommandBookRegisteredListener> listeners) {
+        for (CommandBookRegisteredListener listener : listeners) {
             register(listener);
         }
     }
@@ -119,10 +121,23 @@ public class HandlerList {
      * @param listener listener to remove
      */
     void unregister(RegisteredListener listener) {
-        if (handlerslots.get(listener.getPriority()).contains(listener)) {
+        if (handlerSlots.get(listener.getPriority()).contains(listener)) {
             baked = false;
-            handlerslots.get(listener.getPriority()).remove(listener);
+            handlerSlots.get(listener.getPriority()).remove(listener);
         }
+    }
+    
+    void unregister(Object owner) {
+        boolean changed = false;
+        for (Entry<Priority, ArrayList<CommandBookRegisteredListener>> entry : handlerSlots.entrySet()) {
+            for (Iterator<CommandBookRegisteredListener> i = entry.getValue().iterator(); i.hasNext();) {
+                if (i.next().getOwner().equals(owner)) {
+                    i.remove();
+                    changed = true;
+                }
+            }
+        }
+        if (changed) baked = false;
     }
 
     /**
@@ -130,7 +145,7 @@ public class HandlerList {
      */
     void bake() {
         if (baked) return; // don't re-bake when still valid
-        for (Entry<Priority, ArrayList<RegisteredListener>> entry : handlerslots.entrySet()) {
+        for (Entry<Priority, ArrayList<CommandBookRegisteredListener>> entry : handlerSlots.entrySet()) {
             handlers[eventSlots.get(entry.getKey())] = (entry.getValue().toArray(new RegisteredListener[entry.getValue().size()]));
         }
         baked = true;
