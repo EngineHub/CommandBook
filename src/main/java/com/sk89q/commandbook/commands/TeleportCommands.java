@@ -23,16 +23,16 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import com.sk89q.commandbook.CommandBookPlugin;
+import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.util.PlayerIteratorAction;
 import com.sk89q.commandbook.util.TeleportPlayerIterator;
 import com.sk89q.minecraft.util.commands.*;
 
 public class TeleportCommands {
 
-    private CommandBookPlugin plugin;
+    private CommandBook plugin;
     
-    public TeleportCommands(CommandBookPlugin plugin) {
+    public TeleportCommands(CommandBook plugin) {
         this.plugin = plugin;
     }
     

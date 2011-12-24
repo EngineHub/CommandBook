@@ -1,5 +1,5 @@
 name: CommandBook
-main: com.sk89q.commandbook.CommandBookPlugin
+main: com.sk89q.commandbook.CommandBook
 version: "${project.version}"
 softdepend: [WorldEdit]
 commands:
@@ -235,25 +235,3 @@ commands:
         usage: /<command> <target>
         _parent: mute
         _category: messaging
-
-    kick:
-        description: Kick a player by name
-        usage: /<command> <target> [reason...]
-        _component: bans
-    ban:
-        description: Ban a player by name
-        usage: /<command> <target> [reason...]
-        _component: bans
-    unban:
-        aliases: pardon
-        description: Unban a player by name
-        usage: /<command> <target> [reason...]
-        _component: bans
-    isbanned:
-        description: Checks if a player's name is banned
-        usage: /<command> <target>
-        _component: bans
-    bans:
-        description: Ban save/load commands
-        usage: /<command> ...
-        _component: bans

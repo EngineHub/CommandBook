@@ -24,10 +24,10 @@ import org.bukkit.World;
 
 public class TimeLockManager {
     
-    private CommandBookPlugin plugin;
+    private CommandBook plugin;
     private Map<String, Integer> tasks = new HashMap<String, Integer>();
     
-    public TimeLockManager(CommandBookPlugin plugin) {
+    public TimeLockManager(CommandBook plugin) {
         this.plugin = plugin;
     }
     

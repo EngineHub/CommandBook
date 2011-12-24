@@ -18,7 +18,7 @@
 
 package com.sk89q.commandbook.commands;
 
-import com.sk89q.commandbook.CommandBookPlugin;
+import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.locations.NamedLocation;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
@@ -32,9 +32,9 @@ import java.util.List;
 
 public class WarpManagementCommands {
 
-    private CommandBookPlugin plugin;
+    private CommandBook plugin;
     
-    public WarpManagementCommands(CommandBookPlugin plugin) {
+    public WarpManagementCommands(CommandBook plugin) {
         this.plugin = plugin;
     }
 

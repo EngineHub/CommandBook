@@ -22,9 +22,9 @@ public class GarbageCollector implements Runnable {
     
     public static final long CHECK_FREQUENCY = 12000;
     
-    private CommandBookPlugin plugin;
+    private CommandBook plugin;
     
-    public GarbageCollector(CommandBookPlugin plugin) {
+    public GarbageCollector(CommandBook plugin) {
         this.plugin = plugin;
     }
 

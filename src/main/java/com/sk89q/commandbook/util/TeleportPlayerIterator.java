@@ -22,14 +22,14 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import com.sk89q.commandbook.CommandBookPlugin;
+import com.sk89q.commandbook.CommandBook;
 
 public class TeleportPlayerIterator extends PlayerIteratorAction {
     
     protected Location loc;
     protected Location oldLoc;
     
-    public TeleportPlayerIterator(CommandBookPlugin plugin,
+    public TeleportPlayerIterator(CommandBook plugin,
             CommandSender sender, Location loc) {
         super(plugin, sender);
         this.loc = loc;

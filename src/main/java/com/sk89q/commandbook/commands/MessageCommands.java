@@ -25,7 +25,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerChatEvent;
-import com.sk89q.commandbook.CommandBookPlugin;
+import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.events.CommandSenderMessageEvent;
 import com.sk89q.commandbook.events.SharedMessageEvent;
 import com.sk89q.minecraft.util.commands.Command;
@@ -36,9 +36,9 @@ import com.sk89q.minecraft.util.commands.CommandPermissions;
 public class MessageCommands {
 
     private static final Logger logger = Logger.getLogger("Minecraft.CommandBook");
-    private CommandBookPlugin plugin;
+    private CommandBook plugin;
     
-    public MessageCommands(CommandBookPlugin plugin) {
+    public MessageCommands(CommandBook plugin) {
         this.plugin = plugin;
     }
 

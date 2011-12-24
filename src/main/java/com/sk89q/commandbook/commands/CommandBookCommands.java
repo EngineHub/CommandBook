@@ -18,9 +18,9 @@
 
 package com.sk89q.commandbook.commands;
 
+import com.sk89q.commandbook.CommandBook;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
-import com.sk89q.commandbook.CommandBookPlugin;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
@@ -28,9 +28,9 @@ import com.sk89q.minecraft.util.commands.CommandPermissions;
 
 public class CommandBookCommands {
     
-    private CommandBookPlugin plugin;
+    private CommandBook plugin;
     
-    public CommandBookCommands(CommandBookPlugin plugin) {
+    public CommandBookCommands(CommandBook plugin) {
         this.plugin = plugin;
     }
     

@@ -41,7 +41,7 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import com.sk89q.commandbook.CommandBookPlugin;
+import com.sk89q.commandbook.CommandBook;
 
 /**
  * Flat file ban database.
@@ -55,7 +55,7 @@ public class FlatFileBanDatabase implements BanDatabase {
     protected final Logger auditLogger
             = Logger.getLogger("Minecraft.CommandBook.Bans");
     
-    protected CommandBookPlugin plugin;
+    protected BansComponent component;
     protected File dataDirectory;
     protected File namesFile;
     protected File ipFile;
@@ -63,9 +63,9 @@ public class FlatFileBanDatabase implements BanDatabase {
     protected Set<String> bannedNames;
     protected Set<String> bannedIP;
 
-    public FlatFileBanDatabase(File dataDirectory, CommandBookPlugin plugin) {
+    public FlatFileBanDatabase(File dataDirectory, BansComponent component) {
         this.dataDirectory = dataDirectory;
-        this.plugin = plugin;
+        this.component = component;
 
         namesFile = new File(dataDirectory, "banned_names.txt");
         ipFile = new File(dataDirectory, "banned_ip.txt");
@@ -233,8 +233,8 @@ public class FlatFileBanDatabase implements BanDatabase {
 
     public synchronized void banName(String name, CommandSender source, String reason) {
         auditLogger.info(String.format("BAN: %s (%s) banned name '%s': %s",
-                plugin.toUniqueName(source), 
-                plugin.toInetAddressString(source),
+                CommandBook.inst().toUniqueName(source),
+                CommandBook.inst().toInetAddressString(source),
                 name,
                 reason));
         
@@ -243,8 +243,8 @@ public class FlatFileBanDatabase implements BanDatabase {
 
     public synchronized void banAddress(String address, CommandSender source, String reason) {
         auditLogger.info(String.format("BAN: %s (%s) banned address '%s': %s",
-                plugin.toUniqueName(source), 
-                plugin.toInetAddressString(source),
+                CommandBook.inst().toUniqueName(source),
+                CommandBook.inst().toInetAddressString(source),
                 address,
                 reason));
         
@@ -256,8 +256,8 @@ public class FlatFileBanDatabase implements BanDatabase {
         
         if (removed) {
             auditLogger.info(String.format("UNBAN: %s (%s) unbanned name '%s': %s",
-                    plugin.toUniqueName(source), 
-                    plugin.toInetAddressString(source),
+                    CommandBook.inst().toUniqueName(source),
+                    CommandBook.inst().toInetAddressString(source),
                     name,
                     reason));
         }
@@ -270,8 +270,8 @@ public class FlatFileBanDatabase implements BanDatabase {
         
         if (removed) {
             auditLogger.info(String.format("UNBAN: %s (%s) unbanned ADDRESS '%s'",
-                    plugin.toUniqueName(source), 
-                    plugin.toInetAddressString(source),
+                    CommandBook.inst().toUniqueName(source),
+                    CommandBook.inst().toInetAddressString(source),
                     address,
                     reason));
         }
@@ -281,8 +281,8 @@ public class FlatFileBanDatabase implements BanDatabase {
 
     public void logKick(Player player, CommandSender source, String reason) {
         auditLogger.info(String.format("KICKED: %s (%s) kicked player '%s': %s",
-                plugin.toUniqueName(source), 
-                plugin.toInetAddressString(source),
+                CommandBook.inst().toUniqueName(source),
+                CommandBook.inst().toInetAddressString(source),
                 player.getName(),
                 reason));
     }

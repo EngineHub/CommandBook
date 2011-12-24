@@ -21,13 +21,13 @@ package com.sk89q.commandbook.commands;
 
 import static com.sk89q.commandbook.CommandBookUtil.getCardinalDirection;
 
+import com.sk89q.commandbook.CommandBook;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.sk89q.commandbook.CommandBookPlugin;
 import com.sk89q.commandbook.CommandBookUtil;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
@@ -37,9 +37,9 @@ import com.sk89q.minecraft.util.commands.CommandPermissions;
 
 public class WorldCommands {
 
-    private CommandBookPlugin plugin;
+    private CommandBook plugin;
     
-    public WorldCommands(CommandBookPlugin plugin) {
+    public WorldCommands(CommandBook plugin) {
         this.plugin = plugin;
     }
 

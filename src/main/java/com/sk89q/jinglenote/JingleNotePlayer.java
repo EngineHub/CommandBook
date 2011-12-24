@@ -7,12 +7,12 @@
 
 package com.sk89q.jinglenote;
 
+import com.sk89q.commandbook.CommandBook;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import com.sk89q.commandbook.CommandBookPlugin;
 
 public class JingleNotePlayer implements Runnable {
-    protected CommandBookPlugin plugin;
+    protected CommandBook plugin;
     protected Player player;
     protected Location loc;
     protected JingleSequencer sequencer;
@@ -20,7 +20,7 @@ public class JingleNotePlayer implements Runnable {
     
     protected boolean keepMusicBlock = false;
     
-    public JingleNotePlayer(CommandBookPlugin plugin, Player player,
+    public JingleNotePlayer(CommandBook plugin, Player player,
             Location loc, JingleSequencer seq,  int delay) {
         this.plugin = plugin;
         this.player = player;

@@ -18,11 +18,11 @@
 
 package com.sk89q.commandbook.commands;
 
+import com.sk89q.commandbook.CommandBook;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import com.sk89q.commandbook.CommandBookPlugin;
 import com.sk89q.commandbook.locations.NamedLocation;
 import com.sk89q.commandbook.util.TeleportPlayerIterator;
 import com.sk89q.minecraft.util.commands.Command;
@@ -33,9 +33,9 @@ import com.sk89q.minecraft.util.commands.NestedCommand;
 
 public class WarpCommands {
 
-    private CommandBookPlugin plugin;
+    private CommandBook plugin;
     
-    public WarpCommands(CommandBookPlugin plugin) {
+    public WarpCommands(CommandBook plugin) {
         this.plugin = plugin;
     }
     

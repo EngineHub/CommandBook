@@ -27,9 +27,9 @@ public class SessionChecker implements Runnable {
     
     public static final long CHECK_FREQUENCY = 1200;
     
-    private CommandBookPlugin plugin;
+    private CommandBook plugin;
     
-    public SessionChecker(CommandBookPlugin plugin) {
+    public SessionChecker(CommandBook plugin) {
         this.plugin = plugin;
     }
 

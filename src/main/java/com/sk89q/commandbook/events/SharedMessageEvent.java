@@ -18,15 +18,15 @@
 
 package com.sk89q.commandbook.events;
 
-import org.bukkit.event.Event;
+import com.sk89q.commandbook.events.core.CommandBookEvent;
+import com.sk89q.commandbook.events.core.HandlerList;
 
-public class SharedMessageEvent extends Event {
+public class SharedMessageEvent extends CommandBookEvent {
     
     private static final long serialVersionUID = -6438425022394756162L;
     private String message;
 
     public SharedMessageEvent(String message) {
-        super("CommandBook.SharedMessageEvent");
         this.message = message;
     }
 
@@ -34,4 +34,13 @@ public class SharedMessageEvent extends Event {
         return message;
     }
 
+    private static final HandlerList handlers = new HandlerList();
+
+    public HandlerList getHandlers() {
+        return handlers;
+    }
+
+    public static HandlerList getHandlerList() {
+        return handlers;
+    }
 }

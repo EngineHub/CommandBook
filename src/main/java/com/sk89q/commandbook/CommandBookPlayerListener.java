@@ -58,14 +58,14 @@ public class CommandBookPlayerListener extends PlayerListener {
     protected final static Pattern namePattern = Pattern.compile(
             "^[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_]{1,16}$");
     
-    protected CommandBookPlugin plugin;
+    protected CommandBook plugin;
     
     /**
      * Construct the listener.
      * 
      * @param plugin
      */
-    public CommandBookPlayerListener(CommandBookPlugin plugin) {
+    public CommandBookPlayerListener(CommandBook plugin) {
         this.plugin = plugin;
     }
 
@@ -81,17 +81,6 @@ public class CommandBookPlayerListener extends PlayerListener {
                     "for having an invalid name (to disable, turn off verify-name-format in CommandBook)");
             event.disallow(Result.KICK_OTHER, "Invalid player name detected!");
             return;
-        }
-        
-        try {
-            if (plugin.getBanDatabase().isBannedName(event.getPlayer().getName())
-                    || plugin.getBanDatabase().isBannedAddress(
-                            event.getPlayer().getAddress().getAddress())) {
-                event.disallow(Result.KICK_BANNED, plugin.getBanMessage());
-                return;
-            }
-        } catch (NullPointerException e) {
-            // Bug in CraftBukkit
         }
     }
 

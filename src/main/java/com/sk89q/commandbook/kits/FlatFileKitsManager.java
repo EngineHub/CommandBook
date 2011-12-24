@@ -30,8 +30,9 @@ import java.util.Map;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.sk89q.commandbook.CommandBook;
 import org.bukkit.inventory.ItemStack;
-import com.sk89q.commandbook.CommandBookPlugin;
 
 /**
  * Manages kits.
@@ -44,7 +45,7 @@ public class FlatFileKitsManager implements KitManager {
     private static final Pattern kitPattern =
             Pattern.compile("^\\[([^\\]=]+)(?:= *([0-9]+) *)?\\]$");
     
-    private CommandBookPlugin plugin;
+    private CommandBook plugin;
     private File file;
     private Map<String, Kit> kits = new HashMap<String, Kit>();
     
@@ -54,7 +55,7 @@ public class FlatFileKitsManager implements KitManager {
      * @param plugin
      * @param file 
      */
-    public FlatFileKitsManager(File file, CommandBookPlugin plugin) {
+    public FlatFileKitsManager(File file, CommandBook plugin) {
         this.plugin = plugin;
         this.file = file;
     }

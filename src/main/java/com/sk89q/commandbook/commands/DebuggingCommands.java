@@ -21,7 +21,7 @@ package com.sk89q.commandbook.commands;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
-import com.sk89q.commandbook.CommandBookPlugin;
+import com.sk89q.commandbook.CommandBook;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
@@ -29,9 +29,9 @@ import com.sk89q.minecraft.util.commands.CommandPermissions;
 
 public class DebuggingCommands {
     
-    private CommandBookPlugin plugin;
+    private CommandBook plugin;
     
-    public DebuggingCommands(CommandBookPlugin plugin) {
+    public DebuggingCommands(CommandBook plugin) {
         this.plugin = plugin;
     }
 

@@ -18,10 +18,12 @@
 
 package com.sk89q.commandbook.events;
 
+import com.sk89q.commandbook.events.core.CommandBookEvent;
+import com.sk89q.commandbook.events.core.HandlerList;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.Event;
 
-public class CommandSenderMessageEvent extends Event {
+public class CommandSenderMessageEvent extends CommandBookEvent {
     
     private static final long serialVersionUID = 1724483171471625110L;
     
@@ -29,7 +31,6 @@ public class CommandSenderMessageEvent extends Event {
     private String message;
 
     public CommandSenderMessageEvent(CommandSender sender, String message) {
-        super("CommandBook.CommandSenderMessageEvent");
         this.sender = sender;
         this.message = message;
     }
@@ -42,4 +43,13 @@ public class CommandSenderMessageEvent extends Event {
         return message;
     }
 
+    private static final HandlerList handlers = new HandlerList();
+
+    public HandlerList getHandlers() {
+        return handlers;
+    }
+
+    public static HandlerList getHandlerList() {
+        return handlers;
+    }
 }

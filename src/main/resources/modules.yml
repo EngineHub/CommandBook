@@ -1,0 +1,7 @@
+bans: com.sk89q.commandbook.bans.BansComponent
+locations:
+messaging:
+teleport:
+server:
+items:
+kits:

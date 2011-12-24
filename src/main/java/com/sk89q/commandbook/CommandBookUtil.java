@@ -102,7 +102,7 @@ public class CommandBookUtil {
      * @param plugin 
      */
     public static void sendOnlineList(Player[] online, CommandSender sender,
-            CommandBookPlugin plugin) {
+            CommandBook plugin) {
         
         StringBuilder out = new StringBuilder();
         
@@ -270,7 +270,7 @@ public class CommandBookUtil {
      */
     @SuppressWarnings("deprecation")
     public static void giveItem(CommandSender sender, ItemStack item, int amt,
-            Iterable<Player> targets, CommandBookPlugin plugin, boolean drop, boolean overrideStackSize)
+            Iterable<Player> targets, CommandBook plugin, boolean drop, boolean overrideStackSize)
             throws CommandException {
         
         boolean included = false; // Is the command sender also receiving items?
@@ -397,7 +397,6 @@ public class CommandBookUtil {
      * @param player
      * @param dir
      * @param speed
-     * @param spread
      */
     public static void sendArrowFromPlayer(Player player,
             Vector dir, float speed) {

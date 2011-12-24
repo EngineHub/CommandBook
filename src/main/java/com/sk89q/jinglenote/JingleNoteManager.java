@@ -12,7 +12,7 @@ import java.util.Map;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import com.sk89q.commandbook.CommandBookPlugin;
+import com.sk89q.commandbook.CommandBook;
 import com.sk89q.worldedit.blocks.BlockType;
 
 /**
@@ -30,9 +30,9 @@ public class JingleNoteManager {
     /**
      * Plugin.
      */
-    private CommandBookPlugin plugin;
+    private CommandBook plugin;
     
-    public JingleNoteManager(CommandBookPlugin plugin) {
+    public JingleNoteManager(CommandBook plugin) {
         this.plugin = plugin;
     }
     

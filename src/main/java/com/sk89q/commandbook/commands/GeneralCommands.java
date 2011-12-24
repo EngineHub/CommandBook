@@ -24,6 +24,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiUnavailableException;
+
+import com.sk89q.commandbook.CommandBook;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -31,7 +33,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import com.sk89q.commandbook.CommandBookPlugin;
 import com.sk89q.commandbook.CommandBookUtil;
 import com.sk89q.commandbook.events.MOTDSendEvent;
 import com.sk89q.commandbook.events.OnlineListSendEvent;
@@ -41,9 +42,9 @@ import static com.sk89q.commandbook.CommandBookUtil.*;
 
 public class GeneralCommands {
     
-    private CommandBookPlugin plugin;
+    private CommandBook plugin;
     
-    public GeneralCommands(CommandBookPlugin plugin) {
+    public GeneralCommands(CommandBook plugin) {
         this.plugin = plugin;
     }
 

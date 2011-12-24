@@ -27,14 +27,14 @@ public class CommandBookWorldListener extends WorldListener {
     
     protected static final Logger logger = Logger.getLogger("Minecraft.CommandBook");
     
-    protected CommandBookPlugin plugin;
+    protected CommandBook plugin;
     
     /**
      * Construct the listener.
      * 
      * @param plugin
      */
-    public CommandBookWorldListener(CommandBookPlugin plugin) {
+    public CommandBookWorldListener(CommandBook plugin) {
         this.plugin = plugin;
     }
 

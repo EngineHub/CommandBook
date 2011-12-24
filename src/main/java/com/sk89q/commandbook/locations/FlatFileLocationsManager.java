@@ -31,18 +31,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+
+import com.sk89q.commandbook.CommandBook;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
-import com.sk89q.commandbook.CommandBookPlugin;
 
 public class FlatFileLocationsManager implements LocationManager<NamedLocation> {
     
     private static final Logger logger = Logger.getLogger("Minecraft.CommandBook");
     
-    private CommandBookPlugin plugin;
+    private CommandBook plugin;
     private World castWorld;
     private File file;
     private Map<String, NamedLocation> locs = new HashMap<String, NamedLocation>();
@@ -55,7 +56,7 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
      * @param file
      * @param type
      */
-    public FlatFileLocationsManager(File file, CommandBookPlugin plugin, String type) {
+    public FlatFileLocationsManager(File file, CommandBook plugin, String type) {
         this.plugin = plugin;
         this.file = file;
         this.type = type;
@@ -208,11 +209,11 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
 
     public static class LocationsFactory implements LocationManagerFactory<LocationManager<NamedLocation>> {
 
-        private CommandBookPlugin plugin;
+        private CommandBook plugin;
         public File rootDir;
         private String type;
 
-        public LocationsFactory(File rootDir, CommandBookPlugin plugin, String type) {
+        public LocationsFactory(File rootDir, CommandBook plugin, String type) {
             this.rootDir = rootDir;
             this.plugin = plugin;
             this.type = type;

@@ -19,10 +19,11 @@
 package com.sk89q.commandbook.commands;
 
 import java.util.Map;
+
+import com.sk89q.commandbook.CommandBook;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import com.sk89q.commandbook.CommandBookPlugin;
 import com.sk89q.commandbook.kits.Kit;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
@@ -30,9 +31,9 @@ import com.sk89q.minecraft.util.commands.CommandException;
 
 public class KitCommands {
 
-    private CommandBookPlugin plugin;
+    private CommandBook plugin;
     
-    public KitCommands(CommandBookPlugin plugin) {
+    public KitCommands(CommandBook plugin) {
         this.plugin = plugin;
     }
     
