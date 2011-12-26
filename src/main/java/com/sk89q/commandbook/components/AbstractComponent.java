@@ -52,11 +52,14 @@ public abstract class AbstractComponent {
      */
     private YAMLNode rawConfiguration;
 
+    private ComponentLoader loader;
+
     private boolean enabled;
 
-    public void setUp(CommandsManager<CommandSender> commands, YAMLNode rawConfiguration) {
+    public void setUp(CommandsManager<CommandSender> commands, YAMLNode rawConfiguration, ComponentLoader loader) {
         this.commands = commands;
         this.rawConfiguration = rawConfiguration;
+        this.loader = loader;
     }
 
     /**
@@ -175,5 +178,13 @@ public abstract class AbstractComponent {
 
     void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public ComponentLoader getComponentLoader() {
+        return loader;
+    }
+    
+    public void setRawConfiguration(YAMLNode node) {
+        this.rawConfiguration = node;
     }
 }

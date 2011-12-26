@@ -22,6 +22,8 @@ package com.sk89q.commandbook.commands;
 import static com.sk89q.commandbook.CommandBookUtil.getCardinalDirection;
 
 import com.sk89q.commandbook.CommandBook;
+import com.sk89q.commandbook.util.LocationUtil;
+import com.sk89q.commandbook.util.PlayerUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -43,72 +45,6 @@ public class WorldCommands {
         this.plugin = plugin;
     }
 
-    @Command(aliases = {"time"},
-            usage = "[world] <time|\"current\">", desc = "Get/change the world time",
-            flags = "l", min = 0, max = 2)
-    public void time(CommandContext args, CommandSender sender) throws CommandException {
-        
-        World world;
-        String timeStr;
-        boolean onlyLock = false;
-    
-        // Easy way to get the time
-        if (args.argsLength() == 0) {
-            world = plugin.checkPlayer(sender).getWorld();
-            timeStr = "current";
-        // If no world was specified, get the world from the sender, but
-        // fail if the sender isn't player
-        } else if (args.argsLength() == 1) {
-            world = plugin.checkPlayer(sender).getWorld();
-            timeStr = args.getString(0);
-        } else { // A world was specified!
-            world = plugin.matchWorld(sender, args.getString(0));
-            timeStr = args.getString(1);
-        }
-        
-        // Let the player get the time
-        if (timeStr.equalsIgnoreCase("current")
-                || timeStr.equalsIgnoreCase("cur")
-                || timeStr.equalsIgnoreCase("now")) {
-            
-            // We want to lock to the current time
-            if (!args.hasFlag('l')) {
-                plugin.checkPermission(sender, "commandbook.time.check");
-                sender.sendMessage(ChatColor.YELLOW
-                        + "Time: " + CommandBookUtil.getTimeString(world.getTime()));
-                return;
-            }
-            
-            onlyLock = true;
-        }
-        
-        plugin.checkPermission(sender, "commandbook.time");
-    
-        if (!onlyLock) {
-            plugin.getTimeLockManager().unlock(world);
-            world.setTime(plugin.matchTime(timeStr));
-        }
-        
-        String verb = "set";
-        
-        // Locking
-        if (args.hasFlag('l')) {
-            plugin.checkPermission(sender, "commandbook.time.lock");
-            plugin.getTimeLockManager().lock(world);
-            verb = "locked";
-        }
-        
-        if (plugin.broadcastChanges) { 
-            plugin.getServer().broadcastMessage(ChatColor.YELLOW
-                    + plugin.toName(sender) + " " + verb + " the time of '"
-                    + world.getName() + "' to "
-                    + CommandBookUtil.getTimeString(world.getTime()) + ".");
-        } else {
-            sender.sendMessage(ChatColor.YELLOW + "Time " + verb + " to "
-                    + CommandBookUtil.getTimeString(world.getTime()) + ".");
-        }
-    }
-
     @Command(aliases = {"compass"},
             usage = "[player]", desc = "Show your current compass direction",
             flags = "", min = 0, max = 1)
@@ -118,11 +54,11 @@ public class WorldCommands {
         Player player;
         
         if (args.argsLength() == 0) {
-            player = plugin.checkPlayer(sender);
+            player = PlayerUtil.checkPlayer(sender);
         } else {
             plugin.checkPermission(sender, "commandbook.whereami.other");
             
-            player = plugin.matchSinglePlayer(sender, args.getString(0));
+            player = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
         }
     
         sender.sendMessage(ChatColor.YELLOW +
@@ -139,11 +75,11 @@ public class WorldCommands {
         Player player;
     
         if (args.argsLength() == 0) {
-            player = plugin.checkPlayer(sender);
+            player = PlayerUtil.checkPlayer(sender);
         } else {
             plugin.checkPermission(sender, "commandbook.biome.other");
             
-            player = plugin.matchSinglePlayer(sender, args.getString(0));
+            player = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
         }
     
         sender.sendMessage(ChatColor.YELLOW + player.getLocation().getBlock().getBiome().name().toLowerCase().replace("_"," ")+" biome.");
@@ -160,11 +96,11 @@ public class WorldCommands {
         Location loc;
         
         if (args.argsLength() == 0) {
-            Player player = plugin.checkPlayer(sender);
+            Player player = PlayerUtil.checkPlayer(sender);
             world = player.getWorld();
             loc = player.getLocation();
         } else {
-            loc = plugin.matchLocation(sender, args.getString(0));
+            loc = LocationUtil.matchLocation(sender, args.getString(0));
             world = loc.getWorld();
         }
     
@@ -185,12 +121,12 @@ public class WorldCommands {
         int duration = -1;
     
         if (args.argsLength() == 1) {
-            world = plugin.checkPlayer(sender).getWorld();
+            world = PlayerUtil.checkPlayer(sender).getWorld();
         } else if (args.argsLength() == 2) {
-            world = plugin.checkPlayer(sender).getWorld();
+            world = PlayerUtil.checkPlayer(sender).getWorld();
             duration = args.getInteger(1);
         } else { // A world was specified!
-            world = plugin.matchWorld(sender, args.getString(2));
+            world = LocationUtil.matchWorld(sender, args.getString(2));
             duration = args.getInteger(1);
         }
         
@@ -209,7 +145,7 @@ public class WorldCommands {
     
             if (plugin.broadcastChanges) { 
                 plugin.getServer().broadcastMessage(ChatColor.YELLOW
-                        + plugin.toName(sender) + " has started on a storm on '"
+                        + PlayerUtil.toName(sender) + " has started on a storm on '"
                         + world.getName() + "'.");
             }
             
@@ -233,7 +169,7 @@ public class WorldCommands {
     
             if (plugin.broadcastChanges) { 
                 plugin.getServer().broadcastMessage(ChatColor.YELLOW
-                        + plugin.toName(sender) + " has stopped a storm on '"
+                        + PlayerUtil.toName(sender) + " has stopped a storm on '"
                         + world.getName() + "'.");
             }
             
@@ -258,12 +194,12 @@ public class WorldCommands {
         int duration = -1;
     
         if (args.argsLength() == 1) {
-            world = plugin.checkPlayer(sender).getWorld();
+            world = PlayerUtil.checkPlayer(sender).getWorld();
         } else if (args.argsLength() == 2) {
-            world = plugin.checkPlayer(sender).getWorld();
+            world = PlayerUtil.checkPlayer(sender).getWorld();
             duration = args.getInteger(1);
         } else { // A world was specified!
-            world = plugin.matchWorld(sender, args.getString(2));
+            world = LocationUtil.matchWorld(sender, args.getString(2));
             duration = args.getInteger(1);
         }
         

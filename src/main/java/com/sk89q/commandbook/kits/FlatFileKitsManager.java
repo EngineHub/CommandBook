@@ -44,19 +44,16 @@ public class FlatFileKitsManager implements KitManager {
     private static final Logger logger = Logger.getLogger("Minecraft.CommandBook");
     private static final Pattern kitPattern =
             Pattern.compile("^\\[([^\\]=]+)(?:= *([0-9]+) *)?\\]$");
-    
-    private CommandBook plugin;
+
     private File file;
     private Map<String, Kit> kits = new HashMap<String, Kit>();
     
     /**
      * Construct the manager.
-     * 
-     * @param plugin
+     *
      * @param file 
      */
-    public FlatFileKitsManager(File file, CommandBook plugin) {
-        this.plugin = plugin;
+    public FlatFileKitsManager(File file) {
         this.file = file;
     }
     
@@ -110,7 +107,7 @@ public class FlatFileKitsManager implements KitManager {
                 }
                 
                 String[] parts = line.split(",");
-                ItemStack item = plugin.getItem(parts[0].replace(" ", ""));
+                ItemStack item = CommandBook.inst().getItem(parts[0].replace(" ", ""));
                 
                 if (item == null) {
                     logger.warning("CommandBook: Unknown kit item '" + item + "'");

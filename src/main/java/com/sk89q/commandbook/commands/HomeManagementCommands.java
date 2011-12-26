@@ -20,6 +20,8 @@ package com.sk89q.commandbook.commands;
 
 import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.locations.NamedLocation;
+import com.sk89q.commandbook.util.LocationUtil;
+import com.sk89q.commandbook.util.PlayerUtil;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
@@ -45,9 +47,9 @@ public class HomeManagementCommands {
         World world;
         String homeName = sender.getName();
         if (args.argsLength() == 2) {
-            world = plugin.matchWorld(sender, args.getString(1));
+            world = LocationUtil.matchWorld(sender, args.getString(1));
         } else {
-            world = plugin.checkPlayer(sender).getWorld();
+            world = PlayerUtil.checkPlayer(sender).getWorld();
         }
         if (args.argsLength() > 0) homeName = args.getString(0);
         NamedLocation home = plugin.getHomesManager().get(world, homeName);
@@ -71,9 +73,9 @@ public class HomeManagementCommands {
         int page = args.getInteger(0, 1) - 1;
         if (plugin.getWarpsManager().isPerWorld()) {
             if (args.hasFlag('w')) {
-                world = plugin.matchWorld(sender, args.getFlag('w'));
+                world = LocationUtil.matchWorld(sender, args.getFlag('w'));
             } else {
-                world = plugin.checkPlayer(sender).getWorld();
+                world = PlayerUtil.checkPlayer(sender).getWorld();
             }
             if (world == null) throw new CommandException("Error finding world to use!");
         }

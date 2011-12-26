@@ -24,6 +24,7 @@ import com.sk89q.commandbook.config.ConfigurationBase;
 import com.sk89q.commandbook.config.Setting;
 import com.sk89q.commandbook.config.SettingBase;
 import com.sk89q.commandbook.events.core.BukkitEvent;
+import com.sk89q.commandbook.util.PlayerUtil;
 import com.sk89q.minecraft.util.commands.*;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -45,7 +46,8 @@ public class BansComponent extends AbstractComponent implements Listener {
         // Setup the ban database
         bans = new FlatFileBanDatabase(CommandBook.inst().getDataFolder(), this);
         bans.load();
-
+        CommandBook.inst().getEventManager().registerEvents(this, this);
+        registerCommands(BanCommands.class);
     }
 
     @Override
@@ -98,7 +100,7 @@ public class BansComponent extends AbstractComponent implements Listener {
         @Command(aliases = {"kick"}, usage = "<target> [reason...]", desc = "Kick a user", min = 1, max = -1)
         @CommandPermissions({"commandbook.kick"})
         public void kick(CommandContext args, CommandSender sender) throws CommandException {
-            Iterable<Player> targets = CommandBook.inst().matchPlayers(sender, args.getString(0));
+            Iterable<Player> targets = PlayerUtil.matchPlayers(sender, args.getString(0));
             String message = args.argsLength() >= 2 ? args.getJoinedStrings(1)
                     : "Kicked!";
 
@@ -114,7 +116,7 @@ public class BansComponent extends AbstractComponent implements Listener {
             //Broadcast the Message
             if (CommandBook.inst().broadcastKicks) {
                 CommandBook.server().broadcastMessage(ChatColor.YELLOW
-                        + CommandBook.inst().toName(sender) + " has kicked " + broadcastPlayers
+                        + PlayerUtil.toName(sender) + " has kicked " + broadcastPlayers
                         + " - " + message);
             }
         }
@@ -132,9 +134,9 @@ public class BansComponent extends AbstractComponent implements Listener {
 
                 // Exact mode matches names exactly
                 if (args.hasFlag('e')) {
-                    player = CommandBook.inst().matchPlayerExactly(sender, args.getString(0));
+                    player = PlayerUtil.matchPlayerExactly(sender, args.getString(0));
                 } else {
-                    player = CommandBook.inst().matchSinglePlayer(sender, args.getString(0));
+                    player = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
                 }
 
                 // Need to kick + log
@@ -160,7 +162,7 @@ public class BansComponent extends AbstractComponent implements Listener {
             //Broadcast the Message
             if (CommandBook.inst().broadcastKicks) {
                 CommandBook.server().broadcastMessage(ChatColor.YELLOW
-                        + CommandBook.inst().toName(sender) + " has banned " + banName
+                        + PlayerUtil.toName(sender) + " has banned " + banName
                         + " - " + message);
             }
 
@@ -272,6 +274,29 @@ public class BansComponent extends AbstractComponent implements Listener {
         @Command(aliases = {"bans"}, desc = "Ban management")
         @NestedCommand({BanCommands.class})
         public void bans() throws CommandException {
+        }
+    }
+
+    private class BanManagementCommands {
+
+        @Command(aliases = {"load", "reload", "read"}, usage = "", desc = "Reload bans from disk", min = 0, max = 0)
+        @CommandPermissions({"commandbook.bans.load"})
+        public void loadBans(CommandContext args, CommandSender sender) throws CommandException {
+            if (getBanDatabase().load()) {
+                sender.sendMessage(ChatColor.YELLOW + "Bans database reloaded.");
+            } else {
+                throw new CommandException("Bans database failed to load entirely. See server console.");
+            }
+        }
+
+        @Command(aliases = {"save", "write"}, usage = "", desc = "Save bans to disk", min = 0, max = 0)
+        @CommandPermissions({"commandbook.bans.save"})
+        public void saveBans(CommandContext args, CommandSender sender) throws CommandException {
+            if (getBanDatabase().load()) {
+                sender.sendMessage(ChatColor.YELLOW + "Bans database saved.");
+            } else {
+                throw new CommandException("Bans database failed to save entirely. See server console.");
+            }
         }
     }
 }

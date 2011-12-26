@@ -26,6 +26,7 @@ import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiUnavailableException;
 
 import com.sk89q.commandbook.CommandBook;
+import com.sk89q.commandbook.util.PlayerUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -70,17 +71,17 @@ public class GeneralCommands {
         // One argument: Just the item type and amount 1
         if (args.argsLength() == 1) {
             item = plugin.matchItem(sender, args.getString(0));
-            targets = plugin.matchPlayers(plugin.checkPlayer(sender));
+            targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
         // Two arguments: Item type and amount
         } else if (args.argsLength() == 2) {
             item = plugin.matchItem(sender, args.getString(0));
             amt = args.getInteger(1);
-            targets = plugin.matchPlayers(plugin.checkPlayer(sender));
+            targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
         // Three arguments: Player, item type, and item amount
         } else if (args.argsLength() == 3) {
             item = plugin.matchItem(sender, args.getString(1));
             amt = args.getInteger(2);
-            targets = plugin.matchPlayers(sender, args.getString(0));
+            targets = PlayerUtil.matchPlayers(sender, args.getString(0));
             
             // Make sure that this player has permission to give items to other
             /// players!
@@ -108,11 +109,11 @@ public class GeneralCommands {
 
         // Two arguments: Player, item type
         if (args.argsLength() == 2) {
-            targets = plugin.matchPlayers(sender, args.getString(0));
+            targets = PlayerUtil.matchPlayers(sender, args.getString(0));
             item = plugin.matchItem(sender, args.getString(1));
         // Three arguments: Player, item type, and item amount
         } else if (args.argsLength() == 3) {
-            targets = plugin.matchPlayers(sender, args.getString(0));
+            targets = PlayerUtil.matchPlayers(sender, args.getString(0));
             item = plugin.matchItem(sender, args.getString(1));
             amt = args.getInteger(2);
         }
@@ -217,68 +218,6 @@ public class GeneralCommands {
         sender.sendMessage(out.toString());
     }
     
-    @Command(aliases = {"playertime"},
-            usage = "[filter] <time|\"current\">", desc = "Get/change a player's time",
-            flags = "rsw", min = 0, max = 2)
-    public void playertime(CommandContext args, CommandSender sender) throws CommandException {
-        Iterable<Player> players;
-        String timeStr = "current";
-        boolean included = false;
-
-        if (args.argsLength() < 2) {
-            plugin.checkPermission(sender, "commandbook.time.player");
-            if (args.argsLength() == 1) {
-                timeStr = args.getString(0);
-            }
-            players = plugin.matchPlayers(plugin.checkPlayer(sender));
-        } else {
-            players = plugin.matchPlayers(sender, args.getString(0));
-            timeStr = args.getString(1);
-            plugin.checkPermission(sender, "commandbook.time.player.other");
-        }
-
-        if (args.hasFlag('r')) {
-            for (Player player : players) {
-                player.resetPlayerTime();
-                if (!args.hasFlag('s')) {
-                    player.sendMessage(ChatColor.YELLOW + "Your time was reset to world time");
-                }
-                if (sender instanceof Player && ((Player) sender).equals(player)) {
-                    included = true;
-                }
-            }
-            if (!included) {
-                sender.sendMessage(ChatColor.YELLOW + "Player times reset");
-            }
-            return;
-        }
-
-        if (timeStr.equalsIgnoreCase("current")
-                || timeStr.equalsIgnoreCase("cur")
-                || timeStr.equalsIgnoreCase("now")) {
-            plugin.checkPermission(sender, "commandbook.time.player.check");
-            sender.sendMessage(ChatColor.YELLOW
-                    + "Player Time: " + CommandBookUtil.getTimeString(plugin.matchSinglePlayer(sender,
-                    args.getString(0, plugin.checkPlayer(sender).getName())).getPlayerTime()));
-            return;
-        }
-
-        for (Player player : players) {
-            if (!player.equals(sender)) {
-                plugin.checkPermission(sender, "commandbook.time.player.other");
-                player.sendMessage(ChatColor.YELLOW + "Your time set to " + CommandBookUtil.getTimeString(player.getPlayerTime()));
-            } else {
-                plugin.checkPermission(sender, "commandbook.time.player");
-                player.sendMessage(ChatColor.YELLOW + "Your time set to " + CommandBookUtil.getTimeString(player.getPlayerTime()));
-                included = true;
-            }
-            player.setPlayerTime(args.hasFlag('w') ? Integer.parseInt(timeStr) : plugin.matchTime(timeStr), args.hasFlag('w'));
-        }
-        if (!included) {
-            sender.sendMessage(ChatColor.YELLOW + "Player times set to " + CommandBookUtil.getTimeString(plugin.matchTime(timeStr)));
-        }
-    }
-    
     @Command(aliases = {"motd"},
             usage = "", desc = "Show the message of the day",
             min = 0, max = 0)
@@ -297,98 +236,6 @@ public class GeneralCommands {
                     replaceColorMacros(
                             plugin.replaceMacros(
                                     sender, motd)));
-        }
-    }
-    
-    @Command(aliases = {"intro"},
-            usage = "", desc = "Play the introduction song",
-            min = 0, max = 0)
-    @CommandPermissions({"commandbook.intro"})
-    public void intro(CommandContext args, CommandSender sender) throws CommandException {
-
-        Player player = plugin.checkPlayer(sender);
-        
-        if (plugin.disableMidi) {
-            throw new CommandException("MIDI support is disabled.");
-        }
-
-        try {
-            MidiJingleSequencer sequencer = new MidiJingleSequencer(
-                    new File(plugin.getDataFolder(), "intro.mid"));
-            plugin.getJingleNoteManager().play(player, sequencer, 0);
-            sender.sendMessage(ChatColor.YELLOW + "Playing intro.midi...");
-        } catch (MidiUnavailableException e) {
-            throw new CommandException("Failed to access MIDI: "
-                    + e.getMessage());
-        } catch (InvalidMidiDataException e) {
-            throw new CommandException("Failed to read intro MIDI file: "
-                    + e.getMessage());
-        } catch (FileNotFoundException e) {
-            throw new CommandException("No intro.mid is available.");
-        } catch (IOException e) {
-            throw new CommandException("Failed to read intro MIDI file: "
-                    + e.getMessage());
-        }
-    }
-    
-    @Command(aliases = {"midi"},
-            usage = "[midi]", desc = "Play a MIDI file",
-            min = 0, max = 1)
-    public void midi(CommandContext args, CommandSender sender) throws CommandException {
-        Player player = plugin.checkPlayer(sender);
-        
-        if (args.argsLength() == 0) {
-            plugin.getJingleNoteManager().stop(player);
-            sender.sendMessage(ChatColor.YELLOW + "All music stopped.");
-            return;
-        }
-        
-        plugin.checkPermission(sender, "commandbook.midi");
-        
-        String filename = args.getString(0);
-        
-        if (!filename.matches("^[A-Za-z0-9 \\-_\\.~\\[\\]\\(\\$),]+$")) {
-            throw new CommandException("Invalid filename specified!");
-        }
-        
-        File[] trialPaths = {
-                new File(plugin.getDataFolder(), "midi/" + filename),
-                new File(plugin.getDataFolder(), "midi/" + filename + ".mid"),
-                new File(plugin.getDataFolder(), "midi/" + filename + ".midi"),
-                new File("midi", filename),
-                new File("midi", filename + ".mid"),
-                new File("midi", filename + ".midi"),
-                };
-        
-        File file = null;
-        
-        for (File f : trialPaths) {
-            if (f.exists()) {
-                file = f;
-                break;
-            }
-        }
-        
-        if (file == null) {
-            throw new CommandException("The specified MIDI file was not found.");
-        }
-        
-        try {
-            MidiJingleSequencer sequencer = new MidiJingleSequencer(file);
-            plugin.getJingleNoteManager().play(player, sequencer, 0);
-            sender.sendMessage(ChatColor.YELLOW + "Playing " + file.getName()
-                    + "... Use '/midi' to stop.");
-        } catch (MidiUnavailableException e) {
-            throw new CommandException("Failed to access MIDI: "
-                    + e.getMessage());
-        } catch (InvalidMidiDataException e) {
-            throw new CommandException("Failed to read intro MIDI file: "
-                    + e.getMessage());
-        } catch (FileNotFoundException e) {
-            throw new CommandException("The specified MIDI file was not found.");
-        } catch (IOException e) {
-            throw new CommandException("Failed to read intro MIDI file: "
-                    + e.getMessage());
         }
     }
     
@@ -419,17 +266,17 @@ public class GeneralCommands {
         Player player;
         
         if (args.argsLength() == 0) {
-            player = plugin.checkPlayer(sender);
+            player = PlayerUtil.checkPlayer(sender);
         } else {
             plugin.checkPermission(sender, "commandbook.whereami.other");
             
-            player = plugin.matchSinglePlayer(sender, args.getString(0));
+            player = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
         }
 
         Location pos = player.getLocation();
         
         sender.sendMessage(ChatColor.YELLOW +
-                "You are in the world: " + plugin.checkPlayer(sender).getWorld().getName());
+                "You are in the world: " + PlayerUtil.checkPlayer(sender).getWorld().getName());
         sender.sendMessage(ChatColor.YELLOW +
                 String.format("You're at: (%.4f, %.4f, %.4f)",
                         pos.getX(), pos.getY(), pos.getZ()));
@@ -452,11 +299,11 @@ public class GeneralCommands {
         Player player;
         
         if (args.argsLength() == 0) {
-            player = plugin.checkPlayer(sender);
+            player = PlayerUtil.checkPlayer(sender);
         } else {
             plugin.checkPermission(sender, "commandbook.whois.other");
             
-            player = plugin.matchSinglePlayer(sender, args.getString(0));
+            player = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
         }
 
         sender.sendMessage(ChatColor.YELLOW
@@ -486,10 +333,10 @@ public class GeneralCommands {
         boolean included = false;
         
         if (args.argsLength() == 0) {
-            targets = plugin.matchPlayers(plugin.checkPlayer(sender));
+            targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
         // A different player
         } else {
-            targets = plugin.matchPlayers(sender, args.getString(0));
+            targets = PlayerUtil.matchPlayers(sender, args.getString(0));
             
             // Make sure that this player can clear other players!
             plugin.checkPermission(sender, "commandbook.clear.other");
@@ -528,7 +375,7 @@ public class GeneralCommands {
             } else {
                 player.sendMessage(ChatColor.YELLOW
                         + "Your inventory has been cleared by "
-                        + plugin.toName(sender));
+                        + PlayerUtil.toName(sender));
                 
             }
         }
@@ -554,7 +401,7 @@ public class GeneralCommands {
     public void pong(CommandContext args, CommandSender sender) throws CommandException {
         
         sender.sendMessage(ChatColor.YELLOW +
-                "I hear " + plugin.toName(sender) + " likes cute Asian boys.");
+                "I hear " + PlayerUtil.toName(sender) + " likes cute Asian boys.");
     }
     
     @Command(aliases = {"debug"}, desc = "Debugging commands")
@@ -581,10 +428,10 @@ public class GeneralCommands {
         boolean included = false;
         
         if (args.argsLength() == 0) {
-            targets = plugin.matchPlayers(plugin.checkPlayer(sender));
+            targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
         // A different player
         } else {
-            targets = plugin.matchPlayers(sender, args.getString(0));
+            targets = PlayerUtil.matchPlayers(sender, args.getString(0));
             
             // Make sure that this player can 'more' other players!
             plugin.checkPermission(sender, "commandbook.more.other");
@@ -611,7 +458,7 @@ public class GeneralCommands {
             } else {
                 player.sendMessage(ChatColor.YELLOW
                         + "Your item(s) has been expanded in stack size by "
-                        + plugin.toName(sender));
+                        + PlayerUtil.toName(sender));
                 
             }
         }
@@ -630,7 +477,7 @@ public class GeneralCommands {
     @CommandPermissions({"commandbook.away"})
     public void afk(CommandContext args, CommandSender sender) throws CommandException {
 
-        Player player = plugin.checkPlayer(sender);
+        Player player = PlayerUtil.checkPlayer(sender);
 
         if (plugin.getSession(player).getIdleStatus() == null) {
             String status = "";
@@ -661,12 +508,12 @@ public class GeneralCommands {
         if (args.argsLength() == 0) { // check self
             // check current player
             plugin.checkPermission(sender, "commandbook.gamemode.check");
-            player = plugin.checkPlayer(sender);
+            player = PlayerUtil.checkPlayer(sender);
             mode = player.getGameMode();
         } else {
             if (args.hasFlag('c')) { //check other player
                 plugin.checkPermission(sender, "commandbook.gamemode.check.other");
-                player = plugin.matchSinglePlayer(sender, args.getString(0));
+                player = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
                 mode = player.getGameMode();
             } else {
                 change = true;
@@ -678,10 +525,10 @@ public class GeneralCommands {
                 if (args.argsLength() == 1) { // self mode
                     plugin.checkPermission(sender, "commandbook.gamemode.change");
                     modeString = args.getString(0);
-                    player = plugin.checkPlayer(sender);
+                    player = PlayerUtil.checkPlayer(sender);
                 } else { // 2 - first is player, second mode
                     plugin.checkPermission(sender, "commandbook.gamemode.change.other");
-                    player = plugin.matchSinglePlayer(sender, args.getString(0));
+                    player = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
                     modeString = args.getString(1);
                 }
 

@@ -21,6 +21,8 @@ package com.sk89q.commandbook.commands;
 import java.util.Random;
 
 import com.sk89q.commandbook.CommandBook;
+import com.sk89q.commandbook.util.LocationUtil;
+import com.sk89q.commandbook.util.PlayerUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
@@ -59,9 +61,9 @@ public class FunCommands {
         Location loc;
 
         if (args.argsLength() >= 3) {
-            loc = plugin.matchLocation(sender, args.getString(2));
+            loc = LocationUtil.matchLocation(sender, args.getString(2));
         } else {
-            loc = plugin.checkPlayer(sender).getLocation();
+            loc = PlayerUtil.checkPlayer(sender).getLocation();
         }
 
         String[] creatureInput = args.getString(0).split("\\|");
@@ -183,12 +185,12 @@ public class FunCommands {
         
         // Detect arguments based on the number of arguments provided
         if (args.argsLength() == 0) {
-            targets = plugin.matchPlayers(plugin.checkPlayer(sender));
+            targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
             
             // Check permissions!
             plugin.checkPermission(sender, "commandbook.slap");
         } else if (args.argsLength() == 1) {            
-            targets = plugin.matchPlayers(sender, args.getString(0));
+            targets = PlayerUtil.matchPlayers(sender, args.getString(0));
             
             // Check permissions!
             plugin.checkPermission(sender, "commandbook.slap.other");
@@ -227,17 +229,17 @@ public class FunCommands {
                     included = true;
                 } else {
                     player.sendMessage(ChatColor.YELLOW + "You've been slapped by "
-                            + plugin.toName(sender) + ".");
+                            + PlayerUtil.toName(sender) + ".");
                     
                 }
             } else {
                 if (count < 6) {
                     plugin.getServer().broadcastMessage(
-                            ChatColor.YELLOW + plugin.toName(sender)
-                            + " slapped " + plugin.toName(player));
+                            ChatColor.YELLOW + PlayerUtil.toName(sender)
+                            + " slapped " + PlayerUtil.toName(player));
                 } else if (count == 6) {
                     plugin.getServer().broadcastMessage(
-                            ChatColor.YELLOW + plugin.toName(sender)
+                            ChatColor.YELLOW + PlayerUtil.toName(sender)
                             + " slapped more people...");
                 }
             }
@@ -259,9 +261,9 @@ public class FunCommands {
         
         // Detect arguments based on the number of arguments provided
         if (args.argsLength() == 0) {
-            targets = plugin.matchPlayers(plugin.checkPlayer(sender));
+            targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
         } else if (args.argsLength() == 1) {            
-            targets = plugin.matchPlayers(sender, args.getString(0));
+            targets = PlayerUtil.matchPlayers(sender, args.getString(0));
             
             // Check permissions!
             plugin.checkPermission(sender, "commandbook.rocket.other");
@@ -283,17 +285,17 @@ public class FunCommands {
                     included = true;
                 } else {
                     player.sendMessage(ChatColor.YELLOW + "You've been rocketed by "
-                            + plugin.toName(sender) + ".");
+                            + PlayerUtil.toName(sender) + ".");
                     
                 }
             } else {
                 if (count < 6) {
                     plugin.getServer().broadcastMessage(
-                            ChatColor.YELLOW + plugin.toName(sender)
-                            + " rocketed " + plugin.toName(player));
+                            ChatColor.YELLOW + PlayerUtil.toName(sender)
+                            + " rocketed " + PlayerUtil.toName(player));
                 } else if (count == 6) {
                     plugin.getServer().broadcastMessage(
-                            ChatColor.YELLOW + plugin.toName(sender)
+                            ChatColor.YELLOW + PlayerUtil.toName(sender)
                             + " rocketed more people...");
                 }
             }
@@ -315,9 +317,9 @@ public class FunCommands {
         
         // Detect arguments based on the number of arguments provided
         if (args.argsLength() == 0) {
-            targets = plugin.matchPlayers(plugin.checkPlayer(sender));
+            targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
         } else if (args.argsLength() == 1) {
-            targets = plugin.matchPlayers(sender, args.getString(0));
+            targets = PlayerUtil.matchPlayers(sender, args.getString(0));
             
             // Check permissions!
             plugin.checkPermission(sender, "commandbook.barrage.other");
@@ -339,17 +341,17 @@ public class FunCommands {
                     included = true;
                 } else {
                     player.sendMessage(ChatColor.YELLOW + "BARRAGE attack from "
-                            + plugin.toName(sender) + ".");
+                            + PlayerUtil.toName(sender) + ".");
                     
                 }
             } else {
                 if (count < 6) {
                     plugin.getServer().broadcastMessage(
-                            ChatColor.YELLOW + plugin.toName(sender)
-                            + " used BARRAGE on " + plugin.toName(player));
+                            ChatColor.YELLOW + PlayerUtil.toName(sender)
+                            + " used BARRAGE on " + PlayerUtil.toName(player));
                 } else if (count == 6) {
                     plugin.getServer().broadcastMessage(
-                            ChatColor.YELLOW + plugin.toName(sender)
+                            ChatColor.YELLOW + PlayerUtil.toName(sender)
                             + " used it more people...");
                 }
             }
@@ -373,9 +375,9 @@ public class FunCommands {
         
         // Detect arguments based on the number of arguments provided
         if (args.argsLength() == 0) {
-            targets = plugin.matchPlayers(plugin.checkPlayer(sender));
+            targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
         } else if (args.argsLength() == 1) {
-            targets = plugin.matchPlayers(sender, args.getString(0));
+            targets = PlayerUtil.matchPlayers(sender, args.getString(0));
             
             // Check permissions!
             plugin.checkPermission(sender, "commandbook.firebarrage.other");
@@ -394,17 +396,17 @@ public class FunCommands {
                     included = true;
                 } else {
                     player.sendMessage(ChatColor.YELLOW + "Fireball attack from "
-                            + plugin.toName(sender) + ".");
+                            + PlayerUtil.toName(sender) + ".");
                     
                 }
             } else {
                 if (count < 6) {
                     plugin.getServer().broadcastMessage(
-                            ChatColor.YELLOW + plugin.toName(sender)
-                            + " used Fireball attack on " + plugin.toName(player));
+                            ChatColor.YELLOW + PlayerUtil.toName(sender)
+                            + " used Fireball attack on " + PlayerUtil.toName(player));
                 } else if (count == 6) {
                     plugin.getServer().broadcastMessage(
-                            ChatColor.YELLOW + plugin.toName(sender)
+                            ChatColor.YELLOW + PlayerUtil.toName(sender)
                             + " used it more people...");
                 }
             }
@@ -426,12 +428,12 @@ public class FunCommands {
         
         // Detect arguments based on the number of arguments provided
         if (args.argsLength() == 0) {
-            targets = plugin.matchPlayers(plugin.checkPlayer(sender));
+            targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
             
             // Check permissions!
             plugin.checkPermission(sender, "commandbook.shock");
         } else if (args.argsLength() == 1) {            
-            targets = plugin.matchPlayers(sender, args.getString(0));
+            targets = PlayerUtil.matchPlayers(sender, args.getString(0));
             
             // Check permissions!
             plugin.checkPermission(sender, "commandbook.shock.other");
@@ -471,17 +473,17 @@ public class FunCommands {
                     included = true;
                 } else {
                     player.sendMessage(ChatColor.YELLOW + "You've been shocked by "
-                            + plugin.toName(sender) + ".");
+                            + PlayerUtil.toName(sender) + ".");
                     
                 }
             } else {
                 if (count < 6) {
                     plugin.getServer().broadcastMessage(
-                            ChatColor.YELLOW + plugin.toName(sender)
-                            + " shocked " + plugin.toName(player));
+                            ChatColor.YELLOW + PlayerUtil.toName(sender)
+                            + " shocked " + PlayerUtil.toName(player));
                 } else if (count == 6) {
                     plugin.getServer().broadcastMessage(
-                            ChatColor.YELLOW + plugin.toName(sender)
+                            ChatColor.YELLOW + PlayerUtil.toName(sender)
                             + " shocked more people...");
                 }
             }
@@ -503,12 +505,12 @@ public class FunCommands {
         
         // Detect arguments based on the number of arguments provided
         if (args.argsLength() == 0) {
-            targets = plugin.matchPlayers(plugin.checkPlayer(sender));
+            targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
             
             // Check permissions!
             plugin.checkPermission(sender, "commandbook.thor");
         } else if (args.argsLength() == 1) {            
-            targets = plugin.matchPlayers(sender, args.getString(0));
+            targets = PlayerUtil.matchPlayers(sender, args.getString(0));
             
             // Check permissions!
             plugin.checkPermission(sender, "commandbook.thor.other");
@@ -525,7 +527,7 @@ public class FunCommands {
                 included = true;
             } else {
                 player.sendMessage(ChatColor.YELLOW + "You have been granted the might power of Thor's hammer by "
-                        + plugin.toName(sender) + ".");
+                        + PlayerUtil.toName(sender) + ".");
                 
             }
         }
@@ -545,12 +547,12 @@ public class FunCommands {
         
         // Detect arguments based on the number of arguments provided
         if (args.argsLength() == 0) {
-            targets = plugin.matchPlayers(plugin.checkPlayer(sender));
+            targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
             
             // Check permissions!
             plugin.checkPermission(sender, "commandbook.thor");
         } else if (args.argsLength() == 1) {            
-            targets = plugin.matchPlayers(sender, args.getString(0));
+            targets = PlayerUtil.matchPlayers(sender, args.getString(0));
             
             // Check permissions!
             plugin.checkPermission(sender, "commandbook.thor.other");
@@ -567,7 +569,7 @@ public class FunCommands {
                 included = true;
             } else {
                 player.sendMessage(ChatColor.YELLOW + "Thor's hammer has been revoked from you by "
-                        + plugin.toName(sender) + ".");
+                        + PlayerUtil.toName(sender) + ".");
                 
             }
         }

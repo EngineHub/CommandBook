@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import com.sk89q.commandbook.util.PlayerUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -334,7 +336,7 @@ public class CommandBookUtil {
                 included = true;
             } else {
                 player.sendMessage(ChatColor.YELLOW + "Given from "
-                        + plugin.toName(sender) + ": "
+                        + PlayerUtil.toName(sender) + ": "
                         + amtText + " "
                         + plugin.toItemName(item.getTypeId()) + ".");
                 

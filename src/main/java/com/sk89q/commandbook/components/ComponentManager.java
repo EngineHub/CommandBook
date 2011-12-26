@@ -56,7 +56,7 @@ public class ComponentManager {
 
                 YAMLNode componentConfig = loader.getConfiguration(component);
 
-                component.setUp(commands, componentConfig);
+                component.setUp(commands, componentConfig, loader);
             }
         }
         return true;
@@ -82,6 +82,20 @@ public class ComponentManager {
             field.set(component, registration);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
+        }
+    }
+    
+    public void unloadComponents() {
+        for (AbstractComponent component : registeredComponents.values()) {
+            component.unload();
+            component.unregisterCommands();
+        }
+    }
+    
+    public void reloadComponents() {
+        for (AbstractComponent component : registeredComponents.values()) {
+            component.setRawConfiguration(component.getComponentLoader().getConfiguration(component));
+            component.reload();
         }
     }
 }

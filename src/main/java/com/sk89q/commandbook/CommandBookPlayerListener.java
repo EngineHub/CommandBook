@@ -128,28 +128,6 @@ public class CommandBookPlayerListener extends PlayerListener {
                     plugin.getServer().getOnlinePlayers(), player, plugin);
         }
 
-        if (!plugin.disableMidi) {
-            MidiJingleSequencer sequencer = null;
-            
-            try {
-                File file = new File(plugin.getDataFolder(), "intro.mid");
-                if (file.exists()) {
-                    sequencer = new MidiJingleSequencer(file);
-                    plugin.getJingleNoteManager().play(player, sequencer, 2000);
-                }
-            } catch (MidiUnavailableException e) {
-                logger.log(Level.WARNING, "CommandBook: Failed to access MIDI: "
-                        + e.getMessage());
-            } catch (InvalidMidiDataException e) {
-                logger.log(Level.WARNING, "CommandBook: Failed to read intro MIDI file: "
-                        + e.getMessage());
-            } catch (FileNotFoundException e) {
-            } catch (IOException e) {
-                logger.log(Level.WARNING, "CommandBook: Failed to read intro MIDI file: "
-                        + e.getMessage());
-            }
-        }
-
         World defaultWorld = plugin.getServer().getWorlds().get(0);
         if (!new File(defaultWorld.getName() + File.separatorChar + "players" +
                 File.separatorChar + player.getName() + ".dat").exists() && plugin.exactSpawn)
@@ -199,7 +177,6 @@ public class CommandBookPlayerListener extends PlayerListener {
     public void onPlayerQuit(PlayerQuitEvent event) {
         plugin.getSession(event.getPlayer()).handleDisconnect();
         plugin.getAdminSession(event.getPlayer()).handleDisconnect();
-        plugin.getJingleNoteManager().stop(event.getPlayer());
     }
 
     @Override

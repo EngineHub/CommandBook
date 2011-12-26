@@ -19,6 +19,8 @@
 package com.sk89q.commandbook.commands;
 
 import com.sk89q.commandbook.CommandBook;
+import com.sk89q.commandbook.util.LocationUtil;
+import com.sk89q.commandbook.util.PlayerUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
@@ -48,13 +50,13 @@ public class WarpCommands {
         
         // Detect arguments based on the number of arguments provided
         if (args.argsLength() == 1) {
-            Player player = plugin.checkPlayer(sender);
-            targets = plugin.matchPlayers(player);
+            Player player = PlayerUtil.checkPlayer(sender);
+            targets = PlayerUtil.matchPlayers(player);
             warp = plugin.getWarpsManager().get(player.getWorld(), args.getString(0));
         } else if (args.argsLength() == 2) {            
-            targets = plugin.matchPlayers(sender, args.getString(0));
+            targets = PlayerUtil.matchPlayers(sender, args.getString(0));
             if (plugin.getWarpsManager().isPerWorld()) {
-                Player player = plugin.checkPlayer(sender);
+                Player player = PlayerUtil.checkPlayer(sender);
                 warp = plugin.getWarpsManager().get(player.getWorld(), args.getString(1));
             } else {
                 warp = plugin.getWarpsManager().get(null, args.getString(1));
@@ -63,9 +65,9 @@ public class WarpCommands {
             // Check permissions!
             plugin.checkPermission(sender, "commandbook.warp.teleport.other");
         } else if (args.argsLength() == 3) {            
-            targets = plugin.matchPlayers(sender, args.getString(1));
+            targets = PlayerUtil.matchPlayers(sender, args.getString(1));
             warp = plugin.getWarpsManager().get(
-                    plugin.matchWorld(sender, args.getString(0)), args.getString(2));
+                    LocationUtil.matchWorld(sender, args.getString(0)), args.getString(2));
             
             // Check permissions!
             plugin.checkPermission(sender, "commandbook.warp.teleport.other");
@@ -77,7 +79,7 @@ public class WarpCommands {
             throw new CommandException("A warp by the given name does not exist.");
         }
 
-        (new TeleportPlayerIterator(plugin, sender, loc)).iterate(targets);
+        (new TeleportPlayerIterator(sender, loc)).iterate(targets);
     }
     
     @Command(aliases = {"setwarp"}, usage = "<warp> [location]", desc = "Set a warp", min = 1, max = 2)
@@ -89,10 +91,10 @@ public class WarpCommands {
         
         // Detect arguments based on the number of arguments provided
         if (args.argsLength() == 1) {
-            player = plugin.checkPlayer(sender);
+            player = PlayerUtil.checkPlayer(sender);
             loc = player.getLocation();
         } else {            
-            loc = plugin.matchLocation(sender, args.getString(1));
+            loc = LocationUtil.matchLocation(sender, args.getString(1));
         }
         
         plugin.getWarpsManager().create(warpName, loc, player);

@@ -4,5 +4,6 @@ messaging:
 teleport:
 server:
 items:
-kits:
-midi:
+kits: com.sk89q.commandbook.kits.KitsComponent
+midi: com.sk89q.jinglenote.JingleNoteComponent
+time: com.sk89q.commandbook.time.TimeComponent

@@ -28,8 +28,7 @@ import org.bukkit.entity.Player;
  * @author sk89q
  */
 public abstract class PlayerIteratorAction {
-    
-    protected CommandBook plugin;
+
     protected CommandSender sender;
     
     private boolean included;
@@ -37,12 +36,10 @@ public abstract class PlayerIteratorAction {
     
     /**
      * Construct the object.
-     * 
-     * @param plugin 
+     *
      * @param sender
      */
-    public PlayerIteratorAction(CommandBook plugin, CommandSender sender) {
-        this.plugin = plugin;
+    public PlayerIteratorAction(CommandSender sender) {
         this.sender = sender;
     }
     

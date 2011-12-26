@@ -38,21 +38,4 @@ public class CommandBookWorldListener extends WorldListener {
         this.plugin = plugin;
     }
 
-    /**
-     * Called when a World is loaded.
-     */
-    @Override
-    public void onWorldLoad(WorldLoadEvent event) {
-        World world = event.getWorld();
-        Integer lockedTime = plugin.getLockedTimes().get(world.getName());
-        
-        if (lockedTime != null) {
-            world.setTime(lockedTime);
-            plugin.getTimeLockManager().lock(world);
-            logger.info("CommandBook: Time locked to '"
-                    + CommandBookUtil.getTimeString(lockedTime) + "' for world '"
-                    + world.getName() + "'");
-        }
-    }
-
 }

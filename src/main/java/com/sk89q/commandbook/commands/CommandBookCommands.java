@@ -43,11 +43,8 @@ public class CommandBookCommands {
     @Command(aliases = {"reload"}, usage = "", desc = "Reload CommandBook's settings", min = 0, max = 0)
     @CommandPermissions({"commandbook.reload"})
     public void reload(CommandContext args, CommandSender sender) throws CommandException {
-        // TODO: Migrate this to reloading components
         plugin.populateConfiguration();
-        //plugin.getBanDatabase().load();
-        plugin.getKitManager().load();
-        plugin.getSpawnManager().load();
+        plugin.getComponentManager().reloadComponents();
         
         sender.sendMessage(ChatColor.YELLOW + "CommandBook's configuration has been reloaded.");
     }

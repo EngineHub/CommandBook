@@ -30,13 +30,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 
+import com.sk89q.commandbook.components.ComponentManager;
+import com.sk89q.commandbook.components.ConfigListedComponentLoader;
+import com.sk89q.commandbook.events.core.EventManager;
 import com.sk89q.commandbook.util.CommandRegistration;
 import com.sk89q.util.yaml.YAMLFormat;
 import com.sk89q.util.yaml.YAMLProcessor;
 import com.sk89q.wepif.PermissionsResolverManager;
 import org.bukkit.*;
-import org.bukkit.World.Environment;
-import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -51,14 +52,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.config.Configuration;
 import com.sk89q.commandbook.commands.*;
-import com.sk89q.commandbook.kits.FlatFileKitsManager;
-import com.sk89q.commandbook.kits.KitManager;
 import com.sk89q.commandbook.locations.FlatFileLocationsManager;
 import com.sk89q.commandbook.locations.LocationManager;
 import com.sk89q.commandbook.locations.LocationManagerFactory;
 import com.sk89q.commandbook.locations.RootLocationManager;
 import com.sk89q.commandbook.locations.NamedLocation;
-import com.sk89q.jinglenote.JingleNoteManager;
 import com.sk89q.minecraft.util.commands.*;
 import com.sk89q.worldedit.blocks.BlockID;
 import com.sk89q.worldedit.blocks.BlockType;
@@ -66,6 +64,7 @@ import com.sk89q.worldedit.blocks.ClothColor;
 import com.sk89q.worldedit.blocks.ItemType;
 import static com.sk89q.commandbook.CommandBookUtil.*;
 import com.sk89q.commandbook.locations.WrappedSpawnManager;
+import static com.sk89q.commandbook.util.PlayerUtil.*;
 
 /**
  * Base plugin class for CommandBook.
@@ -76,19 +75,15 @@ import com.sk89q.commandbook.locations.WrappedSpawnManager;
 public final class CommandBook extends JavaPlugin {
     
     private static final Logger logger = Logger.getLogger("Minecraft.CommandBook");
-    private static final Pattern TWELVE_HOUR_TIME = Pattern.compile("^([0-9]+(?::[0-9]+)?)([apmAPM\\.]+)$");
     
     private static CommandBook instance;
 
     private CommandsManager<CommandSender> commands;
     private RootLocationManager<NamedLocation> warps;
     private RootLocationManager<NamedLocation> homes;
-    private TimeLockManager timeLockManager;
-    private JingleNoteManager jingleNoteManager;
     private WrappedSpawnManager spawns;
     
     public boolean listOnJoin;
-    public boolean disableMidi;
     public boolean verifyNameFormat;
     public boolean broadcastChanges;
     public boolean broadcastKicks;
@@ -98,7 +93,6 @@ public final class CommandBook extends JavaPlugin {
     public Set<Integer> disallowedItems;
     public Map<String, Integer> itemNames;
     public Set<Integer> thorItems;
-    public KitManager kits;
     public String banMessage;
     public boolean opPermissions;
     public boolean useDisplayNames;
@@ -110,16 +104,15 @@ public final class CommandBook extends JavaPlugin {
     public boolean playersListGroupedNames;
     public boolean playersListMaxPlayers;
     public boolean crappyWrapperCompat;
-    public int timeLockDelay;
 
     protected Map<String, String> messages = new HashMap<String, String>();
     protected Map<String, UserSession> sessions =
         new HashMap<String, UserSession>();
     protected Map<String, AdministrativeSession> adminSessions =
         new HashMap<String, AdministrativeSession>();
-    protected Map<String, Integer> lockedTimes =
-        new HashMap<String, Integer>();
     protected YAMLProcessor config;
+    protected EventManager eventManager = new EventManager();
+    protected ComponentManager componentManager;
 
     
     public CommandBook() {
@@ -153,24 +146,7 @@ public final class CommandBook extends JavaPlugin {
 
         createDefaultConfiguration("config.yml");
         createDefaultConfiguration("kits.txt");
-        
-        // Setup the time locker
-        timeLockManager = new TimeLockManager(this);
-        
-        // Load configuration
-        populateConfiguration();
 
-        
-        // Setup kits
-        kits = new FlatFileKitsManager(new File(getDataFolder(), "kits.txt"), this);
-        kits.load();
-        
-        // Jingle note manager
-        jingleNoteManager = new JingleNoteManager(this);
-        
-        // Prepare permissions
-        PermissionsResolverManager.initialize(this);
-        
         // Register the commands that we want to use
         final CommandBook plugin = this;
         commands = new CommandsManager<CommandSender>() {
@@ -179,7 +155,8 @@ public final class CommandBook extends JavaPlugin {
                 return plugin.hasPermission(player, perm);
             }
         };
-        
+
+
         commands.setInjector(new Injector() {
             public Object getInstance(Class<?> cls) throws InvocationTargetException,
                     IllegalAccessException, InstantiationException {
@@ -196,6 +173,17 @@ public final class CommandBook extends JavaPlugin {
                 return constr.newInstance(plugin);
             }
         });
+
+        // Prepare permissions
+        PermissionsResolverManager.initialize(this);
+        
+        componentManager = new ComponentManager();
+        componentManager.addComponentLoader(new ConfigListedComponentLoader());
+
+        componentManager.loadComponents();
+        
+        // Load configuration
+        populateConfiguration();
         
 		final CommandRegistration cmdRegister = new CommandRegistration(this, commands);
         cmdRegister.register(GeneralCommands.class);
@@ -204,7 +192,6 @@ public final class CommandBook extends JavaPlugin {
         cmdRegister.register(MessageCommands.class);
         cmdRegister.register(DebuggingCommands.class);
         cmdRegister.register(ModerationCommands.class);
-        cmdRegister.register(KitCommands.class);
         cmdRegister.register(WarpCommands.class);
         cmdRegister.register(HomeCommands.class);
         cmdRegister.register(WorldCommands.class);
@@ -216,9 +203,6 @@ public final class CommandBook extends JavaPlugin {
         getServer().getScheduler().scheduleAsyncRepeatingTask(
                 this, new SessionChecker(this),
                 SessionChecker.CHECK_FREQUENCY, SessionChecker.CHECK_FREQUENCY);
-        getServer().getScheduler().scheduleAsyncRepeatingTask(
-                this, new GarbageCollector(this),
-                GarbageCollector.CHECK_FREQUENCY, GarbageCollector.CHECK_FREQUENCY);
     }
     
     /**
@@ -243,8 +227,8 @@ public final class CommandBook extends JavaPlugin {
      * temporary data occurs here.
      */
     public void onDisable() {
-        jingleNoteManager.stopAll();
         this.getServer().getScheduler().cancelTasks(this);
+        componentManager.unloadComponents();
     }
     
     /**
@@ -333,7 +317,6 @@ public final class CommandBook extends JavaPlugin {
         opPermissions = config.getBoolean("op-permissions", true);
         useDisplayNames = config.getBoolean("use-display-names", true);
         banMessage = config.getString("bans.message", "You were banned.");
-        disableMidi = config.getBoolean("disable-midi", false);
         verifyNameFormat = config.getBoolean("verify-name-format", true);
         broadcastChanges = config.getBoolean("broadcast-changes", true);
         broadcastBans = config.getBoolean("broadcast-bans", false);
@@ -345,7 +328,6 @@ public final class CommandBook extends JavaPlugin {
         crappyWrapperCompat = config.getBoolean("crappy-wrapper-compat", true);
         thorItems = new HashSet<Integer>(config.getIntList(
                 "thor-hammer-items", Arrays.asList(new Integer[]{278, 285, 257, 270})));
-        timeLockDelay = config.getInt("time-lock-delay", 20);
 
         LocationManagerFactory<LocationManager<NamedLocation>> warpsFactory =
                 new FlatFileLocationsManager.LocationsFactory(getDataFolder(), this, "Warps");
@@ -357,45 +339,10 @@ public final class CommandBook extends JavaPlugin {
         homes = new RootLocationManager<NamedLocation>(homesFactory,
                 config.getBoolean("per-world-homes", false));
         
-        if (disableMidi) {
-            logger.info("CommandBook: MIDI support is disabled.");
-        }
-        
         if (crappyWrapperCompat) {
             logger.info("CommandBook: Maximum wrapper compatibility is enabled. " +
                     "Some features have been disabled to be compatible with " +
                     "poorly written server wrappers.");
-        }
-        
-        Object timeLocks = config.getProperty("time-lock");
-        
-        if (timeLocks != null && timeLocks instanceof Map) {
-            for (Map.Entry<String, Object> entry : ((Map<String, Object>) timeLocks).entrySet()) {
-                int time = 0;
-                
-                try {
-                    time = matchTime(String.valueOf(entry.getValue()));
-                } catch (CommandException e) {
-                    logger.warning("CommandBook: Time lock: Failed to parse time '"
-                            + entry.getValue() + "'");
-                }
-                
-                lockedTimes.put(entry.getKey(), time);
-                
-                World world = getServer().getWorld(entry.getKey());
-                
-                if (world == null) {
-                    logger.info("CommandBook: Could not time-lock unknown world '"
-                            + entry.getKey() + "'");
-                    continue;
-                }
-                
-                world.setTime(time);
-                timeLockManager.lock(world);
-                logger.info("CommandBook: Time locked to '"
-                        + CommandBookUtil.getTimeString(time) + "' for world '"
-                        + world.getName() + "'");
-            }
         }
         spawns = new WrappedSpawnManager(new File(getDataFolder(), "spawns.yml"));
     }
@@ -573,22 +520,6 @@ public final class CommandBook extends JavaPlugin {
     }
     
     /**
-     * Checks to see if the sender is a player, otherwise throw an exception.
-     * 
-     * @param sender
-     * @return 
-     * @throws CommandException 
-     */
-    public Player checkPlayer(CommandSender sender)
-            throws CommandException {
-        if (sender instanceof Player) {
-            return (Player) sender;
-        } else {
-            throw new CommandException("A player context is required. (Specify a world or player if the command supports it.)");
-        }
-    }
-    
-    /**
      * Attempts to match a creature type.
      * 
      * @param sender
@@ -615,519 +546,6 @@ public final class CommandBook extends JavaPlugin {
     }
     
     /**
-     * Match player names.
-     * 
-     * @param filter
-     * @return
-     */
-    public List<Player> matchPlayerNames(String filter) {
-        Player[] players = getServer().getOnlinePlayers();
-
-        filter = filter.toLowerCase();
-        
-        // Allow exact name matching
-        if (filter.charAt(0) == '@' && filter.length() >= 2) {
-            filter = filter.substring(1);
-            
-            for (Player player : players) {
-                if (player.getName().equalsIgnoreCase(filter)) {
-                    List<Player> list = new ArrayList<Player>();
-                    list.add(player);
-                    return list;
-                }
-            }
-            
-            return new ArrayList<Player>();
-        // Allow partial name matching
-        } else if (filter.charAt(0) == '*' && filter.length() >= 2) {
-            filter = filter.substring(1);
-            
-            List<Player> list = new ArrayList<Player>();
-            
-            for (Player player : players) {
-                if (player.getName().toLowerCase().contains(filter)) {
-                    list.add(player);
-                }
-            }
-            
-            return list;
-        
-        // Start with name matching
-        } else {
-            List<Player> list = new ArrayList<Player>();
-            
-            for (Player player : players) {
-                if (player.getName().toLowerCase().startsWith(filter)) {
-                    list.add(player);
-                }
-            }
-            
-            return list;
-        }
-    }
-    
-    /**
-     * Checks if the given list of players is greater than size 0, otherwise
-     * throw an exception.
-     * 
-     * @param players
-     * @return 
-     * @throws CommandException
-     */
-    protected Iterable<Player> checkPlayerMatch(List<Player> players)
-            throws CommandException {
-        // Check to see if there were any matches
-        if (players.size() == 0) {
-            throw new CommandException("No players matched query.");
-        }
-        
-        return players;
-    }
-    
-    /**
-     * Checks permissions and throws an exception if permission is not met.
-     * 
-     * @param source 
-     * @param filter
-     * @return iterator for players
-     * @throws CommandException no matches found
-     */
-    public Iterable<Player> matchPlayers(CommandSender source, String filter)
-            throws CommandException {
-        
-        if (getServer().getOnlinePlayers().length == 0) {
-            throw new CommandException("No players matched query.");
-        }
-        
-        if (filter.equals("*")) {
-            return checkPlayerMatch(Arrays.asList(getServer().getOnlinePlayers()));
-        }
-
-        // Handle special hash tag groups
-        if (filter.charAt(0) == '#') {
-            // Handle #world, which matches player of the same world as the
-            // calling source
-            if (filter.equalsIgnoreCase("#world")) {
-                List<Player> players = new ArrayList<Player>();
-                Player sourcePlayer = checkPlayer(source);
-                World sourceWorld = sourcePlayer.getWorld();
-                
-                for (Player player : getServer().getOnlinePlayers()) {
-                    if (player.getWorld().equals(sourceWorld)) {
-                        players.add(player);
-                    }
-                }
-
-                return checkPlayerMatch(players);
-            
-            // Handle #near, which is for nearby players.
-            } else if (filter.equalsIgnoreCase("#near")) {
-                List<Player> players = new ArrayList<Player>();
-                Player sourcePlayer = checkPlayer(source);
-                World sourceWorld = sourcePlayer.getWorld();
-                org.bukkit.util.Vector sourceVector
-                        = sourcePlayer.getLocation().toVector();
-                
-                for (Player player : getServer().getOnlinePlayers()) {
-                    if (player.getWorld().equals(sourceWorld)
-                            && player.getLocation().toVector().distanceSquared(
-                                    sourceVector) < 900) {
-                        players.add(player);
-                    }
-                }
-
-                return checkPlayerMatch(players);
-            
-            } else {
-                throw new CommandException("Invalid group '" + filter + "'.");
-            }
-        }
-        
-        List<Player> players = matchPlayerNames(filter);
-        
-        return checkPlayerMatch(players);
-    }
-    
-    /**
-     * Match a single player exactly.
-     * 
-     * @param sender
-     * @param filter
-     * @return
-     * @throws CommandException
-     */
-    public Player matchPlayerExactly(CommandSender sender, String filter)
-            throws CommandException {
-        Player[] players = getServer().getOnlinePlayers();
-        for (Player player : players) {
-            if (player.getName().equalsIgnoreCase(filter)) {
-                return player;
-            }
-        }
-    
-        throw new CommandException("No player found!");
-    }
-    
-    /**
-     * Match only a single player.
-     * 
-     * @param sender
-     * @param filter
-     * @return
-     * @throws CommandException
-     */
-    public Player matchSinglePlayer(CommandSender sender, String filter)
-            throws CommandException {
-        // This will throw an exception if there are no matches
-        Iterator<Player> players = matchPlayers(sender, filter).iterator();
-        
-        Player match = players.next();
-        
-        // We don't want to match the wrong person, so fail if if multiple
-        // players were found (we don't want to just pick off the first one,
-        // as that may be the wrong player)
-        if (players.hasNext()) {
-            throw new CommandException("More than one player found! " +
-                    "Use @<name> for exact matching.");
-        }
-        
-        return match;
-    }
-    
-    /**
-     * Match only a single player or console.
-     * 
-     * @param sender
-     * @param filter
-     * @return
-     * @throws CommandException
-     */
-    public CommandSender matchPlayerOrConsole(CommandSender sender, String filter)
-            throws CommandException {
-        
-        // Let's see if console is wanted
-        if (filter.equalsIgnoreCase("#console")
-                || filter.equalsIgnoreCase("*console*")
-                || filter.equalsIgnoreCase("!")) {
-            try {
-                return getServer().getConsoleSender();
-            } catch (Throwable t) {
-                // Legacy support
-                return new LegacyConsoleSender(getServer());
-            }
-        }
-        
-        return matchSinglePlayer(sender, filter);
-    }
-    
-    /**
-     * Get a single player as an iterator for players.
-     * 
-     * @param player
-     * @return iterator for players
-     */
-    public Iterable<Player> matchPlayers(Player player) {
-        return Arrays.asList(new Player[] {player});
-    }
-    
-    /**
-     * Match a target.
-     * 
-     * @param source 
-     * @param filter
-     * @return iterator for players
-     * @throws CommandException no matches found
-     */
-    public Location matchLocation(CommandSender source, String filter)
-            throws CommandException {
-
-        // Handle coordinates
-        if (filter.matches("^[\\-0-9\\.]+,[\\-0-9\\.]+,[\\-0-9\\.]+(?:.+)?$")) {
-            checkPermission(source, "commandbook.locations.coords");
-            
-            String[] args = filter.split(":");
-            String[] parts = args[0].split(",");
-            double x, y, z;
-            
-            try {
-                x = Double.parseDouble(parts[0]);
-                y = Double.parseDouble(parts[1]);
-                z = Double.parseDouble(parts[2]);
-            } catch (NumberFormatException e) {
-                throw new CommandException("Coordinates expected numbers!");
-            }
-
-            if (args.length > 1) {
-                return new Location(matchWorld(source, args[1]), x, y, z);
-            } else {
-                Player player = checkPlayer(source);
-                return new Location(player.getWorld(), x, y, z);
-            }
-            
-        // Handle special hash tag groups
-        } else if (filter.charAt(0) == '#') {
-            checkPermission(source, "commandbook.spawn");
-            
-            String[] args = filter.split(":");
-
-            // Handle #world, which matches player of the same world as the
-            // calling source
-            if (args[0].equalsIgnoreCase("#spawn")) {
-                if (args.length > 1) {
-                    return matchWorld(source, args[1]).getSpawnLocation();
-                } else {
-                    Player sourcePlayer = checkPlayer(source);
-                    return sourcePlayer.getLocation().getWorld().getSpawnLocation();
-                }
-
-            // Handle #target, which matches the player's target position
-            } else if (args[0].equalsIgnoreCase("#target")) {
-                Player player = checkPlayer(source);
-                Location playerLoc = player.getLocation();
-                Block targetBlock = player.getTargetBlock(null, 100);
-                
-                if (targetBlock == null) {
-                    throw new CommandException("Failed to find a block in your target!");
-                } else {
-                    Location loc = targetBlock.getLocation();
-                    playerLoc.setX(loc.getX());
-                    playerLoc.setY(loc.getY());
-                    playerLoc.setZ(loc.getZ());
-                    return CommandBookUtil.findFreePosition(playerLoc);
-                }
-            // Handle #home and #warp, which matches a player's home or a warp point
-            } else if (args[0].equalsIgnoreCase("#home")
-                    || args[0].equalsIgnoreCase("#warp")) {
-                String type = args[0].substring(1);
-                checkPermission(source, "commandbook.locations." + type);
-                RootLocationManager<NamedLocation> manager = type.equalsIgnoreCase("warp")
-                                                             ? getWarpsManager()
-                                                             : getHomesManager();
-                if (args.length == 1) {
-                    if (type.equalsIgnoreCase("warp")) {
-                        throw new CommandException("Please specify a warp name.");
-                    }
-                    // source player home
-                    Player ply = checkPlayer(source);
-                    NamedLocation loc = manager.get(ply.getWorld(), ply.getName());
-                    if (loc == null) {
-                        throw new CommandException("You have not set your home yet.");
-                    }
-                    return loc.getLocation();
-                } else if (args.length == 2) {
-                    if (source instanceof Player) {
-                        Player player = (Player) source;
-                        NamedLocation loc = manager.get(player.getWorld(), args[1]);
-                        if (loc != null && !(loc.getCreatorName().equalsIgnoreCase(player.getName()))) {
-                            checkPermission(source, "commandbook.locations." + type + ".other");
-                        }
-                    }
-                    return getManagedLocation(manager, checkPlayer(source).getWorld(), args[1]);
-                } else if (args.length == 3) {
-                    if (source instanceof Player) {
-                        Player player = (Player) source;
-                        NamedLocation loc = manager.get(matchWorld(source, args[2]), args[1]);
-                        if (loc != null && !(loc.getCreatorName().equalsIgnoreCase(player.getName()))) {
-                            checkPermission(source, "commandbook.locations." + type + ".other");
-                        }
-                    }
-                    return getManagedLocation(manager, matchWorld(source, args[2]), args[1]);
-                }
-            // Handle #me, which is for when a location argument is required
-            } else if (args[0].equalsIgnoreCase("#me")) {
-                return checkPlayer(source).getLocation();
-            } else {
-                throw new CommandException("Invalid group '" + filter + "'.");
-            }
-        }
-        
-        List<Player> players = matchPlayerNames(filter);
-        
-        // Check to see if there were any matches
-        if (players.size() == 0) {
-            throw new CommandException("No players matched query.");
-        }
-        
-        return players.get(0).getLocation();
-    }
-
-    /**
-     * Get a location from a location manager.
-     * 
-     * @param manager RootLocationManager to look in
-     * @param world
-     * @param id name of the location
-     * @return a Bukkit location
-     * @throws CommandException if the location by said id does not exist
-     */
-    public Location getManagedLocation(RootLocationManager<NamedLocation> manager,
-            World world, String id) throws CommandException {
-        NamedLocation loc = manager.get(world, id);
-        if (loc == null) throw new CommandException("A location by that name could not be found.");
-        return loc.getLocation();
-    }
-    
-    /**
-     * Match a world.
-     * @param sender 
-     * 
-     * @param filter
-     * @return
-     * @throws CommandException 
-     */
-    public World matchWorld(CommandSender sender, String filter) throws CommandException {
-        List<World> worlds = getServer().getWorlds();
-
-        // Handle special hash tag groups
-        if (filter.charAt(0) == '#') {
-            // #main for the main world
-            if (filter.equalsIgnoreCase("#main")) {
-                return worlds.get(0);
-            
-            // #normal for the first normal world
-            } else if (filter.equalsIgnoreCase("#normal")) {
-                for (World world : worlds) {
-                    if (world.getEnvironment() == Environment.NORMAL) {
-                        return world;
-                    }
-                }
-
-                throw new CommandException("No normal world found.");
-            
-            // #nether for the first nether world
-            } else if (filter.equalsIgnoreCase("#nether")) {
-                for (World world : worlds) {
-                    if (world.getEnvironment() == Environment.NETHER) {
-                        return world;
-                    }
-                }
-
-                throw new CommandException("No nether world found.");
-
-            // #skylands for the first skylands world
-            } else if (filter.equalsIgnoreCase("#skylands") || filter.equalsIgnoreCase("#theend") || filter.equalsIgnoreCase("#end")) {
-                Environment skylandsEnv = CommandBookUtil.getSkylandsEnvironment();
-                for (World world : worlds) {
-                    if (world.getEnvironment() == skylandsEnv) {
-                        return world;
-                    }
-                }
-
-                throw new CommandException("No skylands world found.");
-            // Handle getting a world from a player
-            } else if (filter.matches("^#player$")) {
-                String parts[] = filter.split(":", 2);
-                
-                // They didn't specify an argument for the player!
-                if (parts.length == 1) {
-                    throw new CommandException("Argument expected for #player.");
-                }
-                
-                return matchPlayers(sender, parts[1]).iterator().next().getWorld();
-            } else {
-                throw new CommandException("Invalid identifier '" + filter + "'.");
-            }
-        }
-        
-        for (World world : worlds) {
-            if (world.getName().equals(filter)) {
-                return world;
-            }
-        }
-        
-        throw new CommandException("No world by that exact name found.");
-    }
-    
-    /**
-     * Parse a time string.
-     * 
-     * @param timeStr
-     * @return
-     * @throws CommandException
-     */
-    public int matchTime(String timeStr) throws CommandException {
-        Matcher matcher;
-        
-        try {
-            int time = Integer.parseInt(timeStr);
-            
-            // People tend to enter just a number of the hour
-            if (time <= 24) {
-                return ((time - 8) % 24) * 1000;
-            }
-            
-            return time;
-        } catch (NumberFormatException e) {
-            // Not an integer!
-        }
-        
-        // Tick time
-        if (timeStr.matches("^*[0-9]+$")) {
-            return Integer.parseInt(timeStr.substring(1));
-        
-        // Allow 24-hour time
-        } else if (timeStr.matches("^[0-9]+:[0-9]+$")) {
-            String[] parts = timeStr.split(":");
-            int hours = Integer.parseInt(parts[0]);
-            int mins = Integer.parseInt(parts[1]);
-            int n = (int) (((hours - 8) % 24) * 1000
-                + Math.round((mins % 60) / 60.0 * 1000));
-            return n;
-        
-        // Or perhaps 12-hour time
-        } else if ((matcher = TWELVE_HOUR_TIME.matcher(timeStr)).matches()) {
-            String time = matcher.group(1);
-            String period = matcher.group(2);
-            int shift = 0;
-            
-            if (period.equalsIgnoreCase("am")
-                    || period.equalsIgnoreCase("a.m.")) {
-                shift = 0;
-            } else if (period.equalsIgnoreCase("pm")
-                    || period.equalsIgnoreCase("p.m.")) {
-                shift = 12;
-            } else {
-                throw new CommandException("'am' or 'pm' expected, got '"
-                        + period + "'.");
-            }
-            
-            String[] parts = time.split(":");
-            int hours = Integer.parseInt(parts[0]);
-            int mins = parts.length >= 2 ? Integer.parseInt(parts[1]) : 0;
-            int n = (int) ((((hours % 12) + shift - 8) % 24) * 1000
-                + (mins % 60) / 60.0 * 1000);
-            return n;
-        
-        // Or some shortcuts
-        } else if (timeStr.equalsIgnoreCase("dawn")) {
-            return (6 - 8 + 24) * 1000;
-        } else if (timeStr.equalsIgnoreCase("sunrise")) {
-            return (7 - 8 + 24) * 1000;
-        } else if (timeStr.equalsIgnoreCase("morning")) {
-            return (8 - 8 + 24) * 1000;
-        } else if (timeStr.equalsIgnoreCase("day")) {
-            return (8 - 8 + 24) * 1000;
-        } else if (timeStr.equalsIgnoreCase("midday")
-                || timeStr.equalsIgnoreCase("noon")) {
-            return (12 - 8 + 24) * 1000;
-        } else if (timeStr.equalsIgnoreCase("afternoon")) {
-            return (14 - 8 + 24) * 1000;
-        } else if (timeStr.equalsIgnoreCase("evening")) {
-            return (16 - 8 + 24) * 1000;
-        } else if (timeStr.equalsIgnoreCase("sunset")) {
-            return (21 - 8 + 24) * 1000;
-        } else if (timeStr.equalsIgnoreCase("dusk")) {
-            return (21 - 8 + 24) * 1000 + (int) (30 / 60.0 * 1000);
-        } else if (timeStr.equalsIgnoreCase("night")) {
-            return (22 - 8 + 24) * 1000;
-        } else if (timeStr.equalsIgnoreCase("midnight")) {
-            return (0 - 8 + 24) * 1000;
-        }
-        
-        throw new CommandException("Time input format unknown.");
-    }
-    
-    /**
      * Gets the IP address of a command sender.
      * 
      * @param sender
@@ -1151,46 +569,6 @@ public final class CommandBook extends JavaPlugin {
     public String toUniqueName(CommandSender sender) {
         if (sender instanceof Player) {
             return ((Player) sender).getName();
-        } else {
-            return "*Console*";
-        }
-    }
-    
-    /**
-     * Gets the name of a command sender. This play be a display name.
-     * 
-     * @param sender
-     * @return
-     */
-    public String toName(CommandSender sender) {
-        if (sender instanceof Player) {
-            String name = useDisplayNames
-                    ? ((Player) sender).getDisplayName()
-                    : ((Player) sender).getName();
-            return ChatColor.stripColor(name);
-        } else if (sender instanceof ConsoleCommandSender){
-            return "*Console*";
-        } else {
-            return sender.getName();
-        }
-    }
-    
-    /**
-     * Gets the name of a command sender. This play be a display name.
-     * 
-     * @param sender
-     * @param endColor 
-     * @return
-     */
-    public String toColoredName(CommandSender sender, ChatColor endColor) {
-        if (sender instanceof Player) {
-            String name = useDisplayNames
-                    ? ((Player) sender).getDisplayName()
-                    : ((Player) sender).getName();
-            if (endColor != null && name.contains("\u00A7")) {
-                name = name + endColor;
-            }
-            return name;
         } else {
             return "*Console*";
         }
@@ -1422,48 +800,12 @@ public final class CommandBook extends JavaPlugin {
     }
     
     /**
-     * Return the kit manager.
-     * 
-     * @return
-     */
-    public KitManager getKitManager() {
-        return kits;
-    }
-    
-    /**
      * Get the ban message.
      * 
      * @return
      */
     public String getBanMessage() {
         return banMessage;
-    }
-    
-    /**
-     * Get the time lock manager.
-     * 
-     * @return
-     */
-    public TimeLockManager getTimeLockManager() {
-        return timeLockManager;
-    }
-    
-    /**
-     * Get locked times.
-     * 
-     * @return
-     */
-    public Map<String, Integer> getLockedTimes() {
-        return lockedTimes;
-    }
-    
-    /**
-     * Get the jingle note manager.
-     * 
-     * @return
-     */
-    public JingleNoteManager getJingleNoteManager() {
-        return jingleNoteManager;
     }
     
     /**
@@ -1599,5 +941,13 @@ public final class CommandBook extends JavaPlugin {
 
     public YAMLProcessor getGlobalConfiguration() {
         return config;
+    }
+    
+    public EventManager getEventManager() {
+        return eventManager;
+    }
+
+    public ComponentManager getComponentManager() {
+        return componentManager;
     }
 }

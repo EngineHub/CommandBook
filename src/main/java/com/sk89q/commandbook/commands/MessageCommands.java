@@ -21,6 +21,8 @@ package com.sk89q.commandbook.commands;
 
 import static com.sk89q.commandbook.CommandBookUtil.replaceColorMacros;
 import java.util.logging.Logger;
+
+import com.sk89q.commandbook.util.PlayerUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -50,10 +52,10 @@ public class MessageCommands {
             return;
         }
         
-        String name = plugin.toName(sender);
+        String name = PlayerUtil.toName(sender);
         String msg = args.getJoinedStrings(0);
 
-        plugin.getServer().getPluginManager().callEvent(
+        plugin.getEventManager().callEvent(
                 new SharedMessageEvent(name + " " + msg));
 
         plugin.getServer().broadcastMessage("* " + name + " " + msg);
@@ -71,18 +73,18 @@ public class MessageCommands {
         
         if (sender instanceof Player) {
             PlayerChatEvent event = new PlayerChatEvent((Player) sender, msg);
-            plugin.getServer().getPluginManager().callEvent(event);
+            plugin.getEventManager().callEvent(event);
             if (event.isCancelled()) {
                 return;
             }
         }
 
-        plugin.getServer().getPluginManager().callEvent(
+        plugin.getEventManager().callEvent(
                 new CommandSenderMessageEvent(sender, msg));
 
         if (sender instanceof Player) {
             plugin.getServer().broadcastMessage(
-                    "<" + plugin.toColoredName(sender, ChatColor.WHITE)
+                    "<" + PlayerUtil.toColoredName(sender, ChatColor.WHITE)
                     + "> " + args.getJoinedStrings(0));
         } else {
             plugin.getServer().broadcastMessage(
@@ -96,26 +98,26 @@ public class MessageCommands {
     public void msg(CommandContext args, CommandSender sender) throws CommandException {
         // This will throw errors as needed
         CommandSender receiver =
-                plugin.matchPlayerOrConsole(sender, args.getString(0));
+                PlayerUtil.matchPlayerOrConsole(sender, args.getString(0));
         String message = args.getJoinedStrings(1);
         
         if (receiver instanceof Player && plugin.getSession((Player) receiver).getIdleStatus() != null) {
             String status = plugin.getSession((Player) receiver).getIdleStatus();
-            sender.sendMessage(ChatColor.GRAY + plugin.toName(receiver) + " is afk. "
+            sender.sendMessage(ChatColor.GRAY + PlayerUtil.toName(receiver) + " is afk. "
                     + "They might not see your message."
                     + (status.isEmpty() ? "" : " (" + status + ")"));
         }
         
         receiver.sendMessage(ChatColor.GRAY + "(From "
-                + plugin.toName(sender) + "): "
+                + PlayerUtil.toName(sender) + "): "
                 + ChatColor.WHITE + message);
         
         sender.sendMessage(ChatColor.GRAY + "(To "
-                + plugin.toName(receiver) + "): "
+                + PlayerUtil.toName(receiver) + "): "
                 + ChatColor.WHITE + message);
 
-        logger.info("(PM) " + plugin.toName(sender) + " -> "
-            + plugin.toName(receiver) + ": " + message);
+        logger.info("(PM) " + PlayerUtil.toName(sender) + " -> "
+            + PlayerUtil.toName(receiver) + ": " + message);
 
         plugin.getSession(sender).setLastRecipient(receiver);
         
@@ -135,7 +137,7 @@ public class MessageCommands {
         
         if (lastRecipient != null) {
             // This will throw errors as needed
-            receiver = plugin.matchPlayerOrConsole(sender, lastRecipient);
+            receiver = PlayerUtil.matchPlayerOrConsole(sender, lastRecipient);
         } else {
             sender.sendMessage(ChatColor.RED + "You haven't messaged anyone.");
             return;
@@ -143,21 +145,21 @@ public class MessageCommands {
         
         if (receiver instanceof Player && plugin.getSession((Player) receiver).getIdleStatus() != null) {
             String status = plugin.getSession((Player) receiver).getIdleStatus();
-            sender.sendMessage(ChatColor.GRAY + plugin.toName(receiver) + " is afk. "
+            sender.sendMessage(ChatColor.GRAY + PlayerUtil.toName(receiver) + " is afk. "
                     + "They might not see your message."
                     + (status.isEmpty() ? "" : " (" + status + ")"));
         }
         
         receiver.sendMessage(ChatColor.GRAY + "(From "
-                + plugin.toName(sender) + "): "
+                + PlayerUtil.toName(sender) + "): "
                 + ChatColor.WHITE + message);
         
         sender.sendMessage(ChatColor.GRAY + "(To "
-                + plugin.toName(receiver) + "): "
+                + PlayerUtil.toName(receiver) + "): "
                 + ChatColor.WHITE + message);
 
-        logger.info("(PM) " + plugin.toName(sender) + " -> "
-            + plugin.toName(receiver) + ": " + message);
+        logger.info("(PM) " + PlayerUtil.toName(sender) + " -> "
+            + PlayerUtil.toName(receiver) + ": " + message);
 
         // If the receiver hasn't had any player talk to them yet or hasn't
         // send a message, then we add it to the receiver's last message target

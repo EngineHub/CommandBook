@@ -20,7 +20,7 @@ package com.sk89q.commandbook.commands;
 
 import static com.sk89q.commandbook.CommandBookUtil.replaceColorMacros;
 
-import com.sk89q.commandbook.bans.BanCommands;
+import com.sk89q.commandbook.util.PlayerUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -30,7 +30,6 @@ import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
-import com.sk89q.minecraft.util.commands.NestedCommand;
 
 public class ModerationCommands {
 
@@ -97,26 +96,26 @@ public class ModerationCommands {
     @CommandPermissions({"commandbook.mute"})
     public void mute(CommandContext args, CommandSender sender) throws CommandException {
         
-        Player player = plugin.matchSinglePlayer(sender, args.getString(0));
+        Player player = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
 
         plugin.getAdminSession(player).setMute(true);
 
         player.sendMessage(ChatColor.YELLOW + "You've been muted by "
-                + plugin.toName(sender));
+                + PlayerUtil.toName(sender));
         sender.sendMessage(ChatColor.YELLOW + "You've muted "
-                + plugin.toName(player));
+                + PlayerUtil.toName(player));
     }
     
     @Command(aliases = {"unmute"}, usage = "<target>", desc = "Unmute a player", min = 1, max = 1)
     @CommandPermissions({"commandbook.mute"})
     public void unmute(CommandContext args, CommandSender sender) throws CommandException {
-        Player player = plugin.matchSinglePlayer(sender, args.getString(0));
+        Player player = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
 
         plugin.getAdminSession(player).setMute(false);
 
         player.sendMessage(ChatColor.YELLOW + "You've been unmuted by "
-                + plugin.toName(sender));
+                + PlayerUtil.toName(sender));
         sender.sendMessage(ChatColor.YELLOW + "You've unmuted "
-                + plugin.toName(player));
+                + PlayerUtil.toName(player));
     }
 }

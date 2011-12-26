@@ -12,7 +12,6 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 public class JingleNotePlayer implements Runnable {
-    protected CommandBook plugin;
     protected Player player;
     protected Location loc;
     protected JingleSequencer sequencer;
@@ -20,9 +19,8 @@ public class JingleNotePlayer implements Runnable {
     
     protected boolean keepMusicBlock = false;
     
-    public JingleNotePlayer(CommandBook plugin, Player player,
+    public JingleNotePlayer(Player player,
             Location loc, JingleSequencer seq,  int delay) {
-        this.plugin = plugin;
         this.player = player;
         this.loc = loc;
         this.sequencer = seq;
@@ -49,7 +47,7 @@ public class JingleNotePlayer implements Runnable {
             
             if (!keepMusicBlock) {
                 // Restore music block
-                plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+                CommandBook.server().getScheduler().scheduleSyncDelayedTask(CommandBook.inst(), new Runnable() {
                     
                     public void run() {
                         int prevId = player.getWorld().getBlockTypeIdAt(loc);

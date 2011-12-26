@@ -55,6 +55,7 @@ public class ConfigListedComponentLoader implements ComponentLoader {
         List<AbstractComponent> components = new ArrayList<AbstractComponent>();
         List<String> disabledComponents = CommandBook.inst().getGlobalConfiguration().getStringList("components.disabled", null);
         List<String> stagedEnabled = CommandBook.inst().getGlobalConfiguration().getStringList("components.enabled", null);
+        stagedEnabled.addAll(jarComponentAliases.getKeys(""));
         for (Iterator<String> i = stagedEnabled.iterator(); i.hasNext(); ) {
             String nextName = i.next();
             nextName = jarComponentAliases.getString(nextName, nextName);
@@ -76,11 +77,9 @@ public class ConfigListedComponentLoader implements ComponentLoader {
             try {
                 Constructor<? extends AbstractComponent> construct = next.asSubclass(AbstractComponent.class).getConstructor();
                 components.add(construct.newInstance());
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-                continue;
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (Throwable t) {
+                CommandBook.logger().warning("CommandBook: Error initializing component " + next + ": " + t.getMessage());
+                t.printStackTrace();
                 continue;
             }
 

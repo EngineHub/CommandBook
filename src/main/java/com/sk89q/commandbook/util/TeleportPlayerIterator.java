@@ -29,9 +29,8 @@ public class TeleportPlayerIterator extends PlayerIteratorAction {
     protected Location loc;
     protected Location oldLoc;
     
-    public TeleportPlayerIterator(CommandBook plugin,
-            CommandSender sender, Location loc) {
-        super(plugin, sender);
+    public TeleportPlayerIterator(CommandSender sender, Location loc) {
+        super(sender);
         this.loc = loc;
     }
     
@@ -50,15 +49,15 @@ public class TeleportPlayerIterator extends PlayerIteratorAction {
     public void onVictim(CommandSender sender, Player player) {
         if (oldLoc.getWorld().equals(loc.getWorld())) {
             player.sendMessage(ChatColor.YELLOW + "You've been teleported by "
-                    + plugin.toName(sender) + ".");
+                    + PlayerUtil.toName(sender) + ".");
         } else {
             player.sendMessage(ChatColor.YELLOW + "You've been teleported by "
-                    + plugin.toName(sender) + " to world '"
+                    + PlayerUtil.toName(sender) + " to world '"
                     + loc.getWorld().getName() + "'.");
         }
         
         player.sendMessage(ChatColor.YELLOW + "Teleported by "
-                + plugin.toName(sender) + ".");
+                + PlayerUtil.toName(sender) + ".");
     }
     
     @Override
