@@ -112,7 +112,7 @@ public class WorldCommands {
     @Command(aliases = {"compass"},
             usage = "[player]", desc = "Show your current compass direction",
             flags = "", min = 0, max = 1)
-    @CommandPermissions({"commandbook.whereami.compass.other"})
+    @CommandPermissions({"commandbook.whereami.compass"})
     public void compass(CommandContext args, CommandSender sender) throws CommandException {
     
         Player player;
