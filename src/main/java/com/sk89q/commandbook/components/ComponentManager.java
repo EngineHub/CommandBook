@@ -25,6 +25,7 @@ import com.sk89q.minecraft.util.commands.SimpleInjector;
 import com.sk89q.util.yaml.YAMLNode;
 import org.bukkit.command.CommandSender;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.logging.Level;
@@ -34,14 +35,15 @@ import java.util.logging.Level;
  */
 public class ComponentManager {
     protected List<ComponentLoader> loaders = new ArrayList<ComponentLoader>();
-    protected Map<String, AbstractComponent> registeredComponents = new HashMap<String, AbstractComponent>();
+    protected List<AbstractComponent> registeredComponents = new ArrayList<AbstractComponent>();
+    protected final Map<Class<? extends Annotation>, AnnotationHandler<?>> annotationHandlers = new LinkedHashMap<Class<? extends Annotation>, AnnotationHandler<?>>();
 
-    public boolean addComponentLoader(ComponentLoader loader) {
+    public synchronized boolean addComponentLoader(ComponentLoader loader) {
         loaders.add(loader);
         return true;
     }
 
-    public boolean loadComponents() {
+    public synchronized boolean loadComponents() {
         Collection<AbstractComponent> components = new ArrayList<AbstractComponent>();
         for (ComponentLoader loader : loaders) {
             for (AbstractComponent component : loader.loadComponents()) {
@@ -57,45 +59,65 @@ public class ComponentManager {
                 YAMLNode componentConfig = loader.getConfiguration(component);
 
                 component.setUp(commands, componentConfig, loader);
+                
+                registeredComponents.add(component);
             }
         }
         return true;
     }
 
-    public void enableComponents() {
-        for (AbstractComponent component : registeredComponents.values()) {
+    public synchronized void enableComponents() {
+        for (AbstractComponent component : registeredComponents) {
             for (Field field : component.getClass().getDeclaredFields()) {
                 field.setAccessible(true);
-                /*if (field.isAnnotationPresent(RequiredService.class)) {
-                    setFieldService(field, field.getType(), component);
-                }*/
+                for (Annotation annotation : field.getAnnotations()) {
+                    AnnotationHandler<Annotation> handler =
+                            (AnnotationHandler<Annotation>)annotationHandlers.get(annotation.annotationType());
+                    if (handler != null) {
+                        if (!handler.handle(component, field, annotation)) {
+                            CommandBook.logger().log(Level.WARNING, "CommandBook: Component "
+                                    + component.getClass().getSimpleName() +
+                                    " could not be enabled! Error in annotation handler for field " + field);
+                        }
+                    }
+                }
             }
-            CommandBook.logger().log(Level.FINEST, "CommandBook: Component " + component.getClass().getSimpleName() + " successfully enabled!");
+            CommandBook.logger().log(Level.FINEST, "CommandBook: Component " +
+                    component.getClass().getSimpleName() + " successfully enabled!");
             component.initialize();
+            component.setEnabled(true);
         }
 
-    }
-
-    public <T> void setFieldService(Field field, Class<T> service, AbstractComponent component) {
-        T registration = CommandBook.server().getServicesManager().load(service);
-        try {
-            field.set(component, registration);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
     }
     
-    public void unloadComponents() {
-        for (AbstractComponent component : registeredComponents.values()) {
+    public synchronized void unloadComponents() {
+        for (AbstractComponent component : registeredComponents) {
             component.unload();
             component.unregisterCommands();
         }
     }
     
-    public void reloadComponents() {
-        for (AbstractComponent component : registeredComponents.values()) {
+    public synchronized void reloadComponents() {
+        for (AbstractComponent component : registeredComponents) {
             component.setRawConfiguration(component.getComponentLoader().getConfiguration(component));
             component.reload();
         }
+    }
+    
+    public synchronized <T> T getComponent(Class<T> type) {
+        for (AbstractComponent component : registeredComponents) {
+            if (component.getClass().equals(type)) {
+                return type.cast(component);
+            }
+        }
+        return null;
+    }
+    
+    public synchronized <T extends Annotation> void registerAnnotationHandler(Class<T> annotation, AnnotationHandler<T> handler) {
+        annotationHandlers.put(annotation, handler);
+    }
+    
+    public synchronized <T extends Annotation> AnnotationHandler<T> getAnnotatioHandler(Class<T> annotation) {
+        return (AnnotationHandler<T>)annotationHandlers.get(annotation);
     }
 }

@@ -159,7 +159,7 @@ public class GeneralCommands {
             return;
         }
 
-        plugin.getServer().getPluginManager().callEvent(
+        plugin.getEventManager().callEvent(
                 new OnlineListSendEvent(sender));
         
         // This applies mostly to the console, so there might be 0 players
@@ -229,7 +229,7 @@ public class GeneralCommands {
         if (motd == null) {
             sender.sendMessage(ChatColor.RED + "MOTD not configured in CommandBook yet!");
         } else {
-            plugin.getServer().getPluginManager().callEvent(
+            plugin.getEventManager().callEvent(
                     new MOTDSendEvent(sender));
             
             sendMessage(sender,
@@ -404,11 +404,6 @@ public class GeneralCommands {
                 "I hear " + PlayerUtil.toName(sender) + " likes cute Asian boys.");
     }
     
-    @Command(aliases = {"debug"}, desc = "Debugging commands")
-    @NestedCommand({DebuggingCommands.class})
-    public void debug(CommandContext args, CommandSender sender) throws CommandException {
-    }
-    
     @Command(aliases = {"more"},
             usage = "[player]", desc = "Gets more of an item",
             flags = "aio", min = 0, max = 1)
@@ -468,30 +463,6 @@ public class GeneralCommands {
         if (!included) {
             sender.sendMessage(ChatColor.YELLOW
                     + "Stack sizes increased.");
-        }
-    }
-
-    @Command(aliases = {"afk"},
-            usage = "", desc = "Set yourself as away",
-            flags = "", min = 0, max = -1)
-    @CommandPermissions({"commandbook.away"})
-    public void afk(CommandContext args, CommandSender sender) throws CommandException {
-
-        Player player = PlayerUtil.checkPlayer(sender);
-
-        if (plugin.getSession(player).getIdleStatus() == null) {
-            String status = "";
-            if (args.argsLength() > 0) {
-                status = args.getJoinedStrings(0);
-                plugin.getSession(player).setIdleStatus(status);
-            }
-
-            player.sendMessage(ChatColor.YELLOW
-                    + (status.isEmpty() ? "Set as away" : "Set away status to \"" + status + "\"")
-                    + ". To return, type /afk again.");
-        } else {
-            player.sendMessage(ChatColor.YELLOW + "You are no longer away.");
-            plugin.getSession(player).setIdleStatus(null);
         }
     }
 

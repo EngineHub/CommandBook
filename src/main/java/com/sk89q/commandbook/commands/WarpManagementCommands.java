@@ -39,10 +39,14 @@ public class WarpManagementCommands {
     public WarpManagementCommands(CommandBook plugin) {
         this.plugin = plugin;
     }
+    
+    public String getName() {
+        return "warp";
+    }
 
     @Command(aliases = {"del", "delete", "remove", "rem"}, usage = "<warpname> [world]",
              desc = "Remove a warp", min = 1, max = 2 )
-    @CommandPermissions({"commandbook.warp.remove"})
+    @CommandPermissions({"commandbook.remove"})
     public void remove(CommandContext args, CommandSender sender) throws CommandException {
         World world;
         String warpName = args.getString(0);

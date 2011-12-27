@@ -83,18 +83,6 @@ public class CommandBookPlayerListener extends PlayerListener {
             return;
         }
     }
-
-    /**
-     * Called on player chat.
-     */
-    @Override
-    public void onPlayerChat(PlayerChatEvent event) {
-        if (plugin.getAdminSession(event.getPlayer()).isMute()) {
-            event.getPlayer().sendMessage(ChatColor.RED + "You are muted.");
-            event.setCancelled(true);
-            return;
-        }
-    }
     
     /**
      * Called on player join.
@@ -103,14 +91,11 @@ public class CommandBookPlayerListener extends PlayerListener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         
-        // Trigger the session
-        plugin.getSession(player).handleReconnect();
-        
         // Show the MOTD.
         String motd = plugin.getMessage("motd");
         
         if (motd != null) {
-            plugin.getServer().getPluginManager().callEvent(
+            plugin.getEventManager().callEvent(
                     new MOTDSendEvent(player));
             
             sendMessage(player,
@@ -121,29 +106,13 @@ public class CommandBookPlayerListener extends PlayerListener {
         
         // Show the online list
         if (plugin.listOnJoin) {
-            plugin.getServer().getPluginManager().callEvent(
+            plugin.getEventManager().callEvent(
                     new OnlineListSendEvent(player));
             
             CommandBookUtil.sendOnlineList(
                     plugin.getServer().getOnlinePlayers(), player, plugin);
         }
 
-        World defaultWorld = plugin.getServer().getWorlds().get(0);
-        if (!new File(defaultWorld.getName() + File.separatorChar + "players" +
-                File.separatorChar + player.getName() + ".dat").exists() && plugin.exactSpawn)
-            player.teleport(plugin.getSpawnManager().getWorldSpawn(player.getWorld()));
-    }
-    
-    /**
-     * Called on player respawn.
-     */
-    @Override
-    public void onPlayerRespawn(PlayerRespawnEvent event) {
-        Player player = event.getPlayer();
-        plugin.getSession(player).rememberLocation(player);
-        if (plugin.exactSpawn && !event.isBedSpawn()) {
-            event.setRespawnLocation(plugin.getSpawnManager().getWorldSpawn(player.getWorld()));
-        }
     }
 
     /**
@@ -152,7 +121,7 @@ public class CommandBookPlayerListener extends PlayerListener {
     @Override
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-        
+
         if (plugin.getSession(player).hasThor()) {
             if (!plugin.thorItems.contains(player.getItemInHand().getTypeId())) {
                 return;
@@ -167,32 +136,6 @@ public class CommandBookPlayerListener extends PlayerListener {
                 Block block = event.getClickedBlock();
                 player.getWorld().strikeLightning(block.getLocation());
             }
-        }
-    }
-
-    /**
-     * Called on player disconnect.
-     */
-    @Override
-    public void onPlayerQuit(PlayerQuitEvent event) {
-        plugin.getSession(event.getPlayer()).handleDisconnect();
-        plugin.getAdminSession(event.getPlayer()).handleDisconnect();
-    }
-
-    @Override
-    public void onPlayerTeleport(PlayerTeleportEvent event) {
-        Location loc = event.getTo();
-        Player player = event.getPlayer();
-        if (event.isCancelled()) {
-            return;
-        }
-        if (loc == plugin.getSession(player).getIgnoreLocation()) {
-            plugin.getSession(player).setIgnoreLocation(null);
-            return;
-        }
-        plugin.getSession(event.getPlayer()).rememberLocation(event.getPlayer());
-        if (loc.equals(loc.getWorld().getSpawnLocation())) {
-            event.setTo(plugin.getSpawnManager().getWorldSpawn(loc.getWorld()));
         }
     }
     

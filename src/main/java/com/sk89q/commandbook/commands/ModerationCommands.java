@@ -39,13 +39,7 @@ public class ModerationCommands {
         this.plugin = plugin;
     }
     
-    @Command(aliases = {"broadcast"}, usage = "<message...>", desc = "Broadcast a message", min = 1, max = -1)
-    @CommandPermissions({"commandbook.broadcast"})
-    public void broadcast(CommandContext args, CommandSender sender) throws CommandException {
-        plugin.getServer().broadcastMessage(
-                replaceColorMacros(plugin.broadcastFormat).replace(
-                        "%s", args.getJoinedStrings(0)));
-    }
+
 
     /*@Command(aliases = {"freeze"},
             usage = "<target>", desc = "Freeze a player",
@@ -91,31 +85,4 @@ public class ModerationCommands {
         sender.sendMessage(ChatColor.YELLOW + "You've unfrozen "
                 + plugin.toName(player));
     }*/
-    
-    @Command(aliases = {"mute"}, usage = "<target>", desc = "Mute a player", min = 1, max = 1)
-    @CommandPermissions({"commandbook.mute"})
-    public void mute(CommandContext args, CommandSender sender) throws CommandException {
-        
-        Player player = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
-
-        plugin.getAdminSession(player).setMute(true);
-
-        player.sendMessage(ChatColor.YELLOW + "You've been muted by "
-                + PlayerUtil.toName(sender));
-        sender.sendMessage(ChatColor.YELLOW + "You've muted "
-                + PlayerUtil.toName(player));
-    }
-    
-    @Command(aliases = {"unmute"}, usage = "<target>", desc = "Unmute a player", min = 1, max = 1)
-    @CommandPermissions({"commandbook.mute"})
-    public void unmute(CommandContext args, CommandSender sender) throws CommandException {
-        Player player = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
-
-        plugin.getAdminSession(player).setMute(false);
-
-        player.sendMessage(ChatColor.YELLOW + "You've been unmuted by "
-                + PlayerUtil.toName(sender));
-        sender.sendMessage(ChatColor.YELLOW + "You've unmuted "
-                + PlayerUtil.toName(player));
-    }
 }

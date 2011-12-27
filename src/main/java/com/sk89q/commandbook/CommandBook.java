@@ -47,7 +47,6 @@ import org.bukkit.event.Event;
 import org.bukkit.event.Listener;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.player.PlayerListener;
-import org.bukkit.event.world.WorldListener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.config.Configuration;
@@ -81,7 +80,6 @@ public final class CommandBook extends JavaPlugin {
     private CommandsManager<CommandSender> commands;
     private RootLocationManager<NamedLocation> warps;
     private RootLocationManager<NamedLocation> homes;
-    private WrappedSpawnManager spawns;
     
     public boolean listOnJoin;
     public boolean verifyNameFormat;
@@ -93,23 +91,17 @@ public final class CommandBook extends JavaPlugin {
     public Set<Integer> disallowedItems;
     public Map<String, Integer> itemNames;
     public Set<Integer> thorItems;
-    public String banMessage;
     public boolean opPermissions;
     public boolean useDisplayNames;
     public String consoleSayFormat;
     public String broadcastFormat;
     public int defaultItemStackSize;
-    public boolean exactSpawn;
     public boolean playersListColoredNames;
     public boolean playersListGroupedNames;
     public boolean playersListMaxPlayers;
     public boolean crappyWrapperCompat;
 
     protected Map<String, String> messages = new HashMap<String, String>();
-    protected Map<String, UserSession> sessions =
-        new HashMap<String, UserSession>();
-    protected Map<String, AdministrativeSession> adminSessions =
-        new HashMap<String, AdministrativeSession>();
     protected YAMLProcessor config;
     protected EventManager eventManager = new EventManager();
     protected ComponentManager componentManager;
@@ -188,21 +180,15 @@ public final class CommandBook extends JavaPlugin {
 		final CommandRegistration cmdRegister = new CommandRegistration(this, commands);
         cmdRegister.register(GeneralCommands.class);
 		cmdRegister.register(FunCommands.class);
-        cmdRegister.register(TeleportCommands.class);
-        cmdRegister.register(MessageCommands.class);
         cmdRegister.register(DebuggingCommands.class);
-        cmdRegister.register(ModerationCommands.class);
         cmdRegister.register(WarpCommands.class);
         cmdRegister.register(HomeCommands.class);
         cmdRegister.register(WorldCommands.class);
         
         // Register events
         registerEvents();
-        
-        // Cleanup
-        getServer().getScheduler().scheduleAsyncRepeatingTask(
-                this, new SessionChecker(this),
-                SessionChecker.CHECK_FREQUENCY, SessionChecker.CHECK_FREQUENCY);
+
+        componentManager.enableComponents();
     }
     
     /**
@@ -210,16 +196,10 @@ public final class CommandBook extends JavaPlugin {
      */
     protected void registerEvents() {
         PlayerListener playerListener = new CommandBookPlayerListener(this);
-        WorldListener worldListener = new CommandBookWorldListener(this);
 
         registerEvent(Event.Type.PLAYER_LOGIN, playerListener);
         registerEvent(Event.Type.PLAYER_JOIN, playerListener);
         registerEvent(Event.Type.PLAYER_INTERACT, playerListener);
-        registerEvent(Event.Type.PLAYER_QUIT, playerListener);
-        registerEvent(Event.Type.PLAYER_CHAT, playerListener);
-        registerEvent(Event.Type.PLAYER_RESPAWN, playerListener);
-        registerEvent(Event.Type.PLAYER_TELEPORT, playerListener);
-        registerEvent(Event.Type.WORLD_LOAD, worldListener);
     }
 
     /**
@@ -316,18 +296,15 @@ public final class CommandBook extends JavaPlugin {
         listOnJoin = getConfiguration().getBoolean("online-on-join", true);
         opPermissions = config.getBoolean("op-permissions", true);
         useDisplayNames = config.getBoolean("use-display-names", true);
-        banMessage = config.getString("bans.message", "You were banned.");
         verifyNameFormat = config.getBoolean("verify-name-format", true);
         broadcastChanges = config.getBoolean("broadcast-changes", true);
         broadcastBans = config.getBoolean("broadcast-bans", false);
         broadcastKicks = config.getBoolean("broadcast-kicks", false);
-        consoleSayFormat = config.getString("console-say-format", "<`r*Console`w> %s");
-        broadcastFormat = config.getString("broadcast-format", "`r[Broadcast] %s");
+
         defaultItemStackSize = config.getInt("default-item-stack-size", 1);
-        exactSpawn = config.getBoolean("exact-spawn", false);
         crappyWrapperCompat = config.getBoolean("crappy-wrapper-compat", true);
         thorItems = new HashSet<Integer>(config.getIntList(
-                "thor-hammer-items", Arrays.asList(new Integer[]{278, 285, 257, 270})));
+                "thor-hammer-items", Arrays.asList(278, 285, 257, 270)));
 
         LocationManagerFactory<LocationManager<NamedLocation>> warpsFactory =
                 new FlatFileLocationsManager.LocationsFactory(getDataFolder(), this, "Warps");
@@ -344,7 +321,7 @@ public final class CommandBook extends JavaPlugin {
                     "Some features have been disabled to be compatible with " +
                     "poorly written server wrappers.");
         }
-        spawns = new WrappedSpawnManager(new File(getDataFolder(), "spawns.yml"));
+
     }
     
     /**
@@ -800,15 +777,6 @@ public final class CommandBook extends JavaPlugin {
     }
     
     /**
-     * Get the ban message.
-     * 
-     * @return
-     */
-    public String getBanMessage() {
-        return banMessage;
-    }
-    
-    /**
      * Replace macros in the text.
      * 
      * @param sender 
@@ -861,70 +829,6 @@ public final class CommandBook extends JavaPlugin {
         }
         return message;
     }
-    
-    /**
-     * Get a session.
-     * 
-     * @param user 
-     * @return
-     */
-    public UserSession getSession(CommandSender user) {
-        synchronized (sessions) {
-            String key;
-            
-            if (user instanceof Player) {
-                key = ((Player) user).getName();
-            } else {
-                key = UserSession.CONSOLE_NAME;
-            }
-            
-            UserSession session = sessions.get(key);
-            if (session != null) {
-                return session;
-            }
-            session = new UserSession();
-            sessions.put(key, session);
-            return session;
-        }
-    }
-    
-    /**
-     * Get sessions.
-     * 
-     * @return
-     */
-    public Map<String, UserSession> getSessions() {
-        return sessions;
-    }
-    
-    /**
-     * Get a session.
-     * 
-     * @param user 
-     * @return
-     */
-    public AdministrativeSession getAdminSession(Player user) {
-        synchronized (adminSessions) {
-            String key = user.getName();
-            
-            AdministrativeSession session = adminSessions.get(key);
-            if (session != null) {
-                return session;
-            }
-            session = new AdministrativeSession();
-            adminSessions.put(key, session);
-            return session;
-        }
-    }
-    
-    /**
-     * Get sessions.
-     * 
-     * @return
-     */
-    public Map<String, AdministrativeSession> getAdminSessions() {
-        return adminSessions;
-    }
 
     /**
      * Get the permissions resolver.
@@ -933,10 +837,6 @@ public final class CommandBook extends JavaPlugin {
      */
     public PermissionsResolverManager getPermissionsResolver() {
         return PermissionsResolverManager.getInstance();
-    }
-
-    public WrappedSpawnManager getSpawnManager() {
-        return spawns;
     }
 
     public YAMLProcessor getGlobalConfiguration() {
