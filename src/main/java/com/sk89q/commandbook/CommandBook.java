@@ -78,8 +78,6 @@ public final class CommandBook extends JavaPlugin {
     private static CommandBook instance;
 
     private CommandsManager<CommandSender> commands;
-    private RootLocationManager<NamedLocation> warps;
-    private RootLocationManager<NamedLocation> homes;
     
     public boolean listOnJoin;
     public boolean verifyNameFormat;
@@ -180,9 +178,6 @@ public final class CommandBook extends JavaPlugin {
 		final CommandRegistration cmdRegister = new CommandRegistration(this, commands);
         cmdRegister.register(GeneralCommands.class);
 		cmdRegister.register(FunCommands.class);
-        cmdRegister.register(DebuggingCommands.class);
-        cmdRegister.register(WarpCommands.class);
-        cmdRegister.register(HomeCommands.class);
         cmdRegister.register(WorldCommands.class);
         
         // Register events
@@ -305,16 +300,6 @@ public final class CommandBook extends JavaPlugin {
         crappyWrapperCompat = config.getBoolean("crappy-wrapper-compat", true);
         thorItems = new HashSet<Integer>(config.getIntList(
                 "thor-hammer-items", Arrays.asList(278, 285, 257, 270)));
-
-        LocationManagerFactory<LocationManager<NamedLocation>> warpsFactory =
-                new FlatFileLocationsManager.LocationsFactory(getDataFolder(), this, "Warps");
-        warps = new RootLocationManager<NamedLocation>(warpsFactory,
-                config.getBoolean("per-world-warps", false));
-
-        LocationManagerFactory<LocationManager<NamedLocation>> homesFactory =
-                new FlatFileLocationsManager.LocationsFactory(getDataFolder(), this, "Homes");
-        homes = new RootLocationManager<NamedLocation>(homesFactory,
-                config.getBoolean("per-world-homes", false));
         
         if (crappyWrapperCompat) {
             logger.info("CommandBook: Maximum wrapper compatibility is enabled. " +
@@ -756,24 +741,6 @@ public final class CommandBook extends JavaPlugin {
      */
     public String getMessage(String id) {
         return messages.get(id);
-    }
-    
-    /**
-     * Get the root warps manager.
-     * 
-     * @return
-     */
-    public RootLocationManager<NamedLocation> getWarpsManager() {
-        return warps;
-    }
-    
-    /**
-     * Get the root homes manager.
-     * 
-     * @return
-     */
-    public RootLocationManager<NamedLocation> getHomesManager() {
-        return homes;
     }
     
     /**

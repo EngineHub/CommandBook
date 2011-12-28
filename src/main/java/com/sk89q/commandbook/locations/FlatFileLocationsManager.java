@@ -43,7 +43,6 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
     
     private static final Logger logger = Logger.getLogger("Minecraft.CommandBook");
     
-    private CommandBook plugin;
     private World castWorld;
     private File file;
     private Map<String, NamedLocation> locs = new HashMap<String, NamedLocation>();
@@ -52,12 +51,10 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
     /**
      * Construct the manager.
      * 
-     * @param plugin
      * @param file
      * @param type
      */
-    public FlatFileLocationsManager(File file, CommandBook plugin, String type) {
-        this.plugin = plugin;
+    public FlatFileLocationsManager(File file, String type) {
         this.file = file;
         this.type = type;
     }
@@ -96,7 +93,7 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
                         float pitch = Float.parseFloat(line[6]);
                         float yaw = Float.parseFloat(line[7]);
                         
-                        World world = plugin.getServer().getWorld(worldName);
+                        World world = CommandBook.server().getWorld(worldName);
                         
                         if (world == null) {
                             // We shouldn't have this warp
@@ -104,7 +101,7 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
                                 continue;
                             }
                             
-                            world = plugin.getServer().getWorlds().get(0);
+                            world = CommandBook.server().getWorlds().get(0);
                         } else {
                             // We shouldn't have this warp
                             if (castWorld != null && !castWorld.equals(world)) {
@@ -209,23 +206,21 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
 
     public static class LocationsFactory implements LocationManagerFactory<LocationManager<NamedLocation>> {
 
-        private CommandBook plugin;
         public File rootDir;
         private String type;
 
-        public LocationsFactory(File rootDir, CommandBook plugin, String type) {
+        public LocationsFactory(File rootDir, String type) {
             this.rootDir = rootDir;
-            this.plugin = plugin;
             this.type = type;
         }
 
         public LocationManager<NamedLocation> createManager() {
-            return new FlatFileLocationsManager(new File(rootDir, type.toLowerCase() + ".csv"), plugin, type);
+            return new FlatFileLocationsManager(new File(rootDir, type.toLowerCase() + ".csv"), type);
         }
 
         public LocationManager<NamedLocation> createManager(World castWorld) {
             return new FlatFileLocationsManager(
-                    new File(rootDir, type.toLowerCase() + File.separator + castWorld.getName() + ".csv"), plugin, type);
+                    new File(rootDir, type.toLowerCase() + File.separator + castWorld.getName() + ".csv"), type);
         }
     }
 

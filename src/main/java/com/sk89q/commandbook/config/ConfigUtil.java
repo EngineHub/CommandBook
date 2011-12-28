@@ -23,7 +23,9 @@ import com.sk89q.util.yaml.YAMLNode;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author zml2008
@@ -37,22 +39,22 @@ public class ConfigUtil {
         return ret;
     }
 
-    public static <T, X> X smartCast(Type genericType, Object value) {
+    public static <S, T, U> U smartCast(Type genericType, Object value) {
         if (value == null) {
             return null;
         }
         Type[] neededGenerics;
-        Class<X> target = null;
+        Class<U> target = null;
         if (genericType != null && genericType instanceof ParameterizedType) {
             ParameterizedType type = (ParameterizedType) genericType;
             Type raw = type.getRawType();
             if (raw instanceof Class) {
-                target = (Class<X>)raw;
+                target = (Class<U>)raw;
             }
             neededGenerics = type.getActualTypeArguments();
         } else {
             if (genericType instanceof Class) {
-                target = (Class<X>)genericType;
+                target = (Class<U>)genericType;
             }
             neededGenerics = new Type[0];
         }
@@ -87,8 +89,22 @@ public class ConfigUtil {
                 }
                 ret = values;
             }
+        } else if (neededGenerics.length == 2) {
+            if (target.equals(Map.class)
+                    && neededGenerics[0] instanceof Class
+                    && neededGenerics[1] instanceof Class
+                    && value instanceof Map) {
+                Class<S> keyType = ((Class)neededGenerics[0]);
+                Class<T> valueType = ((Class)neededGenerics[1]);
+                Map<Object, Object> raw = (Map<Object, Object>) value;
+                Map<S, T> values = new HashMap<S, T>();
+                for (Map.Entry<Object, Object> entry : raw.entrySet()) {
+                    values.put((S)smartCast(keyType, entry.getKey()), (T)smartCast(valueType, entry.getValue()));
+                }
+                ret = values;
+            }
         }
-        return (X)ret;
+        return (U)ret;
     }
 
     public static Number getNumber(Class<?> target, Number value) {
