@@ -426,18 +426,20 @@ public class GeneralCommands {
         }
 
         Location pos = player.getLocation();
-        
+
         sender.sendMessage(ChatColor.YELLOW +
-                "You are in the world: " + plugin.checkPlayer(sender).getWorld().getName());
+                "Player " + player.getName());
         sender.sendMessage(ChatColor.YELLOW +
-                String.format("You're at: (%.4f, %.4f, %.4f)",
+                "World: " + player.getWorld().getName());
+        sender.sendMessage(ChatColor.YELLOW +
+                String.format("Location: (%.4f, %.4f, %.4f)",
                         pos.getX(), pos.getY(), pos.getZ()));
         sender.sendMessage(ChatColor.YELLOW +
-                "Your depth is: " + (int) Math.floor(pos.getY()));
+                "Depth: " + (int) Math.floor(pos.getY()));
         
         if (plugin.hasPermission(sender, "commandbook.whereami.compass")) {
             sender.sendMessage(ChatColor.YELLOW +
-                    String.format("Your direction: %s",
+                    String.format("Direction: %s",
                             getCardinalDirection(player)));
         }
     }
