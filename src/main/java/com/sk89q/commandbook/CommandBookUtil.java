@@ -266,37 +266,37 @@ public class CommandBookUtil {
      * @param item
      * @param amt
      * @param targets
-     * @param plugin
+     * @param component
      * @param drop
      * @throws CommandException
      */
     @SuppressWarnings("deprecation")
     public static void giveItem(CommandSender sender, ItemStack item, int amt,
-            Iterable<Player> targets, CommandBook plugin, boolean drop, boolean overrideStackSize)
+            Iterable<Player> targets, ItemsComponent component, boolean drop, boolean overrideStackSize)
             throws CommandException {
         
         boolean included = false; // Is the command sender also receiving items?
 
         int maxStackSize = overrideStackSize ? 64 : item.getType().getMaxStackSize();
         
-        plugin.checkAllowedItem(sender, item.getTypeId());
+        component.checkAllowedItem(sender, item.getTypeId());
         
         // Check for invalid amounts
         if (amt == 0 || amt < -1) {
             throw new CommandException("Invalid item amount!");
         } else if (amt == -1) {
             // Check to see if the player can give infinite items
-            plugin.checkPermission(sender, "commandbook.give.infinite");
+            CommandBook.inst().checkPermission(sender, "commandbook.give.infinite");
         } else if (overrideStackSize) {
-            plugin.checkPermission(sender, "commandbook.override.maxstacksize");
+            CommandBook.inst().checkPermission(sender, "commandbook.override.maxstacksize");
         } else if (amt > maxStackSize * 5) {
             // Check to see if the player can give stacks of this size
-            if (!plugin.hasPermission(sender, "commandbook.give.stacks.unlimited")) {
+            if (!CommandBook.inst().hasPermission(sender, "commandbook.give.stacks.unlimited")) {
                 throw new CommandException("More than 5 stacks is too excessive.");
             }
         } else if (amt > maxStackSize /* && amt < max * 5 */) {
             // Check to see if the player can give stacks
-            plugin.checkPermission(sender, "commandbook.give.stacks");
+            CommandBook.inst().checkPermission(sender, "commandbook.give.stacks");
         }
 
         // Get a nice amount name
@@ -330,7 +330,7 @@ public class CommandBookUtil {
             // Tell the user about the given item
             if (player.equals(sender)) {
                 player.sendMessage(ChatColor.YELLOW + "You've been given " + amtText + " "
-                        + plugin.toItemName(item.getTypeId()) + ".");
+                        + component.toItemName(item.getTypeId()) + ".");
                 
                 // Keep track of this
                 included = true;
@@ -338,7 +338,7 @@ public class CommandBookUtil {
                 player.sendMessage(ChatColor.YELLOW + "Given from "
                         + PlayerUtil.toName(sender) + ": "
                         + amtText + " "
-                        + plugin.toItemName(item.getTypeId()) + ".");
+                        + component.toItemName(item.getTypeId()) + ".");
                 
             }
         }
@@ -347,7 +347,7 @@ public class CommandBookUtil {
         // user a message so s/he know that something is indeed working
         if (!included) {
             sender.sendMessage(ChatColor.YELLOW.toString() + amtText + " "
-                    + plugin.toItemName(item.getTypeId()) + " has been given.");
+                    + component.toItemName(item.getTypeId()) + " has been given.");
         }
     }
 

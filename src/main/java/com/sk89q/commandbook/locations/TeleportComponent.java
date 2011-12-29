@@ -158,6 +158,31 @@ public class TeleportComponent extends AbstractComponent implements Listener {
             }).iterate(targets);
         }
 
+
+        @Command(aliases = {"setspawn"},
+                usage = "[location]", desc = "Change spawn location",
+                flags = "", min = 0, max = 1)
+        @CommandPermissions({"commandbook.setspawn"})
+        public void setspawn(CommandContext args, CommandSender sender) throws CommandException {
+
+            World world;
+            Location loc;
+
+            if (args.argsLength() == 0) {
+                Player player = PlayerUtil.checkPlayer(sender);
+                world = player.getWorld();
+                loc = player.getLocation();
+            } else {
+                loc = LocationUtil.matchLocation(sender, args.getString(0));
+                world = loc.getWorld();
+            }
+
+            getSpawnManager().setWorldSpawn(loc);
+
+            sender.sendMessage(ChatColor.YELLOW +
+                    "Spawn location of '" + world.getName() + "' set!");
+        }
+
         @Command(aliases = {"teleport"}, usage = "[target] <destination>",
                 desc = "Teleport to a location", min = 1, max = 2)
         @CommandPermissions({"commandbook.teleport"})

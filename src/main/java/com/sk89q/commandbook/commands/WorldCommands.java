@@ -86,30 +86,6 @@ public class WorldCommands {
     
     }
 
-    @Command(aliases = {"setspawn"},
-            usage = "[location]", desc = "Change spawn location",
-            flags = "", min = 0, max = 1)
-    @CommandPermissions({"commandbook.setspawn"})
-    public void setspawn(CommandContext args, CommandSender sender) throws CommandException {
-        
-        World world;
-        Location loc;
-        
-        if (args.argsLength() == 0) {
-            Player player = PlayerUtil.checkPlayer(sender);
-            world = player.getWorld();
-            loc = player.getLocation();
-        } else {
-            loc = LocationUtil.matchLocation(sender, args.getString(0));
-            world = loc.getWorld();
-        }
-    
-        plugin.getSpawnManager().setWorldSpawn(loc);
-    
-        sender.sendMessage(ChatColor.YELLOW +
-                "Spawn location of '" + world.getName() + "' set!");
-    }
-
     @Command(aliases = {"weather"},
             usage = "<'stormy'|'sunny'> [duration] [world]", desc = "Change the world weather",
             min = 1, max = 3)

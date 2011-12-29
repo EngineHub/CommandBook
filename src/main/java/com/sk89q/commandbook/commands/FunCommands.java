@@ -21,6 +21,7 @@ package com.sk89q.commandbook.commands;
 import java.util.Random;
 
 import com.sk89q.commandbook.CommandBook;
+import com.sk89q.commandbook.util.ItemUtil;
 import com.sk89q.commandbook.util.LocationUtil;
 import com.sk89q.commandbook.util.PlayerUtil;
 import org.bukkit.ChatColor;
@@ -150,7 +151,7 @@ public class FunCommands {
                     ((Sheep) creature).setSheared(true);
                     return creature;
                 }
-                ((Sheep) creature).setColor(plugin.matchDyeColor(specialType));
+                ((Sheep) creature).setColor(ItemUtil.matchDyeColor(specialType));
                 return creature;
             } else if (creature instanceof Pig
                     && specialType.matches("saddle(d)?")) {

@@ -4,7 +4,7 @@ warps: com.sk89q.commandbook.locations.WarpsComponent
 messaging: com.sk89q.commandbook.MessagingComponent
 teleport: com.sk89q.commandbook.locations.TeleportComponent
 #server: com.sk89q.commandbook.ServerComponent
-#items: com.sk89q.commandbook.items.ItemsComponent
+items: com.sk89q.commandbook.ItemsComponent
 kits: com.sk89q.commandbook.kits.KitsComponent
 midi: com.sk89q.jinglenote.JingleNoteComponent
 time: com.sk89q.commandbook.time.TimeComponent

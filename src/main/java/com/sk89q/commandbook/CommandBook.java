@@ -84,16 +84,10 @@ public final class CommandBook extends JavaPlugin {
     public boolean broadcastChanges;
     public boolean broadcastKicks;
     public boolean broadcastBans;
-    public boolean useItemPermissionsOnly;
-    public Set<Integer> allowedItems;
-    public Set<Integer> disallowedItems;
-    public Map<String, Integer> itemNames;
     public Set<Integer> thorItems;
     public boolean opPermissions;
     public boolean useDisplayNames;
-    public String consoleSayFormat;
-    public String broadcastFormat;
-    public int defaultItemStackSize;
+
     public boolean playersListColoredNames;
     public boolean playersListGroupedNames;
     public boolean playersListMaxPlayers;
@@ -270,15 +264,6 @@ public final class CommandBook extends JavaPlugin {
             logger.log(Level.WARNING, "CommandBook: Error loading configuration: ", e);
         }
         this.config = config;
-
-        // Load item disallow/allow lists
-        useItemPermissionsOnly = config.getBoolean("item-permissions-only", false);
-        allowedItems = new HashSet<Integer>(
-                config.getIntList("allowed-items", null));
-        disallowedItems = new HashSet<Integer>(
-                config.getIntList("disallowed-items", null));
-        
-        loadItemList();
         
         // Load messages
         messages.put("motd", config.getString("motd", null));
@@ -295,8 +280,6 @@ public final class CommandBook extends JavaPlugin {
         broadcastChanges = config.getBoolean("broadcast-changes", true);
         broadcastBans = config.getBoolean("broadcast-bans", false);
         broadcastKicks = config.getBoolean("broadcast-kicks", false);
-
-        defaultItemStackSize = config.getInt("default-item-stack-size", 1);
         crappyWrapperCompat = config.getBoolean("crappy-wrapper-compat", true);
         thorItems = new HashSet<Integer>(config.getIntList(
                 "thor-hammer-items", Arrays.asList(278, 285, 257, 270)));
@@ -310,36 +293,6 @@ public final class CommandBook extends JavaPlugin {
     }
     
     /**
-     * Loads the item list.
-     */
-    @SuppressWarnings({ "unchecked" })
-    protected void loadItemList() {
-        Configuration config = getConfiguration();
-        
-        // Load item names aliases list
-        Object itemNamesTemp = config.getProperty("item-names");
-        if (itemNamesTemp != null && itemNamesTemp instanceof Map) {
-            itemNames = new HashMap<String, Integer>();
-            
-            try {
-                Map<Object, Object> temp = (Map<Object, Object>) itemNamesTemp;
-                
-                for (Map.Entry<Object, Object> entry : temp.entrySet()) {
-                    String name = entry.getKey().toString().toLowerCase();
-                    
-                    // Check if the item ID is a number
-                    if (entry.getValue() instanceof Integer) {
-                        itemNames.put(name, (Integer) entry.getValue());
-                    }
-                }
-            } catch (ClassCastException e) {
-            }
-        } else {
-            itemNames = new HashMap<String, Integer>();
-        }
-    }
-    
-    /**
      * Create a default configuration file from the .jar.
      * 
      * @param name
@@ -348,8 +301,7 @@ public final class CommandBook extends JavaPlugin {
         File actual = new File(getDataFolder(), name);
         if (!actual.exists()) {
 
-            InputStream input =
-                    null;
+            InputStream input = null;
             try {
                 JarFile file = new JarFile(getFile());
                 ZipEntry copy = file.getEntry("defaults/" + name);
@@ -437,49 +389,6 @@ public final class CommandBook extends JavaPlugin {
             throw new CommandPermissionsException();
         }
     }
-
-    /**
-     * Checks to see if a user can use an item.
-     * 
-     * @param sender
-     * @param id
-     * @throws CommandException 
-     */
-    public void checkAllowedItem(CommandSender sender, int id)
-            throws CommandException {
-
-        if (Material.getMaterial(id) == null || id == 0) {
-            throw new CommandException("Non-existent item specified.");
-        }
-
-        // Check if the user has an override
-        if (hasPermission(sender, "commandbook.override.any-item")) {
-            return;
-        }
-
-        boolean hasPermissions = hasPermission(sender, "commandbook.items." + id);
-        
-        // Also check the permissions system
-        if (hasPermissions) {
-            return;
-        }
-        
-        if (useItemPermissionsOnly) {
-            if (!hasPermissions) {
-                throw new CommandException("That item is not allowed.");
-            }
-        }
-        
-        if (allowedItems.size() > 0) {
-            if (!allowedItems.contains(id)) {
-                throw new CommandException("That item is not allowed.");
-            }
-        }
-        
-        if (disallowedItems.contains((id))) {
-            throw new CommandException("That item is disallowed.");
-        }
-    }
     
     /**
      * Attempts to match a creature type.
@@ -535,204 +444,7 @@ public final class CommandBook extends JavaPlugin {
             return "*Console*";
         }
     }
-    
-    /**
-     * Gets the name of an item.
-     * 
-     * @param id
-     * @return
-     */
-    public String toItemName(int id) {
-        ItemType type = ItemType.fromID(id);
-        
-        if (type != null) {
-            return type.getName();
-        } else {
-            return "#" + id;
-        }
-    }
-    
-    /**
-     * Returns a matched item.
-     * 
-     * @param name
-     * @return item
-     */
-    public ItemStack getItem(String name) {
 
-        int id = 0;
-        int dmg = 0;
-        String dataName = null;
-
-        if (name.contains(":")) {
-            String[] parts = name.split(":");
-            dataName = parts[1];
-            name = parts[0];
-        }
-        
-        try {
-            id = Integer.parseInt(name);
-        } catch (NumberFormatException e) {
-            // First check the configurable list of aliases
-            Integer idTemp = itemNames.get(name.toLowerCase());
-            
-            if (idTemp != null) {
-                id = (int) idTemp;
-            } else {
-                // Then check WorldEdit
-                ItemType type = ItemType.lookup(name);
-                
-                if (type == null) {
-                    return null;
-                }
-                
-                id = type.getID();
-            }
-        }
-        
-        // If the user specified an item data or damage value, let's try
-        // to parse it!
-        if (dataName != null) {            
-            try {
-                dmg = matchItemData(id, dataName);
-            } catch (CommandException e) {
-                return null;
-            }
-        }
-        return new ItemStack(id, 1, (short)dmg);
-    }
-    
-    /**
-     * Matches an item and gets the appropriate item stack.
-     * 
-     * @param source 
-     * @param name
-     * @return iterator for players
-     * @throws CommandException 
-     */
-    public ItemStack matchItem(CommandSender source, String name)
-            throws CommandException {
-
-        int id = 0;
-        int dmg = 0;
-        String dataName = null;
-
-        if (name.contains(":")) {
-            String[] parts = name.split(":");
-            dataName = parts[1];
-            name = parts[0];
-        }
-        
-        try {
-            id = Integer.parseInt(name);
-        } catch (NumberFormatException e) {
-            // First check the configurable list of aliases
-            Integer idTemp = itemNames.get(name.toLowerCase());
-            
-            if (idTemp != null) {
-                id = (int) idTemp;
-            } else {
-                // Then check WorldEdit
-                ItemType type = ItemType.lookup(name);
-                
-                if (type == null) {
-                    throw new CommandException("No item type known by '" + name + "'");
-                }
-                
-                id = type.getID();
-            }
-        }
-        
-        // If the user specified an item data or damage value, let's try
-        // to parse it!
-        if (dataName != null) {            
-            dmg = matchItemData(id, dataName);
-        }
-        return new ItemStack(id, 1, (short)dmg);
-    }
-    
-    /**
-     * Attempt to match item data values.
-     * 
-     * @param id
-     * @param filter
-     * @return
-     * @throws CommandException 
-     */
-    public int matchItemData(int id, String filter) throws CommandException {
-        try {
-            // First let's try the filter as if it was a number
-            return Integer.parseInt(filter);
-        } catch (NumberFormatException e) {
-        }
-
-        // So the value isn't a number, but it may be an alias!
-        switch (id) {
-            case BlockID.WOOD:
-                if (filter.equalsIgnoreCase("redwood")) {
-                    return 1;
-                } else if (filter.equalsIgnoreCase("birch")) {
-                    return 2;
-                }
-                
-                throw new CommandException("Unknown wood type name of '" + filter + "'.");
-            case BlockID.STEP:
-            case BlockID.DOUBLE_STEP:
-                BlockType dataType = BlockType.lookup(filter);
-                
-                if (dataType != null) {
-                    if (dataType == BlockType.STONE) {
-                        return 0;
-                    } else if (dataType == BlockType.SANDSTONE) {
-                        return 1;
-                    } else if (dataType == BlockType.WOOD) {
-                        return 2;
-                    } else if (dataType == BlockType.COBBLESTONE) {
-                        return 3;
-                    } else {
-                        throw new CommandException("Invalid slab material of '" + filter + "'.");
-                    }
-                } else {
-                    throw new CommandException("Unknown slab material of '" + filter + "'.");
-                }
-            case BlockID.CLOTH:
-                ClothColor col = ClothColor.lookup(filter);
-                if (col != null) {
-                    return col.getID();
-                }
-                
-                throw new CommandException("Unknown wool color name of '" + filter + "'.");
-            case 351: // Dye
-                ClothColor dyeCol = ClothColor.lookup(filter);
-                if (dyeCol != null) {
-                    return 15 - dyeCol.getID();
-                }
-                
-                throw new CommandException("Unknown dye color name of '" + filter + "'.");
-            default: 
-                throw new CommandException("Invalid data value of '" + filter + "'.");
-        }
-    }
-    
-    /**
-     * Attempt to match a dye color for sheep wool.
-     *
-     * @param filter
-     * @return
-     * @throws CommandException
-     */
-    public DyeColor matchDyeColor(String filter) throws CommandException {
-        if (filter.equalsIgnoreCase("random")) {
-            return DyeColor.getByData((byte) new Random().nextInt(15));
-        }
-        try {
-            DyeColor match = DyeColor.valueOf(filter.toUpperCase());
-            if (match != null) {
-                return match;
-            }
-        } catch (IllegalArgumentException e) {}
-        throw new CommandException("Unknown dye color name of '" + filter + "'.");
-    }
     /**
      * Get preprogrammed messages.
      * 

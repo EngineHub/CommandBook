@@ -55,75 +55,6 @@ public class GeneralCommands {
     public static void cmdBook() {
     }
     
-    @Command(aliases = {"item"},
-            usage = "[target] <item[:data]> [amount]", desc = "Give an item",
-            flags = "do", min = 1, max = 3)
-    @CommandPermissions({"commandbook.give"})
-    public void item(CommandContext args, CommandSender sender) throws CommandException {
-        ItemStack item = null;
-        int amt = plugin.defaultItemStackSize;
-        Iterable<Player> targets = null;
-
-        // How this command handles parameters depends on how many there
-        // are, so the following code splits the incoming input
-        // into three different possibilities
-        
-        // One argument: Just the item type and amount 1
-        if (args.argsLength() == 1) {
-            item = plugin.matchItem(sender, args.getString(0));
-            targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
-        // Two arguments: Item type and amount
-        } else if (args.argsLength() == 2) {
-            item = plugin.matchItem(sender, args.getString(0));
-            amt = args.getInteger(1);
-            targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
-        // Three arguments: Player, item type, and item amount
-        } else if (args.argsLength() == 3) {
-            item = plugin.matchItem(sender, args.getString(1));
-            amt = args.getInteger(2);
-            targets = PlayerUtil.matchPlayers(sender, args.getString(0));
-            
-            // Make sure that this player has permission to give items to other
-            /// players!
-            plugin.checkPermission(sender, "commandbook.give.other");
-        }
-
-        if (item == null) {
-            throw new CommandException("Something went wrong parsing the item info!");
-        }
-        giveItem(sender, item, amt, targets, plugin, args.hasFlag('d'), args.hasFlag('o'));
-    }
-    
-    @Command(aliases = {"give"},
-            usage = "[-d] <target> <item[:data]> [amount]", desc = "Give an item",
-            flags = "do", min = 2, max = 3)
-    @CommandPermissions({"commandbook.give.other"})
-    public void give(CommandContext args, CommandSender sender) throws CommandException {
-        ItemStack item = null;
-        int amt = plugin.defaultItemStackSize;
-        Iterable<Player> targets = null;
-
-        // How this command handles parameters depends on how many there
-        // are, so the following code splits the incoming input
-        // into three different possibilities
-
-        // Two arguments: Player, item type
-        if (args.argsLength() == 2) {
-            targets = PlayerUtil.matchPlayers(sender, args.getString(0));
-            item = plugin.matchItem(sender, args.getString(1));
-        // Three arguments: Player, item type, and item amount
-        } else if (args.argsLength() == 3) {
-            targets = PlayerUtil.matchPlayers(sender, args.getString(0));
-            item = plugin.matchItem(sender, args.getString(1));
-            amt = args.getInteger(2);
-        }
-
-        if (item == null) {
-            throw new CommandException("Something went wrong parsing the item info!");
-        }
-        giveItem(sender, item, amt, targets, plugin, args.hasFlag('d'), args.hasFlag('o'));
-    }
-    
     @Command(aliases = {"who"},
             usage = "[filter]", desc = "Get the list of online users",
             min = 0, max = 1)
@@ -321,72 +252,7 @@ public class GeneralCommands {
         }
     }
     
-    @Command(aliases = {"clear"},
-            usage = "[target]", desc = "Clear your inventory",
-            flags = "as", min = 0, max = 1)
-    @CommandPermissions({"commandbook.clear"})
-    public void clear(CommandContext args, CommandSender sender) throws CommandException {
-        
-        Iterable<Player> targets = null;
-        boolean clearAll = args.hasFlag('a');
-        boolean clearSingle = args.hasFlag('s');
-        boolean included = false;
-        
-        if (args.argsLength() == 0) {
-            targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
-        // A different player
-        } else {
-            targets = PlayerUtil.matchPlayers(sender, args.getString(0));
-            
-            // Make sure that this player can clear other players!
-            plugin.checkPermission(sender, "commandbook.clear.other");
-        }
-        
-        for (Player player : targets) {
-            Inventory inventory = player.getInventory();
-            
-            if (clearSingle) {
-                player.setItemInHand(null);
-            } else {
-                for (int i = (clearAll ? 0 : 9); i < 36; i++) {
-                    inventory.setItem(i, null);
-                }
-                
-                if (clearAll) {
-                    // Armor slots
-                    for (int i = 36; i <= 39; i++) {
-                        inventory.setItem(i, null);
-                    }
-                }
-            }
-        
-            // Tell the user about the given item
-            if (player.equals(sender)) {
-                if (clearAll) {
-                    player.sendMessage(ChatColor.YELLOW
-                            + "Your inventory has been cleared.");
-                } else {
-                    player.sendMessage(ChatColor.YELLOW
-                            + "Your inventory has been cleared. Use -a to clear ALL.");
-                }
-                
-                // Keep track of this
-                included = true;
-            } else {
-                player.sendMessage(ChatColor.YELLOW
-                        + "Your inventory has been cleared by "
-                        + PlayerUtil.toName(sender));
-                
-            }
-        }
-        
-        // The player didn't receive any items, then we need to send the
-        // user a message so s/he know that something is indeed working
-        if (!included) {
-            sender.sendMessage(ChatColor.YELLOW
-                    + "Inventories cleared.");
-        }
-    }
+
     
     @Command(aliases = {"ping"},
             usage = "", desc = "A dummy command",
@@ -402,68 +268,6 @@ public class GeneralCommands {
         
         sender.sendMessage(ChatColor.YELLOW +
                 "I hear " + PlayerUtil.toName(sender) + " likes cute Asian boys.");
-    }
-    
-    @Command(aliases = {"more"},
-            usage = "[player]", desc = "Gets more of an item",
-            flags = "aio", min = 0, max = 1)
-    @CommandPermissions({"commandbook.more"})
-    public void more(CommandContext args, CommandSender sender) throws CommandException {
-
-        Iterable<Player> targets = null;
-        boolean moreAll = args.hasFlag('a');
-        boolean infinite = args.hasFlag('i');
-        boolean overrideStackSize = args.hasFlag('o');
-        if (infinite) {
-            plugin.checkPermission(sender, "commandbook.more.infinite");
-        } else if (overrideStackSize) {
-            plugin.checkPermission(sender, "commandbook.override.maxstacksize");
-        }
-
-        boolean included = false;
-        
-        if (args.argsLength() == 0) {
-            targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
-        // A different player
-        } else {
-            targets = PlayerUtil.matchPlayers(sender, args.getString(0));
-            
-            // Make sure that this player can 'more' other players!
-            plugin.checkPermission(sender, "commandbook.more.other");
-        }
-        
-        for (Player player : targets) {
-            Inventory inventory = player.getInventory();
-            
-            if (moreAll) {
-                for (int i = 0; i < 39; i++) {
-                    expandStack(inventory.getItem(i), infinite, overrideStackSize);
-                }
-            } else {
-                expandStack(player.getItemInHand(), infinite, overrideStackSize);
-            }
-        
-            // Tell the user about the given item
-            if (player.equals(sender)) {
-                player.sendMessage(ChatColor.YELLOW
-                        + "Your item(s) has been expanded in stack size.");
-                
-                // Keep track of this
-                included = true;
-            } else {
-                player.sendMessage(ChatColor.YELLOW
-                        + "Your item(s) has been expanded in stack size by "
-                        + PlayerUtil.toName(sender));
-                
-            }
-        }
-        
-        // The player didn't receive any items, then we need to send the
-        // user a message so s/he know that something is indeed working
-        if (!included) {
-            sender.sendMessage(ChatColor.YELLOW
-                    + "Stack sizes increased.");
-        }
     }
 
     @Command(aliases = {"gamemode"},

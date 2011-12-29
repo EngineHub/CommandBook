@@ -22,10 +22,7 @@ import com.sk89q.util.yaml.YAMLNode;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author zml2008
@@ -39,7 +36,7 @@ public class ConfigUtil {
         return ret;
     }
 
-    public static <S, T, U> U smartCast(Type genericType, Object value) {
+    public static <U> U smartCast(Type genericType, Object value) {
         if (value == null) {
             return null;
         }
@@ -78,28 +75,27 @@ public class ConfigUtil {
                 }
             }
         } else if (neededGenerics.length == 1) {
-            if (target.equals(List.class)
-                    && neededGenerics[0] instanceof Class
-                    && value instanceof List) {
-                Class<T> listType = ((Class)neededGenerics[0]);
-                List<T> values = new ArrayList<T>();
+            if (target.equals(List.class) && value instanceof List) {
+                List<Object> values = new ArrayList<Object>();
                 List raw = (List) value;
                 for (Object obj : raw) {
-                    values.add((T)smartCast(listType, obj));
+                    values.add(smartCast(neededGenerics[0], obj));
+                }
+                ret = values;
+            } else if (target.equals(Set.class) && value instanceof Set) {
+                Set<Object> values = new HashSet<Object>();
+                Set raw = (Set) value;
+                for (Object obj : raw) {
+                    values.add(smartCast(neededGenerics[0], obj));
                 }
                 ret = values;
             }
         } else if (neededGenerics.length == 2) {
-            if (target.equals(Map.class)
-                    && neededGenerics[0] instanceof Class
-                    && neededGenerics[1] instanceof Class
-                    && value instanceof Map) {
-                Class<S> keyType = ((Class)neededGenerics[0]);
-                Class<T> valueType = ((Class)neededGenerics[1]);
+            if (target.equals(Map.class) && value instanceof Map) {
                 Map<Object, Object> raw = (Map<Object, Object>) value;
-                Map<S, T> values = new HashMap<S, T>();
+                Map<Object, Object> values = new HashMap<Object, Object>();
                 for (Map.Entry<Object, Object> entry : raw.entrySet()) {
-                    values.put((S)smartCast(keyType, entry.getKey()), (T)smartCast(valueType, entry.getValue()));
+                    values.put(smartCast(neededGenerics[0], entry.getKey()), smartCast(neededGenerics[1], entry.getValue()));
                 }
                 ret = values;
             }
