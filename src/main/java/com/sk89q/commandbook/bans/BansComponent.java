@@ -34,7 +34,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
 
 /**
- * @author zml2008
+ * Provides a kick and ban system.
  */
 public class BansComponent extends AbstractComponent implements Listener {
     private BanDatabase bans;

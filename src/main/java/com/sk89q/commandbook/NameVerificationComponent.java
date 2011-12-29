@@ -18,7 +18,6 @@
 
 package com.sk89q.commandbook;
 
-import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.components.AbstractComponent;
 import com.sk89q.commandbook.events.core.BukkitEvent;
 import org.bukkit.event.Event;
@@ -28,7 +27,7 @@ import org.bukkit.event.player.PlayerLoginEvent;
 import java.util.regex.Pattern;
 
 /**
- * @author zml2008
+ * NameVerificationComponent verifies that player names are valid when they join.
  */
 public class NameVerificationComponent extends AbstractComponent implements Listener {
     protected final static Pattern namePattern = Pattern.compile(

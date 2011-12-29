@@ -21,11 +21,6 @@ package com.sk89q.commandbook;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -189,7 +184,7 @@ public class CommandBookUtil {
      */
     @SuppressWarnings("deprecation")
     public static void giveItem(CommandSender sender, ItemStack item, int amt,
-            Iterable<Player> targets, ItemsComponent component, boolean drop, boolean overrideStackSize)
+            Iterable<Player> targets, InventoryComponent component, boolean drop, boolean overrideStackSize)
             throws CommandException {
         
         boolean included = false; // Is the command sender also receiving items?

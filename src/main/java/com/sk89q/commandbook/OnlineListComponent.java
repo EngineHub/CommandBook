@@ -41,7 +41,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author zml2008
+ * Lists online players both on command and on player join.
  */
 public class OnlineListComponent extends AbstractComponent implements Listener {
 
@@ -61,9 +61,10 @@ public class OnlineListComponent extends AbstractComponent implements Listener {
 
     @SettingBase("online-list")
     private static class LocalConfiguration extends ConfigurationBase {
-        @Setting("show-max-players") public boolean playersListMaxPlayers;
+        @Setting("show-max-players") public boolean playersListMaxPlayers = true;
         @Setting("grouped-manes") public boolean playersListGroupedNames;
         @Setting("colored-names") public boolean playersListColoredNames;
+        @Setting("list-on-join") public boolean listOnJoin = true;
     }
 
     /**
@@ -160,6 +161,7 @@ public class OnlineListComponent extends AbstractComponent implements Listener {
 
     @BukkitEvent(type = Event.Type.PLAYER_JOIN, priority = Event.Priority.High)
     public void onPlayerJoin(PlayerJoinEvent event) {
+        if (!config.listOnJoin) return;
         Player player = event.getPlayer();
         CommandBook.inst().getEventManager().callEvent(
                 new OnlineListSendEvent(player));
@@ -169,7 +171,7 @@ public class OnlineListComponent extends AbstractComponent implements Listener {
     }
 
     public class Commands {
-        @Command(aliases = {"who"},
+        @Command(aliases = {"who", "list", "playerlist", "online", "players"},
                 usage = "[filter]", desc = "Get the list of online users",
                 min = 0, max = 1)
         @CommandPermissions({"commandbook.who"})

@@ -75,16 +75,16 @@ public class ConfigUtil {
                 ret = getNumber(target, (Number)value);
             }
         } else if (neededGenerics.length == 1) {
-            if (target.equals(List.class) && value instanceof List) {
+            if (target.equals(List.class) && value instanceof Collection) {
                 List<Object> values = new ArrayList<Object>();
-                List raw = (List) value;
+                Collection raw = (Collection) value;
                 for (Object obj : raw) {
                     values.add(smartCast(neededGenerics[0], obj));
                 }
                 ret = values;
-            } else if (target.equals(Set.class) && value instanceof Set) {
+            } else if (target.equals(Set.class) && value instanceof Collection) {
                 Set<Object> values = new HashSet<Object>();
-                Set raw = (Set) value;
+                Collection raw = (Collection) value;
                 for (Object obj : raw) {
                     values.add(smartCast(neededGenerics[0], obj));
                 }
@@ -145,5 +145,12 @@ public class ConfigUtil {
             }
         }
         return null;
+    }
+    
+    public static Object prepareSerialization(Object obj) {
+        if (obj instanceof Collection) {
+            obj = new ArrayList((Collection)obj);
+        }
+        return obj;
     }
 }

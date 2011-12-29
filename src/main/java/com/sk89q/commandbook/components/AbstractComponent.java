@@ -18,20 +18,19 @@
 
 package com.sk89q.commandbook.components;
 
+import com.sk89q.bukkit.util.CommandsManagerRegistration;
 import com.sk89q.commandbook.CommandBook;
-import com.sk89q.commandbook.commands.CommandBookComponentCommand;
 import com.sk89q.commandbook.config.ConfigurationBase;
 import com.sk89q.commandbook.config.Setting;
 import com.sk89q.commandbook.config.SettingBase;
-import com.sk89q.commandbook.util.ReflectionUtil;
 import com.sk89q.minecraft.util.commands.*;
 import com.sk89q.util.yaml.YAMLNode;
 import org.bukkit.ChatColor;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.SimpleCommandMap;
 
 import java.lang.reflect.Field;
-import java.util.*;
 import java.util.logging.Level;
 
 import static com.sk89q.commandbook.config.ConfigUtil.*;
@@ -39,12 +38,17 @@ import static com.sk89q.commandbook.config.ConfigUtil.*;
 /**
  * @author zml2008
  */
-public abstract class AbstractComponent {
+public abstract class AbstractComponent implements CommandExecutor {
 
     /**
      * The {@link CommandsManager} where all commands are registered for this component.
      */
     private CommandsManager<CommandSender> commands;
+
+    /**
+     * The {@link CommandsManagerRegistration} used to handle dynamic registration of commands contained within this component
+     */
+    private CommandsManagerRegistration commandRegistration;
 
     /**
      * The raw configuration for this component. This is usually accessed through
@@ -60,6 +64,7 @@ public abstract class AbstractComponent {
         this.commands = commands;
         this.rawConfiguration = rawConfiguration;
         this.loader = loader;
+        commandRegistration = new CommandsManagerRegistration(CommandBook.inst(), this, commands);
     }
 
     /**
@@ -80,14 +85,13 @@ public abstract class AbstractComponent {
         for (Field field : config.getClass().getFields()) {
             if (!field.isAnnotationPresent(Setting.class)) continue;
             String key = field.getAnnotation(Setting.class).value();
-            System.out.println(field.getGenericType());
             final Object value = smartCast(field.getGenericType(), node.getProperty(key));
                 try {
                     field.setAccessible(true);
                     if (value != null && field.getType().isAssignableFrom(value.getClass())) {
                             field.set(config, value);
                     } else {
-                        node.setProperty(key, field.get(config));
+                        node.setProperty(key, prepareSerialization(field.get(config)));
                     }
                 } catch (IllegalAccessException e) {
                     CommandBook.logger().log(Level.SEVERE, "Error setting configuration value of field: ", e);
@@ -107,7 +111,7 @@ public abstract class AbstractComponent {
             if (!field.isAnnotationPresent(Setting.class)) continue;
             String key = field.getAnnotation(Setting.class).value();
             try {
-                node.setProperty(key, field.get(config));
+                node.setProperty(key, prepareSerialization(field.get(config)));
             } catch (IllegalAccessException e) {
                 CommandBook.logger().log(Level.SEVERE, "Error getting configuration value of field: ", e);
                 e.printStackTrace();
@@ -117,45 +121,14 @@ public abstract class AbstractComponent {
     }
 
     public void registerCommands(Class<?> clazz)  {
-        List<Command> registered = commands.registerAndReturn(clazz);
-        SimpleCommandMap commandMap = ReflectionUtil.getField(CommandBook.server().getPluginManager(), "commandMap");
-        if (registered == null || commandMap == null) {
-            System.out.println("Commandmap or registered null when registering commands for " + this);
-            return;
-        }
-        if (registered.size() == 0) {
-            System.err.println();
-        }
-        for (Command command : registered) {
-            System.out.println("Registering command " + command + " for " + this);
-            commandMap.register(CommandBook.inst().getDescription().getName() + getClass().getSimpleName(), new CommandBookComponentCommand(command, this));
-        }
+        commandRegistration.register(clazz);
     }
 
     public void unregisterCommands() {
-        SimpleCommandMap commandMap = ReflectionUtil.getField(CommandBook.server().getPluginManager(), "commandMap");
-        List<String> toRemove = new ArrayList<String>();
-        Map<String, org.bukkit.command.Command> knownCommands = ReflectionUtil.getField(commandMap, "knownCommands");
-        Set<String> aliases = ReflectionUtil.getField(commandMap, "aliases");
-        for (Iterator<org.bukkit.command.Command> i = knownCommands.values().iterator(); i.hasNext();) {
-            org.bukkit.command.Command cmd = i.next();
-            if (cmd instanceof CommandBookComponentCommand && ((CommandBookComponentCommand) cmd).getComponent().equals(this)) {
-                i.remove();
-                for (String alias : cmd.getAliases()) {
-                    org.bukkit.command.Command aliasCmd = knownCommands.get(alias);
-                    if (cmd.equals(aliasCmd)) {
-                        aliases.remove(alias);
-                        toRemove.add(alias);
-                    }
-                }
-            }
-        }
-        for (String string : toRemove) {
-            knownCommands.remove(string);
-        }
+        commandRegistration.unregisterCommands();
     }
     
-    public boolean handleCommand(CommandSender sender, String alias, String[] args) {
+    public boolean onCommand(CommandSender sender, Command command, String alias, String[] args) {
         try {
             commands.execute(alias, args, sender, sender);
             return true;

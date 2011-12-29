@@ -19,7 +19,7 @@
 package com.sk89q.commandbook;
 
 /**
- * @author zml2008
+ * RuntimeException that is a parent class for all CommandBook runtime exceptions
  */
 public class CommandBookRuntimeException extends RuntimeException {
     private static final long serialVersionUID = -6408892128500052917L;

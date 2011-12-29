@@ -53,30 +53,10 @@ public class TeleportComponent extends AbstractComponent implements Listener {
     
     @InjectComponent private SessionComponent sessions;
 
-    private WrappedSpawnManager spawns;
-
-    private LocalConfiguration config;
-
     @Override
     public void initialize() {
-        spawns = new WrappedSpawnManager(new File(CommandBook.inst().getDataFolder(), "spawns.yml"));
-        config = configure(new LocalConfiguration());
         CommandBook.inst().getEventManager().registerEvents(this, this);
         registerCommands(Commands.class);
-    }
-
-    @Override
-    public void reload() {
-        spawns.load();
-        config = configure(new LocalConfiguration());
-    }
-
-    public WrappedSpawnManager getSpawnManager() {
-        return spawns;
-    }
-
-    private static class LocalConfiguration extends ConfigurationBase {
-        @Setting("exact-spawn") public boolean exactSpawn;
     }
 
     // -- Event handlers
@@ -84,10 +64,6 @@ public class TeleportComponent extends AbstractComponent implements Listener {
     @BukkitEvent(type = Event.Type.PLAYER_RESPAWN)
     public void onRespawn(PlayerRespawnEvent event) {
         sessions.getSession(event.getPlayer()).rememberLocation(event.getPlayer());
-        Player player = event.getPlayer();
-        if (config.exactSpawn && !event.isBedSpawn()) {
-            event.setRespawnLocation(spawns.getWorldSpawn(player.getWorld()));
-        }
     }
     
     @BukkitEvent(type = Event.Type.PLAYER_TELEPORT)
@@ -103,87 +79,11 @@ public class TeleportComponent extends AbstractComponent implements Listener {
             return;
         }
         sessions.getSession(event.getPlayer()).rememberLocation(event.getPlayer());
-        if (loc.equals(loc.getWorld().getSpawnLocation())) {
-            event.setTo(spawns.getWorldSpawn(loc.getWorld()));
-        }
     }
-    
-    @BukkitEvent(type = Event.Type.PLAYER_JOIN)
-    public void onJoin(PlayerJoinEvent event) {
-        if (!event.getPlayer().hasPlayedBefore() && config.exactSpawn) {
-            event.getPlayer().teleport(spawns.getWorldSpawn(event.getPlayer().getWorld()));
-        }
-    }
-    
+
     public class Commands {
-        @Command(aliases = {"spawn"}, usage = "[player]", desc = "Teleport to spawn", min = 0, max = 1)
-        @CommandPermissions({"commandbook.spawn"})
-        public void spawn(CommandContext args, CommandSender sender) throws CommandException {
-            Iterable<Player> targets = null;
 
-            // Detect arguments based on the number of arguments provided
-            if (args.argsLength() == 1) {
-                targets = PlayerUtil.matchPlayers(sender, args.getString(0));
-
-                // Check permissions!
-                CommandBook.inst().checkPermission(sender, "commandbook.spawn.other");
-            } else {
-                targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
-            }
-
-            (new PlayerIteratorAction(sender) {
-
-                @Override
-                public void perform(Player player) {
-                    player.teleport(getSpawnManager().getWorldSpawn(player.getWorld()));
-                }
-
-                @Override
-                public void onCaller(Player player) {
-                    player.sendMessage(ChatColor.YELLOW + "Teleported to spawn.");
-                }
-
-                @Override
-                public void onVictim(CommandSender sender, Player player) {
-                    player.sendMessage(ChatColor.YELLOW + "Teleported to spawn by "
-                            + PlayerUtil.toName(sender) + ".");
-                }
-
-                @Override
-                public void onInformMany(CommandSender sender, int affected) {
-                    sender.sendMessage(ChatColor.YELLOW.toString()
-                            + affected + " teleported to spawn.");
-                }
-
-            }).iterate(targets);
-        }
-
-
-        @Command(aliases = {"setspawn"},
-                usage = "[location]", desc = "Change spawn location",
-                flags = "", min = 0, max = 1)
-        @CommandPermissions({"commandbook.setspawn"})
-        public void setspawn(CommandContext args, CommandSender sender) throws CommandException {
-
-            World world;
-            Location loc;
-
-            if (args.argsLength() == 0) {
-                Player player = PlayerUtil.checkPlayer(sender);
-                world = player.getWorld();
-                loc = player.getLocation();
-            } else {
-                loc = LocationUtil.matchLocation(sender, args.getString(0));
-                world = loc.getWorld();
-            }
-
-            getSpawnManager().setWorldSpawn(loc);
-
-            sender.sendMessage(ChatColor.YELLOW +
-                    "Spawn location of '" + world.getName() + "' set!");
-        }
-
-        @Command(aliases = {"teleport"}, usage = "[target] <destination>",
+        @Command(aliases = {"teleport", "tp"}, usage = "[target] <destination>",
                 desc = "Teleport to a location", min = 1, max = 2)
         @CommandPermissions({"commandbook.teleport"})
         public void teleport(CommandContext args, CommandSender sender) throws CommandException {
@@ -228,7 +128,7 @@ public class TeleportComponent extends AbstractComponent implements Listener {
                     + " requests a teleport! Use /bring <name> to accept.");
         }
 
-        @Command(aliases = {"bring"}, usage = "<target>", desc = "Bring a player to you", min = 1, max = 1)
+        @Command(aliases = {"bring", "tphere", "summon", "s"}, usage = "<target>", desc = "Bring a player to you", min = 1, max = 1)
         public void bring(CommandContext args, CommandSender sender) throws CommandException {
             Player player = PlayerUtil.checkPlayer(sender);
             if (!CommandBook.inst().hasPermission(sender, "commandbook.teleport.other")) {
@@ -267,7 +167,7 @@ public class TeleportComponent extends AbstractComponent implements Listener {
             }).iterate(targets);
         }
 
-        @Command(aliases = {"put"}, usage = "<target>",
+        @Command(aliases = {"put", "place"}, usage = "<target>",
                 desc = "Put a player at where you are looking", min = 1, max = 1)
         @CommandPermissions({"commandbook.teleport.other"})
         public void put(CommandContext args, CommandSender sender) throws CommandException {
@@ -288,7 +188,7 @@ public class TeleportComponent extends AbstractComponent implements Listener {
             }).iterate(targets);
         }
 
-        @Command(aliases = {"return"}, usage = "", desc = "Teleport back to your last location", min = 0, max = 0)
+        @Command(aliases = {"return", "ret"}, usage = "", desc = "Teleport back to your last location", min = 0, max = 0)
         @CommandPermissions({"commandbook.return"})
         public void ret(CommandContext args, CommandSender sender) throws CommandException {
             Player player = PlayerUtil.checkPlayer(sender);

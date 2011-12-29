@@ -26,7 +26,8 @@ import org.bukkit.command.CommandSender;
 import java.util.List;
 
 /**
- * @author zml2008
+ * Commands that wist to display a paginated list of results can use this class to do
+ * the actual pagination, giving a list of items, a page number, and basic formatting information.
  */
 public abstract class PaginatedResult<T> {
     private final String header;

@@ -44,7 +44,6 @@ public class ComponentManager {
     }
 
     public synchronized boolean loadComponents() {
-        Collection<AbstractComponent> components = new ArrayList<AbstractComponent>();
         for (ComponentLoader loader : loaders) {
             for (AbstractComponent component : loader.loadComponents()) {
                 // Create a CommandsManager instance
@@ -84,7 +83,7 @@ public class ComponentManager {
             }
             component.initialize();
             component.setEnabled(true);
-            CommandBook.logger().log(Level.INFO, "CommandBook: Component " +
+            CommandBook.logger().log(Level.FINEST, "CommandBook: Component " +
                     component.getClass().getSimpleName() + " successfully enabled!");
         }
 

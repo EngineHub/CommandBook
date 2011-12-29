@@ -41,7 +41,7 @@ import org.bukkit.event.player.PlayerChatEvent;
 import static com.sk89q.commandbook.CommandBookUtil.replaceColorMacros;
 
 /**
- * @author zml2008
+ * This component handles events and commands relating to player communication.
  */
 public class MessagingComponent extends AbstractComponent implements Listener {
 
@@ -128,7 +128,7 @@ public class MessagingComponent extends AbstractComponent implements Listener {
             }
         }
 
-        @Command(aliases = {"msg"}, usage = "<target> <message...>", desc = "Private message a user", min = 2, max = -1)
+        @Command(aliases = {"msg", "message", "whisper", "pm", "tell"}, usage = "<target> <message...>", desc = "Private message a user", min = 2, max = -1)
         @CommandPermissions({"commandbook.msg"})
         public void msg(CommandContext args, CommandSender sender) throws CommandException {
             // This will throw errors as needed
@@ -162,7 +162,7 @@ public class MessagingComponent extends AbstractComponent implements Listener {
             sessions.getSession(receiver).setNewLastRecipient(sender);
         }
 
-        @Command(aliases = {"reply"}, usage = "<message...>", desc = "Reply to last user", min = 1, max = -1)
+        @Command(aliases = {"reply", "r"}, usage = "<message...>", desc = "Reply to last user", min = 1, max = -1)
         @CommandPermissions({"commandbook.msg"})
         public void reply(CommandContext args, CommandSender sender) throws CommandException {
             String message = args.getJoinedStrings(0);
@@ -202,7 +202,7 @@ public class MessagingComponent extends AbstractComponent implements Listener {
             sessions.getSession(receiver).setNewLastRecipient(sender);
         }
 
-        @Command(aliases = {"afk"},
+        @Command(aliases = {"afk", "away"},
                 usage = "", desc = "Set yourself as away",
                 flags = "", min = 0, max = -1)
         @CommandPermissions({"commandbook.away"})

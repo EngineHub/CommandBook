@@ -26,14 +26,14 @@ import java.util.*;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 
+import com.sk89q.bukkit.util.CommandRegistration;
+import com.sk89q.bukkit.util.CommandsManagerRegistration;
 import com.sk89q.commandbook.components.*;
+import com.sk89q.commandbook.events.ComponentManagerInitEvent;
 import com.sk89q.commandbook.events.core.EventManager;
 import com.sk89q.commandbook.session.SessionComponent;
-import com.sk89q.commandbook.util.CommandRegistration;
 import com.sk89q.util.yaml.YAMLFormat;
 import com.sk89q.util.yaml.YAMLProcessor;
 import com.sk89q.wepif.PermissionsResolverManager;
@@ -41,31 +41,15 @@ import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.entity.CreatureType;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
-import org.bukkit.event.Listener;
-import org.bukkit.event.Event.Priority;
-import org.bukkit.event.player.PlayerListener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.config.Configuration;
 import com.sk89q.commandbook.commands.*;
-import com.sk89q.commandbook.locations.FlatFileLocationsManager;
-import com.sk89q.commandbook.locations.LocationManager;
-import com.sk89q.commandbook.locations.LocationManagerFactory;
-import com.sk89q.commandbook.locations.RootLocationManager;
-import com.sk89q.commandbook.locations.NamedLocation;
 import com.sk89q.minecraft.util.commands.*;
-import com.sk89q.worldedit.blocks.BlockID;
-import com.sk89q.worldedit.blocks.BlockType;
-import com.sk89q.worldedit.blocks.ClothColor;
 import com.sk89q.worldedit.blocks.ItemType;
-import static com.sk89q.commandbook.CommandBookUtil.*;
-import com.sk89q.commandbook.locations.WrappedSpawnManager;
 
 import static com.sk89q.commandbook.util.ItemUtil.matchItemData;
-import static com.sk89q.commandbook.util.PlayerUtil.*;
 
 /**
  * Base plugin class for CommandBook.
@@ -133,24 +117,6 @@ public final class CommandBook extends JavaPlugin {
             }
         };
 
-
-        commands.setInjector(new Injector() {
-            public Object getInstance(Class<?> cls) throws InvocationTargetException,
-                    IllegalAccessException, InstantiationException {
-                Constructor<?> constr;
-                try {
-                    constr = cls.getConstructor(CommandBook.class);
-                } catch (SecurityException e) {
-                    e.printStackTrace();
-                    return null;
-                } catch (NoSuchMethodException e) {
-                    e.printStackTrace();
-                    return null;
-                }
-                return constr.newInstance(plugin);
-            }
-        });
-
         // Prepare permissions
         PermissionsResolverManager.initialize(this);
         
@@ -163,15 +129,15 @@ public final class CommandBook extends JavaPlugin {
         // -- Annotation handlers
         componentManager.registerAnnotationHandler(InjectComponent.class, new InjectComponentAnnotationHandler());
 
+        getEventManager().callEvent(new ComponentManagerInitEvent(componentManager));
+
         // Load configuration
         populateConfiguration();
 
         componentManager.loadComponents();
         
-		final CommandRegistration cmdRegister = new CommandRegistration(this, commands);
+		final CommandsManagerRegistration cmdRegister = new CommandsManagerRegistration(this, commands);
         cmdRegister.register(GeneralCommands.class);
-		cmdRegister.register(FunCommands.class);
-        cmdRegister.register(WorldCommands.class);
 
         componentManager.enableComponents();
 
@@ -242,7 +208,6 @@ public final class CommandBook extends JavaPlugin {
                     "Some features have been disabled to be compatible with " +
                     "poorly written server wrappers.");
         }
-        config.save();
     }
 
     /**
@@ -280,7 +245,7 @@ public final class CommandBook extends JavaPlugin {
      * 
      * @param name
      */
-    protected void createDefaultConfiguration(String name) {
+    public void createDefaultConfiguration(String name) {
         File actual = new File(getDataFolder(), name);
         if (!actual.exists()) {
 
@@ -421,32 +386,6 @@ public final class CommandBook extends JavaPlugin {
             }
         }
         return new ItemStack(id, 1, (short)dmg);
-    }
-    
-    /**
-     * Attempts to match a creature type.
-     * 
-     * @param sender
-     * @param filter
-     * @return
-     * @throws CommandException
-     */
-    public CreatureType matchCreatureType(CommandSender sender,
-            String filter) throws CommandException {
-        CreatureType type = CreatureType.fromName(filter);
-        if (type != null) {
-            return type;
-        }
-        
-        for (CreatureType testType : CreatureType.values()) {
-            if (testType.getName().toLowerCase().startsWith(filter.toLowerCase())) {
-                return testType;
-            }
-        }
-
-        throw new CommandException("Unknown mob specified! You can "
-                + "choose from the list of: "
-                + CommandBookUtil.getCreatureTypeNameList());
     }
     
     /**

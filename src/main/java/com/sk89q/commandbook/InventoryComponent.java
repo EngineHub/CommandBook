@@ -35,16 +35,15 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Collections;
-import java.util.Map;
 import java.util.Set;
 
 import static com.sk89q.commandbook.util.ItemUtil.*;
 import static com.sk89q.commandbook.CommandBookUtil.giveItem;
 
 /**
- * @author zml2008
+ * This component handles inventory-related commands.
  */
-public class ItemsComponent extends AbstractComponent {
+public class InventoryComponent extends AbstractComponent {
     protected LocalConfiguration config;
 
     @Override
@@ -63,7 +62,6 @@ public class ItemsComponent extends AbstractComponent {
         @Setting("allowed-items") public Set<Integer> allowedItems = Collections.emptySet();
         @Setting("disllowed-items") public Set<Integer> disallowedItems = Collections.emptySet();
         @Setting("default-item-stack-size") public int defaultItemStackSize = 1;
-        @Setting("time-names") public Map<String, Integer> itemNames;
     }
 
     // -- Helper methods
@@ -136,7 +134,7 @@ public class ItemsComponent extends AbstractComponent {
             id = Integer.parseInt(name);
         } catch (NumberFormatException e) {
             // First check the configurable list of aliases
-            Integer idTemp = config.itemNames.get(name.toLowerCase());
+            Integer idTemp = CommandBook.inst().itemNames.get(name.toLowerCase());
 
             if (idTemp != null) {
                 id = (int) idTemp;
@@ -161,7 +159,7 @@ public class ItemsComponent extends AbstractComponent {
     }
 
     public class Commands {
-        @Command(aliases = {"item"},
+        @Command(aliases = {"item", "i"},
                 usage = "[target] <item[:data]> [amount]", desc = "Give an item",
                 flags = "do", min = 1, max = 3)
         @CommandPermissions({"commandbook.give"})
@@ -197,7 +195,7 @@ public class ItemsComponent extends AbstractComponent {
             if (item == null) {
                 throw new CommandException("Something went wrong parsing the item info!");
             }
-            giveItem(sender, item, amt, targets, ItemsComponent.this, args.hasFlag('d'), args.hasFlag('o'));
+            giveItem(sender, item, amt, targets, InventoryComponent.this, args.hasFlag('d'), args.hasFlag('o'));
         }
 
         @Command(aliases = {"give"},
@@ -227,7 +225,7 @@ public class ItemsComponent extends AbstractComponent {
             if (item == null) {
                 throw new CommandException("Something went wrong parsing the item info!");
             }
-            giveItem(sender, item, amt, targets, ItemsComponent.this, args.hasFlag('d'), args.hasFlag('o'));
+            giveItem(sender, item, amt, targets, InventoryComponent.this, args.hasFlag('d'), args.hasFlag('o'));
         }
 
         @Command(aliases = {"clear"},

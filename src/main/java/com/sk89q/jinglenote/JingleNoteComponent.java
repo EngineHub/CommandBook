@@ -104,7 +104,7 @@ public class JingleNoteComponent extends AbstractComponent implements Listener {
         getJingleNoteManager().stop(event.getPlayer());
     }
 
-    private class Commands {
+    public class Commands {
         @Command(aliases = {"intro"},
                 usage = "", desc = "Play the introduction song",
                 min = 0, max = 0)
@@ -132,7 +132,7 @@ public class JingleNoteComponent extends AbstractComponent implements Listener {
             }
         }
 
-        @Command(aliases = {"midi"},
+        @Command(aliases = {"midi", "play"},
                 usage = "[midi]", desc = "Play a MIDI file",
                 min = 0, max = 1)
         public void midi(CommandContext args, CommandSender sender) throws CommandException {

@@ -22,7 +22,6 @@ import com.sk89q.commandbook.components.AbstractComponent;
 import com.sk89q.commandbook.config.ConfigurationBase;
 import com.sk89q.commandbook.config.Setting;
 import com.sk89q.commandbook.events.MOTDSendEvent;
-import com.sk89q.commandbook.events.OnlineListSendEvent;
 import com.sk89q.commandbook.events.core.BukkitEvent;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
@@ -35,16 +34,14 @@ import org.bukkit.event.Event;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static com.sk89q.commandbook.CommandBookUtil.replaceColorMacros;
 import static com.sk89q.commandbook.CommandBookUtil.sendMessage;
 
 /**
- * @author zml2008
+ * Handles stored messages, such as the MOTD and rules pages.
  */
 public class StoredMessagesComponent extends AbstractComponent implements Listener {
 
@@ -71,8 +68,13 @@ public class StoredMessagesComponent extends AbstractComponent implements Listen
     }
 
     private static class LocalConfiguration extends ConfigurationBase {
-        @Setting("motd") public String motd;
-        @Setting("rules") public String rules;
+        @Setting("motd") public String motd = "Hello, `Y%name%`w.\n" +
+                "The time now is `Y%time%`w and you're in world '%world%'.\n" +
+                "`2This is the default CommandBook MOTD! Adjust it in config.yml.\n" +
+                "`2See `bhttp://wiki.sk89q.com/wiki/CommandBook`2 for more configuration information and help!";
+        @Setting("rules") public String rules = "- Be courteous and respect others.\n" +
+                "- Don't use any tools to give you an unfair advantage.\n" +
+                "`2This is the default CommandBook rules text! You can adjust it in config.yml.";
         
     }
 
@@ -83,7 +85,7 @@ public class StoredMessagesComponent extends AbstractComponent implements Listen
         // Show the MOTD.
         String motd = getMessage("motd");
 
-        if (motd != null) {
+        if (motd != null && motd.length() > 0) {
             CommandBook.inst().getEventManager().callEvent(
                     new MOTDSendEvent(player));
 
@@ -104,7 +106,7 @@ public class StoredMessagesComponent extends AbstractComponent implements Listen
 
             String motd = getMessage("motd");
 
-            if (motd == null) {
+            if (motd == null || motd.length() < 1) {
                 sender.sendMessage(ChatColor.RED + "MOTD not configured in CommandBook yet!");
             } else {
                 CommandBook.inst().getEventManager().callEvent(
@@ -125,7 +127,7 @@ public class StoredMessagesComponent extends AbstractComponent implements Listen
 
             String motd = getMessage("rules");
 
-            if (motd == null) {
+            if (motd == null || motd.length() < 1) {
                 sender.sendMessage(ChatColor.RED + "Rules not configured in CommandBook yet!");
             } else {
                 sendMessage(sender,
