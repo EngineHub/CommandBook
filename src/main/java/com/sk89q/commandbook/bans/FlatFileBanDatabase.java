@@ -42,6 +42,7 @@ import java.util.logging.Logger;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import com.sk89q.commandbook.CommandBook;
+import static com.sk89q.commandbook.util.PlayerUtil.toUniqueName;
 
 /**
  * Flat file ban database.
@@ -233,7 +234,7 @@ public class FlatFileBanDatabase implements BanDatabase {
 
     public synchronized void banName(String name, CommandSender source, String reason) {
         auditLogger.info(String.format("BAN: %s (%s) banned name '%s': %s",
-                CommandBook.inst().toUniqueName(source),
+                toUniqueName(source),
                 CommandBook.inst().toInetAddressString(source),
                 name,
                 reason));
@@ -243,7 +244,7 @@ public class FlatFileBanDatabase implements BanDatabase {
 
     public synchronized void banAddress(String address, CommandSender source, String reason) {
         auditLogger.info(String.format("BAN: %s (%s) banned address '%s': %s",
-                CommandBook.inst().toUniqueName(source),
+                toUniqueName(source),
                 CommandBook.inst().toInetAddressString(source),
                 address,
                 reason));
@@ -256,7 +257,7 @@ public class FlatFileBanDatabase implements BanDatabase {
         
         if (removed) {
             auditLogger.info(String.format("UNBAN: %s (%s) unbanned name '%s': %s",
-                    CommandBook.inst().toUniqueName(source),
+                    toUniqueName(source),
                     CommandBook.inst().toInetAddressString(source),
                     name,
                     reason));
@@ -270,7 +271,7 @@ public class FlatFileBanDatabase implements BanDatabase {
         
         if (removed) {
             auditLogger.info(String.format("UNBAN: %s (%s) unbanned ADDRESS '%s'",
-                    CommandBook.inst().toUniqueName(source),
+                    toUniqueName(source),
                     CommandBook.inst().toInetAddressString(source),
                     address,
                     reason));
@@ -281,7 +282,7 @@ public class FlatFileBanDatabase implements BanDatabase {
 
     public void logKick(Player player, CommandSender source, String reason) {
         auditLogger.info(String.format("KICKED: %s (%s) kicked player '%s': %s",
-                CommandBook.inst().toUniqueName(source),
+                toUniqueName(source),
                 CommandBook.inst().toInetAddressString(source),
                 player.getName(),
                 reason));

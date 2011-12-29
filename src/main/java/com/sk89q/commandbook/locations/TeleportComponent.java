@@ -115,7 +115,7 @@ public class TeleportComponent extends AbstractComponent implements Listener {
         }
     }
     
-    private class Commands {
+    public class Commands {
         @Command(aliases = {"spawn"}, usage = "[player]", desc = "Teleport to spawn", min = 0, max = 1)
         @CommandPermissions({"commandbook.spawn"})
         public void spawn(CommandContext args, CommandSender sender) throws CommandException {

@@ -308,4 +308,19 @@ public class PlayerUtil {
             return sender.getName();
         }
     }
+
+    /**
+     * Gets the name of a command sender. This is a unique name and this
+     * method should never return a "display name".
+     *
+     * @param sender
+     * @return
+     */
+    public static String toUniqueName(CommandSender sender) {
+        if (sender instanceof Player) {
+            return ((Player) sender).getName();
+        } else {
+            return "*Console*";
+        }
+    }
 }

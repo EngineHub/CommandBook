@@ -65,14 +65,14 @@ public class ConfigUtil {
                 ret = value;
             } else if (String.class.isAssignableFrom(target)) {
                 ret = value.toString();
-            } else if (target.isPrimitive() || Number.class.isAssignableFrom(target)) {
-                ret = getNumber(target, (Number)value);
             } else if (boolean.class.isAssignableFrom(target) || Boolean.class.isAssignableFrom(target)) {
                 if (value instanceof Boolean) {
                     ret = value;
                 } else {
                     ret = Boolean.parseBoolean(value.toString());
                 }
+            } else if (target.isPrimitive() || Number.class.isAssignableFrom(target)) {
+                ret = getNumber(target, (Number)value);
             }
         } else if (neededGenerics.length == 1) {
             if (target.equals(List.class) && value instanceof List) {

@@ -20,10 +20,13 @@ public class CommandBookEventExecutor implements EventExecutor {
         try {
             eventMethod.invoke(listener, event);
         } catch (IllegalAccessException e) {
-            CommandBook.logger().severe("Error calling event " + event + ": " + e);
+            CommandBook.logger().severe("Error calling event " + event + " to listener" + listener + ": " + e);
             e.printStackTrace();
         } catch (InvocationTargetException e) {
-            CommandBook.logger().severe("Error calling event " + event + ": " + e);
+            CommandBook.logger().severe("Error calling event " + event + " to listener" + listener + ": " + e);
+            e.printStackTrace();
+        } catch (Exception e) {
+            CommandBook.logger().severe("Error calling event " + event + " to listener" + listener + ": " + e);
             e.printStackTrace();
         }
     }

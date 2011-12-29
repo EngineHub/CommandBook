@@ -253,7 +253,7 @@ public class TimeComponent extends AbstractComponent implements Listener {
         throw new CommandException("Time input format unknown.");
     }
 
-    private class Commands {
+    public class Commands {
         @Command(aliases = {"time"},
                 usage = "[world] <time|\"current\">", desc = "Get/change the world time",
                 flags = "l", min = 0, max = 2)

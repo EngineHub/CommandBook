@@ -30,9 +30,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 
-import com.sk89q.commandbook.components.ComponentManager;
-import com.sk89q.commandbook.components.ConfigListedComponentLoader;
+import com.sk89q.commandbook.components.*;
 import com.sk89q.commandbook.events.core.EventManager;
+import com.sk89q.commandbook.session.SessionComponent;
 import com.sk89q.commandbook.util.CommandRegistration;
 import com.sk89q.util.yaml.YAMLFormat;
 import com.sk89q.util.yaml.YAMLProcessor;
@@ -63,6 +63,8 @@ import com.sk89q.worldedit.blocks.ClothColor;
 import com.sk89q.worldedit.blocks.ItemType;
 import static com.sk89q.commandbook.CommandBookUtil.*;
 import com.sk89q.commandbook.locations.WrappedSpawnManager;
+
+import static com.sk89q.commandbook.util.ItemUtil.matchItemData;
 import static com.sk89q.commandbook.util.PlayerUtil.*;
 
 /**
@@ -79,21 +81,12 @@ public final class CommandBook extends JavaPlugin {
 
     private CommandsManager<CommandSender> commands;
     
-    public boolean listOnJoin;
-    public boolean verifyNameFormat;
+    protected Map<String, Integer> itemNames;
     public boolean broadcastChanges;
-    public boolean broadcastKicks;
-    public boolean broadcastBans;
-    public Set<Integer> thorItems;
     public boolean opPermissions;
     public boolean useDisplayNames;
-
-    public boolean playersListColoredNames;
-    public boolean playersListGroupedNames;
-    public boolean playersListMaxPlayers;
     public boolean crappyWrapperCompat;
 
-    protected Map<String, String> messages = new HashMap<String, String>();
     protected YAMLProcessor config;
     protected EventManager eventManager = new EventManager();
     protected ComponentManager componentManager;
@@ -162,33 +155,27 @@ public final class CommandBook extends JavaPlugin {
         PermissionsResolverManager.initialize(this);
         
         componentManager = new ComponentManager();
-        componentManager.addComponentLoader(new ConfigListedComponentLoader());
-
-        componentManager.loadComponents();
         
+        // -- Component loaders
+        componentManager.addComponentLoader(new StaticComponentLoader(new SessionComponent()));
+        componentManager.addComponentLoader(new ConfigListedComponentLoader());
+        
+        // -- Annotation handlers
+        componentManager.registerAnnotationHandler(InjectComponent.class, new InjectComponentAnnotationHandler());
+
         // Load configuration
         populateConfiguration();
+
+        componentManager.loadComponents();
         
 		final CommandRegistration cmdRegister = new CommandRegistration(this, commands);
         cmdRegister.register(GeneralCommands.class);
 		cmdRegister.register(FunCommands.class);
         cmdRegister.register(WorldCommands.class);
-        
-        // Register events
-        registerEvents();
 
         componentManager.enableComponents();
-    }
-    
-    /**
-     * Register the events that are used.
-     */
-    protected void registerEvents() {
-        PlayerListener playerListener = new CommandBookPlayerListener(this);
 
-        registerEvent(Event.Type.PLAYER_LOGIN, playerListener);
-        registerEvent(Event.Type.PLAYER_JOIN, playerListener);
-        registerEvent(Event.Type.PLAYER_INTERACT, playerListener);
+        config.save();
     }
 
     /**
@@ -230,29 +217,6 @@ public final class CommandBook extends JavaPlugin {
     }
     
     /**
-     * Register an event.
-     * 
-     * @param type
-     * @param listener
-     * @param priority
-     */
-    protected void registerEvent(Event.Type type, Listener listener, Priority priority) {
-        getServer().getPluginManager()
-                .registerEvent(type, listener, priority, this);
-    }
-    
-    /**
-     * Register an event at normal priority.
-     * 
-     * @param type
-     * @param listener
-     */
-    protected void registerEvent(Event.Type type, Listener listener) {
-        getServer().getPluginManager()
-                .registerEvent(type, listener, Priority.Normal, this);
-    }
-    
-    /**
      * Loads the configuration.
      */
     @SuppressWarnings({ "unchecked" })
@@ -264,32 +228,51 @@ public final class CommandBook extends JavaPlugin {
             logger.log(Level.WARNING, "CommandBook: Error loading configuration: ", e);
         }
         this.config = config;
-        
-        // Load messages
-        messages.put("motd", config.getString("motd", null));
-        messages.put("rules", config.getString("rules", null));
 
-        playersListColoredNames = config.getBoolean("online-list.colored-names", false);
-        playersListGroupedNames = config.getBoolean("online-list.grouped-names", false);
-        playersListMaxPlayers = config.getBoolean("online-list.show-max-players", true);
-        
-        listOnJoin = getConfiguration().getBoolean("online-on-join", true);
+        loadItemList();
+
         opPermissions = config.getBoolean("op-permissions", true);
         useDisplayNames = config.getBoolean("use-display-names", true);
-        verifyNameFormat = config.getBoolean("verify-name-format", true);
         broadcastChanges = config.getBoolean("broadcast-changes", true);
-        broadcastBans = config.getBoolean("broadcast-bans", false);
-        broadcastKicks = config.getBoolean("broadcast-kicks", false);
+
         crappyWrapperCompat = config.getBoolean("crappy-wrapper-compat", true);
-        thorItems = new HashSet<Integer>(config.getIntList(
-                "thor-hammer-items", Arrays.asList(278, 285, 257, 270)));
         
         if (crappyWrapperCompat) {
             logger.info("CommandBook: Maximum wrapper compatibility is enabled. " +
                     "Some features have been disabled to be compatible with " +
                     "poorly written server wrappers.");
         }
+        config.save();
+    }
 
+    /**
+     * Loads the item list.
+     */
+    @SuppressWarnings({ "unchecked" })
+    protected void loadItemList() {
+        Configuration config = getConfiguration();
+
+        // Load item names aliases list
+        Object itemNamesTemp = config.getProperty("item-names");
+        if (itemNamesTemp != null && itemNamesTemp instanceof Map) {
+            itemNames = new HashMap<String, Integer>();
+
+            try {
+                Map<Object, Object> temp = (Map<Object, Object>) itemNamesTemp;
+
+                for (Map.Entry<Object, Object> entry : temp.entrySet()) {
+                    String name = entry.getKey().toString().toLowerCase();
+
+                    // Check if the item ID is a number
+                    if (entry.getValue() instanceof Integer) {
+                        itemNames.put(name, (Integer) entry.getValue());
+                    }
+                }
+            } catch (ClassCastException e) {
+            }
+        } else {
+            itemNames = new HashMap<String, Integer>();
+        }
     }
     
     /**
@@ -389,6 +372,56 @@ public final class CommandBook extends JavaPlugin {
             throw new CommandPermissionsException();
         }
     }
+
+    /**
+     * Returns a matched item.
+     *
+     * @param name
+     * @return item
+     */
+    public ItemStack getItem(String name) {
+
+        int id = 0;
+        int dmg = 0;
+        String dataName = null;
+
+        if (name.contains(":")) {
+            String[] parts = name.split(":");
+            dataName = parts[1];
+            name = parts[0];
+        }
+
+        try {
+            id = Integer.parseInt(name);
+        } catch (NumberFormatException e) {
+            // First check the configurable list of aliases
+            Integer idTemp = itemNames.get(name.toLowerCase());
+
+            if (idTemp != null) {
+                id = (int) idTemp;
+            } else {
+                // Then check WorldEdit
+                ItemType type = ItemType.lookup(name);
+
+                if (type == null) {
+                    return null;
+                }
+
+                id = type.getID();
+            }
+        }
+
+        // If the user specified an item data or damage value, let's try
+        // to parse it!
+        if (dataName != null) {
+            try {
+                dmg = matchItemData(id, dataName);
+            } catch (CommandException e) {
+                return null;
+            }
+        }
+        return new ItemStack(id, 1, (short)dmg);
+    }
     
     /**
      * Attempts to match a creature type.
@@ -428,85 +461,6 @@ public final class CommandBook extends JavaPlugin {
         } else {
             return "127.0.0.1";
         }
-    }
-    
-    /**
-     * Gets the name of a command sender. This is a unique name and this
-     * method should never return a "display name".
-     * 
-     * @param sender
-     * @return
-     */
-    public String toUniqueName(CommandSender sender) {
-        if (sender instanceof Player) {
-            return ((Player) sender).getName();
-        } else {
-            return "*Console*";
-        }
-    }
-
-    /**
-     * Get preprogrammed messages.
-     * 
-     * @param id 
-     * @return may return null
-     */
-    public String getMessage(String id) {
-        return messages.get(id);
-    }
-    
-    /**
-     * Replace macros in the text.
-     * 
-     * @param sender 
-     * @param message
-     * @return
-     */
-    public String replaceMacros(CommandSender sender, String message) {
-        Player[] online = getServer().getOnlinePlayers();
-        
-        message = message.replace("%name%", toName(sender));
-        message = message.replace("%cname%", toColoredName(sender, null));
-        message = message.replace("%id%", toUniqueName(sender));
-        message = message.replace("%online%", String.valueOf(online.length));
-        
-        // Don't want to build the list unless we need to
-        if (message.contains("%players%")) {
-            message = message.replace("%players%",
-                    CommandBookUtil.getOnlineList(online));
-        }
-        
-        if (sender instanceof Player) {
-            Player player = (Player) sender;
-            World world = player.getWorld();
-
-            message = message.replace("%time%", getTimeString(world.getTime()));
-            message = message.replace("%world%", world.getName());
-        }
-        
-        Pattern cmdPattern = Pattern.compile("%cmd:([^%]+)%");
-        Matcher matcher = cmdPattern.matcher(message);
-        try {
-            StringBuffer buff = new StringBuffer();
-            while (matcher.find()) {
-                Process p = new ProcessBuilder(matcher.group(1).split(" ")).start();
-                BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
-                String s;
-                StringBuilder build = new StringBuilder();
-                while ((s = stdInput.readLine()) != null) {
-                    build.append(s + " ");
-                }
-                stdInput.close();
-                build.delete(build.length() - 1, build.length());
-                matcher.appendReplacement(buff, build.toString());
-                p.destroy();
-            }
-            matcher.appendTail(buff);
-            message = buff.toString();
-        } catch (IOException e) {
-            sender.sendMessage(ChatColor.RED + "Error replacing macros: " + e.getMessage());
-        }
-        return message;
     }
 
     /**

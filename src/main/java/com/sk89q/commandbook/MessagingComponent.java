@@ -58,7 +58,7 @@ public class MessagingComponent extends AbstractComponent implements Listener {
 
     @Override
     public void reload() {
-        config = configure(new LocalConfiguration());
+        configure(config);
     }
 
     private static class LocalConfiguration extends ConfigurationBase {
@@ -79,7 +79,7 @@ public class MessagingComponent extends AbstractComponent implements Listener {
         }
     }
 
-    private class Commands {
+    public class Commands {
         @Command(aliases = {"me"}, usage = "<message...>", desc = "Send an action message", min = 1, max = -1)
         @CommandPermissions({"commandbook.say.me"})
         public void me(CommandContext args, CommandSender sender) throws CommandException {

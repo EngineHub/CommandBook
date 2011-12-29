@@ -53,7 +53,7 @@ public class BansComponent extends AbstractComponent implements Listener {
     @Override
     public void reload() {
         getBanDatabase().load();
-        config = configure(new LocalConfiguration());
+        configure(config);
     }
     
     @Override
@@ -64,6 +64,8 @@ public class BansComponent extends AbstractComponent implements Listener {
     @SettingBase("bans")
     private static class LocalConfiguration extends ConfigurationBase {
         @Setting("message") public String banMessage = "You have been banned";
+        @Setting("broadcast-bans") public boolean broadcastBans;
+        @Setting("broadcast-kicks") public boolean broadcastKicks;
     }
 
     /**
@@ -96,7 +98,7 @@ public class BansComponent extends AbstractComponent implements Listener {
         }
     }
 
-    private class BanCommands {
+    public class BanCommands {
         @Command(aliases = {"kick"}, usage = "<target> [reason...]", desc = "Kick a user", min = 1, max = -1)
         @CommandPermissions({"commandbook.kick"})
         public void kick(CommandContext args, CommandSender sender) throws CommandException {
@@ -114,7 +116,7 @@ public class BansComponent extends AbstractComponent implements Listener {
 
             sender.sendMessage(ChatColor.YELLOW + "Player(s) kicked.");
             //Broadcast the Message
-            if (CommandBook.inst().broadcastKicks) {
+            if (config.broadcastKicks) {
                 CommandBook.server().broadcastMessage(ChatColor.YELLOW
                         + PlayerUtil.toName(sender) + " has kicked " + broadcastPlayers
                         + " - " + message);
@@ -160,7 +162,7 @@ public class BansComponent extends AbstractComponent implements Listener {
             }
 
             //Broadcast the Message
-            if (CommandBook.inst().broadcastKicks) {
+            if (config.broadcastKicks) {
                 CommandBook.server().broadcastMessage(ChatColor.YELLOW
                         + PlayerUtil.toName(sender) + " has banned " + banName
                         + " - " + message);
@@ -272,12 +274,12 @@ public class BansComponent extends AbstractComponent implements Listener {
         }
 
         @Command(aliases = {"bans"}, desc = "Ban management")
-        @NestedCommand({BanCommands.class})
+        @NestedCommand({BanManagementCommands.class})
         public void bans() throws CommandException {
         }
     }
 
-    private class BanManagementCommands {
+    public class BanManagementCommands {
 
         @Command(aliases = {"load", "reload", "read"}, usage = "", desc = "Reload bans from disk", min = 0, max = 0)
         @CommandPermissions({"commandbook.bans.load"})

@@ -34,7 +34,7 @@ import org.bukkit.entity.Player;
  * @author zml2008
  */
 public class WarpsComponent extends LocationsComponent {
-    protected WarpsComponent() {
+    public WarpsComponent() {
         super("Warp");
     }
 
@@ -43,7 +43,7 @@ public class WarpsComponent extends LocationsComponent {
         registerCommands(Commands.class);
     }
 
-    private class Commands {
+    public class Commands {
         @Command(aliases = {"warp"}, usage = "[world] [target] <warp>", desc = "Teleport to a warp", min = 1, max = 3)
         @CommandPermissions({"commandbook.warp.teleport"})
         public void warp(CommandContext args, CommandSender sender) throws CommandException {
@@ -111,7 +111,7 @@ public class WarpsComponent extends LocationsComponent {
         }
     }
     
-    private class ManagementCommands {
+    public class ManagementCommands {
         @Command(aliases = {"del", "delete", "remove", "rem"}, usage = "<warpname> [world]",
                 desc = "Remove a warp", min = 1, max = 2 )
         @CommandPermissions({"commandbook.remove"})

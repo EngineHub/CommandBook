@@ -33,14 +33,14 @@ public class DebugComponent extends AbstractComponent {
         registerCommands(Commands.class);
     }
 
-    private class Commands {
+    public class Commands {
         @Command(aliases = {"debug"}, desc = "Debugging commands")
         @NestedCommand({DebugCommands.class})
         public void debug(CommandContext args, CommandSender sender) throws CommandException {
         }
     }
 
-    private class DebugCommands {
+    public class DebugCommands {
         @Command(aliases = {"clock"}, usage = "", desc = "Tests the clock rate of your server",
                 flags = "", min = 0, max = 1)
         @CommandPermissions({"commandbook.debug.clock"})

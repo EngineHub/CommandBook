@@ -82,10 +82,10 @@ public class ComponentManager {
                     }
                 }
             }
-            CommandBook.logger().log(Level.FINEST, "CommandBook: Component " +
-                    component.getClass().getSimpleName() + " successfully enabled!");
             component.initialize();
             component.setEnabled(true);
+            CommandBook.logger().log(Level.INFO, "CommandBook: Component " +
+                    component.getClass().getSimpleName() + " successfully enabled!");
         }
 
     }

@@ -48,5 +48,13 @@ public class CommandBookCommands {
         
         sender.sendMessage(ChatColor.YELLOW + "CommandBook's configuration has been reloaded.");
     }
+
+    @Command(aliases = {"save"}, usage = "", desc = "Save CommandBook's settings", min = 0, max = 0)
+    @CommandPermissions({"commandbook.save"})
+    public void save(CommandContext args, CommandSender sender) throws CommandException {
+        plugin.getGlobalConfiguration().save();
+
+        sender.sendMessage(ChatColor.YELLOW + "CommandBook's configuration has been reloaded.");
+    }
     
 }

@@ -18,27 +18,9 @@
 
 package com.sk89q.commandbook.session;
 
-public class AdministrativeSession implements PersistentSession {
-    
-    private static final int MAX_AGE = 3600000;
-    
-    private long lastUpdate;
-    private boolean isMute;
-    
-    public boolean isRecent() {
-        return (System.currentTimeMillis() - lastUpdate) < MAX_AGE;
-    }
-    
-    public void handleDisconnect() {
-        lastUpdate = System.currentTimeMillis();
-    }
+public interface PersistentSession {
 
-    public boolean isMute() {
-        return isMute;
-    }
-
-    public void setMute(boolean isMute) {
-        this.isMute = isMute;
-    }
+    public boolean isRecent();
+    public void handleDisconnect();
     
 }

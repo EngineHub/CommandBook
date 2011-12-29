@@ -3,25 +3,10 @@ main: com.sk89q.commandbook.CommandBook
 version: "${project.version}"
 softdepend: [WorldEdit]
 commands:
-    cmdbook:
-        description: CommandBook commands
-        usage: /<command> <arguments...>
-    motd:
-        description: Show the message of the day
-        usage: /<command>
-        _category: server
-    rules:
-        description: Show the rules
-        usage: /<command>
-        _category: server
     who:
         aliases: [list, playerlist, online, players]
         description: Get the list of players
         usage: /<command> [filter]
-        _category: server
-    debug:
-        description: Get server information
-        usage: /<command> ...
         _category: server
     ping:
         description: Get back a dummy reply
@@ -38,36 +23,10 @@ commands:
         description: Create an item
         usage: /<command> [-d] [target] <item[:data]> [amount]
         _category: items
-    give:
-        description: Give an item
-        usage: /<command> [-d] <target> <item[:data]> [amount]
-        _parent: item
-        _category: items
-    kit:
-        description: Get a kit (or list kits)
-        usage: /<command> <kit> [target]
-        _category: items
-    more:
-        description: Expand stack size
-        usage: /<command> [-a] [-i] [target]
-        _category: items
-
     midi:
         aliases: play
         description: Play a MIDI file
         usage: /<command> [midi]
-    intro:
-        description: Replay the intro music
-        usage: /<command>
-        _parent: midi
-
-    time:
-        description: Set the time of your current world
-        usage: /<command> [world] <time|"current">
-    playertime:
-        description: Set the time of specific players
-        usage: /<command> [-rsw] [filter] <time|"current">
-        _parent: time
 
     weather:
         description: Change the weather
@@ -145,11 +104,6 @@ commands:
         description: Teleport to a location
         usage: /<command> [target] <destination>
         _category: teleport
-    call:
-        description: Request a teleport from someone
-        usage: /<command> <target>
-        _category: player
-        _category: teleport
     bring:
         aliases: [tphere, summon, s]
         description: Bring a player to you
@@ -160,56 +114,11 @@ commands:
         description: Place a player at the location you are looking at
         usage: /<command> <target>
         _category: teleport
-    spawn:
-        description: Teleport to spawn
-        usage: /<command>
-        _category: teleport
     return:
         aliases: ret
         description: Return back to your last location
         usage: /<command>
         _category: teleport
-
-    warp:
-        description: Teleport to a warp
-        usage: /<command> [world] [target] <warp>
-        _component: warps
-    setwarp:
-        aliases: createwarp
-        description: Set a warp
-        usage: /<command> <warp> [location]
-        _component: warps
-    warps:
-        description: Warp management commands
-        usage: /<command>
-        _component: warps
-
-    home:
-        description: Teleport to home
-        usage: /<command> [[[world]] [target]] [owner]
-        _component: homes
-    sethome:
-        aliases: createhome
-        description: Set home
-        usage: /<command> [location] [owner]
-        _component: homes
-    homes:
-        description: Home management commands
-        usage: /<command>
-        _component: homes
-
-    broadcast:
-        description: Broadcast a message
-        usage: /<command> <msg...>
-        _category: messaging
-    say:
-        description: Say a message
-        usage: /<command> <msg...>
-        _category: messaging
-    me:
-        description: Say an action message
-        usage: /<command> <msg...>
-        _category: messaging
     msg:
         aliases: [message, whisper, pm, tell]
         description: Send a private message to a user
@@ -225,13 +134,4 @@ commands:
         aliases: away
         description: Set yourself as away
         usage: /<command> [status]
-        _category: messaging
-    mute:
-        description: Mute a player
-        usage: /<command> <target>
-        _category: messaging
-    unmute:
-        description: Unmute a player
-        usage: /<command> <target>
-        _parent: mute
         _category: messaging

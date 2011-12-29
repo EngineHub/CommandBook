@@ -22,6 +22,7 @@ import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.config.ConfigUtil;
 import com.sk89q.commandbook.config.InputStreamYAMLProcessor;
 import com.sk89q.util.yaml.YAMLNode;
+import org.yaml.snakeyaml.error.YAMLException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,12 +40,15 @@ public class ConfigListedComponentLoader implements ComponentLoader {
         jarComponentAliases = new InputStreamYAMLProcessor(null, false) {
             @Override
             public InputStream getInputStream() {
-                return CommandBook.inst().getResource("/defaults/modules.yml");
+                return CommandBook.inst().getClass().getResourceAsStream("/defaults/modules.yml");
             }
         };
         try {
             jarComponentAliases.load();
         } catch (IOException e) {
+            CommandBook.logger().severe("CommandBook: Error loading component aliases!");
+            e.printStackTrace();
+        } catch (YAMLException e) {
             CommandBook.logger().severe("CommandBook: Error loading component aliases!");
             e.printStackTrace();
         }
@@ -53,18 +57,20 @@ public class ConfigListedComponentLoader implements ComponentLoader {
     @Override
     public Collection<AbstractComponent> loadComponents() {
         List<AbstractComponent> components = new ArrayList<AbstractComponent>();
-        List<String> disabledComponents = CommandBook.inst().getGlobalConfiguration().getStringList("components.disabled", null);
-        List<String> stagedEnabled = CommandBook.inst().getGlobalConfiguration().getStringList("components.enabled", null);
-        stagedEnabled.addAll(jarComponentAliases.getKeys(""));
+        Set<String> disabledComponents = new HashSet<String>(CommandBook.inst().getGlobalConfiguration().getStringList("components.disabled", null));
+        Set<String> stagedEnabled = new HashSet<String>(CommandBook.inst().getGlobalConfiguration().getStringList("components.enabled", null));
+        stagedEnabled.addAll(jarComponentAliases.getKeys(null));
         for (Iterator<String> i = stagedEnabled.iterator(); i.hasNext(); ) {
             String nextName = i.next();
             nextName = jarComponentAliases.getString(nextName, nextName);
+            if (disabledComponents.contains(nextName)) return Collections.emptySet();
             Class<?> next = null;
             try {
                 next = Class.forName(nextName);
             } catch (ClassNotFoundException e) {
 
             }
+
 
             if (next == null || !AbstractComponent.class.isAssignableFrom(next)) {
                 CommandBook.logger().warning("CommandBook: Invalid or unknown class found in enabled components: "
@@ -85,8 +91,8 @@ public class ConfigListedComponentLoader implements ComponentLoader {
 
         }
 
-        CommandBook.inst().getGlobalConfiguration().setProperty("components.disabled", disabledComponents);
-        CommandBook.inst().getGlobalConfiguration().setProperty("components.enabled", stagedEnabled);
+        CommandBook.inst().getGlobalConfiguration().setProperty("components.disabled", new ArrayList<String>(disabledComponents));
+        CommandBook.inst().getGlobalConfiguration().setProperty("components.enabled", new ArrayList<String>(stagedEnabled));
         return components;
     }
 

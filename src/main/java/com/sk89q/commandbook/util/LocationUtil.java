@@ -20,8 +20,7 @@ package com.sk89q.commandbook.util;
 
 import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.CommandBookUtil;
-import com.sk89q.commandbook.locations.NamedLocation;
-import com.sk89q.commandbook.locations.RootLocationManager;
+import com.sk89q.commandbook.locations.*;
 import com.sk89q.minecraft.util.commands.CommandException;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -180,9 +179,13 @@ public class LocationUtil {
                     || args[0].equalsIgnoreCase("#warp")) {
                 String type = args[0].substring(1);
                 CommandBook.inst().checkPermission(source, "commandbook.locations." + type);
-                RootLocationManager<NamedLocation> manager = type.equalsIgnoreCase("warp")
-                        ? CommandBook.inst().getWarpsManager()
-                        : CommandBook.inst().getHomesManager();
+                LocationsComponent component = type.equalsIgnoreCase("warp")
+                        ? CommandBook.inst().getComponentManager().getComponent(WarpsComponent.class)
+                        : CommandBook.inst().getComponentManager().getComponent(HomesComponent.class);
+                if (component == null)  {
+                    throw new CommandException("This type of location is not enabled!");
+                }
+                RootLocationManager<NamedLocation> manager = component.getManager();
                 if (args.length == 1) {
                     if (type.equalsIgnoreCase("warp")) {
                         throw new CommandException("Please specify a warp name.");

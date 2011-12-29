@@ -43,7 +43,7 @@ public class HomesComponent extends LocationsComponent {
         registerCommands(Commands.class);
     }
 
-    private class Commands {
+    public class Commands {
         @Command(aliases = {"home"}, usage = "[world] [target] [owner]", desc = "Teleport to a home", min = 0, max = 3)
         @CommandPermissions({"commandbook.home.teleport"})
         public void home(CommandContext args, CommandSender sender) throws CommandException {
@@ -132,7 +132,7 @@ public class HomesComponent extends LocationsComponent {
         }
     }
     
-    private class ManagementCommands {
+    public class ManagementCommands {
         @Command(aliases = {"del", "delete", "remove", "rem"},
                 usage = "[name] [world]", desc = "Remove a home", min = 0, max = 2 )
         @CommandPermissions({"commandbook.home.remove"})

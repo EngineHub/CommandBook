@@ -53,6 +53,11 @@ public class ItemsComponent extends AbstractComponent {
         registerCommands(Commands.class);
     }
 
+    @Override
+    public void reload() {
+        configure(config);
+    }
+
     private static class LocalConfiguration extends ConfigurationBase {
         @Setting("item-permissions-only") public boolean useItemPermissionsOnly;
         @Setting("allowed-items") public Set<Integer> allowedItems = Collections.emptySet();
@@ -107,56 +112,6 @@ public class ItemsComponent extends AbstractComponent {
     }
 
     /**
-     * Returns a matched item.
-     *
-     * @param name
-     * @return item
-     */
-    public ItemStack getItem(String name) {
-
-        int id = 0;
-        int dmg = 0;
-        String dataName = null;
-
-        if (name.contains(":")) {
-            String[] parts = name.split(":");
-            dataName = parts[1];
-            name = parts[0];
-        }
-
-        try {
-            id = Integer.parseInt(name);
-        } catch (NumberFormatException e) {
-            // First check the configurable list of aliases
-            Integer idTemp = config.itemNames.get(name.toLowerCase());
-
-            if (idTemp != null) {
-                id = (int) idTemp;
-            } else {
-                // Then check WorldEdit
-                ItemType type = ItemType.lookup(name);
-
-                if (type == null) {
-                    return null;
-                }
-
-                id = type.getID();
-            }
-        }
-
-        // If the user specified an item data or damage value, let's try
-        // to parse it!
-        if (dataName != null) {
-            try {
-                dmg = matchItemData(id, dataName);
-            } catch (CommandException e) {
-                return null;
-            }
-        }
-        return new ItemStack(id, 1, (short)dmg);
-    }
-
-    /**
      * Matches an item and gets the appropriate item stack.
      *
      * @param source
@@ -205,7 +160,7 @@ public class ItemsComponent extends AbstractComponent {
         return new ItemStack(id, 1, (short)dmg);
     }
 
-    private class Commands {
+    public class Commands {
         @Command(aliases = {"item"},
                 usage = "[target] <item[:data]> [amount]", desc = "Give an item",
                 flags = "do", min = 1, max = 3)

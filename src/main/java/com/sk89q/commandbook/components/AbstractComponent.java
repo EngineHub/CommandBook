@@ -82,15 +82,17 @@ public abstract class AbstractComponent {
             String key = field.getAnnotation(Setting.class).value();
             System.out.println(field.getGenericType());
             final Object value = smartCast(field.getGenericType(), node.getProperty(key));
-            if (value != null && field.getType().isAssignableFrom(value.getClass())) {
                 try {
                     field.setAccessible(true);
-                    field.set(config, value);
+                    if (value != null && field.getType().isAssignableFrom(value.getClass())) {
+                            field.set(config, value);
+                    } else {
+                        node.setProperty(key, field.get(config));
+                    }
                 } catch (IllegalAccessException e) {
                     CommandBook.logger().log(Level.SEVERE, "Error setting configuration value of field: ", e);
                     e.printStackTrace();
                 }
-            }
         }
         return config;
     }
@@ -118,9 +120,14 @@ public abstract class AbstractComponent {
         List<Command> registered = commands.registerAndReturn(clazz);
         SimpleCommandMap commandMap = ReflectionUtil.getField(CommandBook.server().getPluginManager(), "commandMap");
         if (registered == null || commandMap == null) {
+            System.out.println("Commandmap or registered null when registering commands for " + this);
             return;
         }
+        if (registered.size() == 0) {
+            System.err.println();
+        }
         for (Command command : registered) {
+            System.out.println("Registering command " + command + " for " + this);
             commandMap.register(CommandBook.inst().getDescription().getName() + getClass().getSimpleName(), new CommandBookComponentCommand(command, this));
         }
     }

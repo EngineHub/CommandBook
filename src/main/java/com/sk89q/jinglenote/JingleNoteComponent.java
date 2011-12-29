@@ -35,6 +35,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
@@ -76,7 +77,7 @@ public class JingleNoteComponent extends AbstractComponent implements Listener {
     }
 
     @BukkitEvent(type = Event.Type.PLAYER_JOIN)
-    public void onJoin(PlayerLoginEvent event) {
+    public void onJoin(PlayerJoinEvent event) {
         MidiJingleSequencer sequencer = null;
 
         try {

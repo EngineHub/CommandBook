@@ -47,6 +47,11 @@ public class KitsComponent extends AbstractComponent {
                 CommandBook.inst(), new GarbageCollector(this),
                 GarbageCollector.CHECK_FREQUENCY, GarbageCollector.CHECK_FREQUENCY);
     }
+    
+    @Override
+    public void reload() {
+        kits.load();
+    }
 
     /**
      * Return the kit manager.
@@ -57,7 +62,7 @@ public class KitsComponent extends AbstractComponent {
         return kits;
     }
 
-    private class KitCommands {
+    public class KitCommands {
 
         @Command(aliases = {"kit"}, usage = "<id> [target]", desc = "Get a kit", flags = "", min = 0, max = 2)
         public void kit(CommandContext args, CommandSender sender) throws CommandException {

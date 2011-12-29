@@ -19,7 +19,6 @@
 package com.sk89q.commandbook.session;
 
 import com.sk89q.commandbook.CommandBook;
-import com.sk89q.commandbook.PersistentSession;
 import com.sk89q.commandbook.components.AbstractComponent;
 import com.sk89q.commandbook.events.core.BukkitEvent;
 import org.bukkit.command.CommandSender;
@@ -144,7 +143,7 @@ public class SessionComponent extends AbstractComponent implements Runnable, Lis
 
     // -- Events
 
-    @BukkitEvent(type = Event.Type.PLAYER_JOIN)
+    @BukkitEvent(type = Event.Type.PLAYER_LOGIN)
     public void onLoin(PlayerLoginEvent event) {
         // Trigger the session
         getSession(event.getPlayer()).handleReconnect();

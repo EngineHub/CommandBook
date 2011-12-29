@@ -47,7 +47,6 @@ import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 
 public class FunCommands {
-    
     private static Random random = new Random();
     private CommandBook plugin;
 
@@ -168,9 +167,9 @@ public class FunCommands {
                 ((PigZombie) creature).setAnger(Integer.parseInt(specialType));
                 return creature;
             } else if (creature instanceof Enderman) {
-                ItemStack item = plugin.getItem(specialType);
+                /*ItemStack item = plugin.getItem(specialType);
                 if (item == null) return creature;
-                ((Enderman) creature).setCarriedMaterial(item.getData());
+                ((Enderman) creature).setCarriedMaterial(item.getData());*/
                 return creature;
             }
         }
@@ -417,168 +416,6 @@ public class FunCommands {
         // user a message so s/he know that something is indeed working
         if (!included && args.hasFlag('s')) {
             sender.sendMessage(ChatColor.YELLOW.toString() + "Fireball attack sent.");
-        }
-    }
-    
-    @Command(aliases = {"shock"}, usage = "[target]", desc = "Shock a player", flags = "ksa", min = 0, max = 1)
-    @CommandPermissions({"commandbook.shock"})
-    public void shock(CommandContext args, CommandSender sender) throws CommandException {
-        Iterable<Player> targets = null;
-        boolean included = false;
-        int count = 0;
-        
-        // Detect arguments based on the number of arguments provided
-        if (args.argsLength() == 0) {
-            targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
-            
-            // Check permissions!
-            plugin.checkPermission(sender, "commandbook.shock");
-        } else if (args.argsLength() == 1) {            
-            targets = PlayerUtil.matchPlayers(sender, args.getString(0));
-            
-            // Check permissions!
-            plugin.checkPermission(sender, "commandbook.shock.other");
-        }
-
-        for (final Player player : targets) {
-            count++;
-            
-            // Area effect
-            if (args.hasFlag('a')) {
-                final Location origLoc = player.getLocation();
-                
-                for (int i = 0; i < 10; i++) {
-                    plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-                        public void run() {
-                            Location loc = origLoc.clone();
-                            loc.setX(loc.getX() + random.nextDouble() * 20 - 10);
-                            loc.setZ(loc.getZ() + random.nextDouble() * 20 - 10);
-                            player.getWorld().strikeLightning(loc);
-                        }
-                    }, Math.max(0, i * 3 + random.nextInt(10) - 5));
-                }
-            } else {
-                player.getWorld().strikeLightning(player.getLocation());
-            }
-            
-            if (args.hasFlag('k')) {
-                player.setHealth(0);
-            }
-
-            if (args.hasFlag('s')) {
-                // Tell the user
-                if (player.equals(sender)) {
-                    player.sendMessage(ChatColor.YELLOW + "Shocked!");
-                    
-                    // Keep track of this
-                    included = true;
-                } else {
-                    player.sendMessage(ChatColor.YELLOW + "You've been shocked by "
-                            + PlayerUtil.toName(sender) + ".");
-                    
-                }
-            } else {
-                if (count < 6) {
-                    plugin.getServer().broadcastMessage(
-                            ChatColor.YELLOW + PlayerUtil.toName(sender)
-                            + " shocked " + PlayerUtil.toName(player));
-                } else if (count == 6) {
-                    plugin.getServer().broadcastMessage(
-                            ChatColor.YELLOW + PlayerUtil.toName(sender)
-                            + " shocked more people...");
-                }
-            }
-        }
-        
-        // The player didn't get anything, then we need to send the
-        // user a message so s/he know that something is indeed working
-        if (!included && args.hasFlag('s')) {
-            sender.sendMessage(ChatColor.YELLOW.toString() + "Players shocked.");
-        }
-    }
-    
-    @Command(aliases = {"thor"}, usage = "[target]", desc = "Give a player Thor power",
-            flags = "", min = 0, max = 1)
-    @CommandPermissions({"commandbook.thor"})
-    public void thor(CommandContext args, CommandSender sender) throws CommandException {
-        Iterable<Player> targets = null;
-        boolean included = false;
-        
-        // Detect arguments based on the number of arguments provided
-        if (args.argsLength() == 0) {
-            targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
-            
-            // Check permissions!
-            plugin.checkPermission(sender, "commandbook.thor");
-        } else if (args.argsLength() == 1) {            
-            targets = PlayerUtil.matchPlayers(sender, args.getString(0));
-            
-            // Check permissions!
-            plugin.checkPermission(sender, "commandbook.thor.other");
-        }
-
-        for (final Player player : targets) {
-            plugin.getSession(player).setHasThor(true);
-            
-            // Tell the user
-            if (player.equals(sender)) {
-                player.sendMessage(ChatColor.YELLOW + "You have been granted the mighty power of Thor's hammer!");
-                
-                // Keep track of this
-                included = true;
-            } else {
-                player.sendMessage(ChatColor.YELLOW + "You have been granted the might power of Thor's hammer by "
-                        + PlayerUtil.toName(sender) + ".");
-                
-            }
-        }
-        
-        // The player didn't get anything, then we need to send the
-        // user a message so s/he know that something is indeed working
-        if (!included && args.hasFlag('s')) {
-            sender.sendMessage(ChatColor.YELLOW.toString() + "Players given Thor's hammer.");
-        }
-    }
-    
-    @Command(aliases = {"unthor"}, usage = "[target]", desc = "Revoke a player's Thor power", flags = "", min = 0, max = 1)
-    @CommandPermissions({"commandbook.thor"})
-    public void unthor(CommandContext args, CommandSender sender) throws CommandException {
-        Iterable<Player> targets = null;
-        boolean included = false;
-        
-        // Detect arguments based on the number of arguments provided
-        if (args.argsLength() == 0) {
-            targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
-            
-            // Check permissions!
-            plugin.checkPermission(sender, "commandbook.thor");
-        } else if (args.argsLength() == 1) {            
-            targets = PlayerUtil.matchPlayers(sender, args.getString(0));
-            
-            // Check permissions!
-            plugin.checkPermission(sender, "commandbook.thor.other");
-        }
-
-        for (final Player player : targets) {
-            plugin.getSession(player).setHasThor(false);
-            
-            // Tell the user
-            if (player.equals(sender)) {
-                player.sendMessage(ChatColor.YELLOW + "You've lost Thor's hammer!");
-                
-                // Keep track of this
-                included = true;
-            } else {
-                player.sendMessage(ChatColor.YELLOW + "Thor's hammer has been revoked from you by "
-                        + PlayerUtil.toName(sender) + ".");
-                
-            }
-        }
-        
-        // The player didn't get anything, then we need to send the
-        // user a message so s/he know that something is indeed working
-        if (!included && args.hasFlag('s')) {
-            sender.sendMessage(ChatColor.YELLOW.toString() + "Thor's hammer revokved from players.");
         }
     }
     
