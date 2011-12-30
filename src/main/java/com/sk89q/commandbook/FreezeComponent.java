@@ -45,8 +45,7 @@ import org.bukkit.event.Listener;
  * @author Turtle9598
  */
 
-@ComponentInformation(desc = "Commands that involve direct player <-> player or player <-> admin" +
-        "communication are handled through this component.")
+@ComponentInformation(desc = "Blocks a specified player's movement on command")
 public class FreezeComponent extends AbstractComponent implements Listener {
 
     @InjectComponent private SessionComponent sessions;
@@ -94,8 +93,11 @@ public class FreezeComponent extends AbstractComponent implements Listener {
     
     @BukkitEvent(type = Event.Type.PLAYER_TELEPORT)
     public void onTeleport(PlayerTeleportEvent event) {
-        if (sessions.getAdminSession(event.getPlayer()).isFrozen() && event.getFrom().equals(event.getPlayer())) {
-            event.getPlayer().sendMessage(ChatColor.RED + "You are frozen.");
+        Player player = event.getPlayer();
+        
+        if (player.getVehicle() != null) return;
+        if (sessions.getAdminSession(player).isFrozen()) {
+            player.sendMessage(ChatColor.RED + "You are frozen.");
             event.setCancelled(true);
         }
     }
