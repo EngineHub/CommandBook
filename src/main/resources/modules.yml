@@ -1,7 +1,7 @@
 bans: com.sk89q.commandbook.bans.BansComponent
 homes: com.sk89q.commandbook.locations.HomesComponent
 warps: com.sk89q.commandbook.locations.WarpsComponent
-freeze: com.sk89q.commandbook.FreezeComponenet
+freeze: com.sk89q.commandbook.FreezeComponent
 messaging: com.sk89q.commandbook.MessagingComponent
 teleport: com.sk89q.commandbook.locations.TeleportComponent
 items: com.sk89q.commandbook.InventoryComponent

@@ -63,7 +63,7 @@ public class FreezeComponent extends AbstractComponent implements Listener {
      */
     
     @BukkitEvent(type = Event.Type.PLAYER_MOVE)
-    public void onMove(PlayerMoveEvent event) {
+    public void onPlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
 
         if (player.getVehicle() != null) return; // handled in vehicle listener
@@ -92,10 +92,10 @@ public class FreezeComponent extends AbstractComponent implements Listener {
      */
     
     @BukkitEvent(type = Event.Type.PLAYER_TELEPORT)
-    public void onTeleport(PlayerTeleportEvent event) {
+    public void onPlayerTeleport(PlayerTeleportEvent event) {
         Player player = event.getPlayer();
         
-        if (player.getVehicle() != null) return;
+        if (event.getCause().toString().equals("UNKNOWN")) return; //Must check to see if the event is UNKOWN as the Vehicle Move & Player Move events both use unknown teleport events.
         if (sessions.getAdminSession(player).isFrozen()) {
             player.sendMessage(ChatColor.RED + "You are frozen.");
             event.setCancelled(true);
