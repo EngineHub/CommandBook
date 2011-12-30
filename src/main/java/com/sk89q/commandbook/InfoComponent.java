@@ -109,7 +109,7 @@ public class InfoComponent extends AbstractComponent {
         @Command(aliases = {"compass"},
                 usage = "[player]", desc = "Show your current compass direction",
                 flags = "", min = 0, max = 1)
-        @CommandPermissions({"commandbook.whereami.compass.other"})
+        @CommandPermissions({"commandbook.whereami.compass"})
         public void compass(CommandContext args, CommandSender sender) throws CommandException {
 
             Player player;
@@ -117,7 +117,7 @@ public class InfoComponent extends AbstractComponent {
             if (args.argsLength() == 0) {
                 player = PlayerUtil.checkPlayer(sender);
             } else {
-                CommandBook.inst().checkPermission(sender, "commandbook.whereami.other");
+                CommandBook.inst().checkPermission(sender, "commandbook.whereami.compass.other");
 
                 player = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
             }
