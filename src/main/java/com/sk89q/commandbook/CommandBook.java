@@ -35,6 +35,7 @@ import com.sk89q.commandbook.events.ComponentManagerInitEvent;
 import com.sk89q.commandbook.events.core.EventManager;
 import com.sk89q.commandbook.session.SessionComponent;
 import com.sk89q.util.yaml.YAMLFormat;
+import com.sk89q.util.yaml.YAMLNode;
 import com.sk89q.util.yaml.YAMLProcessor;
 import com.sk89q.wepif.PermissionsResolverManager;
 import org.bukkit.*;
@@ -119,6 +120,9 @@ public final class CommandBook extends JavaPlugin {
 
         // Prepare permissions
         PermissionsResolverManager.initialize(this);
+
+        // Load configuration
+        populateConfiguration();
         
         componentManager = new ComponentManager();
         
@@ -130,14 +134,18 @@ public final class CommandBook extends JavaPlugin {
                 return CommandBook.inst().getClass().getResourceAsStream("/defaults/modules.yml");
             }
         }));
+        for (String dir : config.getStringList("component-class-dirs", Arrays.asList("component-classes"))) {
+            final File classesDir = new File(plugin.getDataFolder(), dir);
+            if (!classesDir.exists() || !classesDir.isDirectory()) {
+                classesDir.mkdirs();
+            }
+            componentManager.addComponentLoader(new ClassLoaderComponentLoader(classesDir, new File(plugin.getDataFolder(), "config/")));
+        }
         
         // -- Annotation handlers
         componentManager.registerAnnotationHandler(InjectComponent.class, new InjectComponentAnnotationHandler());
 
         getEventManager().callEvent(new ComponentManagerInitEvent(componentManager));
-
-        // Load configuration
-        populateConfiguration();
 
         componentManager.loadComponents();
         
