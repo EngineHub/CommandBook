@@ -60,17 +60,18 @@ public class InfoComponent extends AbstractComponent {
 
             Location pos = player.getLocation();
 
+            sender.sendMessage(ChatColor.YELLOW + "Player: " + player.getName() + (player == sender ? "(That's you!)" : ""));
             sender.sendMessage(ChatColor.YELLOW +
-                    "You are in the world: " + PlayerUtil.checkPlayer(sender).getWorld().getName());
+                    "World: " + player.getWorld().getName());
             sender.sendMessage(ChatColor.YELLOW +
-                    String.format("You're at: (%.4f, %.4f, %.4f)",
+                    String.format("Location: (%.4f, %.4f, %.4f)",
                             pos.getX(), pos.getY(), pos.getZ()));
             sender.sendMessage(ChatColor.YELLOW +
-                    "Your depth is: " + (int) Math.floor(pos.getY()));
+                    "Depth: " + (int) Math.floor(pos.getY()));
 
             if (CommandBook.inst().hasPermission(sender, "commandbook.whereami.compass")) {
                 sender.sendMessage(ChatColor.YELLOW +
-                        String.format("Your direction: %s",
+                        String.format("Direction: %s",
                                 getCardinalDirection(player)));
             }
         }
