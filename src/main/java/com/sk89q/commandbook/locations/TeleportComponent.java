@@ -190,9 +190,13 @@ public class TeleportComponent extends AbstractComponent implements Listener {
         @Command(aliases = {"return", "ret"}, usage = "[player]", desc = "Teleport back to your last location", min = 0, max = 1)
         @CommandPermissions({"commandbook.return"})
         public void ret(CommandContext args, CommandSender sender) throws CommandException {
-            Player player = args.argsLength() > 0 ?
-                    PlayerUtil.matchSinglePlayer(sender, args.getString(0))
-                    : PlayerUtil.checkPlayer(sender);
+            Player player;
+            if (args.argsLength() > 0) {
+                player = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
+                CommandBook.inst().checkPermission(sender, "commandbook.return.other");
+            } else {
+                player = PlayerUtil.checkPlayer(sender);
+            }
             Location lastLoc = sessions.getSession(player).popLastLocation();
 
             if (lastLoc != null) {
