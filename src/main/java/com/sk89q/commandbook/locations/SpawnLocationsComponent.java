@@ -56,6 +56,7 @@ public class SpawnLocationsComponent extends AbstractComponent implements Listen
     public void initialize() {
         spawns = new WrappedSpawnManager(new File(CommandBook.inst().getDataFolder(), "spawns.yml"));
         config = configure(new LocalConfiguration());
+        registerCommands(Commands.class);
     }
 
     @Override

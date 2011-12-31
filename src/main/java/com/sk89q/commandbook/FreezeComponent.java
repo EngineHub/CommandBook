@@ -98,6 +98,7 @@ public class FreezeComponent extends AbstractComponent implements Listener {
         if (event.getCause() == PlayerTeleportEvent.TeleportCause.UNKNOWN) {
             return; // Must check to see if the event is UNKNOWN as the Vehicle Move & Player Move events both use unknown teleport causes.
         }
+
         if (sessions.getAdminSession(player).isFrozen()) {
             player.sendMessage(ChatColor.RED + "You are frozen.");
             event.setCancelled(true);
