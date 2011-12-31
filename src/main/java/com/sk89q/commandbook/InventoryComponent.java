@@ -293,5 +293,67 @@ public class InventoryComponent extends AbstractComponent {
                         + "Inventories cleared.");
             }
         }
+        
+        @Command(aliases = {"more"},
+                usage = "[player]", desc = "Gets more of an item",
+                flags = "aio", min = 0, max = 1)
+        @CommandPermissions({"commandbook.more"})
+        public void more(CommandContext args, CommandSender sender) throws CommandException {
+
+            Iterable<Player> targets = null;
+            boolean moreAll = args.hasFlag('a');
+            boolean infinite = args.hasFlag('i');
+            boolean overrideStackSize = args.hasFlag('o');
+            if (infinite) {
+                CommandBook.inst().hasPermission(sender, "commandbook.more.infinite");
+            } else if (overrideStackSize) {
+                CommandBook.inst().hasPermission(sender, "commandbook.override.maxstacksize");
+            }
+
+            boolean included = false;
+        
+            if (args.argsLength() == 0) {
+                targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
+            // A different player
+            } else {
+                targets = PlayerUtil.matchPlayers(sender, args.getString(0));
+            
+                // Make sure that this player can 'more' other players!
+                CommandBook.inst().checkPermission(sender, "commandbook.more.other");
+            }
+        
+            for (Player player : targets) {
+                Inventory inventory = player.getInventory();
+            
+                if (moreAll) {
+                    for (int i = 0; i < 39; i++) {
+                        CommandBookUtil.expandStack(inventory.getItem(i), infinite, overrideStackSize);
+                    }
+                } else {
+                    CommandBookUtil.expandStack(player.getItemInHand(), infinite, overrideStackSize);
+                }
+        
+                // Tell the user about the given item
+                if (player.equals(sender)) {
+                    player.sendMessage(ChatColor.YELLOW
+                            + "Your item(s) has been expanded in stack size.");
+                
+                    // Keep track of this
+                    included = true;
+                } else {
+                    player.sendMessage(ChatColor.YELLOW
+                            + "Your item(s) has been expanded in stack size by "
+                            + PlayerUtil.toName(sender));
+                
+                }
+            }
+        
+            // The player didn't receive any items, then we need to send the
+            // user a message so s/he know that something is indeed working
+            if (!included) {
+                sender.sendMessage(ChatColor.YELLOW
+                        + "Stack sizes increased.");
+            }
+        }
     }
 }
