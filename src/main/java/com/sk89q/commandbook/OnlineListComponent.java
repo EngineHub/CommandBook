@@ -59,7 +59,7 @@ public class OnlineListComponent extends AbstractComponent implements Listener {
 
     private static class LocalConfiguration extends ConfigurationBase {
         @Setting("show-max-players") public boolean playersListMaxPlayers = true;
-        @Setting("grouped-manes") public boolean playersListGroupedNames;
+        @Setting("grouped-names") public boolean playersListGroupedNames;
         @Setting("colored-names") public boolean playersListColoredNames;
         @Setting("list-on-join") public boolean listOnJoin = true;
     }

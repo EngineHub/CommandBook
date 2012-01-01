@@ -275,7 +275,7 @@ public class CommandBookUtil {
      * @throws CommandException
      */
     public static void takeItem(CommandSender sender, ItemStack item, int amt,
-            Player target, InventoryComponent component)
+            Player target)
             throws CommandException {
         
         // Check for invalid amounts

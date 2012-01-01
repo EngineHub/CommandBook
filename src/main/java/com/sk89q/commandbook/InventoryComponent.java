@@ -380,7 +380,7 @@ public class InventoryComponent extends AbstractComponent {
             if (item == null) {
                 throw new CommandException("Something went wrong parsing the item info!");
             }
-            takeItem(sender, item, amt, target, InventoryComponent.this);
+            takeItem(sender, item, amt, target);
         }
     }
 }
