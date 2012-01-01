@@ -36,22 +36,22 @@ public class ConfigUtil {
         return ret;
     }
 
-    public static <U> U smartCast(Type genericType, Object value) {
+    public static Object smartCast(Type genericType, Object value) {
         if (value == null) {
             return null;
         }
         Type[] neededGenerics;
-        Class<U> target = null;
+        Class target = null;
         if (genericType != null && genericType instanceof ParameterizedType) {
             ParameterizedType type = (ParameterizedType) genericType;
             Type raw = type.getRawType();
             if (raw instanceof Class) {
-                target = (Class<U>)raw;
+                target = (Class)raw;
             }
             neededGenerics = type.getActualTypeArguments();
         } else {
             if (genericType instanceof Class) {
-                target = (Class<U>)genericType;
+                target = (Class)genericType;
             }
             neededGenerics = new Type[0];
         }
@@ -100,7 +100,7 @@ public class ConfigUtil {
                 ret = values;
             }
         }
-        return (U)ret;
+        return ret;
     }
 
     public static Number getNumber(Class<?> target, Number value) {
