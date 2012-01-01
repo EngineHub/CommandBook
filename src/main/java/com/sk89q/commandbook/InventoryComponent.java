@@ -40,6 +40,7 @@ import java.util.Set;
 
 import static com.sk89q.commandbook.util.ItemUtil.*;
 import static com.sk89q.commandbook.CommandBookUtil.giveItem;
+import static com.sk89q.commandbook.CommandBookUtil.takeItem;
 
 @ComponentInformation(desc = "Inventory-related commands, such as /give and /clear, are handled in this component.")
 public class InventoryComponent extends AbstractComponent {
@@ -215,7 +216,7 @@ public class InventoryComponent extends AbstractComponent {
                 targets = PlayerUtil.matchPlayers(sender, args.getString(0));
                 item = matchItem(sender, args.getString(1));
                 // Three arguments: Player, item type, and item amount
-            } else if (args.argsLength() == 3) {
+            } else if (args.argsLength() == 3) { 
                 targets = PlayerUtil.matchPlayers(sender, args.getString(0));
                 item = matchItem(sender, args.getString(1));
                 amt = args.getInteger(2);
@@ -226,7 +227,33 @@ public class InventoryComponent extends AbstractComponent {
             }
             giveItem(sender, item, amt, targets, InventoryComponent.this, args.hasFlag('d'), args.hasFlag('o'));
         }
+        
+        @Command(aliases = {"take"},
+                usage = "<target> <item[:data]> [amount]", desc = "Take an item",
+                flags = "", min = 2, max = 3)
+        @CommandPermissions({"commandbook.take.other"})
+        public void take(CommandContext args, CommandSender sender) throws CommandException {
+            ItemStack item = null;
+            int amt = config.defaultItemStackSize;
+            Player target = null;
 
+            // Two arguments: Player, item type
+            if (args.argsLength() == 2) {
+                target = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
+                item = matchItem(sender, args.getString(1));
+                // Three arguments: Player, item type, and item amount
+            } else if (args.argsLength() == 3) {
+                target = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
+                item = matchItem(sender, args.getString(1));
+                amt = args.getInteger(2);
+            }
+
+            if (item == null) {
+                throw new CommandException("Something went wrong parsing the item info!");
+            }
+            takeItem(sender, item, amt, target, InventoryComponent.this);
+        }
+        
         @Command(aliases = {"clear"},
                 usage = "[target]", desc = "Clear your inventory",
                 flags = "as", min = 0, max = 1)

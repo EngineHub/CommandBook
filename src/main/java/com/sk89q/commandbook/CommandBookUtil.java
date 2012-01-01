@@ -39,6 +39,7 @@ import org.bukkit.util.Vector;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.blocks.BlockType;
 
+import org.bukkit.Material;
 import static com.sk89q.commandbook.util.PlayerUtil.toColoredName;
 import static com.sk89q.commandbook.util.PlayerUtil.toName;
 import static com.sk89q.commandbook.util.PlayerUtil.toUniqueName;
@@ -260,6 +261,43 @@ public class CommandBookUtil {
         if (!included) {
             sender.sendMessage(ChatColor.YELLOW.toString() + amtText + " "
                     + ItemUtil.toItemName(item.getTypeId()) + " has been given.");
+        }
+    }
+    
+    /**
+     * Process an item give request.
+     * 
+     * @param sender
+     * @param item
+     * @param amt
+     * @param target
+     * @param component
+     * @throws CommandException
+     */
+    public static void takeItem(CommandSender sender, ItemStack item, int amt,
+            Player target, InventoryComponent component)
+            throws CommandException {
+        
+        // Check for invalid amounts
+        if (amt <= 0) {
+            throw new CommandException("Invalid item amount!");
+        }
+            
+        
+        item.setAmount(amt);              
+        if (target.getInventory().contains(item.getTypeId())) {
+            target.getInventory().removeItem(item);           
+
+            target.sendMessage(ChatColor.YELLOW + "Taken from "
+                            + PlayerUtil.toName(sender) + ": "
+                            + amt + " "
+                            + ItemUtil.toItemName(item.getTypeId()) + ".");
+        
+            sender.sendMessage(ChatColor.YELLOW.toString() + amt + " "
+                        + ItemUtil.toItemName(item.getTypeId()) + " has been taken.");
+        } else {
+            sender.sendMessage(ChatColor.YELLOW.toString() + target.getName() 
+                    + " has no" + " " + ItemUtil.toItemName(item.getTypeId()) + ".");
         }
     }
 
