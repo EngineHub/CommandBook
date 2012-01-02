@@ -20,22 +20,22 @@
 package com.sk89q.commandbook;
 
 import java.io.*;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 
-import com.sk89q.bukkit.util.CommandRegistration;
 import com.sk89q.bukkit.util.CommandsManagerRegistration;
 import com.sk89q.commandbook.components.*;
+import com.sk89q.commandbook.components.loader.ClassLoaderComponentLoader;
+import com.sk89q.commandbook.components.loader.ConfigListedComponentLoader;
+import com.sk89q.commandbook.components.loader.JarFilesComponentLoader;
+import com.sk89q.commandbook.components.loader.StaticComponentLoader;
 import com.sk89q.commandbook.events.ComponentManagerInitEvent;
 import com.sk89q.commandbook.events.core.EventManager;
 import com.sk89q.commandbook.session.SessionComponent;
 import com.sk89q.util.yaml.YAMLFormat;
-import com.sk89q.util.yaml.YAMLNode;
 import com.sk89q.util.yaml.YAMLProcessor;
 import com.sk89q.wepif.PermissionsResolverManager;
 import org.bukkit.*;
@@ -125,21 +125,32 @@ public final class CommandBook extends JavaPlugin {
         populateConfiguration();
         
         componentManager = new ComponentManager();
+
         
         // -- Component loaders
-        componentManager.addComponentLoader(new StaticComponentLoader(new SessionComponent()));
+        final File configDir = new File(plugin.getDataFolder(), "config/");
+        componentManager.addComponentLoader(new StaticComponentLoader(configDir, new SessionComponent()));
         componentManager.addComponentLoader(new ConfigListedComponentLoader(new YAMLProcessor(null, false) {
             @Override
             public InputStream getInputStream() {
                 return CommandBook.inst().getClass().getResourceAsStream("/defaults/modules.yml");
             }
-        }));
+        }, configDir));
+
         for (String dir : config.getStringList("component-class-dirs", Arrays.asList("component-classes"))) {
             final File classesDir = new File(plugin.getDataFolder(), dir);
             if (!classesDir.exists() || !classesDir.isDirectory()) {
                 classesDir.mkdirs();
             }
-            componentManager.addComponentLoader(new ClassLoaderComponentLoader(classesDir, new File(plugin.getDataFolder(), "config/")));
+            componentManager.addComponentLoader(new ClassLoaderComponentLoader(classesDir, configDir));
+        }
+
+        for (String dir : config.getStringList("component-jar-dirs", Arrays.asList("component-jars"))) {
+            final File classesDir = new File(plugin.getDataFolder(), dir);
+            if (!classesDir.exists() || !classesDir.isDirectory()) {
+                classesDir.mkdirs();
+            }
+            componentManager.addComponentLoader(new JarFilesComponentLoader(classesDir, configDir));
         }
         
         // -- Annotation handlers

@@ -16,39 +16,35 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.commandbook.components;
+package com.sk89q.commandbook.components.loader;
 
 import com.sk89q.commandbook.CommandBook;
-import com.sk89q.util.yaml.YAMLFormat;
-import com.sk89q.util.yaml.YAMLNode;
-import com.sk89q.util.yaml.YAMLProcessor;
+import com.sk89q.commandbook.components.AbstractComponent;
 
 import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
- * @author zml2008
+ * A component loader that loads components from a directory of classes.
  */
-public class ClassLoaderComponentLoader implements ComponentLoader {
+public class ClassLoaderComponentLoader extends FileComponentLoader {
     private final URLClassLoader loader;
     private final File classDir;
-    private final File configDir;
 
     public ClassLoaderComponentLoader(File classDir, File configDir) {
+        super(configDir);
         this.classDir = classDir;
         try {
             this.loader = new URLClassLoader(new URL[] {classDir.toURI().toURL()}, CommandBook.inst().getClass().getClassLoader());
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
-        }
-        this.configDir = configDir;
-        if (!configDir.exists() || !configDir.isDirectory()) {
-            configDir.mkdirs();
         }
     }
 
@@ -62,13 +58,10 @@ public class ClassLoaderComponentLoader implements ComponentLoader {
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
-            if (clazz == null || !AbstractComponent.class.isAssignableFrom(clazz)) {
-                continue;
-            }
+            if (!isComponentClass(clazz)) continue;
 
             try {
-                Constructor<? extends AbstractComponent> construct = clazz.asSubclass(AbstractComponent.class).getConstructor();
-                components.add(construct.newInstance());
+                components.add(instantiateComponent(clazz));
             } catch (Throwable t) {
                 CommandBook.logger().warning("CommandBook: Error initializing component " + clazz + ": " + t.getMessage());
                 t.printStackTrace();
@@ -76,19 +69,6 @@ public class ClassLoaderComponentLoader implements ComponentLoader {
             }
         }
         return components;
-    }
-
-    @Override
-    public YAMLNode getConfiguration(AbstractComponent component) {
-        final File configFile = new File(configDir, component.getClass().getName() + ".yml");
-        YAMLProcessor config = new YAMLProcessor(configFile, true, YAMLFormat.EXTENDED);
-        try {
-            if (!configFile.exists()) configFile.createNewFile();
-            config.load();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return config;
     }
     
     public Set<String> getClassNames() {
@@ -101,7 +81,7 @@ public class ClassLoaderComponentLoader implements ComponentLoader {
             if (file.isDirectory()) {
                 classNames.addAll(recursiveGetClasses(file, parentName + file.getName() + "."));
             } else if (file.getName().endsWith(".class")) {
-                classNames.add(parentName + file.getName().substring(0, file.getName().length() - 6).replaceAll("\\$", "."));
+                classNames.add(parentName + formatPath(file.getName()));
             }
         }
         return classNames;

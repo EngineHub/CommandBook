@@ -46,7 +46,7 @@ import java.util.regex.Pattern;
 /**
  * TimeComponent contains commands and functions related to time management. These include
  */
-@ComponentInformation(desc = "Commands to manage and lock time for a world.")
+@ComponentInformation(friendlyName = "Time Control", desc = "Commands to manage and lock time for a world.")
 public class TimeComponent extends AbstractComponent implements Listener {
 
     /**
@@ -111,6 +111,7 @@ public class TimeComponent extends AbstractComponent implements Listener {
 
     @Override
     public void reload() {
+        super.reload();
         unload();
         configureWorldLocks();
     }

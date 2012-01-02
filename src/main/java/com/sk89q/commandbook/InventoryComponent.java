@@ -42,7 +42,7 @@ import static com.sk89q.commandbook.util.ItemUtil.*;
 import static com.sk89q.commandbook.CommandBookUtil.giveItem;
 import static com.sk89q.commandbook.CommandBookUtil.takeItem;
 
-@ComponentInformation(desc = "Inventory-related commands, such as /give and /clear, are handled in this component.")
+@ComponentInformation(friendlyName = "Inventory", desc = "Inventory-related commands, such as /give and /clear, are handled in this component.")
 public class InventoryComponent extends AbstractComponent {
     protected LocalConfiguration config;
 
@@ -54,6 +54,7 @@ public class InventoryComponent extends AbstractComponent {
 
     @Override
     public void reload() {
+        super.reload();
         configure(config);
     }
 

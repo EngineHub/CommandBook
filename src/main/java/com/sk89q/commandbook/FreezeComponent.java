@@ -45,7 +45,7 @@ import org.bukkit.event.Listener;
  * @author Turtle9598
  */
 
-@ComponentInformation(desc = "Blocks a specified player's movement on command")
+@ComponentInformation(friendlyName = "Freeze", desc = "Blocks a specified player's movement on command")
 public class FreezeComponent extends AbstractComponent implements Listener {
 
     @InjectComponent private SessionComponent sessions;

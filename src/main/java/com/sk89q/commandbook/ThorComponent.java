@@ -45,7 +45,7 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
-@ComponentInformation(desc = "Thor's hammer and other lightning effects.")
+@ComponentInformation(friendlyName = "Thor", desc = "Thor's hammer and other lightning effects.")
 public class ThorComponent extends AbstractComponent implements Listener {
 
     @InjectComponent private SessionComponent sessions;
@@ -63,6 +63,7 @@ public class ThorComponent extends AbstractComponent implements Listener {
 
     @Override
     public void reload() {
+        super.reload();
         configure(config);
     }
 

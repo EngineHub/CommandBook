@@ -32,7 +32,7 @@ import org.bukkit.entity.Player;
 import java.io.File;
 import java.util.Map;
 
-@ComponentInformation(desc = "Distributes kits to players on command (with cooldowns)")
+@ComponentInformation(friendlyName = "Kits", desc = "Distributes kits to players on command (with cooldowns)")
 public class KitsComponent extends AbstractComponent {
     private KitManager kits;
 
@@ -50,6 +50,7 @@ public class KitsComponent extends AbstractComponent {
     
     @Override
     public void reload() {
+        super.reload();
         kits.load();
     }
 

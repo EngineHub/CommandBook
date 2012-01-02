@@ -31,7 +31,7 @@ import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-@ComponentInformation(desc = "Provides warps functionality")
+@ComponentInformation(friendlyName = "Warps", desc = "Provides warps functionality")
 public class WarpsComponent extends LocationsComponent {
     public WarpsComponent() {
         super("Warp");

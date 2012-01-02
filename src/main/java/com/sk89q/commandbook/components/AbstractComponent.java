@@ -20,20 +20,14 @@ package com.sk89q.commandbook.components;
 
 import com.sk89q.bukkit.util.CommandsManagerRegistration;
 import com.sk89q.commandbook.CommandBook;
+import com.sk89q.commandbook.components.loader.ComponentLoader;
 import com.sk89q.commandbook.config.ConfigurationBase;
-import com.sk89q.commandbook.config.Setting;
-import com.sk89q.commandbook.config.SettingBase;
 import com.sk89q.minecraft.util.commands.*;
 import com.sk89q.util.yaml.YAMLNode;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-
-import java.lang.reflect.Field;
-import java.util.logging.Level;
-
-import static com.sk89q.commandbook.config.ConfigUtil.*;
 
 /**
  * @author zml2008
@@ -57,13 +51,15 @@ public abstract class AbstractComponent implements CommandExecutor {
     private YAMLNode rawConfiguration;
 
     private ComponentLoader loader;
+    
+    private ComponentInformation info;
 
     private boolean enabled;
 
-    public void setUp(CommandsManager<CommandSender> commands, YAMLNode rawConfiguration, ComponentLoader loader) {
+    public void setUp(CommandsManager<CommandSender> commands, ComponentLoader loader, ComponentInformation info) {
         this.commands = commands;
-        this.rawConfiguration = rawConfiguration;
         this.loader = loader;
+        this.info = info;
         commandRegistration = new CommandsManagerRegistration(CommandBook.inst(), this, commands);
     }
 
@@ -75,15 +71,19 @@ public abstract class AbstractComponent implements CommandExecutor {
 
     public void unload() {}
 
-    public void reload() {}
+    public void reload() {
+        if (rawConfiguration != null) {
+            rawConfiguration = getComponentLoader().getConfiguration(this);
+        }
+    }
 
     public <T extends ConfigurationBase> T configure(T config) {
-        config.load(rawConfiguration);
+        config.load(getRawConfiguration());
         return config;
     }
     
     public <T extends ConfigurationBase>  T saveConfig(T config) {
-        config.save(rawConfiguration);
+        config.save(getRawConfiguration());
         return config;
     }
 
@@ -131,7 +131,15 @@ public abstract class AbstractComponent implements CommandExecutor {
         return loader;
     }
     
-    public void setRawConfiguration(YAMLNode node) {
-        this.rawConfiguration = node;
+    public ComponentInformation getInformation() {
+        return info;
+    }
+    
+    public YAMLNode getRawConfiguration() {
+        if (rawConfiguration != null) {
+            return rawConfiguration;
+        } else {
+            return rawConfiguration = getComponentLoader().getConfiguration(this);
+        }
     }
 }

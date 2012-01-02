@@ -34,7 +34,9 @@ import org.bukkit.command.CommandSender;
 
 import java.util.List;
 
-@ComponentInformation(desc = "Parent class for components that use a RootLocationManager<NamedLocation>")
+/**
+ * Parent class for components that use a RootLocationManager<NamedLocation> and deal with locations
+ */
 public abstract class LocationsComponent extends AbstractComponent {
     
     private final String name;

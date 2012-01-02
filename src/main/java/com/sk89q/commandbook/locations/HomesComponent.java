@@ -31,7 +31,7 @@ import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-@ComponentInformation(desc = "Home management system")
+@ComponentInformation(friendlyName = "Homes", desc = "Home management system")
 public class HomesComponent extends LocationsComponent {
     public HomesComponent() {
         super("Home");

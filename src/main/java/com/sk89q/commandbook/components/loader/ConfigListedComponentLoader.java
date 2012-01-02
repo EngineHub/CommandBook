@@ -16,28 +16,32 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.commandbook.components;
+package com.sk89q.commandbook.components.loader;
 
 import com.sk89q.commandbook.CommandBook;
+import com.sk89q.commandbook.components.AbstractComponent;
 import com.sk89q.commandbook.config.ConfigUtil;
-import com.sk89q.commandbook.config.InputStreamYAMLProcessor;
 import com.sk89q.util.yaml.YAMLNode;
 import com.sk89q.util.yaml.YAMLProcessor;
 import org.yaml.snakeyaml.error.YAMLException;
 
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author zml2008
  */
-public class ConfigListedComponentLoader implements ComponentLoader {
+public class ConfigListedComponentLoader extends AbstractComponentLoader {
     private YAMLProcessor jarComponentAliases;
 
-    public ConfigListedComponentLoader(YAMLProcessor aliasList) {
+    public ConfigListedComponentLoader(YAMLProcessor aliasList, File configDir) {
+        super(configDir);
         this.jarComponentAliases = aliasList;
         try {
             jarComponentAliases.load();
@@ -53,20 +57,25 @@ public class ConfigListedComponentLoader implements ComponentLoader {
     @Override
     public Collection<AbstractComponent> loadComponents() {
         List<AbstractComponent> components = new ArrayList<AbstractComponent>();
-        Set<String> disabledComponents = new HashSet<String>(CommandBook.inst().getGlobalConfiguration().getStringList("components.disabled", null));
-        Set<String> stagedEnabled = new HashSet<String>(CommandBook.inst().getGlobalConfiguration().getStringList("components.enabled", null));
+        // The lists of components to load.
+        Set<String> disabledComponents = new HashSet<String>(CommandBook.inst().
+                getGlobalConfiguration().getStringList("components.disabled", null));
+        Set<String> stagedEnabled = new HashSet<String>(CommandBook.inst().
+                getGlobalConfiguration().getStringList("components.enabled", null));
         stagedEnabled.addAll(jarComponentAliases.getKeys(null));
         stagedEnabled.removeAll(disabledComponents);
+
+        // And go through the enabled components from the configuration
         for (Iterator<String> i = stagedEnabled.iterator(); i.hasNext(); ) {
             String nextName = i.next();
             nextName = jarComponentAliases.getString(nextName, nextName);
-            Class<?> next = null;
+            Class<?> clazz = null;
             try {
-                next = Class.forName(nextName);
+                clazz = Class.forName(nextName);
             } catch (ClassNotFoundException ignore) {}
 
 
-            if (next == null || !AbstractComponent.class.isAssignableFrom(next)) {
+            if (!isComponentClass(clazz)) {
                 CommandBook.logger().warning("CommandBook: Invalid or unknown class found in enabled components: "
                         + nextName + ". Moving to disabled components list.");
                 i.remove();
@@ -75,23 +84,26 @@ public class ConfigListedComponentLoader implements ComponentLoader {
             }
 
             try {
-                Constructor<? extends AbstractComponent> construct = next.asSubclass(AbstractComponent.class).getConstructor();
-                components.add(construct.newInstance());
+                components.add(instantiateComponent(clazz));
             } catch (Throwable t) {
-                CommandBook.logger().warning("CommandBook: Error initializing component " + next + ": " + t.getMessage());
+                CommandBook.logger().warning("CommandBook: Error initializing component "
+                        + clazz + ": " + t.getMessage());
                 t.printStackTrace();
                 continue;
             }
-
         }
 
-        CommandBook.inst().getGlobalConfiguration().setProperty("components.disabled", new ArrayList<String>(disabledComponents));
-        CommandBook.inst().getGlobalConfiguration().setProperty("components.enabled", new ArrayList<String>(stagedEnabled));
+        // And update the configuration now that we're done loading from this loader
+        CommandBook.inst().getGlobalConfiguration().setProperty("components.disabled",
+                new ArrayList<String>(disabledComponents));
+        CommandBook.inst().getGlobalConfiguration().setProperty("components.enabled",
+                new ArrayList<String>(stagedEnabled));
         return components;
     }
 
     @Override
     public YAMLNode getConfiguration(AbstractComponent component) {
-        return ConfigUtil.getNode(CommandBook.inst().getGlobalConfiguration(), "component." + component.getClass().getSimpleName());
+        return ConfigUtil.getNode(CommandBook.inst().getGlobalConfiguration(),
+                "component." + toFileName(component));
     }
 }

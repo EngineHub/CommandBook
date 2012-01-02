@@ -25,7 +25,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 
-@ComponentInformation(desc = "Provides useful debugging information for server owners.")
+@ComponentInformation(friendlyName = "Debug", desc = "Provides useful debugging information for server owners.")
 public class DebugComponent extends AbstractComponent {
     @Override
     public void initialize() {

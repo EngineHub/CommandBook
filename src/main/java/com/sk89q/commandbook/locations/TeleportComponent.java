@@ -47,7 +47,7 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 
 import java.io.File;
 
-@ComponentInformation(desc = "Teleport-related commands")
+@ComponentInformation(friendlyName = "Teleports", desc = "Teleport-related commands")
 public class TeleportComponent extends AbstractComponent implements Listener {
     
     @InjectComponent private SessionComponent sessions;

@@ -30,7 +30,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 
-@ComponentInformation(desc = "Various world-related commands.")
+@ComponentInformation(friendlyName = "World Tools", desc = "Various world-related commands.")
 public class WorldComponent extends AbstractComponent {
     @Override
     public void initialize() {

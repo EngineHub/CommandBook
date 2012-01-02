@@ -44,7 +44,7 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 
 import java.io.File;
 
-@ComponentInformation(desc = "Allows exact spawn locations for players, " +
+@ComponentInformation(friendlyName = "Spawn Locations", desc = "Allows exact spawn locations for players, " +
         "as well as getting and setting the world's spawn.")
 public class SpawnLocationsComponent extends AbstractComponent implements Listener {
 
@@ -61,6 +61,7 @@ public class SpawnLocationsComponent extends AbstractComponent implements Listen
 
     @Override
     public void reload() {
+        super.reload();
         spawns.load();
     }
 

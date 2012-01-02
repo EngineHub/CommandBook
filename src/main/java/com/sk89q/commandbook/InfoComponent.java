@@ -32,7 +32,7 @@ import org.bukkit.entity.Player;
 
 import static com.sk89q.commandbook.CommandBookUtil.getCardinalDirection;
 
-@ComponentInformation(desc = "InfoComponent contains commands that allow users to gather " +
+@ComponentInformation(friendlyName = "Info", desc = "Info contains commands that allow users to gather " +
         "information about the world, without being able to make changes.")
 public class InfoComponent extends AbstractComponent {
 

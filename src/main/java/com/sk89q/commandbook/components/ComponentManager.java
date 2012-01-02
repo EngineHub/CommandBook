@@ -19,7 +19,7 @@
 package com.sk89q.commandbook.components;
 
 import com.sk89q.commandbook.CommandBook;
-import com.sk89q.commandbook.config.ConfigUtil;
+import com.sk89q.commandbook.components.loader.ComponentLoader;
 import com.sk89q.minecraft.util.commands.CommandsManager;
 import com.sk89q.minecraft.util.commands.SimpleInjector;
 import com.sk89q.util.yaml.YAMLNode;
@@ -56,9 +56,7 @@ public class ComponentManager {
                 };
                 commands.setInjector(new SimpleInjector(component));
 
-                YAMLNode componentConfig = loader.getConfiguration(component);
-
-                component.setUp(commands, componentConfig, loader);
+                component.setUp(commands, loader, component.getClass().getAnnotation(ComponentInformation.class));
                 
                 registeredComponents.add(component);
             }
@@ -100,7 +98,6 @@ public class ComponentManager {
     
     public synchronized void reloadComponents() {
         for (AbstractComponent component : registeredComponents) {
-            component.setRawConfiguration(component.getComponentLoader().getConfiguration(component));
             component.reload();
         }
     }

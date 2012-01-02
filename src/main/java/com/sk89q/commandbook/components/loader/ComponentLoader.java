@@ -16,30 +16,19 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.commandbook.components;
+package com.sk89q.commandbook.components.loader;
 
-import com.sk89q.commandbook.CommandBook;
-import com.sk89q.commandbook.config.ConfigUtil;
+import com.sk89q.commandbook.components.AbstractComponent;
 import com.sk89q.util.yaml.YAMLNode;
-
-import java.util.*;
+import java.util.Collection;
 
 /**
  * @author zml2008
  */
-public class StaticComponentLoader implements ComponentLoader {
-    private List<AbstractComponent> components;
+public interface ComponentLoader {
 
-    public StaticComponentLoader(AbstractComponent... components) {
-        this.components = Arrays.asList(components);
-    }
-    @Override
-    public Collection<AbstractComponent> loadComponents() {
-        return components;
-    }
-
-    @Override
-    public YAMLNode getConfiguration(AbstractComponent component) {
-        return ConfigUtil.getNode(CommandBook.inst().getGlobalConfiguration(), "component." + component.getClass().getSimpleName());
-    }
+    public Collection<AbstractComponent> loadComponents();
+    
+    public YAMLNode getConfiguration(AbstractComponent component);
+    
 }

@@ -41,7 +41,7 @@ import java.util.Map;
 import static com.sk89q.commandbook.CommandBookUtil.replaceColorMacros;
 import static com.sk89q.commandbook.CommandBookUtil.sendMessage;
 
-@ComponentInformation(desc = "Handles stored messages, such as the MOTD and rules pages.")
+@ComponentInformation(friendlyName = "Stored Messages", desc = "Handles stored messages, such as the MOTD and rules pages.")
 public class StoredMessagesComponent extends AbstractComponent implements Listener {
 
     protected final Map<String, String> messages = new HashMap<String, String>();

@@ -30,7 +30,7 @@ import org.bukkit.GameMode;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-@ComponentInformation(desc = "Various player-related commands.")
+@ComponentInformation(friendlyName = "Player Commands", desc = "Various player-related commands.")
 public class PlayerComponent extends AbstractComponent {
     @Override
     public void initialize() {

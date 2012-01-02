@@ -37,7 +37,7 @@ import org.bukkit.util.Vector;
 import static com.sk89q.commandbook.util.EntityUtil.matchCreatureType;
 import java.util.Random;
 
-@ComponentInformation(desc = "Provides some fun commands to toy with users. (/rocket and /pong are two fun ones)")
+@ComponentInformation(friendlyName = "Fun", desc = "Provides some fun commands to toy with users. (/rocket and /pong are two fun ones)")
 public class FunComponent extends AbstractComponent {
     private static final Random random = new Random();
 

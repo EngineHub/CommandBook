@@ -33,7 +33,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-@ComponentInformation(desc = "Handles player sessions")
+@ComponentInformation(friendlyName = "Sessions", desc = "Handles player sessions")
 public class SessionComponent extends AbstractComponent implements Runnable, Listener {
 
     public static final long CHECK_FREQUENCY = 1200;

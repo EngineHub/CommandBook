@@ -41,7 +41,7 @@ import org.bukkit.event.player.PlayerChatEvent;
 
 import static com.sk89q.commandbook.CommandBookUtil.replaceColorMacros;
 
-@ComponentInformation(desc = "Commands that involve direct player <-> player or player <-> admin" +
+@ComponentInformation(friendlyName = "Messaging", desc = "Commands that involve direct player <-> player or player <-> admin" +
         "communication are handled through this component.")
 public class MessagingComponent extends AbstractComponent implements Listener {
 
@@ -58,6 +58,7 @@ public class MessagingComponent extends AbstractComponent implements Listener {
 
     @Override
     public void reload() {
+        super.reload();
         configure(config);
     }
 

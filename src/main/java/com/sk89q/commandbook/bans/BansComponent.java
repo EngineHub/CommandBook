@@ -33,7 +33,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
 
-@ComponentInformation(desc = "A system for kicks and bans.")
+@ComponentInformation(friendlyName = "Bans", desc = "A system for kicks and bans.")
 public class BansComponent extends AbstractComponent implements Listener {
     private BanDatabase bans;
     private LocalConfiguration config;
@@ -50,6 +50,7 @@ public class BansComponent extends AbstractComponent implements Listener {
 
     @Override
     public void reload() {
+        super.reload();
         getBanDatabase().load();
         configure(config);
     }

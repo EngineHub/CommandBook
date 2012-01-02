@@ -1,6 +1,6 @@
 /*
  * CommandBook
- * Copyright (C) 2011 sk89q <http://www.sk89q.com>
+ * Copyright (C) 2012 sk89q <http://www.sk89q.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,16 +18,21 @@
 
 package com.sk89q.commandbook.components;
 
-import com.sk89q.util.yaml.YAMLNode;
-import java.util.Collection;
-
 /**
  * @author zml2008
  */
-public interface ComponentLoader {
-
-    public Collection<AbstractComponent> loadComponents();
+public class InvalidComponentException extends Exception {
+    private final Class<?> componentClass;
     
-    public YAMLNode getConfiguration(AbstractComponent component);
+    public InvalidComponentException(Class<?> componentClass, String message) {
+        super(message);
+        this.componentClass = componentClass;
+    }
     
+    @Override
+    public String getMessage() {
+        return "Component " + componentClass.getCanonicalName() +
+                " could not be loaded due to an error in the structure of the component: "
+                + super.getMessage();
+    }
 }

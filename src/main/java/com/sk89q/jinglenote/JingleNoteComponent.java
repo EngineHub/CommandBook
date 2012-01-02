@@ -47,7 +47,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.logging.Level;
 
-@ComponentInformation(desc = "MIDI sequencer for note blocks with commands.")
+@ComponentInformation(friendlyName = "JingleNote", desc = "MIDI sequencer for note blocks with commands.")
 public class JingleNoteComponent extends AbstractComponent implements Listener {
 
     private JingleNoteManager jingleNoteManager;

@@ -40,7 +40,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@ComponentInformation(desc = "Lists online players both on command and on player join.")
+@ComponentInformation(friendlyName = "Online List", desc = "Lists online players both on command and on player join.")
 public class OnlineListComponent extends AbstractComponent implements Listener {
 
     private LocalConfiguration config;
@@ -54,6 +54,7 @@ public class OnlineListComponent extends AbstractComponent implements Listener {
 
     @Override
     public void reload() {
+        super.reload();
         configure(config);
     }
 

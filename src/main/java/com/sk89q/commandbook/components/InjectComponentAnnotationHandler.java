@@ -29,10 +29,12 @@ public class InjectComponentAnnotationHandler implements AnnotationHandler<Injec
     @Override
     public boolean handle(AbstractComponent component, Field field, InjectComponent annotation) {
         try {
-            field.set(component, CommandBook.inst().getComponentManager().getComponent(field.getType()));
-            return true;
-        } catch (IllegalAccessException e) {
-            return false;
-        }
+            Object target = CommandBook.inst().getComponentManager().getComponent(field.getType());
+            if (target != null) {
+                field.set(component, target);
+                return true;
+            }
+        } catch (IllegalAccessException ignore) {}
+        return false;
     }
 }
