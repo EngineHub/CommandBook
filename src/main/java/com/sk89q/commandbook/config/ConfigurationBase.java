@@ -18,16 +18,64 @@
 
 package com.sk89q.commandbook.config;
 
+import com.sk89q.commandbook.CommandBook;
+import com.sk89q.util.yaml.YAMLNode;
 import com.sk89q.util.yaml.YAMLProcessor;
+
+import java.lang.reflect.Field;
+import java.util.logging.Level;
+
+import static com.sk89q.commandbook.config.ConfigUtil.getNode;
+import static com.sk89q.commandbook.config.ConfigUtil.prepareSerialization;
+import static com.sk89q.commandbook.config.ConfigUtil.smartCast;
 
 /**
  * The base class for configuration of {@link com.sk89q.commandbook.components.AbstractComponent}s
  */
 public abstract class ConfigurationBase {
-    protected YAMLProcessor rawConfig;
     protected boolean isConfigured;
 
     public boolean isConfigured() {
         return isConfigured;
+    }
+    
+    public void load(YAMLNode node) {
+        if (getClass().isAnnotationPresent(SettingBase.class)) {
+            node = getNode(node, getClass().getAnnotation(SettingBase.class).value());
+        }
+        for (Field field : getClass().getFields()) {
+            if (!field.isAnnotationPresent(Setting.class)) continue;
+            String key = field.getAnnotation(Setting.class).value();
+            final Object value = smartCast(field.getGenericType(), node.getProperty(key));
+            try {
+                field.setAccessible(true);
+                if (value != null) {
+                    field.set(this, value);
+                } else {
+                    node.setProperty(key, prepareSerialization(field.get(this)));
+                }
+            } catch (IllegalAccessException e) {
+                CommandBook.logger().log(Level.SEVERE, "Error setting configuration value of field: ", e);
+                e.printStackTrace();
+            }
+        }
+        isConfigured = true;
+    }
+    
+    public void save(YAMLNode node) {
+        if (getClass().isAnnotationPresent(SettingBase.class)) {
+            node = getNode(node, getClass().getAnnotation(SettingBase.class).value());
+        }
+        for (Field field : getClass().getFields()) {
+            field.setAccessible(true);
+            if (!field.isAnnotationPresent(Setting.class)) continue;
+            String key = field.getAnnotation(Setting.class).value();
+            try {
+                node.setProperty(key, prepareSerialization(field.get(this)));
+            } catch (IllegalAccessException e) {
+                CommandBook.logger().log(Level.SEVERE, "Error getting configuration value of field: ", e);
+                e.printStackTrace();
+            }
+        }
     }
 }

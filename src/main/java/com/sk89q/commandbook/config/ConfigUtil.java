@@ -36,6 +36,7 @@ public class ConfigUtil {
         return ret;
     }
 
+    @SuppressWarnings("unchecked")
     public static Object smartCast(Type genericType, Object value) {
         if (value == null) {
             return null;
@@ -146,7 +147,8 @@ public class ConfigUtil {
         }
         return null;
     }
-    
+
+    @SuppressWarnings("unchecked")
     public static Object prepareSerialization(Object obj) {
         if (obj instanceof Collection) {
             obj = new ArrayList((Collection)obj);

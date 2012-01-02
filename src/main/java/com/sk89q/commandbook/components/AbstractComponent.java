@@ -68,7 +68,7 @@ public abstract class AbstractComponent implements CommandExecutor {
     }
 
     /**
-     * This method is called once all of this Components fields have been set up
+     * This method is called once all of this Component's fields have been set up
      * and all other Component classes have been discovered
      */
     public abstract void initialize();
@@ -78,45 +78,12 @@ public abstract class AbstractComponent implements CommandExecutor {
     public void reload() {}
 
     public <T extends ConfigurationBase> T configure(T config) {
-        YAMLNode node = rawConfiguration;
-        if (config.getClass().isAnnotationPresent(SettingBase.class)) {
-            node = getNode(rawConfiguration, config.getClass().getAnnotation(SettingBase.class).value());
-        }
-        for (Field field : config.getClass().getFields()) {
-            if (!field.isAnnotationPresent(Setting.class)) continue;
-            String key = field.getAnnotation(Setting.class).value();
-            final Object value = smartCast(field.getGenericType(), node.getProperty(key));
-                try {
-                    field.setAccessible(true);
-                    if (value != null && field.getType().isAssignableFrom(value.getClass())) {
-                            field.set(config, value);
-                    } else {
-                        node.setProperty(key, prepareSerialization(field.get(config)));
-                    }
-                } catch (IllegalAccessException e) {
-                    CommandBook.logger().log(Level.SEVERE, "Error setting configuration value of field: ", e);
-                    e.printStackTrace();
-                }
-        }
+        config.load(rawConfiguration);
         return config;
     }
     
     public <T extends ConfigurationBase>  T saveConfig(T config) {
-        YAMLNode node = rawConfiguration;
-        if (config.getClass().isAnnotationPresent(SettingBase.class)) {
-            node = getNode(rawConfiguration, config.getClass().getAnnotation(SettingBase.class).value());
-        }
-        for (Field field : config.getClass().getFields()) {
-            field.setAccessible(true);
-            if (!field.isAnnotationPresent(Setting.class)) continue;
-            String key = field.getAnnotation(Setting.class).value();
-            try {
-                node.setProperty(key, prepareSerialization(field.get(config)));
-            } catch (IllegalAccessException e) {
-                CommandBook.logger().log(Level.SEVERE, "Error getting configuration value of field: ", e);
-                e.printStackTrace();
-            }
-        }
+        config.save(rawConfiguration);
         return config;
     }
 
