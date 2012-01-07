@@ -21,6 +21,7 @@ package com.sk89q.commandbook.locations;
 import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.components.AbstractComponent;
 import com.sk89q.commandbook.components.ComponentInformation;
+import com.sk89q.commandbook.components.Depend;
 import com.sk89q.commandbook.components.InjectComponent;
 import com.sk89q.commandbook.config.ConfigurationBase;
 import com.sk89q.commandbook.config.Setting;
@@ -48,6 +49,7 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import java.io.File;
 
 @ComponentInformation(friendlyName = "Teleports", desc = "Teleport-related commands")
+@Depend(components = SessionComponent.class)
 public class TeleportComponent extends AbstractComponent implements Listener {
     
     @InjectComponent private SessionComponent sessions;

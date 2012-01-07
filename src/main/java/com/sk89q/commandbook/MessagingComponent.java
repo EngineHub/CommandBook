@@ -20,6 +20,7 @@ package com.sk89q.commandbook;
 
 import com.sk89q.commandbook.components.AbstractComponent;
 import com.sk89q.commandbook.components.ComponentInformation;
+import com.sk89q.commandbook.components.Depend;
 import com.sk89q.commandbook.components.InjectComponent;
 import com.sk89q.commandbook.config.ConfigurationBase;
 import com.sk89q.commandbook.config.Setting;
@@ -43,6 +44,7 @@ import static com.sk89q.commandbook.CommandBookUtil.replaceColorMacros;
 
 @ComponentInformation(friendlyName = "Messaging", desc = "Commands that involve direct player <-> player or player <-> admin" +
         "communication are handled through this component.")
+@Depend(components = SessionComponent.class)
 public class MessagingComponent extends AbstractComponent implements Listener {
 
     @InjectComponent private SessionComponent sessions;

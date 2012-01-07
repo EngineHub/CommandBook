@@ -20,6 +20,7 @@ package com.sk89q.commandbook;
 
 import com.sk89q.commandbook.components.AbstractComponent;
 import com.sk89q.commandbook.components.ComponentInformation;
+import com.sk89q.commandbook.components.Depend;
 import com.sk89q.commandbook.components.InjectComponent;
 import com.sk89q.commandbook.config.ConfigurationBase;
 import com.sk89q.commandbook.config.Setting;
@@ -46,6 +47,7 @@ import java.util.Random;
 import java.util.Set;
 
 @ComponentInformation(friendlyName = "Thor", desc = "Thor's hammer and other lightning effects.")
+@Depend(components = SessionComponent.class)
 public class ThorComponent extends AbstractComponent implements Listener {
 
     @InjectComponent private SessionComponent sessions;

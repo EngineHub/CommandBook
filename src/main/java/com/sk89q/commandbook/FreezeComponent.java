@@ -18,6 +18,7 @@
 
 package com.sk89q.commandbook;
 
+import com.sk89q.commandbook.components.Depend;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
@@ -45,6 +46,7 @@ import org.bukkit.event.Listener;
  * @author Turtle9598
  */
 
+@Depend(components = SessionComponent.class)
 @ComponentInformation(friendlyName = "Freeze", desc = "Blocks a specified player's movement on command")
 public class FreezeComponent extends AbstractComponent implements Listener {
 
