@@ -126,4 +126,12 @@ public class RootLocationManager<T> {
     public boolean isPerWorld() {
         return perWorld;
     }
+    
+    public void updateWorlds(World world) {
+        if (perWorld) {
+            getManager(world).updateWorlds();
+        } else {
+            rootManager.updateWorlds();
+        }
+    }
 }

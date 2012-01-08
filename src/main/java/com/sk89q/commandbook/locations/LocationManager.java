@@ -55,6 +55,11 @@ public interface LocationManager<T> {
      * @return
      */
     public T get(String id);
+
+    /**
+     * Updates warps from unloaded worlds.
+     */
+    public void updateWorlds();
     
     /**
      * Create a location.

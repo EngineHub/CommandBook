@@ -28,6 +28,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -39,6 +40,8 @@ import org.bukkit.entity.Player;
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
 
+import static com.sk89q.commandbook.CommandBookUtil.getNestedList;
+
 public class FlatFileLocationsManager implements LocationManager<NamedLocation> {
     
     private static final Logger logger = Logger.getLogger("Minecraft.CommandBook");
@@ -46,6 +49,7 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
     private World castWorld;
     private File file;
     private Map<String, NamedLocation> locs = new HashMap<String, NamedLocation>();
+    private Map<String, List<NamedLocation>> unloadedLocs = new HashMap<String, List<NamedLocation>>();
     private String type;
     
     /**
@@ -95,27 +99,23 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
                         
                         World world = CommandBook.server().getWorld(worldName);
                         
-                        if (world == null) {
-                            // We shouldn't have this warp
-                            if (castWorld != null) {
-                                continue;
-                            }
-                            
-                            world = CommandBook.server().getWorlds().get(0);
-                        } else {
+                      
+                        if (world != null) {
                             // We shouldn't have this warp
                             if (castWorld != null && !castWorld.equals(world)) {
                                 continue;
                             }
-                            
-                            worldName = null;
                         }
                         
                         Location loc = new Location(world, x, y, z, yaw, pitch);
                         NamedLocation warp = new NamedLocation(name, loc);
                         warp.setWorldName(worldName);
                         warp.setCreatorName(creator);
-                        locs.put(name.toLowerCase(), warp);
+                        if (world == null) {
+                            getNestedList(unloadedLocs, worldName).add(warp);
+                        } else {
+                            locs.put(name.toLowerCase(), warp);
+                        }
                     } catch (NumberFormatException e) {
                         logger.warning("CommandBook: " + type + " data file has an invalid line with non-numeric numeric fields");
                     }
@@ -176,6 +176,26 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
                     output.close();
                 } catch (IOException e) {
                 }
+            }
+        }
+    }
+
+    public void updateWorlds() {
+        for (Iterator<Map.Entry<String, List<NamedLocation>>> i = unloadedLocs.entrySet().iterator(); i.hasNext();) {
+            Map.Entry<String, List<NamedLocation>> entry = i.next();
+            World world = CommandBook.server().getWorld(entry.getKey());
+            if (world == null) continue;
+            i.remove();
+            for (NamedLocation warp : entry.getValue()) {
+                warp.getLocation().setWorld(world);
+                locs.put(warp.getName().toLowerCase(), warp);
+            }
+        }
+        for (Iterator<NamedLocation> i = locs.values().iterator(); i.hasNext();) {
+            NamedLocation loc = i.next();
+            if (CommandBook.server().getWorld(loc.getWorldName()) == null) {
+                i.remove();
+                getNestedList(unloadedLocs, loc.getWorldName()).add(loc);
             }
         }
     }
