@@ -25,10 +25,13 @@ import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
+import com.sk89q.worldedit.blocks.ItemType;
+
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 @ComponentInformation(friendlyName = "Player Commands", desc = "Various player-related commands.")
 public class PlayerComponent extends AbstractComponent {
@@ -109,6 +112,182 @@ public class PlayerComponent extends AbstractComponent {
             sender.sendMessage("Player " + (CommandBook.inst().useDisplayNames ? player.getDisplayName() : player.getName())
                     + ChatColor.YELLOW + message + ".");
             return;
+        }
+        @Command(aliases = {"heal"}, 
+        		usage = "[player]", desc = "Heal a player",
+        		flags = "s", min = 0, max = 1)
+        @CommandPermissions({"commandbook.heal"})
+        public void heal(CommandContext args,CommandSender sender) throws CommandException {
+            
+            Iterable<Player> targets = null;
+            boolean included = false;
+            
+            // Detect arguments based on the number of arguments provided
+            if (args.argsLength() == 0) {
+                targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
+                
+                // Check permissions!
+                CommandBook.inst().checkPermission(sender, "commandbook.heal");
+            } else if (args.argsLength() == 1) {            
+                targets = PlayerUtil.matchPlayers(sender, args.getString(0));
+                
+                // Check permissions!
+                CommandBook.inst().checkPermission(sender, "commandbook.heal.other");
+            }
+
+            for (Player player : targets) {
+                player.setHealth(20);
+                player.setFoodLevel(20);
+                
+                // Tell the user
+                if (player.equals(sender)) {
+                    player.sendMessage(ChatColor.YELLOW + "Healed!");
+                    
+                    // Keep track of this
+                    included = true;
+                } else {
+                    player.sendMessage(ChatColor.YELLOW + "Healed by "
+                            + PlayerUtil.toName(sender) + ".");
+                    
+                }
+            }
+            
+            // The player didn't receive any items, then we need to send the
+            // user a message so s/he know that something is indeed working
+            if (!included && args.hasFlag('s')) {
+                sender.sendMessage(ChatColor.YELLOW.toString() + "Players healed.");
+            }
+        }
+        @Command(aliases = {"slay"}, 
+        		usage = "[player]", desc = "Slay a player", 
+        		flags = "s", min = 0, max = 1)
+        @CommandPermissions({"commandbook.slay"})
+        
+        public void slay(CommandContext args, CommandSender sender) throws CommandException {
+            
+            Iterable<Player> targets = null;
+            boolean included = false;
+            
+            // Detect arguments based on the number of arguments provided
+            if (args.argsLength() == 0) {
+                targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
+                
+                // Check permissions!
+                CommandBook.inst().checkPermission(sender, "commandbook.slay");
+            } else if (args.argsLength() == 1) {            
+                targets = PlayerUtil.matchPlayers(sender, args.getString(0));
+                
+                // Check permissions!
+                CommandBook.inst().checkPermission(sender, "commandbook.slay.other");
+            }
+
+            for (Player player : targets) {
+                player.setHealth(0);
+                
+                // Tell the user
+                if (player.equals(sender)) {
+                    player.sendMessage(ChatColor.YELLOW + "Slain!");
+                    
+                    // Keep track of this
+                    included = true;
+                } else {
+                    player.sendMessage(ChatColor.YELLOW + "Slain by "
+                            + PlayerUtil.toName(sender) + ".");
+                    
+                }
+            }
+            
+            // The player didn't receive any items, then we need to send the
+            // user a message so s/he know that something is indeed working
+            if (!included && args.hasFlag('s')) {
+                sender.sendMessage(ChatColor.YELLOW.toString() + "Players slain.");
+            }
+        }   
+        @Command(aliases = {"locate"}, usage = "[player]", desc = "Locate a player", max = 1)
+        @CommandPermissions({"commandbook.locate"})
+        public void locate(CommandContext args, CommandSender sender) throws CommandException {
+            
+            Player player = PlayerUtil.checkPlayer(sender);
+            
+            if (args.argsLength() == 0) {
+                player.setCompassTarget(player.getWorld().getSpawnLocation());
+                
+                sender.sendMessage(ChatColor.YELLOW.toString() + "Compass reset to spawn.");
+            } else {
+                Player target = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
+                player.setCompassTarget(target.getLocation());
+                
+                sender.sendMessage(ChatColor.YELLOW.toString() + "Compass repointed.");
+            }
+        }
+        @Command(aliases = {"stack"}, 
+        		usage = "", desc = "Stack items",
+        		max = 0)
+        @CommandPermissions({"commandbook.stack"})
+        public void stack(CommandContext args, CommandSender sender) throws CommandException {
+            
+            Player player = PlayerUtil.checkPlayer(sender);
+            boolean ignoreMax = CommandBook.inst().hasPermission(player, "commandbook.stack.illegitimate");
+            boolean ignoreDamaged = CommandBook.inst().hasPermission(player, "commandbook.stack.damaged");
+            
+            ItemStack[] items = player.getInventory().getContents();
+            int len = items.length;
+
+            int affected = 0;
+            
+            for (int i = 0; i < len; i++) {
+                ItemStack item = items[i];
+
+                // Avoid infinite stacks and stacks with durability
+                if (item == null || item.getAmount() <= 0
+                        || (!ignoreMax && item.getMaxStackSize() == 1)) {
+                    continue;
+                }
+
+                int max = ignoreMax ? 64 : item.getMaxStackSize();
+
+                if (item.getAmount() < max) {
+                    int needed = max - item.getAmount(); // Number of needed items until max
+
+                    // Find another stack of the same type
+                    for (int j = i + 1; j < len; j++) {
+                        ItemStack item2 = items[j];
+
+                        // Avoid infinite stacks and stacks with durability
+                        if (item2 == null || item2.getAmount() <= 0
+                                || (!ignoreMax && item.getMaxStackSize() == 1)) {
+                            continue;
+                        }
+
+                        // Same type?
+                        // Blocks store their color in the damage value
+                        if (item2.getTypeId() == item.getTypeId() &&
+                                ((!ItemType.usesDamageValue(item.getTypeId()) && ignoreDamaged)
+                                        || item.getDurability() == item2.getDurability()) &&
+                                item.getEnchantments().equals(item2.getEnchantments())) {
+                            // This stack won't fit in the parent stack
+                            if (item2.getAmount() > needed) {
+                                item.setAmount(64);
+                                item2.setAmount(item2.getAmount() - needed);
+                                break;
+                            // This stack will
+                            } else {
+                                items[j] = null;
+                                item.setAmount(item.getAmount() + item2.getAmount());
+                                needed = 64 - item.getAmount();
+                            }
+
+                            affected++;
+                        }
+                    }
+                }
+            }
+
+            if (affected > 0) {
+                player.getInventory().setContents(items);
+            }
+
+            player.sendMessage(ChatColor.YELLOW + "Items compacted into stacks!");
         }
     }
 }
