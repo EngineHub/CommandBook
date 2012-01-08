@@ -67,6 +67,36 @@ public class MessagingComponent extends AbstractComponent implements Listener {
     private static class LocalConfiguration extends ConfigurationBase {
         @Setting("console-say-format") public String consoleSayFormat = "<`r*Console`w> %s";
         @Setting("broadcast-format") public String broadcastFormat = "`r[Broadcast] %s";
+        @Setting("twitter-style") public boolean twitterStyle = true;
+    }
+    
+    public void messagePlayer(CommandSender sender, String target, String message) throws CommandException {
+        CommandSender receiver =
+                PlayerUtil.matchPlayerOrConsole(sender, target);
+        String status = sessions.getSession(receiver).getIdleStatus();
+        if (status != null) {
+            sender.sendMessage(ChatColor.GRAY + PlayerUtil.toName(receiver) + " is afk. "
+                    + "They might not see your message."
+                    + (status.trim().length() == 0 ? "" : " (" + status + ")"));
+        }
+
+        receiver.sendMessage(ChatColor.GRAY + "(From "
+                + PlayerUtil.toName(sender) + "): "
+                + ChatColor.WHITE + message);
+
+        sender.sendMessage(ChatColor.GRAY + "(To "
+                + PlayerUtil.toName(receiver) + "): "
+                + ChatColor.WHITE + message);
+
+        CommandBook.logger().info("(PM) " + PlayerUtil.toName(sender) + " -> "
+                + PlayerUtil.toName(receiver) + ": " + message);
+
+        sessions.getSession(sender).setLastRecipient(receiver);
+
+        // If the receiver hasn't had any player talk to them yet or hasn't
+        // send a message, then we add it to the receiver's last message target
+        // so s/he can /reply easily
+        sessions.getSession(receiver).setNewLastRecipient(sender);
     }
 
     /**
@@ -79,6 +109,17 @@ public class MessagingComponent extends AbstractComponent implements Listener {
         if (sessions.getAdminSession(event.getPlayer()).isMute()) {
             event.getPlayer().sendMessage(ChatColor.RED + "You are muted.");
             event.setCancelled(true);
+        } else if (event.getMessage().startsWith("@") && config.twitterStyle) {
+            final String message = event.getMessage();
+            int spaceIndex = message.indexOf(" ");
+            if (spaceIndex > -1) {
+                try {
+                    messagePlayer(event.getPlayer(), message.substring(1, spaceIndex), message.substring(spaceIndex + 1));
+                } catch (CommandException e) {
+                    event.getPlayer().sendMessage(ChatColor.RED + e.getMessage());
+                }
+                event.setCancelled(true);
+            }
         }
     }
 
@@ -135,34 +176,7 @@ public class MessagingComponent extends AbstractComponent implements Listener {
         @CommandPermissions({"commandbook.msg"})
         public void msg(CommandContext args, CommandSender sender) throws CommandException {
             // This will throw errors as needed
-            CommandSender receiver =
-                    PlayerUtil.matchPlayerOrConsole(sender, args.getString(0));
-            String message = args.getJoinedStrings(1);
-
-            if (receiver instanceof Player && sessions.getSession((Player) receiver).getIdleStatus() != null) {
-                String status = sessions.getSession((Player) receiver).getIdleStatus();
-                sender.sendMessage(ChatColor.GRAY + PlayerUtil.toName(receiver) + " is afk. "
-                        + "They might not see your message."
-                        + (status.isEmpty() ? "" : " (" + status + ")"));
-            }
-
-            receiver.sendMessage(ChatColor.GRAY + "(From "
-                    + PlayerUtil.toName(sender) + "): "
-                    + ChatColor.WHITE + message);
-
-            sender.sendMessage(ChatColor.GRAY + "(To "
-                    + PlayerUtil.toName(receiver) + "): "
-                    + ChatColor.WHITE + message);
-
-            CommandBook.logger().info("(PM) " + PlayerUtil.toName(sender) + " -> "
-                    + PlayerUtil.toName(receiver) + ": " + message);
-
-            sessions.getSession(sender).setLastRecipient(receiver);
-
-            // If the receiver hasn't had any player talk to them yet or hasn't
-            // send a message, then we add it to the receiver's last message target
-            // so s/he can /reply easily
-            sessions.getSession(receiver).setNewLastRecipient(sender);
+            messagePlayer(sender, args.getString(0), args.getJoinedStrings(1));
         }
 
         @Command(aliases = {"reply", "r"}, usage = "<message...>", desc = "Reply to last user", min = 1, max = -1)

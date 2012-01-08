@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
 @ComponentInformation(friendlyName = "Name Verification", desc = "This component verifies that player names are valid when they join.")
 public class NameVerificationComponent extends AbstractComponent implements Listener {
     protected final static Pattern namePattern = Pattern.compile(
-            "^[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_]{1,16}$");
+            "^[a-zA-Z0-9_]{1,16}$");
 
     @Override
     public void initialize() {
