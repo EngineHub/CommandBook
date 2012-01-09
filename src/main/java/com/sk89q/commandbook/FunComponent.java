@@ -427,5 +427,63 @@ public class FunComponent extends AbstractComponent {
                 sender.sendMessage(ChatColor.YELLOW.toString() + "Fireball attack sent.");
             }
         }
+        @Command(aliases = {"cannon"},
+                usage = "[target]", desc = "Send a ball of fire to a face", flags = "s",
+                min = 0, max = 1)
+        @CommandPermissions({"commandbook.cannon"})
+       public void cannon(CommandContext args, CommandSender sender) throws CommandException {
+
+            Iterable<Player> targets = null;
+            boolean included = false;
+            int count = 0;
+            
+            // Detect arguments based on the number of arguments provided
+            if (args.argsLength() == 0) {
+                targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
+            } else if (args.argsLength() == 1) {            
+                targets = PlayerUtil.matchPlayers(sender, args.getString(0));
+                
+                // Check permissions!
+               CommandBook.inst().checkPermission(sender, "commandbook.barragefire.other");
+            }
+
+            for (Player player : targets) {
+                double diff = (2 * Math.PI) / 24.0;
+                for (double a = 0; a < 2 * Math.PI; a += diff) {
+                    CommandBookUtil.sendCannonToPlayer(player);
+                }
+
+                if (args.hasFlag('s')) {
+                    // Tell the user
+                    if (player.equals(sender)) {
+                        player.sendMessage(ChatColor.YELLOW + "Fireball attack!");
+                        
+                        // Keep track of this
+                        included = true;
+                    } else {
+                        player.sendMessage(ChatColor.YELLOW + "Fireball attack from "
+                                + PlayerUtil.toName(sender) + ".");
+                        
+                    }
+                } else {
+                    if (count < 6) {
+                    	CommandBook.server().broadcastMessage(
+                                ChatColor.YELLOW + PlayerUtil.toName(sender)
+                                + " used Fireball attack on " + PlayerUtil.toName(player));
+                    } else if (count == 6) {
+                    	CommandBook.server().broadcastMessage(
+                                ChatColor.YELLOW + PlayerUtil.toName(sender)
+                                + " used it more people...");
+                    }
+                }
+            }
+            
+            // The player didn't receive any items, then we need to send the
+            // user a message so s/he know that something is indeed working
+            if (!included && args.hasFlag('s')) {
+                sender.sendMessage(ChatColor.YELLOW.toString() + "Fireball attack sent.");
+            }
+        }
+
     }
 }

@@ -387,6 +387,14 @@ public class CommandBookUtil {
             fball.setDirection(dir.multiply(10));
         }
     }
+    
+    public static void sendCannonToPlayer(Player player) {
+    	Location loc = player.getEyeLocation();
+    	loc.setX(loc.getX());
+    	loc.setY(loc.getY());
+    	loc.setZ(loc.getZ());
+    	player.getWorld().spawn(loc, Fireball.class); 
+    }
 
     /**
      * Get a list of creature names.
