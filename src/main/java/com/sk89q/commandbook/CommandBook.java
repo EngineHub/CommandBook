@@ -70,6 +70,7 @@ public final class CommandBook extends JavaPlugin {
     public boolean broadcastChanges;
     public boolean opPermissions;
     public boolean useDisplayNames;
+    public boolean lookupWithDisplayNames;
     public boolean crappyWrapperCompat;
 
     protected YAMLProcessor config;
@@ -223,6 +224,7 @@ public final class CommandBook extends JavaPlugin {
 
         opPermissions = config.getBoolean("op-permissions", true);
         useDisplayNames = config.getBoolean("use-display-names", true);
+        lookupWithDisplayNames = config.getBoolean("lookup-with-display-names", true);
         broadcastChanges = config.getBoolean("broadcast-changes", true);
 
         crappyWrapperCompat = config.getBoolean("crappy-wrapper-compat", true);
