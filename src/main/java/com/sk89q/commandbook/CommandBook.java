@@ -133,7 +133,7 @@ public final class CommandBook extends JavaPlugin {
         componentManager.addComponentLoader(new ConfigListedComponentLoader(new YAMLProcessor(null, false) {
             @Override
             public InputStream getInputStream() {
-                return CommandBook.inst().getClass().getResourceAsStream("/defaults/modules.yml");
+                return CommandBook.inst().getClass().getResourceAsStream("/defaults/components.yml");
             }
         }, configDir));
 
