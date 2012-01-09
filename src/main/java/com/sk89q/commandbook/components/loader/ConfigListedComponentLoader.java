@@ -62,13 +62,22 @@ public class ConfigListedComponentLoader extends AbstractComponentLoader {
                 getGlobalConfiguration().getStringList("components.disabled", null));
         Set<String> stagedEnabled = new HashSet<String>(CommandBook.inst().
                 getGlobalConfiguration().getStringList("components.enabled", null));
-        stagedEnabled.addAll(jarComponentAliases.getKeys(null));
+        for (String key : jarComponentAliases.getKeys(null)) { // Load the component aliases
+            if (!stagedEnabled.contains(key) 
+                    && !stagedEnabled.contains(jarComponentAliases.getString(key + ".class", key))) { // Not already in the enabled list.
+                if (jarComponentAliases.getBoolean(key + ".default")) { // Enabled by default
+                    stagedEnabled.add(key);
+                } else {
+                    disabledComponents.add(key);
+                }
+            }
+        }
         stagedEnabled.removeAll(disabledComponents);
 
         // And go through the enabled components from the configuration
         for (Iterator<String> i = stagedEnabled.iterator(); i.hasNext(); ) {
             String nextName = i.next();
-            nextName = jarComponentAliases.getString(nextName, nextName);
+            nextName = jarComponentAliases.getString(nextName + ".class", nextName);
             Class<?> clazz = null;
             try {
                 clazz = Class.forName(nextName);

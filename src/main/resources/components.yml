@@ -1,20 +1,60 @@
-bans: com.sk89q.commandbook.bans.BansComponent
-homes: com.sk89q.commandbook.locations.HomesComponent
-warps: com.sk89q.commandbook.locations.WarpsComponent
-freeze: com.sk89q.commandbook.FreezeComponent
-messaging: com.sk89q.commandbook.MessagingComponent
-teleport: com.sk89q.commandbook.locations.TeleportComponent
-items: com.sk89q.commandbook.InventoryComponent
-kits: com.sk89q.commandbook.kits.KitsComponent
-midi: com.sk89q.jinglenote.JingleNoteComponent
-time: com.sk89q.commandbook.time.TimeComponent
-name-verification: com.sk89q.commandbook.NameVerificationComponent
-fun: com.sk89q.commandbook.FunComponent
-debug: com.sk89q.commandbook.DebugComponent
-thor: com.sk89q.commandbook.ThorComponent
-online-list: com.sk89q.commandbook.OnlineListComponent
-stored-messages: com.sk89q.commandbook.StoredMessagesComponent
-spawn-locations: com.sk89q.commandbook.locations.SpawnLocationsComponent
-info: com.sk89q.commandbook.InfoComponent
-world: com.sk89q.commandbook.WorldComponent
-player: com.sk89q.commandbook.PlayerComponent
+bans:
+    class: com.sk89q.commandbook.bans.BansComponent
+    default: true
+homes:
+    class: com.sk89q.commandbook.locations.HomesComponent
+    default: true
+warps:
+    class: com.sk89q.commandbook.locations.WarpsComponent
+    default: true
+freeze:
+    class: com.sk89q.commandbook.FreezeComponent
+    default: false
+messaging:
+    class: com.sk89q.commandbook.MessagingComponent
+    default: true
+teleport:
+    class: com.sk89q.commandbook.locations.TeleportComponent
+    default: true
+items:
+    class: com.sk89q.commandbook.InventoryComponent
+    default: true
+kits:
+    class: com.sk89q.commandbook.kits.KitsComponent
+    default: true
+midi:
+    class: com.sk89q.jinglenote.JingleNoteComponent
+    default: true
+time:
+    class: com.sk89q.commandbook.time.TimeComponent
+    default: true
+name-verification:
+    class: com.sk89q.commandbook.NameVerificationComponent
+    default: true
+fun:
+    class: com.sk89q.commandbook.FunComponent
+    default: true
+debug:
+    class: com.sk89q.commandbook.DebugComponent
+    default: true
+thor:
+    class: com.sk89q.commandbook.ThorComponent
+    default: true
+online-list:
+    class: com.sk89q.commandbook.OnlineListComponent
+    default: true
+stored-messages:
+    class: com.sk89q.commandbook.StoredMessagesComponent
+    default: true
+spawn-locations:
+    class: com.sk89q.commandbook.locations.SpawnLocationsComponent
+    default: true
+info:
+    class: com.sk89q.commandbook.InfoComponent
+    default: true
+world:
+    class: com.sk89q.commandbook.WorldComponent
+    default: true
+player:
+    class: com.sk89q.commandbook.PlayerComponent
+    default: true
