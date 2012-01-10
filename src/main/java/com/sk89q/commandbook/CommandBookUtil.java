@@ -22,12 +22,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -46,7 +47,6 @@ import org.bukkit.util.Vector;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.blocks.BlockType;
 
-import org.bukkit.Material;
 import static com.sk89q.commandbook.util.PlayerUtil.toColoredName;
 import static com.sk89q.commandbook.util.PlayerUtil.toName;
 import static com.sk89q.commandbook.util.PlayerUtil.toUniqueName;
@@ -536,5 +536,37 @@ public class CommandBookUtil {
             source.put(key, value);
         }
         return value;
+    }
+
+    public static long matchFutureDate(String filter) throws CommandException {
+        if (filter.equalsIgnoreCase("now")) return System.currentTimeMillis();
+        String[] groupings = filter.split("-");
+        if (groupings.length == 0) throw new CommandException("Invalid date specified");
+        Calendar cal = new GregorianCalendar();
+        cal.setTimeInMillis(System.currentTimeMillis());
+        for (String str : groupings) {
+            int type;
+            switch (str.charAt(str.length() - 1)) {
+                case 'm':
+                    type = Calendar.MINUTE;
+                    break;
+                case 'h':
+                    type = Calendar.HOUR;
+                    break;
+                case 'd':
+                    type = Calendar.DATE;
+                    break;
+                case 'w':
+                    type = Calendar.WEEK_OF_YEAR;
+                    break;
+                case 'y':
+                    type = Calendar.YEAR;
+                    break;
+                default:
+                    throw new CommandException("Unknown date value specified");
+            }
+            cal.add(type, Integer.valueOf(str.substring(0, str.length() -1)));
+        }
+        return cal.getTimeInMillis();
     }
 }

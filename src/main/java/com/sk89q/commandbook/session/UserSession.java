@@ -41,6 +41,7 @@ public class UserSession implements PersistentSession {
     private long lastRecipientTime = 0;
     private boolean hasThor = false;
     private String idleStatus = null;
+    private String commandToConfirm;
     private Map<String, Long> bringable = new HashMap<String, Long>();
     private Map<String, Long> teleportRequests = new HashMap<String, Long>();
     private LinkedList<Location> locationHistory = new LinkedList<Location>();
@@ -151,5 +152,23 @@ public class UserSession implements PersistentSession {
 
     public Location getIgnoreLocation() {
         return ignoreTeleportLocation;
+    }
+
+    public boolean checkOrQueueConfirmed(String command) {
+        if (commandToConfirm != null) {
+            return true;
+        } else {
+            commandToConfirm = command;
+            return false;
+        }
+    }
+
+    public String getCommandToConfirm(boolean clear) {
+        if (clear) {
+            final String ret = commandToConfirm;
+            commandToConfirm = null;
+            return ret;
+        }
+        return commandToConfirm;
     }
 }

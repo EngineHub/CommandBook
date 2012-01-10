@@ -30,9 +30,7 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
@@ -59,17 +57,18 @@ public class FlatFileBanDatabase implements BanDatabase {
     protected BansComponent component;
     protected File dataDirectory;
     protected File namesFile;
-    protected File ipFile;
 
-    protected Set<String> bannedNames;
-    protected Set<String> bannedIP;
+    protected Map<String, Ban> bannedNames;
 
+    public static boolean toImport(File dataDirectory) {
+        return new File(dataDirectory, "banned_names.txt").exists();
+    }
+    
     public FlatFileBanDatabase(File dataDirectory, BansComponent component) {
         this.dataDirectory = dataDirectory;
         this.component = component;
 
         namesFile = new File(dataDirectory, "banned_names.txt");
-        ipFile = new File(dataDirectory, "banned_ip.txt");
         
         // Set up an audit trail
         try {
@@ -79,7 +78,7 @@ public class FlatFileBanDatabase implements BanDatabase {
             
             handler.setFormatter(new Formatter() {
                 private SimpleDateFormat dateFormat =
-                        new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                        new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
                 
                 @Override
                 public String format(LogRecord record) {
@@ -105,22 +104,11 @@ public class FlatFileBanDatabase implements BanDatabase {
             bannedNames = readLowercaseList(namesFile);
             logger.info("CommandBook: " + bannedNames.size() + " banned name(s) loaded.");
         } catch (IOException e) {
-            bannedNames = new HashSet<String>();
+            bannedNames = new HashMap<String, Ban>();
             logger.warning("CommandBook: Failed to load " + namesFile.getAbsolutePath()
                     + ": " + e.getMessage());
             successful = false;
         }
-/*
-        try {
-            bannedIP = readList(ipFile);
-            logger.info("CommandBook: " + bannedIP.size() + " banned IP(s) loaded.");
-        } catch (IOException e) {
-            bannedIP = new HashSet<String>();
-            logger.warning("CommandBook: Failed to load " + ipFile.getAbsolutePath()
-                    + ": " + e.getMessage());
-            successful = false;
-        }
-*/
         return successful;
     }
 
@@ -143,9 +131,9 @@ public class FlatFileBanDatabase implements BanDatabase {
      * @return
      * @throws IOException
      */
-    protected synchronized Set<String> readLowercaseList(File file) throws IOException {
+    protected synchronized Map<String, Ban> readLowercaseList(File file) throws IOException {
         FileInputStream input = null;
-        Set<String> list = new HashSet<String>();
+        Map<String, Ban> list = new HashMap<String, Ban>();
         
         try {
             input = new FileInputStream(file);
@@ -157,7 +145,8 @@ public class FlatFileBanDatabase implements BanDatabase {
                 line = line.trim();
                 
                 if (line.length() > 0) {
-                    list.add(line.toLowerCase().trim());
+                    list.put(line.toLowerCase().trim(),
+                            new Ban(line.toLowerCase().trim(), null, null, System.currentTimeMillis(), 0L));
                 }
             }
         } catch (FileNotFoundException e) {
@@ -184,20 +173,10 @@ public class FlatFileBanDatabase implements BanDatabase {
                     + ": " + e.getMessage());
             successful = false;
         }
-/*
-        try {
-            writeList(ipFile, bannedIP);
-            //logger.info("CommandBook: " + bannedIP.size() + " banned IPs written.");
-        } catch (IOException e) {
-            logger.warning("CommandBook: Failed to write " + ipFile.getAbsolutePath()
-                    + ": " + e.getMessage());
-            successful = false;
-        }
-*/
         return successful;
     }
     
-    protected synchronized void writeList(File file, Set<String> list)
+    protected synchronized void writeList(File file, Map<String, Ban> list)
             throws IOException {
         FileOutputStream output = null;
         
@@ -206,7 +185,7 @@ public class FlatFileBanDatabase implements BanDatabase {
             OutputStreamWriter streamWriter = new OutputStreamWriter(output, "utf-8");
             BufferedWriter writer = new BufferedWriter(streamWriter);
             
-            for (String line : list) {
+            for (String line : list.keySet()) {
                 writer.write(line + "\r\n");
             }
             
@@ -225,11 +204,19 @@ public class FlatFileBanDatabase implements BanDatabase {
     }
 
     public synchronized boolean isBannedName(String name) {
-        return bannedNames.contains(name.toLowerCase().trim());
+        return bannedNames.containsKey(name.toLowerCase().trim());
     }
 
     public synchronized boolean isBannedAddress(InetAddress address) {
-        return bannedIP.contains(address.getHostAddress());
+        return false;
+    }
+
+    public String getBannedNameMesage(String name) {
+        return "You have been banned";
+    }
+
+    public String getBannedAddressMessage(String address) {
+        return "You have been banned";
     }
 
     public synchronized void banName(String name, CommandSender source, String reason) {
@@ -239,21 +226,23 @@ public class FlatFileBanDatabase implements BanDatabase {
                 name,
                 reason));
         
-        bannedNames.add(name.toLowerCase());
+        bannedNames.put(name, new Ban(name.toLowerCase(), null, null, System.currentTimeMillis(), 0L));
     }
 
     public synchronized void banAddress(String address, CommandSender source, String reason) {
-        auditLogger.info(String.format("BAN: %s (%s) banned address '%s': %s",
-                toUniqueName(source),
-                CommandBook.inst().toInetAddressString(source),
-                address,
-                reason));
-        
-        bannedIP.add(address);
+        throw new UnsupportedOperationException("Not supported.");
+    }
+
+    public void ban(Player player, CommandSender source, String reason, long end) {
+        banName(player.getName(), source, reason);
+    }
+
+    public void ban(String name, String address, CommandSender source, String reason, long end) {
+        banName(name, source, reason);
     }
 
     public boolean unbanName(String name, CommandSender source, String reason) {
-        boolean removed = bannedNames.remove(name.toLowerCase());
+        boolean removed = bannedNames.remove(name.toLowerCase()) != null;
         
         if (removed) {
             auditLogger.info(String.format("UNBAN: %s (%s) unbanned name '%s': %s",
@@ -267,17 +256,11 @@ public class FlatFileBanDatabase implements BanDatabase {
     }
 
     public boolean unbanAddress(String address, CommandSender source, String reason) {
-        boolean removed = bannedIP.remove(address);
-        
-        if (removed) {
-            auditLogger.info(String.format("UNBAN: %s (%s) unbanned ADDRESS '%s'",
-                    toUniqueName(source),
-                    CommandBook.inst().toInetAddressString(source),
-                    address,
-                    reason));
-        }
-        
-        return removed;
+        return false;
+    }
+
+    public boolean unban(String name, String address, CommandSender source, String reason) {
+        return unbanName(name, source, reason);
     }
 
     public void logKick(Player player, CommandSender source, String reason) {
@@ -288,4 +271,21 @@ public class FlatFileBanDatabase implements BanDatabase {
                 reason));
     }
 
+    public void importFrom(BanDatabase bans) {
+        throw new UnsupportedOperationException("Importing to legacy ban storage provider not supported.");
+    }
+
+    @Override
+    public Ban getBannedName(String name) {
+        return bannedNames.get(name);
+    }
+
+    @Override
+    public Ban getBannedAddress(String address) {
+        return null;
+    }
+
+    public Iterator<Ban> iterator() {
+        return bannedNames.values().iterator();
+    }
 }

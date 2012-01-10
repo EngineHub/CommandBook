@@ -18,6 +18,7 @@
 
 package com.sk89q.commandbook.bans;
 
+import com.sk89q.commandbook.CommandBookUtil;
 import com.sk89q.commandbook.components.AbstractComponent;
 import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.components.ComponentInformation;
@@ -33,6 +34,9 @@ import org.bukkit.event.Event;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 @ComponentInformation(friendlyName = "Bans", desc = "A system for kicks and bans.")
 public class BansComponent extends AbstractComponent implements Listener {
     private BanDatabase bans;
@@ -42,8 +46,14 @@ public class BansComponent extends AbstractComponent implements Listener {
     public void initialize() {
         config = configure(new LocalConfiguration());
         // Setup the ban database
-        bans = new FlatFileBanDatabase(CommandBook.inst().getDataFolder(), this);
+        // Setup the ban database
+        bans = new CSVBanDatabase(CommandBook.inst().getDataFolder(), this);
         bans.load();
+        if (FlatFileBanDatabase.toImport(CommandBook.inst().getDataFolder())) {
+            BanDatabase banDb = new FlatFileBanDatabase(CommandBook.inst().getDataFolder(), this);
+            banDb.load();
+            bans.importFrom(banDb);
+        }
         CommandBook.inst().getEventManager().registerEvents(this, this);
         registerCommands(Commands.class);
     }
@@ -85,11 +95,13 @@ public class BansComponent extends AbstractComponent implements Listener {
         Player player = event.getPlayer();
 
         try {
-            if (getBanDatabase().isBannedName(player.getName())
-                    || getBanDatabase().isBannedAddress(
-                    player.getAddress().getAddress())) {
-                event.disallow(PlayerLoginEvent.Result.KICK_BANNED, config.banMessage);
-                return;
+            if (getBanDatabase().isBannedName(event.getPlayer().getName())) {
+                event.disallow(PlayerLoginEvent.Result.KICK_BANNED,
+                        getBanDatabase().getBannedNameMesage(event.getPlayer().getName()));
+            } else if (getBanDatabase().isBannedAddress(
+                    event.getPlayer().getAddress().getAddress())) {
+                event.disallow(PlayerLoginEvent.Result.KICK_BANNED, getBanDatabase().getBannedAddressMessage(
+                        event.getPlayer().getAddress().getAddress().getHostAddress()));
             }
         } catch (NullPointerException e) {
             // Bug in CraftBukkit
@@ -121,10 +133,12 @@ public class BansComponent extends AbstractComponent implements Listener {
             }
         }
 
-        @Command(aliases = {"ban"}, usage = "<target> [reason...]", desc = "Ban a user", flags = "e", min = 1, max = -1)
+        @Command(aliases = {"ban"}, usage = "[-t end ] <target> [reason...]", desc = "Ban a user", flags = "et:", min = 1, max = -1)
         @CommandPermissions({"commandbook.bans.ban"})
         public void ban(CommandContext args, CommandSender sender) throws CommandException {
             String banName;
+            String banAddress = null;
+            long endDate = args.hasFlag('t') ? CommandBookUtil.matchFutureDate(args.getFlag('t')) : 0L;
             String message = args.argsLength() >= 2 ? args.getJoinedStrings(1)
                     : "Banned!";
 
@@ -166,7 +180,7 @@ public class BansComponent extends AbstractComponent implements Listener {
                         + " - " + message);
             }
 
-            getBanDatabase().banName(banName, sender, message);
+            getBanDatabase().ban(banName, banAddress, sender, message, endDate);
 
             if (!getBanDatabase().save()) {
                 sender.sendMessage(ChatColor.RED + "Bans database failed to save. See console.");
@@ -179,16 +193,16 @@ public class BansComponent extends AbstractComponent implements Listener {
             @CommandPermissions({"commandbook.bans.ban.ip"})
             public static void banIP(CommandContext args, CommandBookPlugin plugin,
                     CommandSender sender) throws CommandException {
-
+                
                 String message = args.argsLength() >= 2 ? args.getJoinedStrings(1)
                         : "Banned!";
-
+                
                 String addr = args.getString(0)
                             .replace("\r", "")
                             .replace("\n", "")
                             .replace("\0", "")
                             .replace("\b", "");
-
+                
                 // Need to kick + log
                 for (Player player : plugin.getServer().getOnlinePlayers()) {
                     if (player.getAddress().getAddress().getHostAddress().equals(addr)) {
@@ -196,17 +210,17 @@ public class BansComponent extends AbstractComponent implements Listener {
                         plugin.getBanDatabase().logKick(player, sender, message);
                     }
                 }
-
+                
                 plugin.getBanDatabase().banAddress(addr, sender, message);
-
+                
                 sender.sendMessage(ChatColor.YELLOW + addr + " banned.");
-
+                
                 if (!plugin.getBanDatabase().save()) {
                     sender.sendMessage(ChatColor.RED + "Bans database failed to save. See console.");
                 }
             }
         */
-        @Command(aliases = {"unban", "pardon"}, usage = "<target>", desc = "Unban a user", min = 1, max = -1)
+        @Command(aliases = {"unban"}, usage = "<target>", desc = "Unban a user", min = 1, max = -1)
         @CommandPermissions({"commandbook.bans.unban"})
         public void unban(CommandContext args, CommandSender sender) throws CommandException {
             String message = args.argsLength() >= 2 ? args.getJoinedStrings(1)
@@ -218,7 +232,7 @@ public class BansComponent extends AbstractComponent implements Listener {
                     .replace("\0", "")
                     .replace("\b", "");
 
-            if (getBanDatabase().unbanName(banName, sender, message)) {
+            if (getBanDatabase().unban(banName, null, sender, message)) {
                 sender.sendMessage(ChatColor.YELLOW + banName + " unbanned.");
 
                 if (!getBanDatabase().save()) {
@@ -228,33 +242,33 @@ public class BansComponent extends AbstractComponent implements Listener {
                 sender.sendMessage(ChatColor.RED + banName + " was not banned.");
             }
         }
-        /*
-            @Command(aliases = {"unbanip"},
-                    usage = "<target> [reason...]", desc = "Unban an IP address",
-                    min = 1, max = -1)
-            @CommandPermissions({"commandbook.bans.unban.ip"})
-            public static void unbanIP(CommandContext args, CommandBookPlugin plugin,
-                    CommandSender sender) throws CommandException {
 
-                String addr = args.getString(0)
-                            .replace("\r", "")
-                            .replace("\n", "")
-                            .replace("\0", "")
-                            .replace("\b", "");
-                String message = args.argsLength() >= 2 ? args.getJoinedStrings(1)
-                        : "Unbanned!";
+        @Command(aliases = {"unbanip"},
+                usage = "<target> [reason...]", desc = "Unban an IP address",
+                min = 1, max = -1)
+        @CommandPermissions({"commandbook.bans.unban.ip"})
+        public void unbanIP(CommandContext args,
+                                   CommandSender sender) throws CommandException {
 
-                if (plugin.getBanDatabase().unbanAddress(addr, sender, message)) {
-                    sender.sendMessage(ChatColor.YELLOW + addr + " unbanned.");
+            String addr = args.getString(0)
+                    .replace("\r", "")
+                    .replace("\n", "")
+                    .replace("\0", "")
+                    .replace("\b", "");
+            String message = args.argsLength() >= 2 ? args.getJoinedStrings(1)
+                    : "Unbanned!";
 
-                    if (!plugin.getBanDatabase().save()) {
-                        sender.sendMessage(ChatColor.RED + "Bans database failed to save. See console.");
-                    }
-                } else {
-                    sender.sendMessage(ChatColor.RED + addr + " was not banned.");
+            if (!getBanDatabase().unban(null, addr, sender, message)) {
+                sender.sendMessage(ChatColor.YELLOW + addr + " unbanned.");
+
+                if (!getBanDatabase().save()) {
+                    sender.sendMessage(ChatColor.RED + "Bans database failed to save. See console.");
                 }
+            } else {
+                sender.sendMessage(ChatColor.RED + addr + " was not banned.");
             }
-        */
+        }
+
         @Command(aliases = {"isbanned"}, usage = "<target>", desc = "Check if a user is banned", min = 1, max = 1)
         @CommandPermissions({"commandbook.bans.isbanned"})
         public void isBanned(CommandContext args,  CommandSender sender) throws CommandException {
@@ -270,6 +284,31 @@ public class BansComponent extends AbstractComponent implements Listener {
                 sender.sendMessage(ChatColor.YELLOW + banName + " NOT banned.");
             }
         }
+
+        private SimpleDateFormat dateFormat =
+                new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+
+        @Command(aliases = {"baninfo"}, usage = "<target>", desc = "Check if a user is banned", min = 1, max = 1)
+        @CommandPermissions({"commandbook.bans.baninfo"})
+        public void banInfo(CommandContext args,  CommandSender sender) throws CommandException {
+            String banName = args.getString(0)
+                    .replace("\r", "")
+                    .replace("\n", "")
+                    .replace("\0", "")
+                    .replace("\b", "");
+            
+            Ban ban = getBanDatabase().getBannedName(banName);
+            
+            if (ban == null) {
+                sender.sendMessage(ChatColor.YELLOW + banName + " is NOT banned.");
+            } else {
+                sender.sendMessage(ChatColor.YELLOW + "Ban for " + banName + ":"  + ban.getAddress() 
+                        + " for reason: '" + ban.getReason() + "' until " + 
+                        (ban.getEnd() == 0L ? " forever" : dateFormat.format(new Date(ban.getEnd()))));
+                
+            }
+        }
+        
 
         @Command(aliases = {"bans"}, desc = "Ban management")
         @NestedCommand({ManagementCommands.class})
@@ -292,7 +331,7 @@ public class BansComponent extends AbstractComponent implements Listener {
         @Command(aliases = {"save", "write"}, usage = "", desc = "Save bans to disk", min = 0, max = 0)
         @CommandPermissions({"commandbook.bans.save"})
         public void saveBans(CommandContext args, CommandSender sender) throws CommandException {
-            if (getBanDatabase().load()) {
+            if (getBanDatabase().save()) {
                 sender.sendMessage(ChatColor.YELLOW + "Bans database saved.");
             } else {
                 throw new CommandException("Bans database failed to save entirely. See server console.");
