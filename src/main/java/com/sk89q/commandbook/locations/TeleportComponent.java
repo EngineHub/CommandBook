@@ -85,7 +85,8 @@ public class TeleportComponent extends AbstractComponent implements Listener {
     public class Commands {
 
         @Command(aliases = {"teleport", "tp"}, usage = "[target] <destination>",
-                desc = "Teleport to a location", min = 1, max = 2)
+                desc = "Teleport to a location",
+                flags = "s", min = 1, max = 2)
         @CommandPermissions({"commandbook.teleport"})
         public void teleport(CommandContext args, CommandSender sender) throws CommandException {
 
@@ -109,8 +110,8 @@ public class TeleportComponent extends AbstractComponent implements Listener {
                     CommandBook.inst().checkPermission(sender, loc.getWorld(), "commandbook.teleport.other");
                 }
             }
-
-            (new TeleportPlayerIterator(sender, loc)).iterate(targets);
+            
+            (new TeleportPlayerIterator(sender, loc, args.hasFlag('s'))).iterate(targets);
         }
 
         @Command(aliases = {"call"}, usage = "<target>", desc = "Request a teleport", min = 1, max = 1)
