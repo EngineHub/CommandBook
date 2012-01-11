@@ -58,3 +58,6 @@ world:
 player:
     class: com.sk89q.commandbook.PlayerComponent
     default: true
+help:
+    class: com.sk89q.commandbook.HelpComponent
+    default: false

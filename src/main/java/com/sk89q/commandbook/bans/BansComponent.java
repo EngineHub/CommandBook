@@ -45,7 +45,7 @@ public class BansComponent extends AbstractComponent implements Listener {
     @Override
     public void initialize() {
         config = configure(new LocalConfiguration());
-        // Setup the ban database
+        
         // Setup the ban database
         bans = new CSVBanDatabase(CommandBook.inst().getDataFolder(), this);
         bans.load();
