@@ -55,9 +55,6 @@ public class TeleportPlayerIterator extends PlayerIteratorAction {
                     + PlayerUtil.toName(sender) + " to world '"
                     + loc.getWorld().getName() + "'.");
         }
-        
-        player.sendMessage(ChatColor.YELLOW + "Teleported by "
-                + PlayerUtil.toName(sender) + ".");
     }
     
     @Override
