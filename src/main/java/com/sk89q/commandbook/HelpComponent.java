@@ -4,10 +4,7 @@ import com.sk89q.commandbook.components.AbstractComponent;
 import com.sk89q.commandbook.components.ComponentInformation;
 import com.sk89q.commandbook.config.ConfigurationBase;
 import com.sk89q.commandbook.config.Setting;
-import com.sk89q.minecraft.util.commands.Command;
-import com.sk89q.minecraft.util.commands.CommandContext;
-import com.sk89q.minecraft.util.commands.CommandException;
-import com.sk89q.minecraft.util.commands.WrappedCommandException;
+import com.sk89q.minecraft.util.commands.*;
 import com.sk89q.util.ReflectionUtil;
 import com.sk89q.util.yaml.YAMLFormat;
 import com.sk89q.util.yaml.YAMLProcessor;
@@ -158,6 +155,7 @@ public class HelpComponent extends AbstractComponent {
         @Command(aliases = "help",
         usage = "[topic]", desc = "Provides help for the server!",
         flags = "c", min = 0, max = 1)
+        @CommandPermissions({"commandbook.help", "commandbook.help.command", "commandbook.help.topic"})
         public void help(CommandContext args, CommandSender sender) throws CommandException {
             if (args.hasFlag('c')) { // Looking up command help
                 if (args.argsLength() < 1) {
@@ -167,6 +165,7 @@ public class HelpComponent extends AbstractComponent {
                 if (cmd == null) {
                     throw new CommandException("Unknown command '" + args.getString(0) + "'; no help available");
                 } else {
+                    CommandBook.inst().checkPermission(sender, "commandbook.help.command." + cmd.getName());
                     sender.sendMessage(ChatColor.YELLOW + "Command: " + cmd.getName());
                     sender.sendMessage(ChatColor.YELLOW + "Aliases: " + cmd.getAliases().toString().replaceAll("\\[(.*)\\]", "$1"));
                     sender.sendMessage(ChatColor.YELLOW + "Description: " + cmd.getDescription());
