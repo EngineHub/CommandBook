@@ -18,6 +18,7 @@
 
 package com.sk89q.commandbook.config;
 
+import com.sk89q.commandbook.config.typeconversions.*;
 import com.sk89q.util.yaml.YAMLNode;
 
 import java.lang.reflect.ParameterizedType;
@@ -28,15 +29,16 @@ import java.util.*;
  * @author zml2008
  */
 public class ConfigUtil {
-    public static YAMLNode getNode(YAMLNode parent, String path) {
-        YAMLNode ret = parent.getNode(path);
-        if (ret == null) {
-            ret = parent.addNode(path);
-        }
-        return ret;
-    }
+    private static final List<TypeConversion> typeConversions = new ArrayList<TypeConversion>(
+            Arrays.asList(new SameTypeConversion(),
+            new StringTypeConversion(),
+            new BooleanTypeConversion(),
+            new NumberTypeConversion(),
+            new SetTypeConversion(),
+            new ListTypeConversion(),
+            new MapTypeConversion()
+    ));
 
-    @SuppressWarnings("unchecked")
     public static Object smartCast(Type genericType, Object value) {
         if (value == null) {
             return null;
@@ -60,92 +62,18 @@ public class ConfigUtil {
         if (target == null) return null;
 
         Object ret = null;
-        // Is it already the correct type?
-        if (neededGenerics.length == 0) {
-            if (target.isInstance(value)) {
-                ret = value;
-            } else if (String.class.isAssignableFrom(target)) {
-                ret = value.toString();
-            } else if (boolean.class.isAssignableFrom(target) || Boolean.class.isAssignableFrom(target)) {
-                if (value instanceof Boolean) {
-                    ret = value;
-                } else {
-                    ret = Boolean.parseBoolean(value.toString());
-                }
-            } else if (target.isPrimitive() || Number.class.isAssignableFrom(target)) {
-                ret = getNumber(target, (Number)value);
-            }
-        } else if (neededGenerics.length == 1) {
-            if (target.equals(List.class) && value instanceof Collection) {
-                List<Object> values = new ArrayList<Object>();
-                Collection raw = (Collection) value;
-                for (Object obj : raw) {
-                    values.add(smartCast(neededGenerics[0], obj));
-                }
-                ret = values;
-            } else if (target.equals(Set.class) && value instanceof Collection) {
-                Set<Object> values = new HashSet<Object>();
-                Collection raw = (Collection) value;
-                for (Object obj : raw) {
-                    values.add(smartCast(neededGenerics[0], obj));
-                }
-                ret = values;
-            }
-        } else if (neededGenerics.length == 2) {
-            if (target.equals(Map.class) && value instanceof Map) {
-                Map<Object, Object> raw = (Map<Object, Object>) value;
-                Map<Object, Object> values = new HashMap<Object, Object>();
-                for (Map.Entry<Object, Object> entry : raw.entrySet()) {
-                    values.put(smartCast(neededGenerics[0], entry.getKey()), smartCast(neededGenerics[1], entry.getValue()));
-                }
-                ret = values;
+        
+        for (TypeConversion conversion : typeConversions) {
+            if ((ret = conversion.handle(target, neededGenerics, value)) != null) {
+                break;
             }
         }
+        
         return ret;
     }
-
-    public static Number getNumber(Class<?> target, Number value) {
-        // Wrapper classes are evil!
-        if (target.equals(Number.class)) {
-            return value;
-        } else if (target.equals(int.class) || target.equals(Integer.class)) {
-            if (value instanceof Integer) {
-                return value;
-            } else {
-                return value.intValue();
-            }
-        } else if (target.equals(byte.class) || target.equals(Byte.class)) {
-            if (value instanceof Byte) {
-                return value;
-            } else {
-                return value.byteValue();
-            }
-        } else if (target.equals(long.class) || target.equals(Long.class)) {
-            if (value instanceof Long) {
-                return value;
-            } else {
-                return value.longValue();
-            }
-        } else if (target.equals(double.class) || target.equals(Double.class)) {
-            if (value instanceof Double) {
-                return value;
-            } else {
-                return value.doubleValue();
-            }
-        } else if (target.equals(float.class) || target.equals(Float.class)) {
-            if (value instanceof Float) {
-                return value;
-            } else {
-                return value.floatValue();
-            }
-        } else if (target.equals(short.class) || target.equals(Short.class)) {
-            if (value instanceof Short) {
-                return value;
-            } else {
-                return value.shortValue();
-            }
-        }
-        return null;
+    
+    public static void registerTypeConversion(TypeConversion conversion) {
+        typeConversions.add(conversion);
     }
 
     @SuppressWarnings("unchecked")
@@ -154,5 +82,13 @@ public class ConfigUtil {
             obj = new ArrayList((Collection)obj);
         }
         return obj;
+    }
+
+    public static YAMLNode getNode(YAMLNode parent, String path) {
+        YAMLNode ret = parent.getNode(path);
+        if (ret == null) {
+            ret = parent.addNode(path);
+        }
+        return ret;
     }
 }
