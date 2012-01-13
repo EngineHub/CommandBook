@@ -332,7 +332,6 @@ public class TimeComponent extends AbstractComponent implements Listener {
             boolean included = false;
 
             if (args.argsLength() < 2) {
-                CommandBook.inst().checkPermission(sender, "commandbook.time.player");
                 if (args.argsLength() == 1) {
                     timeStr = args.getString(0);
                 }
@@ -340,7 +339,15 @@ public class TimeComponent extends AbstractComponent implements Listener {
             } else {
                 players = PlayerUtil.matchPlayers(sender, args.getString(0));
                 timeStr = args.getString(1);
-                CommandBook.inst().checkPermission(sender, "commandbook.time.player.other");
+            }
+            
+            for (Player player : players) {
+                if (player != sender ) {
+                    CommandBook.inst().checkPermission(sender, "commandbook.time.player.other");
+                    break;
+                } else {
+                    CommandBook.inst().checkPermission(sender, "commandbook.time.player");
+                }
             }
 
             if (args.hasFlag('r')) {
@@ -371,10 +378,8 @@ public class TimeComponent extends AbstractComponent implements Listener {
 
             for (Player player : players) {
                 if (!player.equals(sender)) {
-                    CommandBook.inst().checkPermission(sender, "commandbook.time.player.other");
                     player.sendMessage(ChatColor.YELLOW + "Your time set to " + CommandBookUtil.getTimeString(player.getPlayerTime()));
                 } else {
-                    CommandBook.inst().checkPermission(sender, "commandbook.time.player");
                     player.sendMessage(ChatColor.YELLOW + "Your time set to " + CommandBookUtil.getTimeString(player.getPlayerTime()));
                     included = true;
                 }

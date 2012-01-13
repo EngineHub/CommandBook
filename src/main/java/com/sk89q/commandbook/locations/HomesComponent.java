@@ -61,7 +61,12 @@ public class HomesComponent extends LocationsComponent {
                 home = getManager().get(player.getWorld(), args.getString(0));
 
                 // Check permissions!
-                CommandBook.inst().checkPermission(sender, "commandbook.home.other");
+                for (Player target : targets) {
+                    if (target != sender) {
+                        CommandBook.inst().checkPermission(sender, "commandbook.home.other");
+                        break;
+                    }
+                }
             } else if (args.argsLength() == 2) {
                 targets = PlayerUtil.matchPlayers(sender, args.getString(0));
                 if (getManager().isPerWorld()) {
@@ -72,16 +77,30 @@ public class HomesComponent extends LocationsComponent {
                 }
 
                 // Check permissions!
-                CommandBook.inst().checkPermission(sender, "commandbook.home.teleport.other");
-                CommandBook.inst().checkPermission(sender, "commandbook.home.other");
+                for (Player target : targets) {
+                    if (target != sender) {
+                        CommandBook.inst().checkPermission(sender, "commandbook.home.teleport.other");
+                        if (!home.getCreatorName().equals(sender.getName())) {
+                            CommandBook.inst().checkPermission(sender, "commandbook.home.other");
+                        }
+                        break;
+                    }
+                }
             } else if (args.argsLength() == 3) {
                 targets = PlayerUtil.matchPlayers(sender, args.getString(1));
                 home = getManager().get(
                         LocationUtil.matchWorld(sender, args.getString(0)), args.getString(2));
 
                 // Check permissions!
-                CommandBook.inst().checkPermission(sender, "commandbook.home.teleport.other");
-                CommandBook.inst().checkPermission(sender, "commandbook.home.other");
+                for (Player target : targets) {
+                    if (target != sender) {
+                        CommandBook.inst().checkPermission(sender, "commandbook.home.teleport.other");
+                        if (!home.getCreatorName().equals(sender.getName())) {
+                            CommandBook.inst().checkPermission(sender, "commandbook.home.other");
+                        }
+                        break;
+                    }
+                }
             }
 
             if (home != null) {
@@ -111,13 +130,17 @@ public class HomesComponent extends LocationsComponent {
                 loc = player.getLocation();
 
                 // Check permissions!
-                CommandBook.inst().checkPermission(sender, "commandbook.home.set.other");
+                if (!homeName.equals(sender.getName())) {
+                    CommandBook.inst().checkPermission(sender, "commandbook.home.set.other");
+                }
             } else {
                 homeName = args.getString(1);
                 loc = LocationUtil.matchLocation(sender, args.getString(0));
-
+                
                 // Check permissions!
-                CommandBook.inst().checkPermission(sender, "commandbook.home.set.other");
+                if (!homeName.equals(sender.getName())) {
+                    CommandBook.inst().checkPermission(sender, "commandbook.home.set.other");
+                }
             }
 
             getManager().create(homeName, loc, player);

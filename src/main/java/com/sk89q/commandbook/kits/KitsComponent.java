@@ -109,11 +109,18 @@ public class KitsComponent extends AbstractComponent {
                 boolean included = false;
 
                 if (args.argsLength() == 2) {
-                    CommandBook.inst().checkPermission(sender, "commandbook.kit.other");
-
                     targets = PlayerUtil.matchPlayers(sender, args.getString(1));
                 } else {
                     targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
+                }
+
+                for (Player player : targets) {
+                    if (player != sender) {
+                        // Check permissions!
+                        CommandBook.inst().checkPermission(sender, "commandbook.kit.other");
+                    } else {
+                        CommandBook.inst().checkPermission(sender, "commandbook.kit");
+                    }
                 }
 
                 Kit kit = getKitManager().getKit(id);

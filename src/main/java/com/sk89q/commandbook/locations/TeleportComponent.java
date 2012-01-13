@@ -105,9 +105,14 @@ public class TeleportComponent extends AbstractComponent implements Listener {
                 loc = LocationUtil.matchLocation(sender, args.getString(1));
 
                 // Check permissions!
-                CommandBook.inst().checkPermission(sender, "commandbook.teleport.other");
-                if (sender instanceof Player) {
-                    CommandBook.inst().checkPermission(sender, loc.getWorld(), "commandbook.teleport.other");
+                for (Player target : targets) {
+                    if (target != sender) {
+                        CommandBook.inst().checkPermission(sender, "commandbook.teleport.other");
+                        if (sender instanceof Player) {
+                            CommandBook.inst().checkPermission(sender, loc.getWorld(), "commandbook.teleport.other");
+                        }
+                        break;
+                    }
                 }
             }
             
@@ -196,7 +201,9 @@ public class TeleportComponent extends AbstractComponent implements Listener {
             Player player;
             if (args.argsLength() > 0) {
                 player = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
-                CommandBook.inst().checkPermission(sender, "commandbook.return.other");
+                if (player != sender) {
+                    CommandBook.inst().checkPermission(sender, "commandbook.return.other");
+                }
             } else {
                 player = PlayerUtil.checkPlayer(sender);
             }

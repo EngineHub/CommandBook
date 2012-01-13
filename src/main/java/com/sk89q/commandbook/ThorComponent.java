@@ -105,14 +105,17 @@ public class ThorComponent extends AbstractComponent implements Listener {
             // Detect arguments based on the number of arguments provided
             if (args.argsLength() == 0) {
                 targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
-
-                // Check permissions!
-                CommandBook.inst().checkPermission(sender, "commandbook.shock");
             } else if (args.argsLength() == 1) {
                 targets = PlayerUtil.matchPlayers(sender, args.getString(0));
+            }
 
-                // Check permissions!
-                CommandBook.inst().checkPermission(sender, "commandbook.shock.other");
+            for (Player player : targets) {
+                if (player != sender) {
+                    // Check permissions!
+                    CommandBook.inst().checkPermission(sender, "commandbook.shock.other");
+                } else {
+                    CommandBook.inst().checkPermission(sender, "commandbook.shock");
+                }
             }
 
             for (final Player player : targets) {
@@ -182,14 +185,17 @@ public class ThorComponent extends AbstractComponent implements Listener {
             // Detect arguments based on the number of arguments provided
             if (args.argsLength() == 0) {
                 targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
-
-                // Check permissions!
-                CommandBook.inst().checkPermission(sender, "commandbook.thor");
             } else if (args.argsLength() == 1) {
                 targets = PlayerUtil.matchPlayers(sender, args.getString(0));
+            }
 
-                // Check permissions!
-                CommandBook.inst().checkPermission(sender, "commandbook.thor.other");
+            for (Player player : targets) {
+                if (player != sender) {
+                    // Check permissions!
+                    CommandBook.inst().checkPermission(sender, "commandbook.thor.other");
+                } else {
+                    CommandBook.inst().checkPermission(sender, "commandbook.thor");
+                }
             }
 
             for (final Player player : targets) {
@@ -224,14 +230,17 @@ public class ThorComponent extends AbstractComponent implements Listener {
             // Detect arguments based on the number of arguments provided
             if (args.argsLength() == 0) {
                 targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
-
-                // Check permissions!
-                CommandBook.inst().checkPermission(sender, "commandbook.thor");
             } else if (args.argsLength() == 1) {
                 targets = PlayerUtil.matchPlayers(sender, args.getString(0));
+            }
 
-                // Check permissions!
-                CommandBook.inst().checkPermission(sender, "commandbook.thor.other");
+            for (Player player : targets) {
+                if (player != sender) {
+                    // Check permissions!
+                    CommandBook.inst().checkPermission(sender, "commandbook.thor.other");
+                } else {
+                    CommandBook.inst().checkPermission(sender, "commandbook.thor");
+                }
             }
 
             for (final Player player : targets) {

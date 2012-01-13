@@ -53,9 +53,10 @@ public class InfoComponent extends AbstractComponent {
             if (args.argsLength() == 0) {
                 player = PlayerUtil.checkPlayer(sender);
             } else {
-                CommandBook.inst().checkPermission(sender, "commandbook.whereami.other");
-
                 player = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
+                if (player != sender) {
+                    CommandBook.inst().checkPermission(sender, "commandbook.whereami.other");
+                }
             }
 
             Location pos = player.getLocation();
@@ -87,9 +88,10 @@ public class InfoComponent extends AbstractComponent {
             if (args.argsLength() == 0) {
                 player = PlayerUtil.checkPlayer(sender);
             } else {
-                CommandBook.inst().checkPermission(sender, "commandbook.whois.other");
-
                 player = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
+                if (player != sender) {
+                    CommandBook.inst().checkPermission(sender, "commandbook.whois.other");
+                }
             }
 
             sender.sendMessage(ChatColor.YELLOW
@@ -118,9 +120,10 @@ public class InfoComponent extends AbstractComponent {
             if (args.argsLength() == 0) {
                 player = PlayerUtil.checkPlayer(sender);
             } else {
-                CommandBook.inst().checkPermission(sender, "commandbook.whereami.compass.other");
-
                 player = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
+                if (player != sender) {
+                    CommandBook.inst().checkPermission(sender, "commandbook.whereami.compass.other");
+                }
             }
 
             sender.sendMessage(ChatColor.YELLOW +
@@ -139,9 +142,10 @@ public class InfoComponent extends AbstractComponent {
             if (args.argsLength() == 0) {
                 player = PlayerUtil.checkPlayer(sender);
             } else {
-                CommandBook.inst().checkPermission(sender, "commandbook.biome.other");
-
                 player = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
+                if (player != sender) {
+                    CommandBook.inst().checkPermission(sender, "commandbook.biome.other");
+                }
             }
 
             sender.sendMessage(ChatColor.YELLOW + player.getLocation().getBlock().getBiome().name().toLowerCase().replace("_"," ")+" biome.");

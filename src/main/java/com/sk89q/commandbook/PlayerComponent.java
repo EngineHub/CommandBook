@@ -58,8 +58,12 @@ public class PlayerComponent extends AbstractComponent {
                 mode = player.getGameMode();
             } else {
                 if (args.hasFlag('c')) { //check other player
-                    CommandBook.inst().checkPermission(sender, "commandbook.gamemode.check.other");
                     player = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
+                    if (player != sender) {
+                        CommandBook.inst().checkPermission(sender, "commandbook.gamemode.check.other");
+                    } else {
+                        CommandBook.inst().checkPermission(sender, "commandbook.gamemode.check");
+                    }
                     mode = player.getGameMode();
                 } else {
                     change = true;
@@ -69,13 +73,17 @@ public class PlayerComponent extends AbstractComponent {
                     // reliably whether (with a single arg) they meant a player or a mode
                     String modeString = null;
                     if (args.argsLength() == 1) { // self mode
-                        CommandBook.inst().checkPermission(sender, "commandbook.gamemode.change");
                         modeString = args.getString(0);
                         player = PlayerUtil.checkPlayer(sender);
                     } else { // 2 - first is player, second mode
-                        CommandBook.inst().checkPermission(sender, "commandbook.gamemode.change.other");
                         player = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
                         modeString = args.getString(1);
+                    }
+
+                    if (player != sender) {
+                        CommandBook.inst().checkPermission(sender, "commandbook.gamemode.change.other");
+                    } else {
+                        CommandBook.inst().checkPermission(sender, "commandbook.gamemode.change");
                     }
 
                     try {
@@ -111,12 +119,11 @@ public class PlayerComponent extends AbstractComponent {
             }
             sender.sendMessage("Player " + (CommandBook.inst().useDisplayNames ? player.getDisplayName() : player.getName())
                     + ChatColor.YELLOW + message + ".");
-            return;
         }
         @Command(aliases = {"heal"}, 
         		usage = "[player]", desc = "Heal a player",
         		flags = "s", min = 0, max = 1)
-        @CommandPermissions({"commandbook.heal"})
+        @CommandPermissions({"commandbook.heal", "commandbook.heal.other"})
         public void heal(CommandContext args,CommandSender sender) throws CommandException {
             
             Iterable<Player> targets = null;
@@ -126,13 +133,18 @@ public class PlayerComponent extends AbstractComponent {
             if (args.argsLength() == 0) {
                 targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
                 
-                // Check permissions!
-                CommandBook.inst().checkPermission(sender, "commandbook.heal");
             } else if (args.argsLength() == 1) {            
                 targets = PlayerUtil.matchPlayers(sender, args.getString(0));
                 
-                // Check permissions!
-                CommandBook.inst().checkPermission(sender, "commandbook.heal.other");
+            }
+            
+            for (Player player : targets) {
+                if (player != sender) {
+                    // Check permissions!
+                    CommandBook.inst().checkPermission(sender, "commandbook.heal.other");
+                } else {
+                    CommandBook.inst().checkPermission(sender, "commandbook.heal");
+                }
             }
 
             for (Player player : targets) {
@@ -171,14 +183,17 @@ public class PlayerComponent extends AbstractComponent {
             // Detect arguments based on the number of arguments provided
             if (args.argsLength() == 0) {
                 targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
-                
-                // Check permissions!
-                CommandBook.inst().checkPermission(sender, "commandbook.slay");
             } else if (args.argsLength() == 1) {            
                 targets = PlayerUtil.matchPlayers(sender, args.getString(0));
-                
-                // Check permissions!
-                CommandBook.inst().checkPermission(sender, "commandbook.slay.other");
+            }
+
+            for (Player player : targets) {
+                if (player != sender) {
+                    // Check permissions!
+                    CommandBook.inst().checkPermission(sender, "commandbook.slay.other");
+                } else {
+                    CommandBook.inst().checkPermission(sender, "commandbook.slay");
+                }
             }
 
             for (Player player : targets) {

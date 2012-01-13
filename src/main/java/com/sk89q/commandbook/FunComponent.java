@@ -195,14 +195,16 @@ public class FunComponent extends AbstractComponent {
             // Detect arguments based on the number of arguments provided
             if (args.argsLength() == 0) {
                 targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
-
-                // Check permissions!
-                CommandBook.inst().checkPermission(sender, "commandbook.slap");
             } else if (args.argsLength() == 1) {
                 targets = PlayerUtil.matchPlayers(sender, args.getString(0));
+            }
 
-                // Check permissions!
-                CommandBook.inst().checkPermission(sender, "commandbook.slap.other");
+            // Check permissions!
+            for (Player player : targets) {
+                if (player != sender) {
+                    CommandBook.inst().checkPermission(sender, "commandbook.slap.other");
+                    break;
+                }
             }
 
             for (Player player : targets) {
@@ -273,9 +275,14 @@ public class FunComponent extends AbstractComponent {
                 targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
             } else if (args.argsLength() == 1) {
                 targets = PlayerUtil.matchPlayers(sender, args.getString(0));
+            }
 
-                // Check permissions!
-                CommandBook.inst().checkPermission(sender, "commandbook.rocket.other");
+            // Check permissions!
+            for (Player player : targets) {
+                if (player != sender) {
+                    CommandBook.inst().checkPermission(sender, "commandbook.rocket.other");
+                    break;
+                }
             }
 
             for (Player player : targets) {
@@ -329,9 +336,16 @@ public class FunComponent extends AbstractComponent {
                 targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
             } else if (args.argsLength() == 1) {
                 targets = PlayerUtil.matchPlayers(sender, args.getString(0));
+            }
 
-                // Check permissions!
-                CommandBook.inst().checkPermission(sender, "commandbook.barrage.other");
+            // Check permissions!
+            for (Player player : targets) {
+                if (player != sender) {
+                    CommandBook.inst().checkPermission(sender, "commandbook.barrage.other");
+                    break;
+                } else {
+                    CommandBook.inst().checkPermission(sender, "commandbook.barrage");
+                }
             }
 
             for (Player player : targets) {
@@ -387,9 +401,16 @@ public class FunComponent extends AbstractComponent {
                 targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
             } else if (args.argsLength() == 1) {
                 targets = PlayerUtil.matchPlayers(sender, args.getString(0));
+            }
 
-                // Check permissions!
-                CommandBook.inst().checkPermission(sender, "commandbook.firebarrage.other");
+            // Check permissions!
+            for (Player player : targets) {
+                if (player != sender) {
+                    CommandBook.inst().checkPermission(sender, "commandbook.firebarrage.other");
+                    break;
+                } else {
+                    CommandBook.inst().checkPermission(sender, "commandbook.firebarrage");
+                }
             }
 
             for (Player player : targets) {
@@ -442,9 +463,16 @@ public class FunComponent extends AbstractComponent {
                 targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
             } else if (args.argsLength() == 1) {            
                 targets = PlayerUtil.matchPlayers(sender, args.getString(0));
-                
-                // Check permissions!
-               CommandBook.inst().checkPermission(sender, "commandbook.barragefire.other");
+            }
+
+            // Check permissions!
+            for (Player player : targets) {
+                if (player != sender) {
+                    CommandBook.inst().checkPermission(sender, "commandbook.cannon.other");
+                    break;
+                } else {
+                    CommandBook.inst().checkPermission(sender, "commandbook.cannon");
+                }
             }
 
             for (Player player : targets) {

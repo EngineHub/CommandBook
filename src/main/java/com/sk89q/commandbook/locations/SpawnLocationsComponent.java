@@ -110,7 +110,12 @@ public class SpawnLocationsComponent extends AbstractComponent implements Listen
                 targets = PlayerUtil.matchPlayers(sender, args.getString(0));
 
                 // Check permissions!
-                CommandBook.inst().checkPermission(sender, "commandbook.spawn.other");
+                for (Player target : targets) {
+                    if (target != sender) {
+                        CommandBook.inst().checkPermission(sender, "commandbook.spawn.other");
+                        break;
+                    }
+                }
             } else {
                 targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
             }

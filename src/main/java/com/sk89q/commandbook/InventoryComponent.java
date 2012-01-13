@@ -190,7 +190,11 @@ public class InventoryComponent extends AbstractComponent {
 
                 // Make sure that this player has permission to give items to other
                 /// players!
-                CommandBook.inst().checkPermission(sender, "commandbook.give.other");
+                for (Player player : targets) {
+                    if (player != sender) {
+                        CommandBook.inst().checkPermission(sender, "commandbook.give.other");
+                    }
+                }
             }
 
             if (item == null) {
@@ -202,7 +206,7 @@ public class InventoryComponent extends AbstractComponent {
         @Command(aliases = {"give"},
                 usage = "[-d] <target> <item[:data]> [amount]", desc = "Give an item",
                 flags = "do", min = 2, max = 3)
-        @CommandPermissions({"commandbook.give.other"})
+        @CommandPermissions({"commandbook.give", "commandbook.give.other"})
         public void give(CommandContext args, CommandSender sender) throws CommandException {
             ItemStack item = null;
             int amt = config.defaultItemStackSize;
@@ -221,6 +225,14 @@ public class InventoryComponent extends AbstractComponent {
                 targets = PlayerUtil.matchPlayers(sender, args.getString(0));
                 item = matchItem(sender, args.getString(1));
                 amt = args.getInteger(2);
+            }
+            
+            for (Player target : targets) {
+                if (target != sender) {
+                    CommandBook.inst().checkPermission(sender, "commandbook.give.other");
+                } else {
+                    CommandBook.inst().checkPermission(sender, "commandbook.give");
+                }
             }
 
             if (item == null) {
@@ -245,9 +257,14 @@ public class InventoryComponent extends AbstractComponent {
                 // A different player
             } else {
                 targets = PlayerUtil.matchPlayers(sender, args.getString(0));
-
-                // Make sure that this player can clear other players!
-                CommandBook.inst().checkPermission(sender, "commandbook.clear.other");
+            }
+            
+            for (Player player : targets) {
+                if (sender != player) {
+                    // Make sure that this player can clear other players!
+                    CommandBook.inst().checkPermission(sender, "commandbook.clear.other");
+                    break;
+                }
             }
 
             for (Player player : targets) {
@@ -307,9 +324,9 @@ public class InventoryComponent extends AbstractComponent {
             boolean infinite = args.hasFlag('i');
             boolean overrideStackSize = args.hasFlag('o');
             if (infinite) {
-                CommandBook.inst().hasPermission(sender, "commandbook.more.infinite");
+                CommandBook.inst().checkPermission(sender, "commandbook.more.infinite");
             } else if (overrideStackSize) {
-                CommandBook.inst().hasPermission(sender, "commandbook.override.maxstacksize");
+                CommandBook.inst().checkPermission(sender, "commandbook.override.maxstacksize");
             }
 
             boolean included = false;
@@ -319,9 +336,15 @@ public class InventoryComponent extends AbstractComponent {
             // A different player
             } else {
                 targets = PlayerUtil.matchPlayers(sender, args.getString(0));
-            
-                // Make sure that this player can 'more' other players!
-                CommandBook.inst().checkPermission(sender, "commandbook.more.other");
+            }
+
+            for (Player player : targets) {
+                if (player != sender) {
+                    // Check permissions!
+                    CommandBook.inst().checkPermission(sender, "commandbook.more.other");
+                } else {
+                    CommandBook.inst().checkPermission(sender, "commandbook.more");
+                }
             }
         
             for (Player player : targets) {
@@ -361,7 +384,7 @@ public class InventoryComponent extends AbstractComponent {
         @Command(aliases = {"take"},
                 usage = "<target> <item[:data]> [amount]", desc = "Take an item",
                 flags = "", min = 2, max = 3)
-        @CommandPermissions({"commandbook.take.other"})
+        @CommandPermissions({"commandbook.take"})
         public void take(CommandContext args, CommandSender sender) throws CommandException {
             ItemStack item = null;
             int amt = config.defaultItemStackSize;
@@ -376,6 +399,13 @@ public class InventoryComponent extends AbstractComponent {
                 target = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
                 item = matchItem(sender, args.getString(1));
                 amt = args.getInteger(2);
+            }
+
+            if (target != sender) {
+                // Check permissions!
+                CommandBook.inst().checkPermission(sender, "commandbook.take.other");
+            } else {
+                CommandBook.inst().checkPermission(sender, "commandbook.take");
             }
 
             if (item == null) {

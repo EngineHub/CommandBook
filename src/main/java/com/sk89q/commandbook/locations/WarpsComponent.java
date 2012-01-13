@@ -65,16 +65,18 @@ public class WarpsComponent extends LocationsComponent {
                 } else {
                     warp = getManager().get(null, args.getString(1));
                 }
-
-                // Check permissions!
-                CommandBook.inst().checkPermission(sender, "commandbook.warp.teleport.other");
             } else if (args.argsLength() == 3) {
                 targets = PlayerUtil.matchPlayers(sender, args.getString(1));
                 warp = getManager().get(
                         LocationUtil.matchWorld(sender, args.getString(0)), args.getString(2));
+            }
 
-                // Check permissions!
-                CommandBook.inst().checkPermission(sender, "commandbook.warp.teleport.other");
+            // Check permissions!
+            for (Player target : targets) {
+                if (target != sender) {
+                    CommandBook.inst().checkPermission(sender, "commandbook.warp.teleport.other");
+                    break;
+                }
             }
 
             if (warp != null) {
