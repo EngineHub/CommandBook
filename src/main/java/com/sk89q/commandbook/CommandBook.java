@@ -217,9 +217,14 @@ public final class CommandBook extends JavaPlugin {
      */
     @SuppressWarnings({ "unchecked" })
     public void populateConfiguration() {
-        YAMLProcessor config = new YAMLProcessor(new File(getDataFolder(), "config.yml"), true, YAMLFormat.EXTENDED);
+        final File configFile = new File(getDataFolder(), "config.yml");
+        YAMLProcessor config = new YAMLProcessor(configFile, true, YAMLFormat.EXTENDED);
         YAMLProcessor comments = new DefaultsFileYAMLProcessor("config-comments.yml", false);
         try {
+            if (!configFile.exists()) {
+                configFile.getParentFile().mkdirs();
+                configFile.createNewFile();
+            }
             config.load();
             comments.load();
         } catch (IOException e) {
