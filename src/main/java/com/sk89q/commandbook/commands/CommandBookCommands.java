@@ -19,14 +19,25 @@
 package com.sk89q.commandbook.commands;
 
 import com.sk89q.commandbook.CommandBook;
+import com.sk89q.commandbook.components.AbstractComponent;
+import com.sk89q.commandbook.components.ComponentInformation;
+import com.sk89q.minecraft.util.commands.*;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
-import com.sk89q.minecraft.util.commands.Command;
-import com.sk89q.minecraft.util.commands.CommandContext;
-import com.sk89q.minecraft.util.commands.CommandException;
-import com.sk89q.minecraft.util.commands.CommandPermissions;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Map;
 
 public class CommandBookCommands {
+    
+    public static class CommandBookParentCommand {
+        @Command(aliases = {"cmdbook"}, desc = "CommandBook commands",
+                flags = "d", min = 1, max = 3)
+        @NestedCommand({CommandBookCommands.class})
+        public static void cmdBook() {
+        }
+    }
     
     @Command(aliases = {"version"}, usage = "", desc = "CommandBook version information", min = 0, max = 0)
     public static void version(CommandContext args, CommandSender sender) throws CommandException {
@@ -49,6 +60,45 @@ public class CommandBookCommands {
         CommandBook.inst().getGlobalConfiguration().save();
 
         sender.sendMessage(ChatColor.YELLOW + "CommandBook's configuration has been reloaded.");
+    }
+    
+    @Command(aliases = {"help", "doc"}, usage = "<component>", desc = "Get documentation for a component",
+            flags = "p:", min = 0, max = 1)
+    @CommandPermissions("commandbook.component.help")
+    public static void help(CommandContext args, CommandSender sender) throws CommandException {
+        if (args.argsLength() == 0) {
+            new PaginatedResult<AbstractComponent>("Name - Description") {
+                @Override
+                public String format(AbstractComponent entry) {
+                    return entry.getInformation().friendlyName() + " - " + entry.getInformation().desc();
+                }
+            }.display(sender, CommandBook.inst().getComponentManager().getComponents(), args.getFlagInteger('p', 1));
+            
+        } else {
+            final String componentName = args.getString(0).replaceAll(" ", "-").toLowerCase();
+            AbstractComponent component = CommandBook.inst().getComponentManager().getComponent(componentName);
+            if (component == null) {
+                throw new CommandException("No such component: " + componentName);
+            }
+            ComponentInformation info = component.getInformation();
+            sender.sendMessage(ChatColor.YELLOW + info.friendlyName() + " - " + info.desc());
+            if (info.authors().length > 0 && info.authors()[0].length() > 0) {
+                sender.sendMessage(ChatColor.YELLOW + "Authors: " + 
+                        Arrays.toString(info.authors()).replaceAll("[(.*)]", "$1"));
+            }
+            Map<String, String> commands = component.getCommands();
+            if (commands.size() > 0) {
+                new PaginatedResult<Map.Entry<String, String>>("    Command - Description") {
+                    @Override
+                    public String format(Map.Entry<String, String> entry) {
+                        return "    /" + entry.getKey() + " " + entry.getValue();
+                    }
+                }.display(sender, commands.entrySet(), args.getFlagInteger('p', 1));
+            } else {
+                sender.sendMessage(ChatColor.YELLOW + "No commands");
+            }
+        }
+        
     }
     
 }

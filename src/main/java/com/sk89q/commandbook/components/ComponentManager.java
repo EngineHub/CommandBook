@@ -36,7 +36,7 @@ import java.util.logging.Level;
  */
 public class ComponentManager {
     protected List<ComponentLoader> loaders = new ArrayList<ComponentLoader>();
-    protected List<AbstractComponent> registeredComponents = new ArrayList<AbstractComponent>();
+    protected Map<String, AbstractComponent> registeredComponents = new LinkedHashMap<String, AbstractComponent>();
     protected final Map<Class<? extends Annotation>, AnnotationHandler<?>> annotationHandlers = new LinkedHashMap<Class<? extends Annotation>, AnnotationHandler<?>>();
 
     public synchronized boolean addComponentLoader(ComponentLoader loader) {
@@ -55,17 +55,19 @@ public class ComponentManager {
                     }
                 };
                 commands.setInjector(new SimpleInjector(component));
-
-                component.setUp(commands, loader, component.getClass().getAnnotation(ComponentInformation.class));
                 
-                registeredComponents.add(component);
+                ComponentInformation info = component.getClass().getAnnotation(ComponentInformation.class);
+
+                component.setUp(commands, loader, info);
+                
+                registeredComponents.put(info.friendlyName().replaceAll(" ", "-").toLowerCase(), component);
             }
         }
         return true;
     }
 
     public synchronized void enableComponents() {
-        for (AbstractComponent component : registeredComponents) {
+        for (AbstractComponent component : registeredComponents.values()) {
             for (Field field : component.getClass().getDeclaredFields()) {
                 field.setAccessible(true);
                 for (Annotation annotation : field.getAnnotations()) {
@@ -89,7 +91,7 @@ public class ComponentManager {
     }
     
     public synchronized void unloadComponents() {
-        for (AbstractComponent component : registeredComponents) {
+        for (AbstractComponent component : registeredComponents.values()) {
             component.unload();
             component.unregisterCommands();
         }
@@ -97,18 +99,26 @@ public class ComponentManager {
     }
     
     public synchronized void reloadComponents() {
-        for (AbstractComponent component : registeredComponents) {
+        for (AbstractComponent component : registeredComponents.values()) {
             component.reload();
         }
     }
     
     public synchronized <T> T getComponent(Class<T> type) {
-        for (AbstractComponent component : registeredComponents) {
+        for (AbstractComponent component : registeredComponents.values()) {
             if (component.getClass().equals(type)) {
                 return type.cast(component);
             }
         }
         return null;
+    }
+    
+    public Collection<AbstractComponent> getComponents() {
+        return Collections.unmodifiableCollection(registeredComponents.values());
+    }
+    
+    public AbstractComponent getComponent(String friendlyName) {
+        return registeredComponents.get(friendlyName);
     }
     
     public synchronized <T extends Annotation> void registerAnnotationHandler(Class<T> annotation, AnnotationHandler<T> handler) {

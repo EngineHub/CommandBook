@@ -18,8 +18,6 @@
 
 package com.sk89q.commandbook.kits;
 
-import com.sk89q.commandbook.kits.KitsComponent;
-
 public class GarbageCollector implements Runnable {
     
     public static final long CHECK_FREQUENCY = 12000;

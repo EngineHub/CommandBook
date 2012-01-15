@@ -162,11 +162,11 @@ public final class CommandBook extends JavaPlugin {
             getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
                 @Override
                 public void run() {
-                    cmdRegister.register(GeneralCommands.class);
+                    cmdRegister.register(CommandBookCommands.CommandBookParentCommand.class);
                 }
             }, 0L);
         } else {
-            cmdRegister.register(GeneralCommands.class);
+            cmdRegister.register(CommandBookCommands.CommandBookParentCommand.class);
         }
 
         componentManager.enableComponents();

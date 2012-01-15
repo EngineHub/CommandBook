@@ -29,6 +29,9 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
+import java.util.Collections;
+import java.util.Map;
+
 /**
  * @author zml2008
  */
@@ -149,6 +152,14 @@ public abstract class AbstractComponent implements CommandExecutor {
             return rawConfiguration;
         } else {
             return rawConfiguration = getComponentLoader().getConfiguration(this);
+        }
+    }
+    
+    public Map<String, String> getCommands() {
+        if (commands == null) {
+            return Collections.emptyMap();
+        } else {
+            return commands.getCommands();
         }
     }
 }

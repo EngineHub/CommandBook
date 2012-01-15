@@ -23,6 +23,8 @@ import com.sk89q.minecraft.util.commands.CommandException;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -32,10 +34,14 @@ import java.util.List;
 public abstract class PaginatedResult<T> {
     private final String header;
 
-    protected static final int PER_PAGE = 5;
+    protected static final int PER_PAGE = 6;
     
     public PaginatedResult(String header) {
         this.header = header;
+    }
+    
+    public void display(CommandSender sender, Collection<T> results, int page) throws CommandException {
+        display(sender, new ArrayList<T>(results), page);
     }
     
     public void display(CommandSender sender, List<T> results, int page) throws CommandException {
@@ -47,7 +53,6 @@ public abstract class PaginatedResult<T> {
                 "Unknown page selected! " + maxPages + " total pages.");
 
         sender.sendMessage(ChatColor.YELLOW + header + " (page " + (page + 1) + "/" + (maxPages + 1) + ")");
-        String defaultWorld = CommandBook.server().getWorlds().get(0).getName();
         for (int i = PER_PAGE * page; i < PER_PAGE * page + PER_PAGE  && i < results.size(); i++) {
             sender.sendMessage(ChatColor.YELLOW.toString() + format(results.get(i)));
         }
