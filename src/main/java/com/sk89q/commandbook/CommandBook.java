@@ -227,7 +227,7 @@ public final class CommandBook extends JavaPlugin {
             }
             config.load();
             comments.load();
-        } catch (IOException e) {
+        } catch (Exception e) {
             logger.log(Level.WARNING, "CommandBook: Error loading configuration: ", e);
         }
         this.config = config;

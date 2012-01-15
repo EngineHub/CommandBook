@@ -22,4 +22,4 @@ low-priority-command-registration: |
     with /<command>
     
 op-permissions: Give ops all permissions
-crappy-wrapper-compat: 
+crappy-wrapper-compat: Disables some features to be compatible with badly-written server wrappers.
