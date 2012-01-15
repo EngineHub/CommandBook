@@ -1,8 +1,0 @@
-# These are the defaults for CommandBook's global configuration settings.
-op-permissions: true
-use-display-names: true
-item-names:
-    goldblock: 41
-    ice: 79
-broadcast-changes: true
-crappy-wrapper-compat: true

@@ -72,7 +72,7 @@
         <filtering>true</filtering>
         <directory>${basedir}/src/main/resources/</directory>
         <includes>
-          <include>config.yml</include>
+          <include>config-comments.yml</include>
           <include>kits.txt</include>
           <include>components.yml</include>
         </includes>

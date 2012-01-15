@@ -27,12 +27,7 @@ import org.yaml.snakeyaml.error.YAMLException;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author zml2008
@@ -58,9 +53,9 @@ public class ConfigListedComponentLoader extends AbstractComponentLoader {
     public Collection<AbstractComponent> loadComponents() {
         List<AbstractComponent> components = new ArrayList<AbstractComponent>();
         // The lists of components to load.
-        Set<String> disabledComponents = new HashSet<String>(CommandBook.inst().
+        Set<String> disabledComponents = new LinkedHashSet<String>(CommandBook.inst().
                 getGlobalConfiguration().getStringList("components.disabled", null));
-        Set<String> stagedEnabled = new HashSet<String>(CommandBook.inst().
+        Set<String> stagedEnabled = new LinkedHashSet<String>(CommandBook.inst().
                 getGlobalConfiguration().getStringList("components.enabled", null));
         for (String key : jarComponentAliases.getKeys(null)) { // Load the component aliases
             if (!stagedEnabled.contains(key) 

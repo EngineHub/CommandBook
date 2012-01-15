@@ -32,6 +32,7 @@ import com.sk89q.commandbook.components.loader.ClassLoaderComponentLoader;
 import com.sk89q.commandbook.components.loader.ConfigListedComponentLoader;
 import com.sk89q.commandbook.components.loader.JarFilesComponentLoader;
 import com.sk89q.commandbook.components.loader.StaticComponentLoader;
+import com.sk89q.commandbook.config.DefaultsFileYAMLProcessor;
 import com.sk89q.commandbook.events.ComponentManagerInitEvent;
 import com.sk89q.commandbook.events.core.EventManager;
 import com.sk89q.commandbook.session.SessionComponent;
@@ -72,6 +73,8 @@ public final class CommandBook extends JavaPlugin {
     public boolean useDisplayNames;
     public boolean lookupWithDisplayNames;
     public boolean crappyWrapperCompat;
+    public boolean lowPriorityCommandRegistration;
+    public List<String> disabledCommands;
 
     protected YAMLProcessor config;
     protected EventManager eventManager = new EventManager();
@@ -107,9 +110,6 @@ public final class CommandBook extends JavaPlugin {
         // and other data files will be stored
         getDataFolder().mkdirs();
 
-        createDefaultConfiguration("config.yml");
-        createDefaultConfiguration("kits.txt");
-
         // Register the commands that we want to use
         final CommandBook plugin = this;
         commands = new CommandsManager<CommandSender>() {
@@ -131,12 +131,8 @@ public final class CommandBook extends JavaPlugin {
         // -- Component loaders
         final File configDir = new File(plugin.getDataFolder(), "config/");
         componentManager.addComponentLoader(new StaticComponentLoader(configDir, new SessionComponent()));
-        componentManager.addComponentLoader(new ConfigListedComponentLoader(new YAMLProcessor(null, false) {
-            @Override
-            public InputStream getInputStream() {
-                return CommandBook.inst().getClass().getResourceAsStream("/defaults/components.yml");
-            }
-        }, configDir));
+        componentManager.addComponentLoader(new ConfigListedComponentLoader(
+                new DefaultsFileYAMLProcessor("components.yml", false), configDir));
 
         for (String dir : config.getStringList("component-class-dirs", Arrays.asList("component-classes"))) {
             final File classesDir = new File(plugin.getDataFolder(), dir);
@@ -162,7 +158,16 @@ public final class CommandBook extends JavaPlugin {
         componentManager.loadComponents();
         
 		final CommandsManagerRegistration cmdRegister = new CommandsManagerRegistration(this, commands);
-        cmdRegister.register(GeneralCommands.class);
+        if (lowPriorityCommandRegistration) {
+            getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+                @Override
+                public void run() {
+                    cmdRegister.register(GeneralCommands.class);
+                }
+            }, 0L);
+        } else {
+            cmdRegister.register(GeneralCommands.class);
+        }
 
         componentManager.enableComponents();
 
@@ -213,12 +218,18 @@ public final class CommandBook extends JavaPlugin {
     @SuppressWarnings({ "unchecked" })
     public void populateConfiguration() {
         YAMLProcessor config = new YAMLProcessor(new File(getDataFolder(), "config.yml"), true, YAMLFormat.EXTENDED);
+        YAMLProcessor comments = new DefaultsFileYAMLProcessor("config-comments.yml", false);
         try {
             config.load();
+            comments.load();
         } catch (IOException e) {
             logger.log(Level.WARNING, "CommandBook: Error loading configuration: ", e);
         }
         this.config = config;
+
+        for (Map.Entry<String, Object> e : comments.getMap().entrySet()) {
+            config.setComment(e.getKey(), e.getValue().toString());
+        }
 
         loadItemList();
 
@@ -228,6 +239,8 @@ public final class CommandBook extends JavaPlugin {
         broadcastChanges = config.getBoolean("broadcast-changes", true);
 
         crappyWrapperCompat = config.getBoolean("crappy-wrapper-compat", true);
+        
+        lowPriorityCommandRegistration = config.getBoolean("low-priority-command-registration", false);
         
         if (crappyWrapperCompat) {
             logger.info("CommandBook: Maximum wrapper compatibility is enabled. " +

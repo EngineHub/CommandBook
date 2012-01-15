@@ -38,6 +38,8 @@ public class KitsComponent extends AbstractComponent {
 
     @Override
     public void initialize() {
+        CommandBook.inst().createDefaultConfiguration("kits.txt");
+        
         // Setup kits
         kits = new FlatFileKitsManager(new File(CommandBook.inst().getDataFolder(), "kits.txt"));
         kits.load();

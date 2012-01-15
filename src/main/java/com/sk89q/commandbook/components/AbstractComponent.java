@@ -87,8 +87,17 @@ public abstract class AbstractComponent implements CommandExecutor {
         return config;
     }
 
-    public void registerCommands(Class<?> clazz)  {
-        commandRegistration.register(clazz);
+    public void registerCommands(final Class<?> clazz)  {
+        if (CommandBook.inst().lowPriorityCommandRegistration) {
+         CommandBook.server().getScheduler().scheduleSyncDelayedTask(CommandBook.inst(), new Runnable() {
+             @Override
+             public void run() {
+                 commandRegistration.register(clazz);
+             }
+         }, 0L);
+        } else {
+            commandRegistration.register(clazz);
+        }
     }
 
     public void unregisterCommands() {
