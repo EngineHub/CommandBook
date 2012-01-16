@@ -233,7 +233,9 @@ public final class CommandBook extends JavaPlugin {
         this.config = config;
 
         for (Map.Entry<String, Object> e : comments.getMap().entrySet()) {
-            config.setComment(e.getKey(), e.getValue().toString());
+            if (e.getValue() != null) {
+                config.setComment(e.getKey(), e.getValue().toString());
+            }
         }
 
         loadItemList();
