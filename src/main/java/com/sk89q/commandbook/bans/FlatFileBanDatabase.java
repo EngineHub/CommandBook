@@ -42,14 +42,14 @@ import org.bukkit.entity.Player;
 import com.sk89q.commandbook.CommandBook;
 import static com.sk89q.commandbook.util.PlayerUtil.toUniqueName;
 
+import static com.sk89q.commandbook.CommandBook.logger;
+
 /**
  * Flat file ban database.
  * 
  * @author sk89q
  */
 public class FlatFileBanDatabase implements BanDatabase {
-    
-    protected static final Logger logger = Logger.getLogger("Minecraft.CommandBook");
     
     protected final Logger auditLogger
             = Logger.getLogger("Minecraft.CommandBook.Bans");
@@ -89,10 +89,10 @@ public class FlatFileBanDatabase implements BanDatabase {
             
             auditLogger.addHandler(handler);
         } catch (SecurityException e) {
-            logger.warning("CommandBook: Failed to setup audit log for the "
+            logger().warning("Failed to setup audit log for the "
                     + "flat file ban database: " + e.getMessage());
         } catch (IOException e) {
-            logger.warning("CommandBook: Failed to setup audit log for the "
+            logger().warning("Failed to setup audit log for the "
                     + "flat file ban database: " + e.getMessage());
         }
     }
@@ -102,10 +102,10 @@ public class FlatFileBanDatabase implements BanDatabase {
         
         try {
             bannedNames = readLowercaseList(namesFile);
-            logger.info("CommandBook: " + bannedNames.size() + " banned name(s) loaded.");
+            logger().info(bannedNames.size() + " banned name(s) loaded.");
         } catch (IOException e) {
             bannedNames = new HashMap<String, Ban>();
-            logger.warning("CommandBook: Failed to load " + namesFile.getAbsolutePath()
+            logger().warning("Failed to load " + namesFile.getAbsolutePath()
                     + ": " + e.getMessage());
             successful = false;
         }
@@ -169,7 +169,7 @@ public class FlatFileBanDatabase implements BanDatabase {
             writeList(namesFile, bannedNames);
             //logger.info("CommandBook: " + bannedNames.size() + " banned names written.");
         } catch (IOException e) {
-            logger.warning("CommandBook: Failed to write " + namesFile.getAbsolutePath()
+            logger().warning("Failed to write " + namesFile.getAbsolutePath()
                     + ": " + e.getMessage());
             successful = false;
         }
@@ -192,7 +192,7 @@ public class FlatFileBanDatabase implements BanDatabase {
             writer.close();
         } catch (FileNotFoundException e) {
         } catch (UnsupportedEncodingException e) {
-            logger.log(Level.WARNING, "Failed to write list", e);
+            logger().log(Level.WARNING, "Failed to write list", e);
         } finally {
             if (output != null) {
                 try {

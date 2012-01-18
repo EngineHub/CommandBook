@@ -75,7 +75,7 @@ public class ComponentManager {
                             (AnnotationHandler<Annotation>)annotationHandlers.get(annotation.annotationType());
                     if (handler != null) {
                         if (!handler.handle(component, field, annotation)) {
-                            CommandBook.logger().log(Level.WARNING, "CommandBook: Component "
+                            CommandBook.logger().log(Level.WARNING, "Component "
                                     + component.getClass().getSimpleName() +
                                     " could not be enabled! Error in annotation handler for field " + field);
                         }
@@ -84,7 +84,7 @@ public class ComponentManager {
             }
             component.initialize();
             component.setEnabled(true);
-            CommandBook.logger().log(Level.FINEST, "CommandBook: Component " +
+            CommandBook.logger().log(Level.FINEST, "Component " +
                     component.getClass().getSimpleName() + " successfully enabled!");
         }
 

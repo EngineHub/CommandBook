@@ -23,7 +23,6 @@ import com.sk89q.commandbook.components.AbstractComponent;
 import com.sk89q.commandbook.components.ComponentInformation;
 import com.sk89q.commandbook.config.ConfigurationBase;
 import com.sk89q.commandbook.config.Setting;
-import com.sk89q.commandbook.events.core.BukkitEvent;
 import com.sk89q.commandbook.util.LocationUtil;
 import com.sk89q.commandbook.util.PlayerIteratorAction;
 import com.sk89q.commandbook.util.PlayerUtil;
@@ -36,7 +35,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
@@ -57,6 +56,7 @@ public class SpawnLocationsComponent extends AbstractComponent implements Listen
         spawns = new WrappedSpawnManager(new File(CommandBook.inst().getDataFolder(), "spawns.yml"));
         config = configure(new LocalConfiguration());
         registerCommands(Commands.class);
+        CommandBook.registerEvents(this);
     }
 
     @Override
@@ -73,14 +73,14 @@ public class SpawnLocationsComponent extends AbstractComponent implements Listen
         @Setting("exact-spawn") public boolean exactSpawn;
     }
 
-    @BukkitEvent(type = Event.Type.PLAYER_RESPAWN)
+    @EventHandler(event = PlayerRespawnEvent.class)
     public void onRespawn(PlayerRespawnEvent event) {
         if (config.exactSpawn && !event.isBedSpawn()) {
             event.setRespawnLocation(spawns.getWorldSpawn(event.getPlayer().getWorld()));
         }
     }
 
-    @BukkitEvent(type = Event.Type.PLAYER_TELEPORT)
+    @EventHandler(event = PlayerTeleportEvent.class)
     public void onTeleport(PlayerTeleportEvent event) {
 
         Location loc = event.getTo();
@@ -92,7 +92,7 @@ public class SpawnLocationsComponent extends AbstractComponent implements Listen
         }
     }
 
-    @BukkitEvent(type = Event.Type.PLAYER_JOIN)
+    @EventHandler(event = PlayerJoinEvent.class)
     public void onJoin(PlayerJoinEvent event) {
         if (!event.getPlayer().hasPlayedBefore() && config.exactSpawn) {
             event.getPlayer().teleport(spawns.getWorldSpawn(event.getPlayer().getWorld()));

@@ -21,10 +21,8 @@ package com.sk89q.commandbook.locations;
 import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.commands.PaginatedResult;
 import com.sk89q.commandbook.components.AbstractComponent;
-import com.sk89q.commandbook.components.ComponentInformation;
 import com.sk89q.commandbook.config.ConfigurationBase;
 import com.sk89q.commandbook.config.Setting;
-import com.sk89q.commandbook.events.core.BukkitEvent;
 import com.sk89q.commandbook.util.LocationUtil;
 import com.sk89q.commandbook.util.PlayerUtil;
 import com.sk89q.minecraft.util.commands.CommandContext;
@@ -32,12 +30,10 @@ import com.sk89q.minecraft.util.commands.CommandException;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
-import org.bukkit.event.Event;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
-
-import java.util.List;
 
 /**
  * Parent class for components that use a RootLocationManager<NamedLocation> and deal with locations
@@ -58,7 +54,7 @@ public abstract class LocationsComponent extends AbstractComponent implements Li
         LocationManagerFactory<LocationManager<NamedLocation>> warpsFactory =
                 new FlatFileLocationsManager.LocationsFactory(CommandBook.inst().getDataFolder(), name + "s");
         manager = new RootLocationManager<NamedLocation>(warpsFactory, config.perWorld);
-        CommandBook.inst().getEventManager().registerEvents(this, this);
+        CommandBook.registerEvents(this);
     }
 
     private static class LocalConfiguration extends ConfigurationBase {
@@ -70,12 +66,12 @@ public abstract class LocationsComponent extends AbstractComponent implements Li
         return manager;
     }
     
-    @BukkitEvent(type = Event.Type.WORLD_LOAD)
+    @EventHandler(event = WorldLoadEvent.class)
     public void loadWorld(WorldLoadEvent event) {
         manager.updateWorlds(event.getWorld());
     }
 
-    @BukkitEvent(type = Event.Type.WORLD_UNLOAD)
+    @EventHandler(event = WorldUnloadEvent.class)
     public void unloadWorld(WorldUnloadEvent event) {
         manager.updateWorlds(event.getWorld());
     }

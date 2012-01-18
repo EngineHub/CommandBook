@@ -33,7 +33,7 @@ import org.bukkit.inventory.ItemStack;
  */
 public class Kit {
     
-    private long coolDown;
+    private volatile long coolDown;
     private LinkedList<ItemStack> items = new LinkedList<ItemStack>();
     private Map<String, Long> lastDistribution = new HashMap<String, Long>();
     

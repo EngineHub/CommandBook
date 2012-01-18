@@ -24,15 +24,15 @@ import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.components.ComponentInformation;
 import com.sk89q.commandbook.config.ConfigurationBase;
 import com.sk89q.commandbook.config.Setting;
-import com.sk89q.commandbook.events.core.BukkitEvent;
 import com.sk89q.commandbook.util.PlayerUtil;
 import com.sk89q.minecraft.util.commands.*;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.EventHandler;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -47,14 +47,14 @@ public class BansComponent extends AbstractComponent implements Listener {
         config = configure(new LocalConfiguration());
         
         // Setup the ban database
-        bans = new CSVBanDatabase(CommandBook.inst().getDataFolder(), this);
+        bans = new CSVBanDatabase(CommandBook.inst().getDataFolder());
         bans.load();
         if (FlatFileBanDatabase.toImport(CommandBook.inst().getDataFolder())) {
             BanDatabase banDb = new FlatFileBanDatabase(CommandBook.inst().getDataFolder(), this);
             banDb.load();
             bans.importFrom(banDb);
         }
-        CommandBook.inst().getEventManager().registerEvents(this, this);
+        CommandBook.registerEvents(this);
         registerCommands(Commands.class);
     }
 
@@ -90,18 +90,18 @@ public class BansComponent extends AbstractComponent implements Listener {
      *
      * @param event Relevant event details
      */
-    @BukkitEvent(type = Event.Type.PLAYER_LOGIN)
+    @EventHandler(event = PlayerLoginEvent.class, priority = EventPriority.NORMAL)
     public void playerLogin(PlayerLoginEvent event) {
-        Player player = event.getPlayer();
+        final Player player = event.getPlayer();
 
         try {
-            if (getBanDatabase().isBannedName(event.getPlayer().getName())) {
+            if (getBanDatabase().isBannedName(player.getName())) {
                 event.disallow(PlayerLoginEvent.Result.KICK_BANNED,
-                        getBanDatabase().getBannedNameMesage(event.getPlayer().getName()));
+                        getBanDatabase().getBannedNameMesage(player.getName()));
             } else if (getBanDatabase().isBannedAddress(
-                    event.getPlayer().getAddress().getAddress())) {
+                    player.getAddress().getAddress())) {
                 event.disallow(PlayerLoginEvent.Result.KICK_BANNED, getBanDatabase().getBannedAddressMessage(
-                        event.getPlayer().getAddress().getAddress().getHostAddress()));
+                        player.getAddress().getAddress().getHostAddress()));
             }
         } catch (NullPointerException e) {
             // Bug in CraftBukkit
@@ -160,7 +160,7 @@ public class BansComponent extends AbstractComponent implements Listener {
                 banName = player.getName();
 
                 sender.sendMessage(ChatColor.YELLOW + player.getName()
-                        + " (" + player.getDisplayName() + ChatColor.WHITE
+                        + " (" + player.getDisplayName() + ChatColor.YELLOW
                         + ") banned and kicked.");
             } catch (CommandException e) {
                 banName = args.getString(0)

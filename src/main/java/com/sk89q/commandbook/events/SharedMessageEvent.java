@@ -18,10 +18,10 @@
 
 package com.sk89q.commandbook.events;
 
-import com.sk89q.commandbook.events.core.CommandBookEvent;
-import com.sk89q.commandbook.events.core.HandlerList;
+import org.bukkit.event.Event;
+import org.bukkit.event.HandlerList;
 
-public class SharedMessageEvent extends CommandBookEvent {
+public class SharedMessageEvent extends Event {
     
     private static final long serialVersionUID = -6438425022394756162L;
     private String message;

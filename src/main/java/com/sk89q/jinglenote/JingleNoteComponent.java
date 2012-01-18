@@ -21,12 +21,7 @@ package com.sk89q.jinglenote;
 import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.components.AbstractComponent;
 import com.sk89q.commandbook.components.ComponentInformation;
-import com.sk89q.commandbook.config.ConfigurationBase;
-import com.sk89q.commandbook.events.core.BukkitEvent;
-import com.sk89q.commandbook.events.core.EventListener;
 import com.sk89q.commandbook.util.PlayerUtil;
-import com.sk89q.jinglenote.JingleNoteManager;
-import com.sk89q.jinglenote.MidiJingleSequencer;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
@@ -35,9 +30,9 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import javax.sound.midi.InvalidMidiDataException;
@@ -58,7 +53,7 @@ public class JingleNoteComponent extends AbstractComponent implements Listener {
         jingleNoteManager = new JingleNoteManager();
         
         registerCommands(Commands.class);
-        CommandBook.inst().getEventManager().registerEvents(this, this);
+        CommandBook.registerEvents(this);
     }
 
     @Override
@@ -75,7 +70,7 @@ public class JingleNoteComponent extends AbstractComponent implements Listener {
         return jingleNoteManager;
     }
 
-    @BukkitEvent(type = Event.Type.PLAYER_JOIN)
+    @EventHandler(event = PlayerJoinEvent.class)
     public void onJoin(PlayerJoinEvent event) {
         MidiJingleSequencer sequencer = null;
 
@@ -86,19 +81,19 @@ public class JingleNoteComponent extends AbstractComponent implements Listener {
                 getJingleNoteManager().play(event.getPlayer(), sequencer, 2000);
             }
         } catch (MidiUnavailableException e) {
-            CommandBook.logger().log(Level.WARNING, "CommandBook: Failed to access MIDI: "
+            CommandBook.logger().log(Level.WARNING, "Failed to access MIDI: "
                     + e.getMessage());
         } catch (InvalidMidiDataException e) {
-            CommandBook.logger().log(Level.WARNING, "CommandBook: Failed to read intro MIDI file: "
+            CommandBook.logger().log(Level.WARNING, "Failed to read intro MIDI file: "
                     + e.getMessage());
         } catch (FileNotFoundException e) {
         } catch (IOException e) {
-            CommandBook.logger().log(Level.WARNING, "CommandBook: Failed to read intro MIDI file: "
+            CommandBook.logger().log(Level.WARNING, "Failed to read intro MIDI file: "
                     + e.getMessage());
         }
     }
 
-    @BukkitEvent(type = Event.Type.PLAYER_QUIT)
+    @EventHandler(event = PlayerQuitEvent.class)
     public void onQuit(PlayerQuitEvent event) {
         getJingleNoteManager().stop(event.getPlayer());
     }

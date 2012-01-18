@@ -23,7 +23,6 @@ import com.sk89q.commandbook.components.ComponentInformation;
 import com.sk89q.commandbook.config.ConfigurationBase;
 import com.sk89q.commandbook.config.Setting;
 import com.sk89q.commandbook.events.OnlineListSendEvent;
-import com.sk89q.commandbook.events.core.BukkitEvent;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
@@ -31,7 +30,8 @@ import com.sk89q.minecraft.util.commands.CommandPermissions;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
@@ -48,7 +48,7 @@ public class OnlineListComponent extends AbstractComponent implements Listener {
     @Override
     public void initialize() {
         config = configure(new LocalConfiguration());
-        CommandBook.inst().getEventManager().registerEvents(this, this);
+        CommandBook.registerEvents(this);
         registerCommands(Commands.class);
     }
 
@@ -157,12 +157,11 @@ public class OnlineListComponent extends AbstractComponent implements Listener {
         }
     }
 
-    @BukkitEvent(type = Event.Type.PLAYER_JOIN, priority = Event.Priority.High)
+    @EventHandler(event = PlayerJoinEvent.class, priority = EventPriority.HIGH)
     public void onPlayerJoin(PlayerJoinEvent event) {
         if (!config.listOnJoin) return;
         Player player = event.getPlayer();
-        CommandBook.inst().getEventManager().callEvent(
-                new OnlineListSendEvent(player));
+        CommandBook.callEvent(new OnlineListSendEvent(player));
 
         sendOnlineList(
                 CommandBook.server().getOnlinePlayers(), player);
@@ -204,8 +203,7 @@ public class OnlineListComponent extends AbstractComponent implements Listener {
                 return;
             }
 
-            CommandBook.inst().getEventManager().callEvent(
-                    new OnlineListSendEvent(sender));
+            CommandBook.callEvent(new OnlineListSendEvent(sender));
 
             // This applies mostly to the console, so there might be 0 players
             // online if that's the case!

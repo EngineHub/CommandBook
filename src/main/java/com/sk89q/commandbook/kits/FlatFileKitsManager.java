@@ -27,12 +27,13 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.sk89q.commandbook.CommandBook;
 import org.bukkit.inventory.ItemStack;
+
+import static com.sk89q.commandbook.CommandBook.logger;
 
 /**
  * Manages kits.
@@ -40,8 +41,7 @@ import org.bukkit.inventory.ItemStack;
  * @author sk89q
  */
 public class FlatFileKitsManager implements KitManager {
-    
-    private static final Logger logger = Logger.getLogger("Minecraft.CommandBook");
+
     private static final Pattern kitPattern =
             Pattern.compile("^\\[([^\\]=]+)(?:= *([0-9]+) *)?\\]$");
 
@@ -90,7 +90,7 @@ public class FlatFileKitsManager implements KitManager {
                         try {
                             kit.setCoolDown((long) (Double.parseDouble(coolDownTime) * 1000));
                         } catch (NumberFormatException e) {
-                            logger.warning("CommandBook: Invalid cool down for "
+                            logger().warning("Invalid cool down for "
                                     + line);
                             continue;
                         }
@@ -101,7 +101,7 @@ public class FlatFileKitsManager implements KitManager {
                 
                 // No kit defined yet!
                 if (kit == null) {
-                    logger.warning("CommandBook: Missing \"[kitname]\" section for "
+                    logger().warning("Missing \"[kitname]\" section for "
                             + line);
                     continue;
                 }
@@ -110,7 +110,7 @@ public class FlatFileKitsManager implements KitManager {
                 ItemStack item = CommandBook.inst().getItem(parts[0].replace(" ", ""));
                 
                 if (item == null) {
-                    logger.warning("CommandBook: Unknown kit item '" + item + "'");
+                    logger().warning(" Unknown kit item '" + item + "'");
                     continue;
                 }
                 
@@ -119,18 +119,18 @@ public class FlatFileKitsManager implements KitManager {
                     try {
                         item.setAmount(Integer.parseInt(parts[1]));
                     } catch (NumberFormatException e) {
-                        logger.warning("CommandBook: Invalid amount: '" + parts[1] + "'");
+                        logger().warning("Invalid amount: '" + parts[1] + "'");
                     }
                 }
                 
                 kit.addItem(item);
             }
             
-            logger.info("CommandBook: " + kits.size() + " kit(s) loaded.");
+            logger().info(kits.size() + " kit(s) loaded.");
         } catch (FileNotFoundException e) {
         } catch (UnsupportedEncodingException e) {
         } catch (IOException e) {
-            logger.warning("CommandBook: Failed to load kits.txt: "
+            logger().warning("Failed to load kits.txt: "
                     + e.getMessage());
         } finally {
             if (input != null) {

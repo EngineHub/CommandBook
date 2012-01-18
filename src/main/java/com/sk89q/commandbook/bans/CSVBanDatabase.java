@@ -17,14 +17,14 @@ import com.sk89q.commandbook.util.PlayerUtil;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import static com.sk89q.commandbook.CommandBook.logger;
+
 public class CSVBanDatabase implements BanDatabase {
-    protected static final Logger logger = Logger.getLogger("Minecraft.CommandBook");
 
     protected final Logger auditLogger
             = Logger.getLogger("Minecraft.CommandBook.Bans");
     
     protected File storageFile;
-    private final BansComponent component;
     
     /**
      * Used to lookup bans by name
@@ -44,8 +44,7 @@ public class CSVBanDatabase implements BanDatabase {
     private static final SimpleDateFormat dateFormat = 
             new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
     
-    public CSVBanDatabase(File banStorageDir, BansComponent component) {
-        this.component = component;
+    public CSVBanDatabase(File banStorageDir) {
         storageFile = new File(banStorageDir, "bans.csv");
 
          // Set up an audit trail
@@ -65,10 +64,10 @@ public class CSVBanDatabase implements BanDatabase {
 
             auditLogger.addHandler(handler);
         } catch (SecurityException e) {
-            logger.warning("CommandBook: Failed to setup audit log for the "
+            logger().warning("Failed to setup audit log for the "
                     + "CSV ban database: " + e.getMessage());
         } catch (IOException e) {
-            logger.warning("CommandBook: Failed to setup audit log for the "
+            logger().warning("Failed to setup audit log for the "
                     + "CSV ban database: " + e.getMessage());
         }
     }
@@ -85,7 +84,7 @@ public class CSVBanDatabase implements BanDatabase {
 
             while ((line = reader.readNext()) != null) {
                 if (line.length < 5) {
-                    logger.warning("CommandBook: A ban entry with <5 fields was found!");
+                    logger().warning("A ban entry with <5 fields was found!");
                     continue;
                 }
                 try {
@@ -101,15 +100,15 @@ public class CSVBanDatabase implements BanDatabase {
                     if (address != null) ipBan.put(address, ban);
                     bans.add(ban);
                 } catch (NumberFormatException e) {
-                    logger.warning("Non-long long field found in ban!");
+                    logger().warning("Non-long long field found in ban!");
                 }
             }
-            logger.info("CommandBook: " + bans.size() + " banned name(s) loaded.");
+            logger().info(bans.size() + " banned name(s) loaded.");
         } catch (FileNotFoundException e) {
         } catch (IOException e) {
             nameBan = new HashMap<String, Ban>();
             ipBan = new HashMap<String, Ban>();
-            logger.warning("CommandBook: Failed to load " + storageFile.getAbsolutePath()
+            logger().warning("Failed to load " + storageFile.getAbsolutePath()
                     + ": " + e.getMessage());
             successful = false;
         } finally {
@@ -145,7 +144,7 @@ public class CSVBanDatabase implements BanDatabase {
             writer.flush();
             writer.close();
         } catch (IOException e) {
-            logger.warning("CommandBook: Failed to save " + storageFile.getAbsolutePath()
+            logger().warning("Failed to save " + storageFile.getAbsolutePath()
                     + ": " + e.getMessage());
             successful = false;
         } finally {

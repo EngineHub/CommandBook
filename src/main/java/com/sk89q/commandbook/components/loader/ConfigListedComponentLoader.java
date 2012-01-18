@@ -41,10 +41,10 @@ public class ConfigListedComponentLoader extends AbstractComponentLoader {
         try {
             jarComponentAliases.load();
         } catch (IOException e) {
-            CommandBook.logger().severe("CommandBook: Error loading component aliases!");
+            CommandBook.logger().severe("Error loading component aliases!");
             e.printStackTrace();
         } catch (YAMLException e) {
-            CommandBook.logger().severe("CommandBook: Error loading component aliases!");
+            CommandBook.logger().severe("Error loading component aliases!");
             e.printStackTrace();
         }
     }
@@ -80,7 +80,7 @@ public class ConfigListedComponentLoader extends AbstractComponentLoader {
 
 
             if (!isComponentClass(clazz)) {
-                CommandBook.logger().warning("CommandBook: Invalid or unknown class found in enabled components: "
+                CommandBook.logger().warning("Invalid or unknown class found in enabled components: "
                         + nextName + ". Moving to disabled components list.");
                 i.remove();
                 disabledComponents.add(nextName);
@@ -90,7 +90,7 @@ public class ConfigListedComponentLoader extends AbstractComponentLoader {
             try {
                 components.add(instantiateComponent(clazz));
             } catch (Throwable t) {
-                CommandBook.logger().warning("CommandBook: Error initializing component "
+                CommandBook.logger().warning("Error initializing component "
                         + clazz + ": " + t.getMessage());
                 t.printStackTrace();
                 continue;

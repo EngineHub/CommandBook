@@ -21,7 +21,6 @@ package com.sk89q.commandbook.session;
 import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.components.AbstractComponent;
 import com.sk89q.commandbook.components.ComponentInformation;
-import com.sk89q.commandbook.events.core.BukkitEvent;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
@@ -30,10 +29,10 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.util.Java15Compat;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -52,7 +51,7 @@ public class SessionComponent extends AbstractComponent implements Runnable, Lis
     @Override
     public void initialize() {
         CommandBook.server().getScheduler().scheduleSyncRepeatingTask(CommandBook.inst(), this, CHECK_FREQUENCY, CHECK_FREQUENCY);
-        CommandBook.inst().getEventManager().registerEvents(this, this);
+        CommandBook.registerEvents(this);
         registerCommands(Commands.class);
     }
 
@@ -149,7 +148,7 @@ public class SessionComponent extends AbstractComponent implements Runnable, Lis
 
     // -- Events
 
-    @BukkitEvent(type = Event.Type.PLAYER_LOGIN)
+    @EventHandler(event = PlayerLoginEvent.class)
     public void onLoin(PlayerLoginEvent event) {
         // Trigger the session
         getSession(event.getPlayer()).handleReconnect();
@@ -158,7 +157,7 @@ public class SessionComponent extends AbstractComponent implements Runnable, Lis
     /**
      * Called on player disconnect.
      */
-    @BukkitEvent(type = Event.Type.PLAYER_QUIT)
+    @EventHandler(event = PlayerQuitEvent.class)
     public void onPlayerQuit(PlayerQuitEvent event) {
         getSession(event.getPlayer()).handleDisconnect();
         getAdminSession(event.getPlayer()).handleDisconnect();

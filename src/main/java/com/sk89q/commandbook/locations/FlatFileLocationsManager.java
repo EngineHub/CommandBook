@@ -41,10 +41,9 @@ import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
 
 import static com.sk89q.commandbook.CommandBookUtil.getNestedList;
+import static com.sk89q.commandbook.CommandBook.logger;
 
 public class FlatFileLocationsManager implements LocationManager<NamedLocation> {
-    
-    private static final Logger logger = Logger.getLogger("Minecraft.CommandBook");
     
     private World castWorld;
     private File file;
@@ -85,7 +84,7 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
             String[] line;
             while ((line = csv.readNext()) != null) {
                 if (line.length < 7) {
-                    logger.warning("CommandBook: " + type + " data file has an invalid line with < 7 fields");
+                    logger().warning(type + " data file has an invalid line with < 7 fields");
                 } else {
                     try {
                         String name = line[0].trim().replace(" ", "");
@@ -117,7 +116,7 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
                             locs.put(name.toLowerCase(), warp);
                         }
                     } catch (NumberFormatException e) {
-                        logger.warning("CommandBook: " + type + " data file has an invalid line with non-numeric numeric fields");
+                        logger().warning(type + " data file has an invalid line with non-numeric numeric fields");
                     }
                 }
             }
@@ -125,10 +124,10 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
             this.locs = locs;
             
             if (castWorld != null) {
-                logger.info("CommandBook: " + locs.size() + " " + type + "(s) loaded for "
+                logger().info(locs.size() + " " + type + "(s) loaded for "
                         + castWorld.getName());
             } else {
-                logger.info("CommandBook: " + locs.size() + " " + type + "(s) loaded");
+                logger().info(locs.size() + " " + type + "(s) loaded");
             }
         } finally {
             if (input != null) {

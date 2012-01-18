@@ -24,7 +24,6 @@ import com.sk89q.commandbook.components.Depend;
 import com.sk89q.commandbook.components.InjectComponent;
 import com.sk89q.commandbook.config.ConfigurationBase;
 import com.sk89q.commandbook.config.Setting;
-import com.sk89q.commandbook.events.core.BukkitEvent;
 import com.sk89q.commandbook.session.SessionComponent;
 import com.sk89q.commandbook.util.PlayerUtil;
 import com.sk89q.minecraft.util.commands.Command;
@@ -36,7 +35,7 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -59,7 +58,7 @@ public class ThorComponent extends AbstractComponent implements Listener {
     @Override
     public void initialize() {
         this.config = configure(new LocalConfiguration());
-        CommandBook.inst().getEventManager().registerEvents(this, this);
+        CommandBook.registerEvents(this);
         registerCommands(Commands.class);
     }
 
@@ -73,7 +72,7 @@ public class ThorComponent extends AbstractComponent implements Listener {
         @Setting("hammer-items") public Set<Integer> thorItems = new HashSet<Integer>(Arrays.asList(278, 285, 257, 270));
     }
 
-    @BukkitEvent(type = Event.Type.PLAYER_INTERACT)
+    @EventHandler(event = PlayerInteractEvent.class)
     public void onInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
 

@@ -20,6 +20,7 @@ package com.sk89q.commandbook;
 
 import com.sk89q.commandbook.components.Depend;
 import org.bukkit.entity.Vehicle;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -27,7 +28,6 @@ import org.bukkit.Location;
 import com.sk89q.commandbook.components.AbstractComponent;
 import com.sk89q.commandbook.components.ComponentInformation;
 import com.sk89q.commandbook.components.InjectComponent;
-import com.sk89q.commandbook.events.core.BukkitEvent;
 import com.sk89q.commandbook.session.SessionComponent;
 import com.sk89q.commandbook.util.PlayerUtil;
 import com.sk89q.minecraft.util.commands.Command;
@@ -55,7 +55,7 @@ public class FreezeComponent extends AbstractComponent implements Listener {
     @Override
     public void initialize() {
         registerCommands(Commands.class);
-        CommandBook.inst().getEventManager().registerEvents(this, this);
+        CommandBook.registerEvents(this);
     }
 
     /**
@@ -64,7 +64,7 @@ public class FreezeComponent extends AbstractComponent implements Listener {
      * @param event Relevant event details
      */
     
-    @BukkitEvent(type = Event.Type.PLAYER_MOVE)
+    @EventHandler(event = PlayerMoveEvent.class)
     public void onPlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
 
@@ -93,7 +93,7 @@ public class FreezeComponent extends AbstractComponent implements Listener {
      * @param event Relevant event details
      */
     
-    @BukkitEvent(type = Event.Type.PLAYER_TELEPORT)
+    @EventHandler(event = PlayerTeleportEvent.class)
     public void onPlayerTeleport(PlayerTeleportEvent event) {
         Player player = event.getPlayer();
         
@@ -113,7 +113,7 @@ public class FreezeComponent extends AbstractComponent implements Listener {
      * @param event Relevant event details
      */
     
-    @BukkitEvent(type = Event.Type.VEHICLE_MOVE)
+    @EventHandler(event = VehicleMoveEvent.class)
     public void onVehicleMove(VehicleMoveEvent event) {
         Vehicle vehicle = event.getVehicle();
         if (vehicle.getPassenger() == null

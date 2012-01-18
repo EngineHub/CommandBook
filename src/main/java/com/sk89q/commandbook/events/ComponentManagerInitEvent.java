@@ -19,15 +19,15 @@
 package com.sk89q.commandbook.events;
 
 import com.sk89q.commandbook.components.ComponentManager;
-import com.sk89q.commandbook.events.core.CommandBookEvent;
-import com.sk89q.commandbook.events.core.HandlerList;
+import org.bukkit.event.Event;
+import org.bukkit.event.HandlerList;
 
 /**
  * This event is called after CommandBook has registered its component loaders
  * and annotation handlers. Other plugins can use this event to add their own
  * custom component loaders and annotation handlers.
  */
-public class ComponentManagerInitEvent extends CommandBookEvent {
+public class ComponentManagerInitEvent extends Event {
     private static final long serialVersionUID = -7563977474777221423L;
 
     private final ComponentManager componentManager;

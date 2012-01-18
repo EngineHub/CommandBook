@@ -23,7 +23,6 @@ import com.sk89q.commandbook.components.ComponentInformation;
 import com.sk89q.commandbook.config.ConfigurationBase;
 import com.sk89q.commandbook.config.Setting;
 import com.sk89q.commandbook.events.MOTDSendEvent;
-import com.sk89q.commandbook.events.core.BukkitEvent;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
@@ -31,7 +30,7 @@ import com.sk89q.minecraft.util.commands.CommandPermissions;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
@@ -52,7 +51,7 @@ public class StoredMessagesComponent extends AbstractComponent implements Listen
         // Load messages
         messages.put("motd", config.motd);
         messages.put("rules", config.rules);
-        CommandBook.inst().getEventManager().registerEvents(this, this);
+        CommandBook.registerEvents(this);
         registerCommands(Commands.class);
     }
 
@@ -77,7 +76,7 @@ public class StoredMessagesComponent extends AbstractComponent implements Listen
         
     }
 
-    @BukkitEvent(type = Event.Type.PLAYER_JOIN)
+    @EventHandler(event = PlayerJoinEvent.class)
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
@@ -85,8 +84,7 @@ public class StoredMessagesComponent extends AbstractComponent implements Listen
         String motd = getMessage("motd");
 
         if (motd != null && motd.length() > 0) {
-            CommandBook.inst().getEventManager().callEvent(
-                    new MOTDSendEvent(player));
+            CommandBook.callEvent(new MOTDSendEvent(player));
 
             sendMessage(player,
                     replaceColorMacros(
@@ -108,8 +106,7 @@ public class StoredMessagesComponent extends AbstractComponent implements Listen
             if (motd == null || motd.length() < 1) {
                 sender.sendMessage(ChatColor.RED + "MOTD not configured in CommandBook yet!");
             } else {
-                CommandBook.inst().getEventManager().callEvent(
-                        new MOTDSendEvent(sender));
+                CommandBook.callEvent(new MOTDSendEvent(sender));
 
                 sendMessage(sender,
                         replaceColorMacros(

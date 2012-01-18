@@ -24,7 +24,6 @@ import com.sk89q.commandbook.components.AbstractComponent;
 import com.sk89q.commandbook.components.ComponentInformation;
 import com.sk89q.commandbook.config.ConfigurationBase;
 import com.sk89q.commandbook.config.Setting;
-import com.sk89q.commandbook.events.core.BukkitEvent;
 import com.sk89q.commandbook.util.LocationUtil;
 import com.sk89q.commandbook.util.PlayerUtil;
 import com.sk89q.minecraft.util.commands.Command;
@@ -35,6 +34,7 @@ import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.WorldLoadEvent;
 
@@ -73,7 +73,7 @@ public class TimeComponent extends AbstractComponent implements Listener {
     public void initialize() {
         configureWorldLocks();
         registerCommands(Commands.class);
-        CommandBook.inst().getEventManager().registerEvents(this, this);
+        CommandBook.registerEvents(this);
     }
 
     private void configureWorldLocks() {
@@ -86,7 +86,7 @@ public class TimeComponent extends AbstractComponent implements Listener {
                 try {
                     time = matchTime(String.valueOf(entry.getValue()));
                 } catch (CommandException e) {
-                    CommandBook.logger().warning("CommandBook: Time lock: Failed to parse time '"
+                    CommandBook.logger().warning("Time lock: Failed to parse time '"
                             + entry.getValue() + "'");
                 }
 
@@ -95,14 +95,14 @@ public class TimeComponent extends AbstractComponent implements Listener {
                 World world = CommandBook.server().getWorld(entry.getKey());
 
                 if (world == null) {
-                    CommandBook.logger().info("CommandBook: Could not time-lock unknown world '"
+                    CommandBook.logger().info("Could not time-lock unknown world '"
                             + entry.getKey() + "'");
                     continue;
                 }
 
                 world.setTime(time);
                 lock(world);
-                CommandBook.logger().info("CommandBook: Time locked to '"
+                CommandBook.logger().info("Time locked to '"
                         + CommandBookUtil.getTimeString(time) + "' for world '"
                         + world.getName() + "'");
             }
@@ -129,7 +129,7 @@ public class TimeComponent extends AbstractComponent implements Listener {
     /**
      * Called when a World is loaded.
      */
-    @BukkitEvent(type = Event.Type.WORLD_LOAD)
+    @EventHandler(event = WorldLoadEvent.class)
     public void onWorldLoad(WorldLoadEvent event) {
         World world = event.getWorld();
         Integer lockedTime = getLockedTimes().get(world.getName());
@@ -137,7 +137,7 @@ public class TimeComponent extends AbstractComponent implements Listener {
         if (lockedTime != null) {
             world.setTime(lockedTime);
             lock(world);
-            CommandBook.logger().info("CommandBook: Time locked to '"
+            CommandBook.logger().info("Time locked to '"
                     + CommandBookUtil.getTimeString(lockedTime) + "' for world '"
                     + world.getName() + "'");
         }

@@ -20,8 +20,7 @@ package com.sk89q.commandbook;
 
 import com.sk89q.commandbook.components.AbstractComponent;
 import com.sk89q.commandbook.components.ComponentInformation;
-import com.sk89q.commandbook.events.core.BukkitEvent;
-import org.bukkit.event.Event;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
 
@@ -34,10 +33,10 @@ public class NameVerificationComponent extends AbstractComponent implements List
 
     @Override
     public void initialize() {
-        CommandBook.inst().getEventManager().registerEvents(this, this);
+        CommandBook.registerEvents(this);
     }
 
-    @BukkitEvent(type = Event.Type.PLAYER_LOGIN)
+    @EventHandler(event = PlayerLoginEvent.class)
     public void onLogin(PlayerLoginEvent event) {
         if (!namePattern.matcher(event.getPlayer().getName()).matches()) {
             CommandBook.logger().info("Name verification: " + event.getPlayer().getName() + " was kicked " +

@@ -23,8 +23,11 @@ import com.sk89q.commandbook.components.AbstractComponent;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -48,13 +51,22 @@ public class JarFilesComponentLoader extends FileComponentLoader {
         final List<AbstractComponent> components = new ArrayList<AbstractComponent>();
 
         // Iterate through the files in the jar dirs
-        for (File file : jarDir.listFiles()) {
+        for (final File file : jarDir.listFiles()) {
             if (!file.getName().endsWith(".jar")) continue;
             JarFile jarFile;
             ClassLoader loader;
             try {
                 jarFile = new JarFile(file);
-                loader = new URLClassLoader(new URL[] {file.toURI().toURL()}, CommandBook.inst().getClass().getClassLoader());
+                loader = AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+                    @Override
+                    public ClassLoader run() {
+                        try {
+                            return new URLClassLoader(new URL[] {file.toURI().toURL()}, CommandBook.inst().getClass().getClassLoader());
+                        } catch (MalformedURLException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                });
             } catch (IOException e) {
                 continue;
             }
@@ -77,7 +89,7 @@ public class JarFilesComponentLoader extends FileComponentLoader {
                 try {
                     components.add(instantiateComponent(clazz));
                 } catch (Throwable t) {
-                    CommandBook.logger().warning("CommandBook: Error initializing component " + clazz + ": " + t.getMessage());
+                    CommandBook.logger().warning("Error initializing component " + clazz + ": " + t.getMessage());
                     t.printStackTrace();
                     continue;
                 }

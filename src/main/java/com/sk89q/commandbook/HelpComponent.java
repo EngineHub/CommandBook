@@ -127,7 +127,7 @@ public class HelpComponent extends AbstractComponent {
                 CommandBook.logger().severe("SimpleCommandMap.getFallback does not return a Command!");
             }
         } catch (NoSuchMethodException e) {
-            CommandBook.logger().severe("CommandBook: Unable to find getFallback method in SimpleCommandMap!");
+            CommandBook.logger().severe("Unable to find getFallback method in SimpleCommandMap!");
         }
         SimpleCommandMap_getFallback = method;
     }
@@ -160,6 +160,9 @@ public class HelpComponent extends AbstractComponent {
             if (args.hasFlag('c')) { // Looking up command help
                 if (args.argsLength() < 1) {
                     throw new CommandException("No command given!");
+                }
+                if (!config.commandHelp) {
+                    throw new CommandException("Help for commands is not supported!");
                 }
                 org.bukkit.command.Command cmd = getCommand(args.getString(0));
                 if (cmd == null) {

@@ -34,7 +34,6 @@ import com.sk89q.commandbook.components.loader.JarFilesComponentLoader;
 import com.sk89q.commandbook.components.loader.StaticComponentLoader;
 import com.sk89q.commandbook.config.DefaultsFileYAMLProcessor;
 import com.sk89q.commandbook.events.ComponentManagerInitEvent;
-import com.sk89q.commandbook.events.core.EventManager;
 import com.sk89q.commandbook.session.SessionComponent;
 import com.sk89q.util.yaml.YAMLFormat;
 import com.sk89q.util.yaml.YAMLProcessor;
@@ -44,9 +43,10 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
+import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.util.config.Configuration;
 import com.sk89q.commandbook.commands.*;
 import com.sk89q.minecraft.util.commands.*;
 import com.sk89q.worldedit.blocks.ItemType;
@@ -61,8 +61,6 @@ import static com.sk89q.commandbook.util.ItemUtil.matchItemData;
 @SuppressWarnings("deprecation")
 public final class CommandBook extends JavaPlugin {
     
-    private static final Logger logger = Logger.getLogger("Minecraft.CommandBook");
-    
     private static CommandBook instance;
 
     private CommandsManager<CommandSender> commands;
@@ -74,10 +72,8 @@ public final class CommandBook extends JavaPlugin {
     public boolean lookupWithDisplayNames;
     public boolean crappyWrapperCompat;
     public boolean lowPriorityCommandRegistration;
-    public List<String> disabledCommands;
 
     protected YAMLProcessor config;
-    protected EventManager eventManager = new EventManager();
     protected ComponentManager componentManager;
 
     
@@ -95,7 +91,16 @@ public final class CommandBook extends JavaPlugin {
     }
     
     public static Logger logger() {
-        return logger;
+        return inst().getLogger();
+    }
+    
+    public static void registerEvents(Listener listener) {
+        server().getPluginManager().registerEvents(listener, inst());
+    }
+    
+    public static <T extends Event> T callEvent(T event) {
+        server().getPluginManager().callEvent(event);
+        return event;
     }
 
     /**
@@ -103,8 +108,6 @@ public final class CommandBook extends JavaPlugin {
      * and the plugin is setup.
      */
     public void onEnable() {
-        logger.info(getDescription().getName() + " "
-                + getDescription().getVersion() + " enabled.");
         
         // Make the data folder for the plugin where configuration files
         // and other data files will be stored
@@ -153,7 +156,7 @@ public final class CommandBook extends JavaPlugin {
         // -- Annotation handlers
         componentManager.registerAnnotationHandler(InjectComponent.class, new InjectComponentAnnotationHandler());
 
-        getEventManager().callEvent(new ComponentManagerInitEvent(componentManager));
+        getServer().getPluginManager().callEvent(new ComponentManagerInitEvent(componentManager));
 
         componentManager.loadComponents();
         
@@ -228,7 +231,7 @@ public final class CommandBook extends JavaPlugin {
             config.load();
             comments.load();
         } catch (Exception e) {
-            logger.log(Level.WARNING, "CommandBook: Error loading configuration: ", e);
+            getLogger().log(Level.WARNING, "Error loading configuration: ", e);
         }
         this.config = config;
 
@@ -250,7 +253,7 @@ public final class CommandBook extends JavaPlugin {
         lowPriorityCommandRegistration = config.getBoolean("low-priority-command-registration", false);
         
         if (crappyWrapperCompat) {
-            logger.info("CommandBook: Maximum wrapper compatibility is enabled. " +
+            getLogger().info("Maximum wrapper compatibility is enabled. " +
                     "Some features have been disabled to be compatible with " +
                     "poorly written server wrappers.");
         }
@@ -261,7 +264,7 @@ public final class CommandBook extends JavaPlugin {
      */
     @SuppressWarnings({ "unchecked" })
     protected void loadItemList() {
-        Configuration config = getConfiguration();
+        YAMLProcessor config = getGlobalConfiguration();
 
         // Load item names aliases list
         Object itemNamesTemp = config.getProperty("item-names");
@@ -302,7 +305,7 @@ public final class CommandBook extends JavaPlugin {
                 if (copy == null) throw new FileNotFoundException();
                 input = file.getInputStream(copy);
             } catch (IOException e) {
-                logger.severe(getDescription().getName() + ": Unable to read default configuration: " + name);
+                getLogger().severe("Unable to read default configuration: " + name);
             }
             if (input != null) {
                 FileOutputStream output = null;
@@ -315,8 +318,7 @@ public final class CommandBook extends JavaPlugin {
                         output.write(buf, 0, length);
                     }
                     
-                    logger.info(getDescription().getName()
-                            + ": Default configuration file written: " + name);
+                    getLogger().info("Default configuration file written: " + name);
                 } catch (IOException e) {
                     e.printStackTrace();
                 } finally {
@@ -459,10 +461,6 @@ public final class CommandBook extends JavaPlugin {
 
     public YAMLProcessor getGlobalConfiguration() {
         return config;
-    }
-    
-    public EventManager getEventManager() {
-        return eventManager;
     }
 
     public ComponentManager getComponentManager() {

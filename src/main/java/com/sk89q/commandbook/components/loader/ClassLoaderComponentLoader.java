@@ -25,6 +25,8 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -38,14 +40,19 @@ public class ClassLoaderComponentLoader extends FileComponentLoader {
     private final URLClassLoader loader;
     private final File classDir;
 
-    public ClassLoaderComponentLoader(File classDir, File configDir) {
+    public ClassLoaderComponentLoader(final File classDir, File configDir) {
         super(configDir);
         this.classDir = classDir;
-        try {
-            this.loader = new URLClassLoader(new URL[] {classDir.toURI().toURL()}, CommandBook.inst().getClass().getClassLoader());
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
-        }
+        this.loader = AccessController.doPrivileged(new PrivilegedAction<URLClassLoader>() {
+            @Override
+            public URLClassLoader run() {
+                try {
+                    return new URLClassLoader(new URL[]{classDir.toURI().toURL()}, CommandBook.inst().getClass().getClassLoader());
+                } catch (MalformedURLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
     }
 
     @Override
@@ -63,7 +70,7 @@ public class ClassLoaderComponentLoader extends FileComponentLoader {
             try {
                 components.add(instantiateComponent(clazz));
             } catch (Throwable t) {
-                CommandBook.logger().warning("CommandBook: Error initializing component " + clazz + ": " + t.getMessage());
+                CommandBook.logger().warning("Error initializing component " + clazz + ": " + t.getMessage());
                 t.printStackTrace();
                 continue;
             }
