@@ -66,12 +66,12 @@ public abstract class LocationsComponent extends AbstractComponent implements Li
         return manager;
     }
     
-    @EventHandler(event = WorldLoadEvent.class)
+    @EventHandler
     public void loadWorld(WorldLoadEvent event) {
         manager.updateWorlds(event.getWorld());
     }
 
-    @EventHandler(event = WorldUnloadEvent.class)
+    @EventHandler
     public void unloadWorld(WorldUnloadEvent event) {
         manager.updateWorlds(event.getWorld());
     }

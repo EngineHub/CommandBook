@@ -72,7 +72,7 @@ public class ThorComponent extends AbstractComponent implements Listener {
         @Setting("hammer-items") public Set<Integer> thorItems = new HashSet<Integer>(Arrays.asList(278, 285, 257, 270));
     }
 
-    @EventHandler(event = PlayerInteractEvent.class)
+    @EventHandler
     public void onInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
 

@@ -76,7 +76,7 @@ public class StoredMessagesComponent extends AbstractComponent implements Listen
         
     }
 
-    @EventHandler(event = PlayerJoinEvent.class)
+    @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 

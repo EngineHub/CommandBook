@@ -70,7 +70,7 @@ public class JingleNoteComponent extends AbstractComponent implements Listener {
         return jingleNoteManager;
     }
 
-    @EventHandler(event = PlayerJoinEvent.class)
+    @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         MidiJingleSequencer sequencer = null;
 
@@ -93,7 +93,7 @@ public class JingleNoteComponent extends AbstractComponent implements Listener {
         }
     }
 
-    @EventHandler(event = PlayerQuitEvent.class)
+    @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         getJingleNoteManager().stop(event.getPlayer());
     }

@@ -73,14 +73,14 @@ public class SpawnLocationsComponent extends AbstractComponent implements Listen
         @Setting("exact-spawn") public boolean exactSpawn;
     }
 
-    @EventHandler(event = PlayerRespawnEvent.class)
+    @EventHandler
     public void onRespawn(PlayerRespawnEvent event) {
         if (config.exactSpawn && !event.isBedSpawn()) {
             event.setRespawnLocation(spawns.getWorldSpawn(event.getPlayer().getWorld()));
         }
     }
 
-    @EventHandler(event = PlayerTeleportEvent.class)
+    @EventHandler
     public void onTeleport(PlayerTeleportEvent event) {
 
         Location loc = event.getTo();
@@ -92,7 +92,7 @@ public class SpawnLocationsComponent extends AbstractComponent implements Listen
         }
     }
 
-    @EventHandler(event = PlayerJoinEvent.class)
+    @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         if (!event.getPlayer().hasPlayedBefore() && config.exactSpawn) {
             event.getPlayer().teleport(spawns.getWorldSpawn(event.getPlayer().getWorld()));

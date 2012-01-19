@@ -104,7 +104,7 @@ public class MessagingComponent extends AbstractComponent implements Listener {
      * 
      * @param event Relevant event details
      */
-    @EventHandler(event = PlayerChatEvent.class)
+    @EventHandler
     public void onChat(PlayerChatEvent event) {
         if (sessions.getAdminSession(event.getPlayer()).isMute()) {
             event.getPlayer().sendMessage(ChatColor.RED + "You are muted.");

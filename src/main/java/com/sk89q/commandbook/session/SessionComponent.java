@@ -148,7 +148,7 @@ public class SessionComponent extends AbstractComponent implements Runnable, Lis
 
     // -- Events
 
-    @EventHandler(event = PlayerLoginEvent.class)
+    @EventHandler
     public void onLoin(PlayerLoginEvent event) {
         // Trigger the session
         getSession(event.getPlayer()).handleReconnect();
@@ -157,7 +157,7 @@ public class SessionComponent extends AbstractComponent implements Runnable, Lis
     /**
      * Called on player disconnect.
      */
-    @EventHandler(event = PlayerQuitEvent.class)
+    @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         getSession(event.getPlayer()).handleDisconnect();
         getAdminSession(event.getPlayer()).handleDisconnect();

@@ -157,7 +157,7 @@ public class OnlineListComponent extends AbstractComponent implements Listener {
         }
     }
 
-    @EventHandler(event = PlayerJoinEvent.class, priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerJoin(PlayerJoinEvent event) {
         if (!config.listOnJoin) return;
         Player player = event.getPlayer();

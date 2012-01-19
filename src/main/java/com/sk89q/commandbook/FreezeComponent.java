@@ -64,7 +64,7 @@ public class FreezeComponent extends AbstractComponent implements Listener {
      * @param event Relevant event details
      */
     
-    @EventHandler(event = PlayerMoveEvent.class)
+    @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
 
@@ -93,7 +93,7 @@ public class FreezeComponent extends AbstractComponent implements Listener {
      * @param event Relevant event details
      */
     
-    @EventHandler(event = PlayerTeleportEvent.class)
+    @EventHandler
     public void onPlayerTeleport(PlayerTeleportEvent event) {
         Player player = event.getPlayer();
         
@@ -113,7 +113,7 @@ public class FreezeComponent extends AbstractComponent implements Listener {
      * @param event Relevant event details
      */
     
-    @EventHandler(event = VehicleMoveEvent.class)
+    @EventHandler
     public void onVehicleMove(VehicleMoveEvent event) {
         Vehicle vehicle = event.getVehicle();
         if (vehicle.getPassenger() == null

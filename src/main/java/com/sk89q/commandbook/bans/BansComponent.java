@@ -90,7 +90,7 @@ public class BansComponent extends AbstractComponent implements Listener {
      *
      * @param event Relevant event details
      */
-    @EventHandler(event = PlayerLoginEvent.class, priority = EventPriority.NORMAL)
+    @EventHandler(priority = EventPriority.NORMAL)
     public void playerLogin(PlayerLoginEvent event) {
         final Player player = event.getPlayer();
 

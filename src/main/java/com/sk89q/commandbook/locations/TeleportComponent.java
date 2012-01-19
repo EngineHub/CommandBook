@@ -54,12 +54,12 @@ public class TeleportComponent extends AbstractComponent implements Listener {
 
     // -- Event handlers
     
-    @EventHandler(event = PlayerRespawnEvent.class)
+    @EventHandler
     public void onRespawn(PlayerRespawnEvent event) {
         sessions.getSession(event.getPlayer()).rememberLocation(event.getPlayer());
     }
     
-    @EventHandler(event = PlayerTeleportEvent.class)
+    @EventHandler
     public void onTeleport(PlayerTeleportEvent event) {
 
         Location loc = event.getTo();

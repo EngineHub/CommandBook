@@ -36,7 +36,7 @@ public class NameVerificationComponent extends AbstractComponent implements List
         CommandBook.registerEvents(this);
     }
 
-    @EventHandler(event = PlayerLoginEvent.class)
+    @EventHandler
     public void onLogin(PlayerLoginEvent event) {
         if (!namePattern.matcher(event.getPlayer().getName()).matches()) {
             CommandBook.logger().info("Name verification: " + event.getPlayer().getName() + " was kicked " +

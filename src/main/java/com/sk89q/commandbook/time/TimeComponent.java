@@ -129,7 +129,7 @@ public class TimeComponent extends AbstractComponent implements Listener {
     /**
      * Called when a World is loaded.
      */
-    @EventHandler(event = WorldLoadEvent.class)
+    @EventHandler
     public void onWorldLoad(WorldLoadEvent event) {
         World world = event.getWorld();
         Integer lockedTime = getLockedTimes().get(world.getName());
