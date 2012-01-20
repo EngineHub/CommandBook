@@ -61,3 +61,6 @@ player:
 help:
     class: com.sk89q.commandbook.HelpComponent
     default: false
+god:
+    class: com.sk89q.commandbook.GodComponent
+    default: true
