@@ -23,9 +23,6 @@ import com.sk89q.minecraft.util.commands.CommandException;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.CreatureType;
 
-/**
- * @author zml2008
- */
 public class EntityUtil {
     /**
      * Attempts to match a creature type.
