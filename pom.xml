@@ -22,6 +22,10 @@
       <id>sk89q-mvn2</id>
       <url>http://mvn2.sk89q.com/repo</url>
     </repository>
+    <repository>
+      <id>bukkit-repo</id>
+      <url>http://repo.bukkit.org/content/groups/public/</url>
+    </repository>
   </repositories>
 
   <dependencies>

@@ -24,8 +24,12 @@ import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Tests for ConfigurationBase
@@ -41,12 +45,15 @@ public class ConfigurationBaseTest {
     private static final String NESTED_STRING_VALUE = "cute asian cadvahns";
     private static final String MAP_STRING_STRING_KEY = "map-string-string";
     private static final Map<String, String> MAP_STRING_STRING_VALUE = createMapStringString();
+    private static final String SET_INTEGER_KEY = "int-set";
+    private static final Set<Integer> SET_INTEGER_VALUE = new HashSet<Integer>(Arrays.asList(1, 2, 3, 4 , 5));
 
     private static class LocalConfiguration extends ConfigurationBase {
         @Setting(BOOLEAN_KEY) public boolean booleanSetting;
         @Setting(INT_KEY) public int intSetting;
         @Setting(NESTED_STRING_KEY) public String nestedStringSetting;
         @Setting(MAP_STRING_STRING_KEY) public Map<String, String> mapStringStringSetting;
+        @Setting(SET_INTEGER_KEY) public Set<Integer> setInteger;
     }
     
     private static Map<String, String> createMapStringString() {
@@ -69,6 +76,7 @@ public class ConfigurationBaseTest {
         node.setProperty(INT_KEY, INT_VALUE);
         node.setProperty(NESTED_STRING_KEY, NESTED_STRING_VALUE);
         node.setProperty(MAP_STRING_STRING_KEY, MAP_STRING_STRING_VALUE);
+        node.setProperty(SET_INTEGER_KEY, new ArrayList<Integer>(SET_INTEGER_VALUE));
         config = new LocalConfiguration();
         config.load(node);
     }
@@ -93,6 +101,9 @@ public class ConfigurationBaseTest {
         assertEquals(MAP_STRING_STRING_VALUE, config.mapStringStringSetting);
     }
     
-
+    @Test
+    public void testSetIntegerValue() {
+        assertEquals(SET_INTEGER_VALUE, config.setInteger);
+    }
 
 }

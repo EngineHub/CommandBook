@@ -28,6 +28,6 @@ public class SetTypeConversion extends TypeConversion {
 
     @Override
     public int getParametersRequired() {
-        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+        return 1;
     }
 }
