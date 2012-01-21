@@ -34,4 +34,31 @@ public class Ban {
     public long getEnd() {
         return end;
     }
+    
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof Ban)) {
+            return false;
+        }
+        Ban ban = (Ban) other;
+        return potentialNullEquals(name, ban.name)
+                && potentialNullEquals(address, ban.address);
+    }
+
+    public static boolean potentialNullEquals(Object a, Object b) {
+        if (a == null && b == null) {
+            return true;
+        } else if (a == null || b == null) {
+            return false;
+        } else {
+            return a.equals(b);
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        int result = name != null ? name.hashCode() : 0;
+        result = 31 * result + (address != null ? address.hashCode() : 0);
+        return result;
+    }
 }
