@@ -59,7 +59,6 @@ import static com.sk89q.commandbook.util.ItemUtil.matchItemData;
  * 
  * @author sk89q
  */
-@SuppressWarnings("deprecation")
 public final class CommandBook extends JavaPlugin {
     
     private static CommandBook instance;
@@ -353,7 +352,7 @@ public final class CommandBook extends JavaPlugin {
     public boolean hasPermission(CommandSender sender, String perm) {
         if (!(sender instanceof Player)) {
             return ((sender.isOp() && (opPermissions || sender instanceof ConsoleCommandSender)) 
-                    || PermissionsResolverManager.getInstance().hasPermission(sender.getName(), perm));
+                    || getPermissionsResolver().hasPermission(sender.getName(), perm));
         } 
         return hasPermission(sender, ((Player) sender).getWorld(), perm);
     }
@@ -366,7 +365,7 @@ public final class CommandBook extends JavaPlugin {
         // Invoke the permissions resolver
         if (sender instanceof Player) {
             Player player = (Player) sender;
-            return PermissionsResolverManager.getInstance().hasPermission(world.getName(), player.getName(), perm);
+            return getPermissionsResolver().hasPermission(world.getName(), player.getName(), perm);
         }
 
         return false;

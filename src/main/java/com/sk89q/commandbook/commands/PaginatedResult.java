@@ -18,7 +18,6 @@
 
 package com.sk89q.commandbook.commands;
 
-import com.sk89q.commandbook.CommandBook;
 import com.sk89q.minecraft.util.commands.CommandException;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -28,7 +27,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * Commands that wist to display a paginated list of results can use this class to do
+ * Commands that wish to display a paginated list of results can use this class to do
  * the actual pagination, giving a list of items, a page number, and basic formatting information.
  */
 public abstract class PaginatedResult<T> {
