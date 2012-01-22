@@ -129,7 +129,7 @@ public class SessionComponent extends AbstractComponent implements Runnable, Lis
         cleanUpSessions(getAdminSessions());
     }
 
-    public <T extends PersistentSession> void cleanUpSessions(Map<String, T> map) {
+    public <T extends PersistentSession> void cleanUpSessions(final Map<String, T> map) {
         synchronized (map) {
             Iterator<Map.Entry<String, T>> it = map.entrySet().iterator();
 
@@ -166,17 +166,21 @@ public class SessionComponent extends AbstractComponent implements Runnable, Lis
     public class Commands {
         @Command(aliases = {"confirm", "conf"},
                 desc = "Confirm an action",
-                max = 0)
-        @CommandPermissions({"commandbook.confirm"})
+                max = 0, flags = "vc")
         public void confirm(CommandContext args, CommandSender sender) throws CommandException {
             UserSession session = getSession(sender);
-            String cmd = session.getCommandToConfirm(false);
-            if (cmd.indexOf(" ") < 0) {
+            final String cmd = session.getCommandToConfirm(false);
+            if (cmd == null) throw new CommandException("No command to confirm!");
+            if (args.hasFlag('v')) {
+                sender.sendMessage(ChatColor.YELLOW + "Current command to confirm: " + cmd);
+            } else if (args.hasFlag('c')) {
                 session.getCommandToConfirm(true);
-                throw new CommandException("Invalid command set for " + sender.getName() + "'s session.");
+                sender.sendMessage(ChatColor.YELLOW + "Cleared command to confirm");
+            } else {
+                sender.sendMessage(ChatColor.YELLOW + "Command confirmed: " + cmd);
+                CommandBook.server().dispatchCommand(sender, cmd);
+                session.getCommandToConfirm(true);
             }
-            CommandBook.server().dispatchCommand(sender, cmd);
-            sender.sendMessage(ChatColor.YELLOW + "Action confirmed!");
         }
     }
 }

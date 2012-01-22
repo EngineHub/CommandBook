@@ -21,6 +21,8 @@ package com.sk89q.commandbook.locations;
 import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.commands.PaginatedResult;
 import com.sk89q.commandbook.components.ComponentInformation;
+import com.sk89q.commandbook.components.InjectComponent;
+import com.sk89q.commandbook.session.SessionComponent;
 import com.sk89q.commandbook.util.LocationUtil;
 import com.sk89q.commandbook.util.PlayerUtil;
 import com.sk89q.commandbook.util.TeleportPlayerIterator;
@@ -33,6 +35,8 @@ import org.bukkit.entity.Player;
 
 @ComponentInformation(friendlyName = "Warps", desc = "Provides warps functionality")
 public class WarpsComponent extends LocationsComponent {
+    
+    @InjectComponent private SessionComponent sessions;
     public WarpsComponent() {
         super("Warp");
     }
@@ -101,6 +105,15 @@ public class WarpsComponent extends LocationsComponent {
                 loc = player.getLocation();
             } else {
                 loc = LocationUtil.matchLocation(sender, args.getString(1));
+            }
+            NamedLocation existing = getManager().get(loc.getWorld(), warpName);
+            if (existing != null) {
+                if (!existing.getCreatorName().equals(sender.getName())) {
+                    CommandBook.inst().checkPermission(sender, "commandbook.warp.set.override");
+                }
+                if (!sessions.getSession(sender).checkOrQueueConfirmed(args.getCommand() + " " + args.getJoinedStrings(0))) {
+                    throw new CommandException("Warp already exists! Type /confirm to confirm overwriting");
+                }
             }
 
             getManager().create(warpName, loc, player);
