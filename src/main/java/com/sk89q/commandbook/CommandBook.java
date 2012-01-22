@@ -33,6 +33,7 @@ import com.sk89q.commandbook.components.loader.ConfigListedComponentLoader;
 import com.sk89q.commandbook.components.loader.JarFilesComponentLoader;
 import com.sk89q.commandbook.components.loader.StaticComponentLoader;
 import com.sk89q.commandbook.config.DefaultsFileYAMLProcessor;
+import com.sk89q.commandbook.config.LegacyCommandBookConfigurationMigrator;
 import com.sk89q.commandbook.events.ComponentManagerInitEvent;
 import com.sk89q.commandbook.session.SessionComponent;
 import com.sk89q.util.yaml.YAMLFormat;
@@ -239,6 +240,12 @@ public final class CommandBook extends JavaPlugin {
             if (e.getValue() != null) {
                 config.setComment(e.getKey(), e.getValue().toString());
             }
+        }
+
+        // Migrate the old configuration, if we need to
+        final String result = new LegacyCommandBookConfigurationMigrator(configFile, config).migrate();
+        if (result != null) {
+            logger().severe("Error migrating CommandBook configuration: " + result);
         }
 
         loadItemList();
