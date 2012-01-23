@@ -52,7 +52,7 @@ public class JingleNoteManager {
         instances.put(name, notePlayer);
     }
     
-    public void stop(Player player) {
+    public boolean stop(Player player) {
         String name = player.getName();
         
         // Existing player found!
@@ -60,7 +60,9 @@ public class JingleNoteManager {
             JingleNotePlayer existing = instances.get(name);
             existing.stop(false);
             instances.remove(name);
+            return true;
         }
+        return false;
     }
     
     public void stopAll() {

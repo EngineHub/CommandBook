@@ -105,13 +105,27 @@ public class JingleNoteComponent extends AbstractComponent implements Listener {
         @CommandPermissions({"commandbook.intro"})
         public void intro(CommandContext args, CommandSender sender) throws CommandException {
 
-            Player player = PlayerUtil.checkPlayer(sender);
+            Iterable<Player> targets;
+            if (args.argsLength() == 0) {
+                targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
+            } else {
+                targets = PlayerUtil.matchPlayers(sender, args.getString(0));
+            }
+            
+            for (Player target : targets) {
+                if (target != sender) {
+                    CommandBook.inst().checkPermission(sender, "commandbook.intro.other");
+                    break;
+                }
+            }
 
             try {
                 MidiJingleSequencer sequencer = new MidiJingleSequencer(
                         new File(CommandBook.inst().getDataFolder(), "intro.mid"));
-                getJingleNoteManager().play(player, sequencer, 0);
-                sender.sendMessage(ChatColor.YELLOW + "Playing intro.midi...");
+                for (Player player : targets) {
+                    getJingleNoteManager().play(player, sequencer, 0);
+                    player.sendMessage(ChatColor.YELLOW + "Playing intro.midi...");
+                }
             } catch (MidiUnavailableException e) {
                 throw new CommandException("Failed to access MIDI: "
                         + e.getMessage());
@@ -127,14 +141,29 @@ public class JingleNoteComponent extends AbstractComponent implements Listener {
         }
 
         @Command(aliases = {"midi", "play"},
-                usage = "[midi]", desc = "Play a MIDI file",
+                usage = "[-p player] [midi]", desc = "Play a MIDI file", flags = "p:",
                 min = 0, max = 1)
         public void midi(CommandContext args, CommandSender sender) throws CommandException {
-            Player player = PlayerUtil.checkPlayer(sender);
+            Iterable<Player> targets = null;
+            if (args.hasFlag('p')) {
+                targets = PlayerUtil.matchPlayers(sender, args.getFlag('p'));
+            } else {
+                targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
+            }
+
+            for (Player target : targets) {
+                if (target != sender) {
+                    CommandBook.inst().checkPermission(sender, "commandbook.midi.other");
+                    break;
+                }
+            }
 
             if (args.argsLength() == 0) {
-                getJingleNoteManager().stop(player);
-                sender.sendMessage(ChatColor.YELLOW + "All music stopped.");
+                for (Player target : targets) {
+                    if (getJingleNoteManager().stop(target)) {
+                        target.sendMessage(ChatColor.YELLOW + "All music stopped.");
+                    }
+                }
                 return;
             }
 
@@ -170,9 +199,11 @@ public class JingleNoteComponent extends AbstractComponent implements Listener {
 
             try {
                 MidiJingleSequencer sequencer = new MidiJingleSequencer(file);
-                getJingleNoteManager().play(player, sequencer, 0);
-                sender.sendMessage(ChatColor.YELLOW + "Playing " + file.getName()
-                        + "... Use '/midi' to stop.");
+                for (Player player : targets) {
+                    getJingleNoteManager().play(player, sequencer, 0);
+                    player.sendMessage(ChatColor.YELLOW + "Playing " + file.getName()
+                            + "... Use '/midi' to stop.");
+                }
             } catch (MidiUnavailableException e) {
                 throw new CommandException("Failed to access MIDI: "
                         + e.getMessage());
