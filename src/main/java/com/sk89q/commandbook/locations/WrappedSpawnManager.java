@@ -1,29 +1,24 @@
 package com.sk89q.commandbook.locations;
 
+import com.sk89q.commandbook.CommandBook;
+import com.sk89q.util.yaml.YAMLFormat;
+import com.sk89q.util.yaml.YAMLProcessor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.util.config.Configuration;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
-@SuppressWarnings("deprecation")
 public class WrappedSpawnManager {
 
     /**
      * The configuration that stores world spawn pitches and yaws
      */
-    private final Configuration config;
-
-    /**
-     * The logger
-     */
-    private final Logger logger = Logger.getLogger("Minecraft.CommandBook");
+    private final YAMLProcessor config;
 
     /**
      * The configuration file's header
@@ -51,15 +46,17 @@ public class WrappedSpawnManager {
             try {
                 configFile.createNewFile();
             } catch (IOException e) {
-                logger.log(Level.SEVERE, "CommandBook: Spawn storage file creation error: {0}", e.getMessage());
+                CommandBook.logger().log(Level.SEVERE, "CommandBook: Spawn storage file creation error: {0}", e.getMessage());
             }
-        config = new Configuration(configFile);
+        config = new YAMLProcessor(configFile, true, YAMLFormat.COMPACT);
         load();
     }
 
     public void load() {
         storedSpawns.clear();
-        config.load();
+        try {
+            config.load();
+        } catch (IOException ignore) {}
         for (World world : Bukkit.getServer().getWorlds())
             loadWorld(world);
     }
