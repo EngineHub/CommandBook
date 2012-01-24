@@ -327,14 +327,20 @@ public class TimeComponent extends AbstractComponent implements Listener {
                 usage = "[filter] <time|\"current\">", desc = "Get/change a player's time",
                 flags = "rsw", min = 0, max = 2)
         public void playertime(CommandContext args, CommandSender sender) throws CommandException {
-            Iterable<Player> players;
+            Iterable<Player> players = null;
             String timeStr = "current";
             boolean included = false;
+            boolean reset = args.hasFlag('r');
 
             if (args.argsLength() < 2) {
                 if (args.argsLength() == 1) {
-                    timeStr = args.getString(0);
+                    if (!reset) {
+                        players = PlayerUtil.matchPlayers(sender, timeStr);
+                    } else {
+                        timeStr = args.getString(0);
+                    }
                 }
+                if (players == null)
                 players = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
             } else {
                 players = PlayerUtil.matchPlayers(sender, args.getString(0));
