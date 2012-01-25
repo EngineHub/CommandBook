@@ -109,7 +109,8 @@ public class BansComponent extends AbstractComponent implements Listener {
     }
 
     public class Commands {
-        @Command(aliases = {"kick"}, usage = "<target> [reason...]", desc = "Kick a user", min = 1, max = -1)
+        @Command(aliases = {"kick"}, usage = "<target> [reason...]", desc = "Kick a user",
+                flags = "s", min = 1, max = -1)
         @CommandPermissions({"commandbook.kick"})
         public void kick(CommandContext args, CommandSender sender) throws CommandException {
             Iterable<Player> targets = PlayerUtil.matchPlayers(sender, args.getString(0));
@@ -126,14 +127,15 @@ public class BansComponent extends AbstractComponent implements Listener {
 
             sender.sendMessage(ChatColor.YELLOW + "Player(s) kicked.");
             //Broadcast the Message
-            if (config.broadcastKicks) {
+            if (config.broadcastKicks && !args.hasFlag('s')) {
                 CommandBook.server().broadcastMessage(ChatColor.YELLOW
                         + PlayerUtil.toName(sender) + " has kicked " + broadcastPlayers
                         + " - " + message);
             }
         }
 
-        @Command(aliases = {"ban"}, usage = "[-t end ] <target> [reason...]", desc = "Ban a user", flags = "et:", min = 1, max = -1)
+        @Command(aliases = {"ban"}, usage = "[-t end ] <target> [reason...]", 
+                desc = "Ban a user", flags = "set:", min = 1, max = -1)
         @CommandPermissions({"commandbook.bans.ban"})
         public void ban(CommandContext args, CommandSender sender) throws CommandException {
             String banName;
@@ -174,7 +176,7 @@ public class BansComponent extends AbstractComponent implements Listener {
             }
 
             //Broadcast the Message
-            if (config.broadcastKicks) {
+            if (config.broadcastBans && !args.hasFlag('s')) {
                 CommandBook.server().broadcastMessage(ChatColor.YELLOW
                         + PlayerUtil.toName(sender) + " has banned " + banName
                         + " - " + message);
