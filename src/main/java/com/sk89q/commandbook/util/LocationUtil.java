@@ -249,4 +249,11 @@ public class LocationUtil {
         if (loc == null) throw new CommandException("A location by that name could not be found.");
         return loc.getLocation();
     }
+    
+    public static String toFriendlyString(Location location) {
+        return location.getBlockX() + "," + 
+                location.getBlockY() + "," + 
+                location.getBlockZ() + "@" + 
+                location.getWorld().getName();
+    }
 }

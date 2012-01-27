@@ -49,7 +49,7 @@ public abstract class PaginatedResult<T> {
 
         int maxPages = results.size() / PER_PAGE;
         if (page < 0 || page > maxPages) throw new CommandException(
-                "Unknown page selected! " + maxPages + " total pages.");
+                "Unknown page selected! " + (maxPages + 1) + " total pages.");
 
         sender.sendMessage(ChatColor.YELLOW + header + " (page " + (page + 1) + "/" + (maxPages + 1) + ")");
         for (int i = PER_PAGE * page; i < PER_PAGE * page + PER_PAGE  && i < results.size(); i++) {
