@@ -84,11 +84,11 @@ public class CSVBanDatabase implements BanDatabase {
 
             while ((line = reader.readNext()) != null) {
                 if (line.length < 5) {
-                    logger().warning("A ban entry with <5 fields was found!");
+                    logger().warning("A ban entry with < 5 fields was found!");
                     continue;
                 }
                 try {
-                    String name = line[0];
+                    String name = line[0].toLowerCase();
                     String address = line[1];
                     String reason = line[2];
                     long startDate = Long.parseLong(line[3]);
@@ -171,6 +171,7 @@ public class CSVBanDatabase implements BanDatabase {
     }
 
     public boolean isBannedName(String name) {
+        name = name.toLowerCase();
         Ban ban = nameBan.get(name);
         if (ban != null) {
             if (ban.getEnd() != 0L && ban.getEnd() - System.currentTimeMillis() <= 0) {
@@ -205,6 +206,7 @@ public class CSVBanDatabase implements BanDatabase {
         String banned = null;
         String bannedName = null;
         if (name != null) {
+            name = name.toLowerCase();
             nameBan.put(name, ban);
             banned = "name";
             bannedName = name;
@@ -230,8 +232,7 @@ public class CSVBanDatabase implements BanDatabase {
     }
 
     public void banAddress(String address, CommandSender source, String reason) {
-        Ban ban = new Ban(null, address, reason, System.currentTimeMillis(), 0L);
-        ipBan.put(address, ban);
+        ban(null, address, source, reason, 0L);
     }
 
     public boolean unban(String name, String address, CommandSender source, String reason) {
@@ -239,6 +240,7 @@ public class CSVBanDatabase implements BanDatabase {
         String banned = null;
         String bannedName = null;
         if (name != null) {
+            name = name.toLowerCase();
             ban = nameBan.remove(name);
             if (ban != null) {
                 banned = "name";
@@ -274,16 +276,15 @@ public class CSVBanDatabase implements BanDatabase {
     }
 
     public boolean unbanName(String name, CommandSender source, String reason) {
-        return unban(name,  null, source, reason);
+        return unban(name, null, source, reason);
     }
 
-    public boolean unbanAddress(String address, CommandSender source,
-            String reason) {
+    public boolean unbanAddress(String address, CommandSender source, String reason) {
         return unban(null, address, source, reason);
     }
 
     public String getBannedNameMesage(String name) {
-        Ban ban = nameBan.get(name);
+        Ban ban = nameBan.get(name.toLowerCase());
         if (ban == null || ban.getReason() == null) return "You are banned.";
         return ban.getReason();
     }
