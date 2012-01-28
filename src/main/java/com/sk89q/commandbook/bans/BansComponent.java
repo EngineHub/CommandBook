@@ -96,13 +96,15 @@ public class BansComponent extends AbstractComponent implements Listener {
         final Player player = event.getPlayer();
 
         try {
-            if (getBanDatabase().isBannedName(player.getName())) {
-                event.disallow(PlayerLoginEvent.Result.KICK_BANNED,
-                        getBanDatabase().getBannedNameMesage(player.getName()));
-            } else if (getBanDatabase().isBannedAddress(
-                    player.getAddress().getAddress())) {
-                event.disallow(PlayerLoginEvent.Result.KICK_BANNED, getBanDatabase().getBannedAddressMessage(
-                        player.getAddress().getAddress().getHostAddress()));
+            if (!CommandBook.inst().hasPermission(player, "commandbook.bans.exempt")) {
+                if (getBanDatabase().isBannedName(player.getName())) {
+                    event.disallow(PlayerLoginEvent.Result.KICK_BANNED,
+                            getBanDatabase().getBannedNameMesage(player.getName()));
+                } else if (getBanDatabase().isBannedAddress(
+                        player.getAddress().getAddress())) {
+                    event.disallow(PlayerLoginEvent.Result.KICK_BANNED, getBanDatabase().getBannedAddressMessage(
+                            player.getAddress().getAddress().getHostAddress()));
+                }
             }
         } catch (NullPointerException e) {
             // Bug in CraftBukkit
@@ -120,7 +122,7 @@ public class BansComponent extends AbstractComponent implements Listener {
 
     public class Commands {
         @Command(aliases = {"kick"}, usage = "<target> [reason...]", desc = "Kick a user",
-                flags = "s", min = 1, max = -1)
+                flags = "os", min = 1, max = -1)
         @CommandPermissions({"commandbook.kick"})
         public void kick(CommandContext args, CommandSender sender) throws CommandException {
             Iterable<Player> targets = PlayerUtil.matchPlayers(sender, args.getString(0));
@@ -129,23 +131,30 @@ public class BansComponent extends AbstractComponent implements Listener {
 
             String broadcastPlayers = "";
             for (Player player : targets) {
+                if (CommandBook.inst().hasPermission(player, "commandbook.kick.exempt") 
+                        && !(args.hasFlag('o') && CommandBook.inst().hasPermission(sender,
+                        "commandbook.kick.exempt.override"))) {
+                    sender.sendMessage(ChatColor.RED + "Player " + player.getName() + ChatColor.RED + " is exempt from being banned!");
+                    continue;
+                }
                 player.kickPlayer(message);
                 broadcastPlayers += player.getName() + " ";
                 getBanDatabase().logKick(player, sender, message);
             }
 
-
-            sender.sendMessage(ChatColor.YELLOW + "Player(s) kicked.");
-            //Broadcast the Message
-            if (config.broadcastKicks && !args.hasFlag('s')) {
-                CommandBook.server().broadcastMessage(ChatColor.YELLOW
-                        + PlayerUtil.toName(sender) + " has kicked " + broadcastPlayers
-                        + " - " + message);
+            if (broadcastPlayers.length() > 0) {
+                sender.sendMessage(ChatColor.YELLOW + "Player(s) kicked.");
+                //Broadcast the Message
+                if (config.broadcastKicks && !args.hasFlag('s')) {
+                    CommandBook.server().broadcastMessage(ChatColor.YELLOW
+                            + PlayerUtil.toName(sender) + " has kicked " + broadcastPlayers
+                            + " - " + message);
+                }
             }
         }
 
         @Command(aliases = {"ban"}, usage = "[-t end ] <target> [reason...]", 
-                desc = "Ban a user", flags = "set:", min = 1, max = -1)
+                desc = "Ban a user", flags = "set:o", min = 1, max = -1)
         @CommandPermissions({"commandbook.bans.ban"})
         public void ban(CommandContext args, CommandSender sender) throws CommandException {
             String banName;
@@ -153,6 +162,9 @@ public class BansComponent extends AbstractComponent implements Listener {
             long endDate = args.hasFlag('t') ? CommandBookUtil.matchFutureDate(args.getFlag('t')) : 0L;
             String message = args.argsLength() >= 2 ? args.getJoinedStrings(1)
                     : "Banned!";
+            
+            final boolean hasExemptOverride = args.hasFlag('o')
+                    && CommandBook.inst().hasPermission(sender, "commandbook.bans.exempt.override");
 
             // Check if it's a player in the server right now
             try {
@@ -163,6 +175,11 @@ public class BansComponent extends AbstractComponent implements Listener {
                     player = PlayerUtil.matchPlayerExactly(sender, args.getString(0));
                 } else {
                     player = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
+                }
+                
+                if (CommandBook.inst().hasPermission(player, "commandbook.bans.exempt") && !hasExemptOverride) {
+                    throw new CommandException("This player is exempt from being banned! " +
+                            "(use -o flag to override if you have commandbook.bans.exempt.override)");
                 }
 
                 // Need to kick + log

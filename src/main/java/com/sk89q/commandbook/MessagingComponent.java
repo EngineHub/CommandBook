@@ -243,31 +243,43 @@ public class MessagingComponent extends AbstractComponent implements Listener {
             }
         }
 
-        @Command(aliases = {"mute"}, usage = "<target>", desc = "Mute a player", min = 1, max = 1)
+        @Command(aliases = {"mute"}, usage = "<target>", desc = "Mute a player", flags = "o", min = 1, max = 1)
         @CommandPermissions({"commandbook.mute"})
         public void mute(CommandContext args, CommandSender sender) throws CommandException {
 
             Player player = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
 
-            sessions.getAdminSession(player).setMute(true);
+            if (CommandBook.inst().hasPermission(player, "commandbook.mute.exempt") 
+                    && !(args.hasFlag('o') 
+                    && CommandBook.inst().hasPermission(sender, "commandbook.mute.exempt.override"))) {
+                throw new CommandException("Player " + PlayerUtil.toName(sender) + " is exempt from being muted!");
+            }
 
-            player.sendMessage(ChatColor.YELLOW + "You've been muted by "
-                    + PlayerUtil.toName(sender));
-            sender.sendMessage(ChatColor.YELLOW + "You've muted "
-                    + PlayerUtil.toName(player));
-        }
+            if (!sessions.getAdminSession(player).setMute(true)) {
+
+                player.sendMessage(ChatColor.YELLOW + "You've been muted by "
+                        + PlayerUtil.toName(sender));
+                sender.sendMessage(ChatColor.YELLOW + "You've muted "
+                        + PlayerUtil.toName(player));
+            } else {
+                throw new CommandException("Player " + PlayerUtil.toName(player) + " is already muted!");
+            }
+    }
 
         @Command(aliases = {"unmute"}, usage = "<target>", desc = "Unmute a player", min = 1, max = 1)
         @CommandPermissions({"commandbook.mute"})
         public void unmute(CommandContext args, CommandSender sender) throws CommandException {
             Player player = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
 
-            sessions.getAdminSession(player).setMute(false);
+            if (sessions.getAdminSession(player).setMute(false)) {
 
             player.sendMessage(ChatColor.YELLOW + "You've been unmuted by "
                     + PlayerUtil.toName(sender));
             sender.sendMessage(ChatColor.YELLOW + "You've unmuted "
                     + PlayerUtil.toName(player));
+            } else {
+                throw new CommandException("Player " + PlayerUtil.toName(player) + " was not muted!");
+            }
         }
 
         @Command(aliases = {"broadcast"}, usage = "<message...>", desc = "Broadcast a message", min = 1, max = -1)

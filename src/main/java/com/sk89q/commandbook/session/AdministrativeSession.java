@@ -38,8 +38,10 @@ public class AdministrativeSession implements PersistentSession {
         return isMute;
     }
 
-    public void setMute(boolean isMute) {
+    public boolean setMute(boolean isMute) {
+        final boolean previous = this.isMute;
         this.isMute = isMute;
+        return previous;
     }
     
     public boolean isFrozen() {
