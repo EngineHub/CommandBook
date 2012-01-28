@@ -61,6 +61,8 @@ public class StoredMessagesComponent extends AbstractComponent implements Listen
     public void reload() {
         super.reload();
         configure(config);
+        messages.put("motd", config.motd);
+        messages.put("rules", config.rules);
     }
 
     /**
