@@ -117,7 +117,7 @@ public class PlayerComponent extends AbstractComponent {
             if (change) {
                 player.setGameMode(mode);
             }
-            sender.sendMessage("Player " + (CommandBook.inst().useDisplayNames ? player.getDisplayName() : player.getName())
+            sender.sendMessage(ChatColor.YELLOW + "Player " + (CommandBook.inst().useDisplayNames ? player.getDisplayName() : player.getName())
                     + ChatColor.YELLOW + message + ".");
         }
         @Command(aliases = {"heal"}, 
