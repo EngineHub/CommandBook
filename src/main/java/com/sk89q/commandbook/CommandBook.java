@@ -43,6 +43,7 @@ import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.Listener;
@@ -399,22 +400,39 @@ public final class CommandBook extends JavaPlugin {
      * @return item
      */
     public ItemStack getItem(String name) {
-
+        try {
+            return getCommandItem(name);
+        } catch (CommandException e) {
+            return null;
+        }
+    }
+    
+    
+    public ItemStack getCommandItem(String name) throws CommandException {
         int id = 0;
         int dmg = 0;
         String dataName = null;
+        String enchantmentName = null;
+
+        if (name.contains("|")) {
+            String[] parts = name.split("\\|");
+            name = parts[0];
+            enchantmentName = parts[1];
+        }
 
         if (name.contains(":")) {
-            String[] parts = name.split(":");
+            String[] parts = name.split(":", 2);
             dataName = parts[1];
             name = parts[0];
         }
+
+
 
         try {
             id = Integer.parseInt(name);
         } catch (NumberFormatException e) {
             // First check the configurable list of aliases
-            Integer idTemp = itemNames.get(name.toLowerCase());
+            Integer idTemp = CommandBook.inst().itemNames.get(name.toLowerCase());
 
             if (idTemp != null) {
                 id = (int) idTemp;
@@ -423,7 +441,7 @@ public final class CommandBook extends JavaPlugin {
                 ItemType type = ItemType.lookup(name);
 
                 if (type == null) {
-                    return null;
+                    throw new CommandException("No item type known by '" + name + "'");
                 }
 
                 id = type.getID();
@@ -433,13 +451,51 @@ public final class CommandBook extends JavaPlugin {
         // If the user specified an item data or damage value, let's try
         // to parse it!
         if (dataName != null) {
-            try {
-                dmg = matchItemData(id, dataName);
-            } catch (CommandException e) {
-                return null;
-            }
+            dmg = matchItemData(id, dataName);
         }
-        return new ItemStack(id, 1, (short)dmg);
+
+        ItemStack stack = new ItemStack(id, 1, (short)dmg);
+
+        if (enchantmentName != null) {
+            String[] enchantments = enchantmentName.split(",");
+            for (String enchStr : enchantments) {
+                int level = 1;
+                if (enchStr.contains(":")) {
+                    String[] parts = enchStr.split(":");
+                    enchStr = parts[0];
+                    try {
+                        level = Integer.parseInt(parts[1]);
+                    } catch (NumberFormatException ignore) {}
+                }
+
+                Enchantment ench = null;
+                final String testName = enchStr.toLowerCase().replaceAll("[_\\-]", "");
+                for (Enchantment possible : Enchantment.values()) {
+                    if (possible.getName().toLowerCase().replaceAll("[_\\-]", "").equals(testName)) {
+                        ench = possible;
+                        break;
+                    }
+                }
+
+                if (ench == null) {
+                    throw new CommandException("Unknown enchantment '" + enchStr + "'");
+                }
+
+                if (!ench.canEnchantItem(stack)) {
+                    throw new CommandException("Invalid enchantment '" +  ench.getName() + "' for item '" + name + "'");
+                }
+
+                if (ench.getMaxLevel() < level) {
+                    throw new CommandException("Level '" + level +
+                            "' is above the maximum level for enchantment '" + ench.getName() + "'");
+                }
+
+                stack.addEnchantment(ench, level);
+            }
+
+        }
+
+        return stack;
     }
     
     /**

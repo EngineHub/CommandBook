@@ -31,6 +31,7 @@ import com.sk89q.worldedit.blocks.ItemType;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -42,7 +43,8 @@ import static com.sk89q.commandbook.util.ItemUtil.*;
 import static com.sk89q.commandbook.CommandBookUtil.giveItem;
 import static com.sk89q.commandbook.CommandBookUtil.takeItem;
 
-@ComponentInformation(friendlyName = "Inventory", desc = "Inventory-related commands, such as /give and /clear, are handled in this component.")
+@ComponentInformation(friendlyName = "Inventory",
+        desc = "Inventory-related commands, such as /give and /clear, are handled in this component.")
 public class InventoryComponent extends AbstractComponent {
     protected LocalConfiguration config;
 
@@ -109,59 +111,14 @@ public class InventoryComponent extends AbstractComponent {
             throw new CommandException("That item is disallowed.");
         }
     }
-
-    /**
-     * Matches an item and gets the appropriate item stack.
-     *
-     * @param source
-     * @param name
-     * @return iterator for players
-     * @throws CommandException
-     */
-    public ItemStack matchItem(CommandSender source, String name)
-            throws CommandException {
-
-        int id = 0;
-        int dmg = 0;
-        String dataName = null;
-
-        if (name.contains(":")) {
-            String[] parts = name.split(":");
-            dataName = parts[1];
-            name = parts[0];
-        }
-
-        try {
-            id = Integer.parseInt(name);
-        } catch (NumberFormatException e) {
-            // First check the configurable list of aliases
-            Integer idTemp = CommandBook.inst().itemNames.get(name.toLowerCase());
-
-            if (idTemp != null) {
-                id = (int) idTemp;
-            } else {
-                // Then check WorldEdit
-                ItemType type = ItemType.lookup(name);
-
-                if (type == null) {
-                    throw new CommandException("No item type known by '" + name + "'");
-                }
-
-                id = type.getID();
-            }
-        }
-
-        // If the user specified an item data or damage value, let's try
-        // to parse it!
-        if (dataName != null) {
-            dmg = matchItemData(id, dataName);
-        }
-        return new ItemStack(id, 1, (short)dmg);
+    
+    private ItemStack matchItem(String name) throws CommandException {
+        return CommandBook.inst().getCommandItem(name);
     }
 
     public class Commands {
         @Command(aliases = {"item", "i"},
-                usage = "[target] <item[:data]> [amount]", desc = "Give an item",
+                usage = "[target] <item[:data][|enchantment:level]> [amount]", desc = "Give an item",
                 flags = "do", min = 1, max = 3)
         @CommandPermissions({"commandbook.give"})
         public void item(CommandContext args, CommandSender sender) throws CommandException {
@@ -175,16 +132,16 @@ public class InventoryComponent extends AbstractComponent {
 
             // One argument: Just the item type and amount 1
             if (args.argsLength() == 1) {
-                item = matchItem(sender, args.getString(0));
+                item = matchItem(args.getString(0));
                 targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
                 // Two arguments: Item type and amount
             } else if (args.argsLength() == 2) {
-                item = matchItem(sender, args.getString(0));
+                item = matchItem(args.getString(0));
                 amt = args.getInteger(1);
                 targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
                 // Three arguments: Player, item type, and item amount
             } else if (args.argsLength() == 3) {
-                item = matchItem(sender, args.getString(1));
+                item = matchItem(args.getString(1));
                 amt = args.getInteger(2);
                 targets = PlayerUtil.matchPlayers(sender, args.getString(0));
 
@@ -219,11 +176,11 @@ public class InventoryComponent extends AbstractComponent {
             // Two arguments: Player, item type
             if (args.argsLength() == 2) {
                 targets = PlayerUtil.matchPlayers(sender, args.getString(0));
-                item = matchItem(sender, args.getString(1));
+                item = matchItem(args.getString(1));
                 // Three arguments: Player, item type, and item amount
             } else if (args.argsLength() == 3) {
                 targets = PlayerUtil.matchPlayers(sender, args.getString(0));
-                item = matchItem(sender, args.getString(1));
+                item = matchItem(args.getString(1));
                 amt = args.getInteger(2);
             }
             
@@ -393,11 +350,11 @@ public class InventoryComponent extends AbstractComponent {
             // Two arguments: Player, item type
             if (args.argsLength() == 2) {
                 target = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
-                item = matchItem(sender, args.getString(1));
+                item = matchItem(args.getString(1));
                 // Three arguments: Player, item type, and item amount
             } else if (args.argsLength() == 3) {
                 target = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
-                item = matchItem(sender, args.getString(1));
+                item = matchItem(args.getString(1));
                 amt = args.getInteger(2);
             }
 
