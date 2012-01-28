@@ -44,15 +44,25 @@ import static com.sk89q.commandbook.CommandBookUtil.sendMessage;
 public class StoredMessagesComponent extends AbstractComponent implements Listener {
 
     protected final Map<String, String> messages = new HashMap<String, String>();
-
+    
+    private LocalConfiguration config;
+    
     @Override
     public void initialize() {
-        LocalConfiguration config = configure(new LocalConfiguration());
+        config = configure(new LocalConfiguration());
         // Load messages
         messages.put("motd", config.motd);
         messages.put("rules", config.rules);
         CommandBook.registerEvents(this);
         registerCommands(Commands.class);
+    }
+    
+    @Override
+    public void reload() {
+        super.reload();
+        configure(config);
+        messages.put("motd", config.motd);
+        messages.put("rules", config.rules);
     }
 
     /**
