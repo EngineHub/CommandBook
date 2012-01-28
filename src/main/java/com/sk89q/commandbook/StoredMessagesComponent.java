@@ -49,10 +49,8 @@ public class StoredMessagesComponent extends AbstractComponent implements Listen
     
     @Override
     public void initialize() {
-        config = configure(new LocalConfiguration());
-        // Load messages
-        messages.put("motd", config.motd);
-        messages.put("rules", config.rules);
+        config = new LocalConfiguration();
+        loadMessages();
         CommandBook.registerEvents(this);
         registerCommands(Commands.class);
     }
@@ -60,6 +58,10 @@ public class StoredMessagesComponent extends AbstractComponent implements Listen
     @Override
     public void reload() {
         super.reload();
+        loadMessages();
+    }
+
+    public void loadMessages() {
         configure(config);
         messages.put("motd", config.motd);
         messages.put("rules", config.rules);

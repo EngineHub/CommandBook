@@ -53,11 +53,7 @@ public class GodComponent extends AbstractComponent implements Listener {
         registerCommands(Commands.class);
         // Check god mode for existing players, if any
         for (Player player : CommandBook.server().getOnlinePlayers()) {
-            if (config.autoEnable && (CommandBook.inst().getPermissionsResolver()
-                    .inGroup(player, "cb-invincible")
-                    || CommandBook.inst().hasPermission(player, "commandbook.god.auto-invincible"))) {
-                enableGodMode(player);
-            }
+            checkAutoEnable(player);
         }
         CommandBook.registerEvents(this);
     }
@@ -68,11 +64,7 @@ public class GodComponent extends AbstractComponent implements Listener {
         config = configure(config);
         // Check god mode for existing players, if any
         for (Player player : CommandBook.server().getOnlinePlayers()) {
-            if (config.autoEnable && (CommandBook.inst().getPermissionsResolver()
-                    .inGroup(player, "cb-invincible")
-                    || CommandBook.inst().hasPermission(player, "commandbook.god.auto-invincible"))) {
-                enableGodMode(player);
-            }
+            checkAutoEnable(player);
         }
     }
     
@@ -110,13 +102,17 @@ public class GodComponent extends AbstractComponent implements Listener {
     
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
-        final Player player = event.getPlayer();
+        checkAutoEnable(event.getPlayer());
+    }
+
+    private boolean checkAutoEnable(Player player) {
         if (config.autoEnable && (CommandBook.inst().getPermissionsResolver()
                 .inGroup(player, "cb-invincible")
                 || CommandBook.inst().hasPermission(player, "commandbook.god.auto-invincible"))) {
             enableGodMode(player);
+            return true;
         }
-
+        return false;
     }
 
     /**
