@@ -1,3 +1,21 @@
+/*
+ * CommandBook
+ * Copyright (C) 2012 sk89q <http://www.sk89q.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.sk89q.commandbook;
 
 import com.sk89q.commandbook.components.AbstractComponent;
@@ -164,8 +182,18 @@ public class GodComponent extends AbstractComponent implements Listener {
             }
 
             for (Player player : targets) {
-                enableGodMode(player);
-                player.setFireTicks(0);
+                if (!hasGodMode(player)) {
+                    enableGodMode(player);
+                    player.setFireTicks(0);
+                } else {
+                    if (player == sender) {
+                        player.sendMessage(ChatColor.RED + "You already have god mode!");
+                        included = true;
+                    } else {
+                        sender.sendMessage(ChatColor.RED + player.getName() + " already has god mode!");
+                    }
+                    continue;
+                }
 
                 // Tell the user
                 if (player.equals(sender)) {
@@ -174,6 +202,7 @@ public class GodComponent extends AbstractComponent implements Listener {
                     // Keep track of this
                     included = true;
                 } else {
+                    if (!args.hasFlag('s'))
                     player.sendMessage(ChatColor.YELLOW + "God enabled by "
                             + PlayerUtil.toName(sender) + ".");
 
@@ -212,7 +241,17 @@ public class GodComponent extends AbstractComponent implements Listener {
             }
 
             for (Player player : targets) {
+                if (hasGodMode(player)) {
                 disableGodMode(player);
+                } else {
+                    if (player == sender) {
+                        player.sendMessage(ChatColor.RED + "You do not have god mode enabled!");
+                        included = true;
+                    } else {
+                        sender.sendMessage(ChatColor.RED + player.getName() + " did not have god mode enabled!");
+                    }
+                    continue;
+                }
 
                 // Tell the user
                 if (player.equals(sender)) {
