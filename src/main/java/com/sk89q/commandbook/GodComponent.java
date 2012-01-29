@@ -152,6 +152,16 @@ public class GodComponent extends AbstractComponent implements Listener {
         }
     }
     
+    @EventHandler
+    public void playerWhois(InfoComponent.PlayerWhoisEvent event) {
+        if (event.getPlayer() instanceof Player) {
+            if (CommandBook.inst().hasPermission(event.getSource(), "commandbook.god.check")) {
+                event.addWhoisInformation(null, "Player " + (hasGodMode((Player)event.getPlayer()) 
+                        ? "has" : "does not have") + " god mode");
+            }
+        }
+    }
+    
     public class Commands {
         @Command(aliases = {"god"}, usage = "[player]",
                 desc = "Enable godmode on a player", flags = "s", max = 1)

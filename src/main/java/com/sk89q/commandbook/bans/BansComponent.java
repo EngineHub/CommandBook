@@ -19,6 +19,7 @@
 package com.sk89q.commandbook.bans;
 
 import com.sk89q.commandbook.CommandBookUtil;
+import com.sk89q.commandbook.InfoComponent;
 import com.sk89q.commandbook.components.AbstractComponent;
 import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.components.ComponentInformation;
@@ -105,6 +106,15 @@ public class BansComponent extends AbstractComponent implements Listener {
             }
         } catch (NullPointerException e) {
             // Bug in CraftBukkit
+        }
+    }
+    
+    @EventHandler
+    public void playerWhois(InfoComponent.PlayerWhoisEvent event) {
+        if (CommandBook.inst().hasPermission(event.getSource(), "commandbook.bans.isbanned")) {
+            event.addWhoisInformation(null, "Player " +
+                    (getBanDatabase().isBannedName(event.getPlayer().getName()) ? "is"
+                            : "is not") + " banned.");
         }
     }
 

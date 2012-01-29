@@ -29,29 +29,85 @@ import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
+import org.apache.commons.lang.Validate;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
+import org.bukkit.event.HandlerList;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static com.sk89q.commandbook.CommandBookUtil.getCardinalDirection;
 
 @ComponentInformation(friendlyName = "Info", desc = "Info contains commands that allow users to gather " +
         "information about the world, without being able to make changes.")
 public class InfoComponent extends AbstractComponent {
-    
-    @InjectComponent BansComponent bans;
-    
-    @InjectComponent GodComponent god;
 
     @Override
     public void initialize() {
         registerCommands(Commands.class);
+    }
+    
+    public static class PlayerWhoisEvent extends Event {
+        private final OfflinePlayer player;
+        private final CommandSender source;
+        private final Map<String, String> taggedWhoisInformation = new LinkedHashMap<String, String>();
+        private final List<String> taglessWhoisInformation = new ArrayList<String>();
+        
+        public PlayerWhoisEvent(OfflinePlayer player, CommandSender source) {
+            this.player = player;
+            this.source = source;
+        }
+        
+        public OfflinePlayer getPlayer() {
+            return player;
+        }
+        
+        public CommandSender getSource() {
+            return source;
+        }
+        
+        public void addWhoisInformation(String key, Object value) {
+            if (value == null) {
+                addWhoisInformation(key, (String)null);
+            } else {
+                addWhoisInformation(key, String.valueOf(value));
+            }
+        }
+        
+        public void addWhoisInformation(String key, String value) {
+            if (key == null) {
+                taglessWhoisInformation.add(value);
+            } else {
+                if (value == null) {
+                    taggedWhoisInformation.remove(key);
+                } else {
+                    taggedWhoisInformation.put(key, value);
+                }
+            }
+        }
+        
+        public Map<String, String> getTaggedWhoisInformation() {
+            return Collections.unmodifiableMap(taggedWhoisInformation);
+        }
+        
+        public List<String> getTaglessWhoisInformation() {
+            return Collections.unmodifiableList(taglessWhoisInformation);
+        }
+        
+        private static final HandlerList handlers = new HandlerList();
+
+        public HandlerList getHandlers() {
+            return handlers;
+        }
+
+        public static HandlerList getHandlerList() {
+            return handlers;
+        }
     }
     
     public class Commands {
@@ -119,39 +175,40 @@ public class InfoComponent extends AbstractComponent {
                 }
             }
             
-            List<String> results = new ArrayList<String>();
+            PlayerWhoisEvent event = new PlayerWhoisEvent(offline, sender);
 
             if (offline instanceof Player) {
                 Player player = (Player) offline;
-                results.add("Display name: " + player.getDisplayName());
-                results.add("Entity ID #: " + player.getEntityId());
-                results.add("Current vehicle: " + player.getVehicle());
-                if (god != null && CommandBook.inst().hasPermission(sender, "commandbook.god.check")) {
-                    results.add("Player " + (god.hasGodMode(player) ? "has" : "does not have") + " god mode");
-                }
+                event.addWhoisInformation("Display name", player.getDisplayName());
+                event.addWhoisInformation("Entity ID #", player.getEntityId());
+                event.addWhoisInformation("Current vehicle", player.getVehicle());
+                
 
                 if (CommandBook.inst().hasPermission(sender, "commandbook.ip-address")) {
-                    results.add("Address: " + player.getAddress().toString());
+                    event.addWhoisInformation("Address", player.getAddress().toString());
                 }
+                event.addWhoisInformation("Game mode", player.getGameMode());
             }
             
             Location bedSpawn = offline.getBedSpawnLocation();
             if (bedSpawn != null) {
-                results.add("Bed spawn location:" + 
+                event.addWhoisInformation("Bed spawn location",
                         LocationUtil.toFriendlyString(bedSpawn));
             } else {
-                results.add("No bed spawn location");
+                event.addWhoisInformation(null, "No bed spawn location");
             }
             
             if (offline.hasPlayedBefore()) {
-                results.add("First joined: " + dateFormat.format(offline.getFirstPlayed()) 
-                    + "; Last joined: " + dateFormat.format(offline.getLastPlayed()));
+                event.addWhoisInformation(null, "First joined: " + dateFormat.format(offline.getFirstPlayed())
+                        + "; Last joined: " + dateFormat.format(offline.getLastPlayed()));
             }
             
-            if (bans != null && CommandBook.inst().hasPermission(sender, "commandbook.bans.isbanned")) {
-                results.add("Player " + 
-                        (bans.getBanDatabase().isBannedName(offline.getName()) ? "is" 
-                        : "is not") + " banned.");
+            
+            CommandBook.callEvent(event);
+            
+            List<String> results = new ArrayList<String>(event.getTaglessWhoisInformation());
+            for (Map.Entry<String, String> entry : event.getTaggedWhoisInformation().entrySet()) {
+                results.add(entry.getKey() + ": " + entry.getValue());
             }
             
             new PaginatedResult<String>("Name: " + offline.getName()) {
