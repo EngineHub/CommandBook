@@ -206,19 +206,26 @@ public class HelpComponent extends AbstractComponent {
         @CommandPermissions({"commandbook.help", "commandbook.help.command", "commandbook.help.topic"})
         public void help(CommandContext args, CommandSender sender) throws CommandException {
             if (args.hasFlag('c')) { // Looking up command help
+                if (!config.commandHelp) {
+                    throw new CommandException("Help for commands is not enabled!");
+                }
+
                 if (args.argsLength() == 0) {
-                    CommandMap commandMap = ReflectionUtil.getField(CommandBook.server().getPluginManager(), "commandMap");
+                    Collection<org.bukkit.command.Command> serverCommands = getServerCommands();
+                    for (Iterator<org.bukkit.command.Command> i = serverCommands.iterator(); i.hasNext();) {
+                        final String permission = i.next().getPermission();
+                        if (!(permission == null || permission.length() == 0 || CommandBook.inst().hasPermission(sender, permission))) {
+                            i.remove();
+                        }
+                    }
                     new PaginatedResult<org.bukkit.command.Command>("Usage - Description") {
                         @Override
                         public String format(org.bukkit.command.Command entry) {
                             return entry.getUsage() + " - " 
                                     + entry.getDescription();
                         }
-                    }.display(sender, getServerCommands(), args.getFlagInteger('p', 1));
+                    }.display(sender, serverCommands, args.getFlagInteger('p', 1));
                 } else {
-                    if (!config.commandHelp) {
-                        throw new CommandException("Help for commands is not supported!");
-                    }
                     org.bukkit.command.Command cmd = getCommand(args.getString(0));
                     if (cmd == null) {
                         throw new CommandException("Unknown command '" + args.getString(0) + "'; no help available");
