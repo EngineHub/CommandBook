@@ -26,9 +26,9 @@ import com.sk89q.commandbook.CommandBook;
 
 public class TeleportPlayerIterator extends PlayerIteratorAction {
     
-    protected Location loc;
+    protected final Location loc;
     protected Location oldLoc;
-    protected boolean silent;
+    protected final boolean silent;
     
     public TeleportPlayerIterator(CommandSender sender, Location loc) {
         this(sender, loc, false);

@@ -91,7 +91,6 @@ public class JarFilesComponentLoader extends FileComponentLoader {
                 } catch (Throwable t) {
                     CommandBook.logger().warning("Error initializing component " + clazz + ": " + t.getMessage());
                     t.printStackTrace();
-                    continue;
                 }
             }
         }

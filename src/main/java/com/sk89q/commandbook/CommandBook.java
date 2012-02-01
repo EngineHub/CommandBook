@@ -68,7 +68,7 @@ public final class CommandBook extends JavaPlugin {
     
     protected Map<String, Integer> itemNames;
     public boolean broadcastChanges;
-    public boolean opPermissions;
+    private boolean opPermissions;
     public boolean useDisplayNames;
     public boolean lookupWithDisplayNames;
     public boolean crappyWrapperCompat;
@@ -219,7 +219,7 @@ public final class CommandBook extends JavaPlugin {
     /**
      * Loads the configuration.
      */
-    @SuppressWarnings({ "unchecked" })
+    @SuppressWarnings({"unchecked", "ResultOfMethodCallIgnored"})
     public void populateConfiguration() {
         final File configFile = new File(getDataFolder(), "config.yml");
         YAMLProcessor config = new YAMLProcessor(configFile, true, YAMLFormat.EXTENDED);
@@ -320,7 +320,7 @@ public final class CommandBook extends JavaPlugin {
                 try {
                     output = new FileOutputStream(actual);
                     byte[] buf = new byte[8192];
-                    int length = 0;
+                    int length;
                     while ((length = input.read(buf)) > 0) {
                         output.write(buf, 0, length);
                     }
@@ -409,7 +409,7 @@ public final class CommandBook extends JavaPlugin {
     
     
     public ItemStack getCommandItem(String name) throws CommandException {
-        int id = 0;
+        int id;
         int dmg = 0;
         String dataName = null;
         String enchantmentName = null;
@@ -435,7 +435,7 @@ public final class CommandBook extends JavaPlugin {
             Integer idTemp = CommandBook.inst().itemNames.get(name.toLowerCase());
 
             if (idTemp != null) {
-                id = (int) idTemp;
+                id = idTemp;
             } else {
                 // Then check WorldEdit
                 ItemType type = ItemType.lookup(name);

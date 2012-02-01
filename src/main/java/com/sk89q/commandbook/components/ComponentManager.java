@@ -35,13 +35,12 @@ import java.util.logging.Level;
  * @author zml2008
  */
 public class ComponentManager {
-    protected List<ComponentLoader> loaders = new ArrayList<ComponentLoader>();
-    protected Map<String, AbstractComponent> registeredComponents = new LinkedHashMap<String, AbstractComponent>();
+    protected final List<ComponentLoader> loaders = new ArrayList<ComponentLoader>();
+    protected final Map<String, AbstractComponent> registeredComponents = new LinkedHashMap<String, AbstractComponent>();
     protected final Map<Class<? extends Annotation>, AnnotationHandler<?>> annotationHandlers = new LinkedHashMap<Class<? extends Annotation>, AnnotationHandler<?>>();
 
     public synchronized boolean addComponentLoader(ComponentLoader loader) {
-        loaders.add(loader);
-        return true;
+        return loaders.add(loader);
     }
 
     public synchronized boolean loadComponents() {

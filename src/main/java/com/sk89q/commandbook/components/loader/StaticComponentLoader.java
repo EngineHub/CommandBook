@@ -32,7 +32,7 @@ import java.util.List;
  * Loads components from a list specified in the constructor. This is a bit of a workaround until dependencies can be implemented..
  */
 public class StaticComponentLoader extends AbstractComponentLoader {
-    private List<AbstractComponent> components;
+    private final List<AbstractComponent> components;
 
     public StaticComponentLoader(File configDir, AbstractComponent... components) {
         super(configDir);

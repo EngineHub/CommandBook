@@ -31,14 +31,15 @@ import static com.sk89q.commandbook.CommandBookUtil.replaceColorMacros;
 @ComponentInformation(friendlyName = "Help", desc = "Provides help on various command actions")
 public class HelpComponent extends AbstractComponent {
     private YAMLProcessor help;
-    private Map<String, String[]> messages = new HashMap<String, String[]>();
+    private final Map<String, String[]> messages = new HashMap<String, String[]>();
     private LocalConfiguration config;
     
     @Override
     public void initialize() {
         config = configure(new LocalConfiguration());
         File helpFile = new File(CommandBook.inst().getDataFolder(), config.helpFile);
-        if (!helpFile.getParentFile().exists() || !helpFile.getParentFile().isDirectory()) helpFile.getParentFile().mkdirs();
+        if (!helpFile.getParentFile().exists() || !helpFile.getParentFile().isDirectory())
+            helpFile.getParentFile().mkdirs();
         if (!helpFile.exists() || !helpFile.isFile()) try {
             helpFile.createNewFile();
         } catch (IOException e) {}
@@ -64,7 +65,7 @@ public class HelpComponent extends AbstractComponent {
             "`r/help -c <commandname>`w gives help for a command\n" +
             "`r/help <topic>`w gives help for a topic from a list specified by the server admin.";
 
-    public boolean reloadMessages() {
+    private boolean reloadMessages() {
         try {
             help.load();
         } catch (IOException e) {

@@ -47,7 +47,7 @@ public class PlayerComponent extends AbstractComponent {
         @CommandPermissions({"commandbook.gamemode"})
         public void gamemode(CommandContext args, CommandSender sender) throws CommandException {
 
-            Player player = null;
+            Player player;
             GameMode mode = null;
             boolean change = false;
 
@@ -71,7 +71,7 @@ public class PlayerComponent extends AbstractComponent {
                     // we're going to assume that the first arg of one is mode, but the first of two is player
                     // if they want to check another player, they should use -c instead, since we can't guess
                     // reliably whether (with a single arg) they meant a player or a mode
-                    String modeString = null;
+                    String modeString;
                     if (args.argsLength() == 1) { // self mode
                         modeString = args.getString(0);
                         player = PlayerUtil.checkPlayer(sender);
@@ -103,7 +103,7 @@ public class PlayerComponent extends AbstractComponent {
                 throw new CommandException("Something went wrong, please try again.");
             }
 
-            String message = null;
+            String message;
             if (change) {
                 if (player.getGameMode() == mode) {
                     message = " already had gamemode " + mode.toString();

@@ -80,7 +80,7 @@ public abstract class AbstractComponent implements CommandExecutor {
         }
     }
 
-    public <T extends ConfigurationBase> T configure(T config) {
+    protected <T extends ConfigurationBase> T configure(T config) {
         config.load(getRawConfiguration());
         return config;
     }

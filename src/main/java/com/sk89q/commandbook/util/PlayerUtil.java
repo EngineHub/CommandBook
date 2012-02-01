@@ -286,7 +286,7 @@ public class PlayerUtil {
         if (sender instanceof Player) {
             String name = CommandBook.inst().useDisplayNames
                     ? ((Player) sender).getDisplayName()
-                    : ((Player) sender).getName();
+                    : (sender).getName();
             return ChatColor.stripColor(name);
         } else if (sender instanceof ConsoleCommandSender) {
             return "*Console*";
@@ -306,7 +306,7 @@ public class PlayerUtil {
         if (sender instanceof Player) {
             String name = CommandBook.inst().useDisplayNames
                     ? ((Player) sender).getDisplayName()
-                    : ((Player) sender).getName();
+                    : (sender).getName();
             if (endColor != null && name.contains("\u00A7")) {
                 name = name + endColor;
             }
@@ -327,7 +327,7 @@ public class PlayerUtil {
      */
     public static String toUniqueName(CommandSender sender) {
         if (sender instanceof Player) {
-            return ((Player) sender).getName();
+            return (sender).getName();
         } else {
             return "*Console*";
         }

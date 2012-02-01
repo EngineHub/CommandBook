@@ -72,7 +72,7 @@ public class JingleNoteComponent extends AbstractComponent implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
-        MidiJingleSequencer sequencer = null;
+        MidiJingleSequencer sequencer;
 
         try {
             File file = new File(CommandBook.inst().getDataFolder(), "intro.mid");
@@ -144,7 +144,7 @@ public class JingleNoteComponent extends AbstractComponent implements Listener {
                 usage = "[-p player] [midi]", desc = "Play a MIDI file", flags = "p:",
                 min = 0, max = 1)
         public void midi(CommandContext args, CommandSender sender) throws CommandException {
-            Iterable<Player> targets = null;
+            Iterable<Player> targets;
             if (args.hasFlag('p')) {
                 targets = PlayerUtil.matchPlayers(sender, args.getFlag('p'));
             } else {

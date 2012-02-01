@@ -43,8 +43,8 @@ public class UserSession implements PersistentSession {
     private String idleStatus = null;
     private String commandToConfirm;
     private Map<String, Long> bringable = new HashMap<String, Long>();
-    private Map<String, Long> teleportRequests = new HashMap<String, Long>();
-    private LinkedList<Location> locationHistory = new LinkedList<Location>();
+    private final Map<String, Long> teleportRequests = new HashMap<String, Long>();
+    private final LinkedList<Location> locationHistory = new LinkedList<Location>();
     private Location ignoreTeleportLocation;
     
     public boolean isRecent() {
@@ -70,7 +70,7 @@ public class UserSession implements PersistentSession {
 
     public void setLastRecipient(CommandSender target) {
         if (target instanceof Player) {
-            lastRecipient = ((Player) target).getName();
+            lastRecipient = target.getName();
         } else {
             lastRecipient = CONSOLE_NAME;
         }
@@ -104,10 +104,7 @@ public class UserSession implements PersistentSession {
     public boolean isBringable(Player player) {
         long now = System.currentTimeMillis();
         Long time = bringable.remove(player.getName());
-        if (time != null && (now - time) < BRINGABLE_TIME) {
-            return true;
-        }
-        return false;
+        return (time != null && (now - time) < BRINGABLE_TIME);
     }
 
     public void checkLastTeleportRequest(Player target) throws CommandException {

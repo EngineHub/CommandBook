@@ -314,7 +314,7 @@ public class BansComponent extends AbstractComponent implements Listener {
             }
         }
 
-        private SimpleDateFormat dateFormat =
+        private final SimpleDateFormat dateFormat =
                 new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
         @Command(aliases = {"baninfo"}, usage = "<target>", desc = "Check if a user is banned", min = 1, max = 1)

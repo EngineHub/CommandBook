@@ -68,7 +68,7 @@ public class SessionComponent extends AbstractComponent implements Runnable, Lis
             String key;
 
             if (user instanceof Player) {
-                key = ((Player) user).getName();
+                key = user.getName();
             } else {
                 key = UserSession.CONSOLE_NAME;
             }
@@ -130,18 +130,16 @@ public class SessionComponent extends AbstractComponent implements Runnable, Lis
     }
 
     public <T extends PersistentSession> void cleanUpSessions(final Map<String, T> map) {
-        synchronized (map) {
-            Iterator<Map.Entry<String, T>> it = map.entrySet().iterator();
+        Iterator<Map.Entry<String, T>> it = map.entrySet().iterator();
 
-            while (it.hasNext()) {
-                Map.Entry<String, T> entry = it.next();
-                if (entry.getKey().equals(UserSession.CONSOLE_NAME)) continue;
-                Player player = CommandBook.server().getPlayerExact(entry.getKey());
-                if (player != null && player.isOnline()) continue;
+        while (it.hasNext()) {
+            Map.Entry<String, T> entry = it.next();
+            if (entry.getKey().equals(UserSession.CONSOLE_NAME)) continue;
+            Player player = CommandBook.server().getPlayerExact(entry.getKey());
+            if (player != null && player.isOnline()) continue;
 
-                if (!entry.getValue().isRecent()) {
-                    it.remove();
-                }
+            if (!entry.getValue().isRecent()) {
+                it.remove();
             }
         }
     }

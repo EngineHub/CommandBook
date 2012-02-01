@@ -33,7 +33,7 @@ import static com.sk89q.commandbook.config.ConfigUtil.smartCast;
  * The base class for configuration of {@link com.sk89q.commandbook.components.AbstractComponent}s
  */
 public abstract class ConfigurationBase {
-    protected boolean isConfigured;
+    private boolean isConfigured;
 
     public boolean isConfigured() {
         return isConfigured;

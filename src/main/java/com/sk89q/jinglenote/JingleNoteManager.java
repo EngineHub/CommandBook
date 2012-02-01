@@ -24,7 +24,7 @@ public class JingleNoteManager {
     /**
      * List of instances.
      */
-    protected Map<String, JingleNotePlayer> instances
+    protected final Map<String, JingleNotePlayer> instances
             = new HashMap<String, JingleNotePlayer>();
     
     public void play(Player player, JingleSequencer sequencer, int delay) {

@@ -82,7 +82,7 @@ public class TeleportComponent extends AbstractComponent implements Listener {
         @CommandPermissions({"commandbook.teleport"})
         public void teleport(CommandContext args, CommandSender sender) throws CommandException {
 
-            Iterable<Player> targets = null;
+            Iterable<Player> targets;
             final Location loc;
 
             // Detect arguments based on the number of arguments provided

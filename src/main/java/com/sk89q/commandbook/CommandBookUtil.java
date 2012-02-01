@@ -496,7 +496,7 @@ public class CommandBookUtil {
                 String s;
                 StringBuilder build = new StringBuilder();
                 while ((s = stdInput.readLine()) != null) {
-                    build.append(s + " ");
+                    build.append(s).append(" ");
                 }
                 stdInput.close();
                 build.delete(build.length() - 1, build.length());

@@ -110,7 +110,7 @@ public class OnlineListComponent extends AbstractComponent implements Listener {
 
             for (Map.Entry<String, List<Player>> entry : groups.entrySet()) {
                 out.append("\n");
-                out.append(ChatColor.WHITE + entry.getKey());
+                out.append(ChatColor.WHITE).append(entry.getKey());
                 out.append(": ");
 
                 // To keep track of commas
@@ -122,7 +122,7 @@ public class OnlineListComponent extends AbstractComponent implements Listener {
                     }
 
                     if (config.playersListColoredNames) {
-                        out.append(player.getDisplayName() + ChatColor.WHITE);
+                        out.append(player.getDisplayName()).append(ChatColor.WHITE);
                     } else {
                         out.append(player.getName());
                     }
@@ -141,7 +141,7 @@ public class OnlineListComponent extends AbstractComponent implements Listener {
                 }
 
                 if (config.playersListColoredNames) {
-                    out.append(player.getDisplayName() + ChatColor.WHITE);
+                    out.append(player.getDisplayName()).append(ChatColor.WHITE);
                 } else {
                     out.append(player.getName());
                 }
@@ -238,7 +238,7 @@ public class OnlineListComponent extends AbstractComponent implements Listener {
             // (in case of a filter), and create the list of players.
             for (Player player : online) {
                 // Process the filter
-                if (filter != null && !player.getName().toLowerCase().contains(filter)) {
+                if (!player.getName().toLowerCase().contains(filter)) {
                     break;
                 }
 

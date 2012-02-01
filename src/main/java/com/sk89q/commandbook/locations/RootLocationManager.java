@@ -33,8 +33,8 @@ public class RootLocationManager<T> {
 
     private LocationManager<T> rootManager;
     private Map<String, LocationManager<T>> managers;
-    private LocationManagerFactory<LocationManager<T>> factory;
-    private boolean perWorld;
+    private final LocationManagerFactory<LocationManager<T>> factory;
+    private final boolean perWorld;
     
     public RootLocationManager(LocationManagerFactory<LocationManager<T>> factory, boolean perWorld) {
         this.factory = factory;

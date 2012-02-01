@@ -34,8 +34,8 @@ import org.bukkit.inventory.ItemStack;
 public class Kit {
     
     private volatile long coolDown;
-    private LinkedList<ItemStack> items = new LinkedList<ItemStack>();
-    private Map<String, Long> lastDistribution = new HashMap<String, Long>();
+    private final LinkedList<ItemStack> items = new LinkedList<ItemStack>();
+    private final Map<String, Long> lastDistribution = new HashMap<String, Long>();
     
     /**
      * Set the cooldown time in milliseconds.

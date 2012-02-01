@@ -45,7 +45,7 @@ public class FlatFileKitsManager implements KitManager {
     private static final Pattern kitPattern =
             Pattern.compile("^\\[([^\\]=]+)(?:= *([0-9]+) *)?\\]$");
 
-    private File file;
+    private final File file;
     private Map<String, Kit> kits = new HashMap<String, Kit>();
     
     /**

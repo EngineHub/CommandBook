@@ -46,10 +46,10 @@ import static com.sk89q.commandbook.CommandBook.logger;
 public class FlatFileLocationsManager implements LocationManager<NamedLocation> {
     
     private World castWorld;
-    private File file;
+    private final File file;
     private Map<String, NamedLocation> locs = new HashMap<String, NamedLocation>();
-    private Map<String, List<NamedLocation>> unloadedLocs = new HashMap<String, List<NamedLocation>>();
-    private String type;
+    private final Map<String, List<NamedLocation>> unloadedLocs = new HashMap<String, List<NamedLocation>>();
+    private final String type;
     
     /**
      * Construct the manager.
@@ -69,7 +69,7 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
     public void load() throws IOException {
         FileInputStream input = null;
         Map<String, NamedLocation> locs = new HashMap<String, NamedLocation>();
-        
+
         file.getParentFile().mkdirs();
         if (!file.exists()) {
             file.createNewFile();
@@ -225,8 +225,8 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
 
     public static class LocationsFactory implements LocationManagerFactory<LocationManager<NamedLocation>> {
 
-        public File rootDir;
-        private String type;
+        private final File rootDir;
+        private final String type;
 
         public LocationsFactory(File rootDir, String type) {
             this.rootDir = rootDir;

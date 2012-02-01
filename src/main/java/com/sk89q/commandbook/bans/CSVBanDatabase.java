@@ -24,7 +24,7 @@ public class CSVBanDatabase implements BanDatabase {
     protected final Logger auditLogger
             = Logger.getLogger("Minecraft.CommandBook.Bans");
     
-    protected File storageFile;
+    protected final File storageFile;
     
     /**
      * Used to lookup bans by name
@@ -39,7 +39,7 @@ public class CSVBanDatabase implements BanDatabase {
     /**
      * A set of all bans. No ban in the lookup maps is not in here.
      */
-    protected Set<Ban> bans = new HashSet<Ban>();
+    protected final Set<Ban> bans = new HashSet<Ban>();
     
     private static final SimpleDateFormat dateFormat = 
             new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
@@ -313,10 +313,6 @@ public class CSVBanDatabase implements BanDatabase {
             }
             this.bans.add(ban);
         }
-    }
-
-    public Collection<Ban> getBans() {
-        return Collections.unmodifiableSet(bans);
     }
 
     public Iterator<Ban> iterator() {

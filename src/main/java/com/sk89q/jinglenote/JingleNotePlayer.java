@@ -12,10 +12,10 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 public class JingleNotePlayer implements Runnable {
-    protected Player player;
-    protected Location loc;
+    protected final Player player;
+    protected final Location loc;
     protected JingleSequencer sequencer;
-    protected int delay;
+    protected final int delay;
     
     protected boolean keepMusicBlock = false;
     

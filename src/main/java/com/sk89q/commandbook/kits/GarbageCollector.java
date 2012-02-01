@@ -22,7 +22,7 @@ public class GarbageCollector implements Runnable {
     
     public static final long CHECK_FREQUENCY = 12000;
     
-    private KitsComponent component;
+    private final KitsComponent component;
     
     public GarbageCollector(KitsComponent component) {
         this.component = component;

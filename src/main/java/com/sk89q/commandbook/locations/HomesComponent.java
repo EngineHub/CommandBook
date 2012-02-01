@@ -48,7 +48,7 @@ public class HomesComponent extends LocationsComponent {
         public void home(CommandContext args, CommandSender sender) throws CommandException {
             Iterable<Player> targets = null;
             NamedLocation home = null;
-            Location loc = null;
+            Location loc;
 
             // Detect arguments based on the number of arguments provided
             if (args.argsLength() == 0) {

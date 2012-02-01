@@ -22,6 +22,7 @@ package com.sk89q.commandbook.components;
  * @author zml2008
  */
 public class InvalidComponentException extends Exception {
+    private static final long serialVersionUID = 6023653129909836161L;
     private final Class<?> componentClass;
     
     public InvalidComponentException(Class<?> componentClass, String message) {

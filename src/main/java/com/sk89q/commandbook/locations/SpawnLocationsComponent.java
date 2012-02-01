@@ -103,7 +103,7 @@ public class SpawnLocationsComponent extends AbstractComponent implements Listen
         @Command(aliases = {"spawn"}, usage = "[player]", desc = "Teleport to spawn", min = 0, max = 1)
         @CommandPermissions({"commandbook.spawn"})
         public void spawn(CommandContext args, CommandSender sender) throws CommandException {
-            Iterable<Player> targets = null;
+            Iterable<Player> targets;
 
             // Detect arguments based on the number of arguments provided
             if (args.argsLength() == 1) {

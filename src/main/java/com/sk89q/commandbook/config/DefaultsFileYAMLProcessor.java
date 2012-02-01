@@ -9,7 +9,7 @@ import java.io.InputStream;
  * A simple YAMLProcessor that loads YAML files from the jar's defaults/ folder
  */
 public class DefaultsFileYAMLProcessor extends YAMLProcessor {
-    protected final String file;
+    private final String file;
     
     public DefaultsFileYAMLProcessor(String file, boolean writeDefaults) {
         super(null, writeDefaults);

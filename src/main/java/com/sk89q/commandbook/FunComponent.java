@@ -139,7 +139,7 @@ public class FunComponent extends AbstractComponent {
 
             String[] creatureInput = args.getString(0).split("\\|");
             boolean hasRider = creatureInput.length == 2;
-            String creatureName = "";
+            String creatureName;
             String riderName = "";
             String specialType = "";
             String riderSpecialType = "";

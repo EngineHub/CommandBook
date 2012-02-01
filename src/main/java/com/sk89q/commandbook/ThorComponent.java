@@ -53,7 +53,7 @@ public class ThorComponent extends AbstractComponent implements Listener {
     
     private LocalConfiguration config;
 
-    private static Random random = new Random();
+    private static final Random random = new Random();
     
     @Override
     public void initialize() {

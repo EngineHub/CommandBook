@@ -195,8 +195,8 @@ public class MessagingComponent extends AbstractComponent implements Listener {
                 return;
             }
 
-            if (receiver instanceof Player && sessions.getSession((Player) receiver).getIdleStatus() != null) {
-                String status = sessions.getSession((Player) receiver).getIdleStatus();
+            if (receiver instanceof Player && sessions.getSession(receiver).getIdleStatus() != null) {
+                String status = sessions.getSession(receiver).getIdleStatus();
                 sender.sendMessage(ChatColor.GRAY + PlayerUtil.toName(receiver) + " is afk. "
                         + "They might not see your message."
                         + (status.isEmpty() ? "" : " (" + status + ")"));

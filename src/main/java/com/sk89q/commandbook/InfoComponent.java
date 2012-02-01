@@ -53,6 +53,7 @@ public class InfoComponent extends AbstractComponent {
     }
     
     public static class PlayerWhoisEvent extends Event {
+        private static final long serialVersionUID = -2894521895117036252L;
         private final OfflinePlayer player;
         private final CommandSender source;
         private final Map<String, String> taggedWhoisInformation = new LinkedHashMap<String, String>();

@@ -24,7 +24,7 @@ import org.bukkit.event.HandlerList;
 public class SharedMessageEvent extends Event {
     
     private static final long serialVersionUID = -6438425022394756162L;
-    private String message;
+    private final String message;
 
     public SharedMessageEvent(String message) {
         this.message = message;

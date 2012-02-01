@@ -33,7 +33,7 @@ import java.util.*;
  * @author zml2008
  */
 public class ConfigListedComponentLoader extends AbstractComponentLoader {
-    private YAMLProcessor jarComponentAliases;
+    private final YAMLProcessor jarComponentAliases;
 
     public ConfigListedComponentLoader(YAMLProcessor aliasList, File configDir) {
         super(configDir);
@@ -93,7 +93,6 @@ public class ConfigListedComponentLoader extends AbstractComponentLoader {
                 CommandBook.logger().warning("Error initializing component "
                         + clazz + ": " + t.getMessage());
                 t.printStackTrace();
-                continue;
             }
         }
 

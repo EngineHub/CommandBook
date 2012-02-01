@@ -96,9 +96,7 @@ public class InventoryComponent extends AbstractComponent {
         }
 
         if (config.useItemPermissionsOnly) {
-            if (!hasPermissions) {
-                throw new CommandException("That item is not allowed.");
-            }
+            throw new CommandException("That item is not allowed.");
         }
 
         if (config.allowedItems.size() > 0) {
@@ -204,7 +202,7 @@ public class InventoryComponent extends AbstractComponent {
         @CommandPermissions({"commandbook.clear"})
         public void clear(CommandContext args, CommandSender sender) throws CommandException {
 
-            Iterable<Player> targets = null;
+            Iterable<Player> targets;
             boolean clearAll = args.hasFlag('a');
             boolean clearSingle = args.hasFlag('s');
             boolean included = false;
@@ -276,7 +274,7 @@ public class InventoryComponent extends AbstractComponent {
         @CommandPermissions({"commandbook.more"})
         public void more(CommandContext args, CommandSender sender) throws CommandException {
 
-            Iterable<Player> targets = null;
+            Iterable<Player> targets;
             boolean moreAll = args.hasFlag('a');
             boolean infinite = args.hasFlag('i');
             boolean overrideStackSize = args.hasFlag('o');

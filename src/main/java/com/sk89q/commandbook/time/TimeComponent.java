@@ -199,15 +199,14 @@ public class TimeComponent extends AbstractComponent implements Listener {
             String[] parts = timeStr.split(":");
             int hours = Integer.parseInt(parts[0]);
             int mins = Integer.parseInt(parts[1]);
-            int n = (int) (((hours - 8) % 24) * 1000
+            return (int) (((hours - 8) % 24) * 1000
                     + Math.round((mins % 60) / 60.0 * 1000));
-            return n;
 
             // Or perhaps 12-hour time
         } else if ((matcher = TWELVE_HOUR_TIME.matcher(timeStr)).matches()) {
             String time = matcher.group(1);
             String period = matcher.group(2);
-            int shift = 0;
+            int shift;
 
             if (period.equalsIgnoreCase("am")
                     || period.equalsIgnoreCase("a.m.")) {
@@ -223,9 +222,8 @@ public class TimeComponent extends AbstractComponent implements Listener {
             String[] parts = time.split(":");
             int hours = Integer.parseInt(parts[0]);
             int mins = parts.length >= 2 ? Integer.parseInt(parts[1]) : 0;
-            int n = (int) ((((hours % 12) + shift - 8) % 24) * 1000
+            return (int) ((((hours % 12) + shift - 8) % 24) * 1000
                     + (mins % 60) / 60.0 * 1000);
-            return n;
 
             // Or some shortcuts
         } else if (timeStr.equalsIgnoreCase("dawn")) {
@@ -233,9 +231,9 @@ public class TimeComponent extends AbstractComponent implements Listener {
         } else if (timeStr.equalsIgnoreCase("sunrise")) {
             return (7 - 8 + 24) * 1000;
         } else if (timeStr.equalsIgnoreCase("morning")) {
-            return (8 - 8 + 24) * 1000;
+            return (24) * 1000;
         } else if (timeStr.equalsIgnoreCase("day")) {
-            return (8 - 8 + 24) * 1000;
+            return (24) * 1000;
         } else if (timeStr.equalsIgnoreCase("midday")
                 || timeStr.equalsIgnoreCase("noon")) {
             return (12 - 8 + 24) * 1000;
@@ -362,7 +360,7 @@ public class TimeComponent extends AbstractComponent implements Listener {
                     if (!args.hasFlag('s')) {
                         player.sendMessage(ChatColor.YELLOW + "Your time was reset to world time");
                     }
-                    if (sender instanceof Player && ((Player) sender).equals(player)) {
+                    if (sender instanceof Player && sender.equals(player)) {
                         included = true;
                     }
                 }

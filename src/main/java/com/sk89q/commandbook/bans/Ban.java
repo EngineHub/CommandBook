@@ -4,8 +4,11 @@ package com.sk89q.commandbook.bans;
  * @author zml2008
  */
 public class Ban {
-    private String name, address, reason;
-    private long start, end;
+    private final String name;
+    private final String address;
+    private final String reason;
+    private final long start;
+    private final long end;
 
     public Ban(String name, String address, String reason, long start, long end) {
         this.name = name;

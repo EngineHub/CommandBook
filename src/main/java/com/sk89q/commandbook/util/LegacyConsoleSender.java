@@ -18,7 +18,7 @@ import org.bukkit.plugin.Plugin;
 class LegacyConsoleSender implements CommandSender {
     
     private static final Logger logger = Logger.getLogger("Minecraft.CommandBook");
-    private Server server;
+    private final Server server;
     
     public LegacyConsoleSender(Server server) {
         this.server = server;

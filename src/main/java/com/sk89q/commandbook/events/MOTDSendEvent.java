@@ -25,7 +25,7 @@ import org.bukkit.event.HandlerList;
 public class MOTDSendEvent extends Event {
     
     private static final long serialVersionUID = 9213545377113796845L;
-    private CommandSender target;
+    private final CommandSender target;
 
     public MOTDSendEvent(CommandSender target) {
         this.target = target;

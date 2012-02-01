@@ -29,7 +29,7 @@ import org.bukkit.entity.Player;
  */
 public abstract class PlayerIteratorAction {
 
-    protected CommandSender sender;
+    protected final CommandSender sender;
     
     private boolean included;
     private int affected = 0;

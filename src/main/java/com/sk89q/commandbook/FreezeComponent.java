@@ -82,7 +82,6 @@ public class FreezeComponent extends AbstractComponent implements Listener {
                 newLoc.setY(newLoc.getBlockY());
                 newLoc.setZ(newLoc.getBlockZ() + 0.5);
                 event.setTo(newLoc);
-                return;
             }
         }
     }
@@ -130,7 +129,6 @@ public class FreezeComponent extends AbstractComponent implements Listener {
 
                 vehicle.setVelocity(new org.bukkit.util.Vector(0,0,0));
                 vehicle.teleport(event.getFrom());
-                return;
             }
         }
     }

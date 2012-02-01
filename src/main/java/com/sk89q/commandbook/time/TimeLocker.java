@@ -22,8 +22,8 @@ import org.bukkit.World;
 
 public class TimeLocker implements Runnable {
     
-    private World world;
-    private long time;
+    private final World world;
+    private final long time;
 
     public TimeLocker(World world, long time) {
         super();

@@ -130,7 +130,6 @@ public class GodComponent extends AbstractComponent implements Listener {
             if (hasGodMode(player)) {
                 event.setCancelled(true);
                 player.setFireTicks(0);
-                return;
             }
         }
     }
@@ -147,7 +146,6 @@ public class GodComponent extends AbstractComponent implements Listener {
             if (hasGodMode(player)) {
                 event.setCancelled(true);
                 player.setFireTicks(0);
-                return;
             }
         }
     }

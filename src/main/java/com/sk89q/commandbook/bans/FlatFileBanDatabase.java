@@ -54,9 +54,9 @@ public class FlatFileBanDatabase implements BanDatabase {
     protected final Logger auditLogger
             = Logger.getLogger("Minecraft.CommandBook.Bans");
     
-    protected BansComponent component;
-    protected File dataDirectory;
-    protected File namesFile;
+    protected final BansComponent component;
+    protected final File dataDirectory;
+    protected final File namesFile;
 
     protected Map<String, Ban> bannedNames;
 
@@ -77,7 +77,7 @@ public class FlatFileBanDatabase implements BanDatabase {
                     .replace("\\", "/"), true);
             
             handler.setFormatter(new Formatter() {
-                private SimpleDateFormat dateFormat =
+                private final SimpleDateFormat dateFormat =
                         new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
                 
                 @Override

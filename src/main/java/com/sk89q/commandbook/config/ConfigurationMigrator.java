@@ -32,21 +32,21 @@ public abstract class ConfigurationMigrator {
     protected final YAMLProcessor config;
     protected final File oldFile;
 
-    public ConfigurationMigrator(File configFile) {
+    protected ConfigurationMigrator(File configFile) {
         this(configFile, new YAMLProcessor(configFile, false));
         try {
             config.load();
         } catch (IOException ignore) {}
     }
     
-    public ConfigurationMigrator(File configFile, YAMLProcessor processor) {
+    protected ConfigurationMigrator(File configFile, YAMLProcessor processor) {
         this.oldFile = configFile;
         this.config = processor;
     }
     
-    public abstract Map<String, String> getMigrationKeys();
+    protected abstract Map<String, String> getMigrationKeys();
 
-    public abstract boolean shouldMigrate();
+    protected abstract boolean shouldMigrate();
     
     public String migrate() {
         if (!shouldMigrate()) {

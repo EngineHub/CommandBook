@@ -26,8 +26,8 @@ public class CommandSenderMessageEvent extends Event {
     
     private static final long serialVersionUID = 1724483171471625110L;
     
-    private CommandSender sender;
-    private String message;
+    private final CommandSender sender;
+    private final String message;
 
     public CommandSenderMessageEvent(CommandSender sender, String message) {
         this.sender = sender;

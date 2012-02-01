@@ -25,7 +25,7 @@ import org.bukkit.event.HandlerList;
 public class OnlineListSendEvent extends Event {
     
     private static final long serialVersionUID = -2101268576268728497L;
-    private CommandSender target;
+    private final CommandSender target;
 
     public OnlineListSendEvent(CommandSender target) {
         this.target = target;
