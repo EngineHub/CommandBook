@@ -53,7 +53,7 @@ public class FreezeComponent extends AbstractComponent implements Listener {
     @InjectComponent private SessionComponent sessions;
        
     @Override
-    public void initialize() {
+    public void enable() {
         registerCommands(Commands.class);
         CommandBook.registerEvents(this);
     }

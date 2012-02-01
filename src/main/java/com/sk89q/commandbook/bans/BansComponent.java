@@ -44,7 +44,7 @@ public class BansComponent extends AbstractComponent implements Listener {
     private LocalConfiguration config;
 
     @Override
-    public void initialize() {
+    public void enable() {
         config = configure(new LocalConfiguration());
         
         // Setup the ban database
@@ -67,7 +67,7 @@ public class BansComponent extends AbstractComponent implements Listener {
     }
     
     @Override
-    public void unload() {
+    public void disable() {
         bans.unload();
     }
 

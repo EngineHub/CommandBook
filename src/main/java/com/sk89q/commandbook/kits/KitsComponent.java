@@ -37,7 +37,7 @@ public class KitsComponent extends AbstractComponent {
     private KitManager kits;
 
     @Override
-    public void initialize() {
+    public void enable() {
         CommandBook.inst().createDefaultConfiguration("kits.txt");
         
         // Setup kits

@@ -41,8 +41,8 @@ public class WarpsComponent extends LocationsComponent {
         super("Warp");
     }
 
-    public void initialize() {
-        super.initialize();
+    public void enable() {
+        super.enable();
         registerCommands(Commands.class);
     }
 

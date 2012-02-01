@@ -36,7 +36,7 @@ import org.bukkit.inventory.ItemStack;
 @ComponentInformation(friendlyName = "Player Commands", desc = "Various player-related commands.")
 public class PlayerComponent extends AbstractComponent {
     @Override
-    public void initialize() {
+    public void enable() {
         registerCommands(Commands.class);
     }
 

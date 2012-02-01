@@ -22,7 +22,6 @@ import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.components.loader.ComponentLoader;
 import com.sk89q.minecraft.util.commands.CommandsManager;
 import com.sk89q.minecraft.util.commands.SimpleInjector;
-import com.sk89q.util.yaml.YAMLNode;
 import org.bukkit.command.CommandSender;
 
 import java.lang.annotation.Annotation;
@@ -81,7 +80,7 @@ public class ComponentManager {
                     }
                 }
             }
-            component.initialize();
+            component.enable();
             component.setEnabled(true);
             CommandBook.logger().log(Level.FINEST, "Component " +
                     component.getClass().getSimpleName() + " successfully enabled!");
@@ -91,7 +90,7 @@ public class ComponentManager {
     
     public synchronized void unloadComponents() {
         for (AbstractComponent component : registeredComponents.values()) {
-            component.unload();
+            component.disable();
             component.unregisterCommands();
         }
         registeredComponents.clear();

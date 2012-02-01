@@ -33,7 +33,7 @@ import org.bukkit.command.CommandSender;
 @ComponentInformation(friendlyName = "World Tools", desc = "Various world-related commands.")
 public class WorldComponent extends AbstractComponent {
     @Override
-    public void initialize() {
+    public void enable() {
         registerCommands(Commands.class);
     }
 

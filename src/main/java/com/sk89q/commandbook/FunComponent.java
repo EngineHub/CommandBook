@@ -42,7 +42,7 @@ public class FunComponent extends AbstractComponent {
     private static final Random random = new Random();
 
     @Override
-    public void initialize() {
+    public void enable() {
         registerCommands(Commands.class);
     }
 

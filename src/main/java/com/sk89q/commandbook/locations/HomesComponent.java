@@ -37,8 +37,8 @@ public class HomesComponent extends LocationsComponent {
         super("Home");
     }
     
-    public void initialize() {
-        super.initialize();
+    public void enable() {
+        super.enable();
         registerCommands(Commands.class);
     }
 

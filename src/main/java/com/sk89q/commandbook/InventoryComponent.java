@@ -49,7 +49,7 @@ public class InventoryComponent extends AbstractComponent {
     protected LocalConfiguration config;
 
     @Override
-    public void initialize() {
+    public void enable() {
         config = configure(new LocalConfiguration());
         registerCommands(Commands.class);
     }

@@ -35,7 +35,7 @@ public class HelpComponent extends AbstractComponent {
     private LocalConfiguration config;
     
     @Override
-    public void initialize() {
+    public void enable() {
         config = configure(new LocalConfiguration());
         File helpFile = new File(CommandBook.inst().getDataFolder(), config.helpFile);
         if (!helpFile.getParentFile().exists() || !helpFile.getParentFile().isDirectory())

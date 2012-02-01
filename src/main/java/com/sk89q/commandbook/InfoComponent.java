@@ -48,7 +48,7 @@ import static com.sk89q.commandbook.CommandBookUtil.getCardinalDirection;
 public class InfoComponent extends AbstractComponent {
 
     @Override
-    public void initialize() {
+    public void enable() {
         registerCommands(Commands.class);
     }
     

@@ -28,7 +28,7 @@ import org.bukkit.command.CommandSender;
 @ComponentInformation(friendlyName = "Debug", desc = "Provides useful debugging information for server owners.")
 public class DebugComponent extends AbstractComponent {
     @Override
-    public void initialize() {
+    public void enable() {
         registerCommands(Commands.class);
     }
 

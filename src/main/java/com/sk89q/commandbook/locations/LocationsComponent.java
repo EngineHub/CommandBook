@@ -49,7 +49,7 @@ public abstract class LocationsComponent extends AbstractComponent implements Li
     }
 
     @Override
-    public void initialize() {
+    public void enable() {
         LocalConfiguration config = configure(new LocalConfiguration());
         LocationManagerFactory<LocationManager<NamedLocation>> warpsFactory =
                 new FlatFileLocationsManager.LocationsFactory(CommandBook.inst().getDataFolder(), name + "s");

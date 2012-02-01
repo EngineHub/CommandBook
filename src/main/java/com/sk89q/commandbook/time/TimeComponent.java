@@ -33,7 +33,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.WorldLoadEvent;
@@ -70,7 +69,7 @@ public class TimeComponent extends AbstractComponent implements Listener {
     protected LocalConfiguration config;
 
     @Override
-    public void initialize() {
+    public void enable() {
         configureWorldLocks();
         registerCommands(Commands.class);
         CommandBook.registerEvents(this);
@@ -112,12 +111,12 @@ public class TimeComponent extends AbstractComponent implements Listener {
     @Override
     public void reload() {
         super.reload();
-        unload();
+        disable();
         configureWorldLocks();
     }
 
     @Override
-    public void unload() {
+    public void disable() {
         saveConfig(config);
     }
     

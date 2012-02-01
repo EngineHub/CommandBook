@@ -48,7 +48,7 @@ public class GodComponent extends AbstractComponent implements Listener {
     private LocalConfiguration config;
     
     @Override
-    public void initialize() {
+    public void enable() {
         config = configure(new LocalConfiguration());
         registerCommands(Commands.class);
         // Check god mode for existing players, if any
@@ -154,7 +154,7 @@ public class GodComponent extends AbstractComponent implements Listener {
     public void playerWhois(InfoComponent.PlayerWhoisEvent event) {
         if (event.getPlayer() instanceof Player) {
             if (CommandBook.inst().hasPermission(event.getSource(), "commandbook.god.check")) {
-                event.addWhoisInformation(null, "Player " + (hasGodMode((Player)event.getPlayer()) 
+                event.addWhoisInformation(null, "Player " + (hasGodMode((Player) event.getPlayer())
                         ? "has" : "does not have") + " god mode");
             }
         }

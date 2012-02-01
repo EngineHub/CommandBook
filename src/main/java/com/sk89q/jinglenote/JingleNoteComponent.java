@@ -48,7 +48,7 @@ public class JingleNoteComponent extends AbstractComponent implements Listener {
     private JingleNoteManager jingleNoteManager;
 
     @Override
-    public void initialize() {
+    public void enable() {
         // Jingle note manager
         jingleNoteManager = new JingleNoteManager();
         
@@ -57,7 +57,7 @@ public class JingleNoteComponent extends AbstractComponent implements Listener {
     }
 
     @Override
-    public void unload() {
+    public void disable() {
         jingleNoteManager.stopAll();
     }
 

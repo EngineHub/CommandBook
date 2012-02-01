@@ -52,7 +52,7 @@ public class MessagingComponent extends AbstractComponent implements Listener {
     private LocalConfiguration config;
     
     @Override
-    public void initialize() {
+    public void enable() {
         config = configure(new LocalConfiguration());
         registerCommands(Commands.class);
         CommandBook.registerEvents(this);

@@ -46,7 +46,7 @@ public class OnlineListComponent extends AbstractComponent implements Listener {
     private LocalConfiguration config;
 
     @Override
-    public void initialize() {
+    public void enable() {
         config = configure(new LocalConfiguration());
         CommandBook.registerEvents(this);
         registerCommands(Commands.class);

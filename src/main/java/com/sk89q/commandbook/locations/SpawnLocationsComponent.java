@@ -52,7 +52,7 @@ public class SpawnLocationsComponent extends AbstractComponent implements Listen
     private LocalConfiguration config;
 
     @Override
-    public void initialize() {
+    public void enable() {
         spawns = new WrappedSpawnManager(new File(CommandBook.inst().getDataFolder(), "spawns.yml"));
         config = configure(new LocalConfiguration());
         registerCommands(Commands.class);

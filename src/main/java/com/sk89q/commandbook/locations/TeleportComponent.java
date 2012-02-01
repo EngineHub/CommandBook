@@ -47,7 +47,7 @@ public class TeleportComponent extends AbstractComponent implements Listener {
     @InjectComponent private SessionComponent sessions;
 
     @Override
-    public void initialize() {
+    public void enable() {
         CommandBook.registerEvents(this);
         registerCommands(Commands.class);
     }

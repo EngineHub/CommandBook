@@ -48,7 +48,7 @@ public class StoredMessagesComponent extends AbstractComponent implements Listen
     private LocalConfiguration config;
     
     @Override
-    public void initialize() {
+    public void enable() {
         config = new LocalConfiguration();
         loadMessages();
         CommandBook.registerEvents(this);

@@ -70,9 +70,9 @@ public abstract class AbstractComponent implements CommandExecutor {
      * This method is called once all of this Component's fields have been set up
      * and all other Component classes have been discovered
      */
-    public abstract void initialize();
+    public abstract void enable();
 
-    public void unload() {}
+    public void disable() {}
 
     public void reload() {
         if (rawConfiguration != null) {
@@ -125,6 +125,8 @@ public abstract class AbstractComponent implements CommandExecutor {
                 sender.sendMessage(ChatColor.RED + "An error has occurred. See console.");
                 e.printStackTrace();
             }
+        } catch (UnhandledCommandException e) {
+            sender.sendMessage("Unknown command: " + command.getName() + "! This should never be happening!");
         } catch (CommandException e) {
             sender.sendMessage(ChatColor.RED + e.getMessage());
         }

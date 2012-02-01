@@ -49,7 +49,7 @@ public class SessionComponent extends AbstractComponent implements Runnable, Lis
             new HashMap<String, AdministrativeSession>();
 
     @Override
-    public void initialize() {
+    public void enable() {
         CommandBook.server().getScheduler().scheduleSyncRepeatingTask(CommandBook.inst(), this, CHECK_FREQUENCY, CHECK_FREQUENCY);
         CommandBook.registerEvents(this);
         registerCommands(Commands.class);

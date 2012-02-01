@@ -56,7 +56,7 @@ public class ThorComponent extends AbstractComponent implements Listener {
     private static final Random random = new Random();
     
     @Override
-    public void initialize() {
+    public void enable() {
         this.config = configure(new LocalConfiguration());
         CommandBook.registerEvents(this);
         registerCommands(Commands.class);
