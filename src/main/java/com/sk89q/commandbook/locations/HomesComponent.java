@@ -59,14 +59,6 @@ public class HomesComponent extends LocationsComponent {
                 Player player = PlayerUtil.checkPlayer(sender);
                 targets = PlayerUtil.matchPlayers(player);
                 home = getManager().get(player.getWorld(), args.getString(0));
-
-                // Check permissions!
-                for (Player target : targets) {
-                    if (target != sender) {
-                        CommandBook.inst().checkPermission(sender, "commandbook.home.other");
-                        break;
-                    }
-                }
             } else if (args.argsLength() == 2) {
                 targets = PlayerUtil.matchPlayers(sender, args.getString(0));
                 if (getManager().isPerWorld()) {
@@ -80,9 +72,6 @@ public class HomesComponent extends LocationsComponent {
                 for (Player target : targets) {
                     if (target != sender) {
                         CommandBook.inst().checkPermission(sender, "commandbook.home.teleport.other");
-                        if (!home.getCreatorName().equals(sender.getName())) {
-                            CommandBook.inst().checkPermission(sender, "commandbook.home.other");
-                        }
                         break;
                     }
                 }
@@ -90,20 +79,20 @@ public class HomesComponent extends LocationsComponent {
                 targets = PlayerUtil.matchPlayers(sender, args.getString(1));
                 home = getManager().get(
                         LocationUtil.matchWorld(sender, args.getString(0)), args.getString(2));
-
+                
                 // Check permissions!
                 for (Player target : targets) {
                     if (target != sender) {
                         CommandBook.inst().checkPermission(sender, "commandbook.home.teleport.other");
-                        if (!home.getCreatorName().equals(sender.getName())) {
-                            CommandBook.inst().checkPermission(sender, "commandbook.home.other");
-                        }
                         break;
                     }
                 }
             }
 
             if (home != null) {
+                if (!home.getCreatorName().equals(sender.getName())) {
+                    CommandBook.inst().checkPermission(sender, "commandbook.home.other");
+                }
                 loc = home.getLocation();
             } else {
                 throw new CommandException("A home for the given player does not exist.");
