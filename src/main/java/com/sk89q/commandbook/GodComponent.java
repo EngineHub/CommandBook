@@ -33,6 +33,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 import java.util.HashSet;
@@ -147,6 +148,13 @@ public class GodComponent extends AbstractComponent implements Listener {
                 event.setCancelled(true);
                 player.setFireTicks(0);
             }
+        }
+    }
+    
+    @EventHandler
+    public void playerChangedWorld(PlayerChangedWorldEvent event) {
+        if (!CommandBook.inst().hasPermission(event.getPlayer(), "commandbook.god")) {
+            disableGodMode(event.getPlayer());
         }
     }
     
