@@ -254,7 +254,7 @@ public class GodComponent extends AbstractComponent implements Listener {
 
             for (Player player : targets) {
                 if (hasGodMode(player)) {
-                disableGodMode(player);
+                    disableGodMode(player);
                 } else {
                     if (player == sender) {
                         player.sendMessage(ChatColor.RED + "You do not have god mode enabled!");

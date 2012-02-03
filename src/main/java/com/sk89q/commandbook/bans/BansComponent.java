@@ -134,7 +134,7 @@ public class BansComponent extends AbstractComponent implements Listener {
                 if (CommandBook.inst().hasPermission(player, "commandbook.kick.exempt") 
                         && !(args.hasFlag('o') && CommandBook.inst().hasPermission(sender,
                         "commandbook.kick.exempt.override"))) {
-                    sender.sendMessage(ChatColor.RED + "Player " + player.getName() + ChatColor.RED + " is exempt from being banned!");
+                    sender.sendMessage(ChatColor.RED + "Player " + player.getName() + ChatColor.RED + " is exempt from being kicked!");
                     continue;
                 }
                 player.kickPlayer(message);
