@@ -19,13 +19,13 @@
 package com.sk89q.jinglenote;
 
 import com.sk89q.commandbook.CommandBook;
-import com.sk89q.commandbook.components.AbstractComponent;
-import com.sk89q.commandbook.components.ComponentInformation;
+import com.zachsthings.libcomponents.ComponentInformation;
 import com.sk89q.commandbook.util.PlayerUtil;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
+import com.zachsthings.libcomponents.bukkit.BukkitComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -43,7 +43,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 
 @ComponentInformation(friendlyName = "JingleNote", desc = "MIDI sequencer for note blocks with commands.")
-public class JingleNoteComponent extends AbstractComponent implements Listener {
+public class JingleNoteComponent extends BukkitComponent implements Listener {
 
     private JingleNoteManager jingleNoteManager;
 

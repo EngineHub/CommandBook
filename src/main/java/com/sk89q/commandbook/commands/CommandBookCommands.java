@@ -19,13 +19,12 @@
 package com.sk89q.commandbook.commands;
 
 import com.sk89q.commandbook.CommandBook;
-import com.sk89q.commandbook.components.AbstractComponent;
-import com.sk89q.commandbook.components.ComponentInformation;
+import com.zachsthings.libcomponents.AbstractComponent;
+import com.zachsthings.libcomponents.ComponentInformation;
 import com.sk89q.minecraft.util.commands.*;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -80,7 +79,7 @@ public class CommandBookCommands {
             if (component == null) {
                 throw new CommandException("No such component: " + componentName);
             }
-            ComponentInformation info = component.getInformation();
+            final ComponentInformation info = component.getInformation();
             sender.sendMessage(ChatColor.YELLOW + info.friendlyName() + " - " + info.desc());
             if (info.authors().length > 0 && info.authors()[0].length() > 0) {
                 sender.sendMessage(ChatColor.YELLOW + "Authors: " + 

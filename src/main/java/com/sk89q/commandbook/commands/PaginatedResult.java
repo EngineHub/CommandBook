@@ -39,11 +39,11 @@ public abstract class PaginatedResult<T> {
         this.header = header;
     }
     
-    public void display(CommandSender sender, Collection<T> results, int page) throws CommandException {
+    public void display(CommandSender sender, Collection<? extends T> results, int page) throws CommandException {
         display(sender, new ArrayList<T>(results), page);
     }
     
-    public void display(CommandSender sender, List<T> results, int page) throws CommandException {
+    public void display(CommandSender sender, List<? extends T> results, int page) throws CommandException {
         if (results.size() == 0) throw new CommandException("No results match!");
         --page;
 

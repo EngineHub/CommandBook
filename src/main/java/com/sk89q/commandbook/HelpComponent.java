@@ -2,10 +2,10 @@ package com.sk89q.commandbook;
 
 import com.sk89q.bukkit.util.DynamicPluginCommand;
 import com.sk89q.commandbook.commands.PaginatedResult;
-import com.sk89q.commandbook.components.AbstractComponent;
-import com.sk89q.commandbook.components.ComponentInformation;
-import com.sk89q.commandbook.config.ConfigurationBase;
-import com.sk89q.commandbook.config.Setting;
+import com.zachsthings.libcomponents.bukkit.BukkitComponent;
+import com.zachsthings.libcomponents.ComponentInformation;
+import com.zachsthings.libcomponents.config.ConfigurationBase;
+import com.zachsthings.libcomponents.config.Setting;
 import com.sk89q.minecraft.util.commands.*;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandException;
@@ -29,7 +29,7 @@ import static com.sk89q.commandbook.CommandBookUtil.replaceColorMacros;
  * Simple but very messy Help component.
  */
 @ComponentInformation(friendlyName = "Help", desc = "Provides help on various command actions")
-public class HelpComponent extends AbstractComponent {
+public class HelpComponent extends BukkitComponent {
     private YAMLProcessor help;
     private final Map<String, String[]> messages = new HashMap<String, String[]>();
     private LocalConfiguration config;

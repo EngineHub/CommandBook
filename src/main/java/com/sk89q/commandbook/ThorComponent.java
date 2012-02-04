@@ -18,12 +18,12 @@
 
 package com.sk89q.commandbook;
 
-import com.sk89q.commandbook.components.AbstractComponent;
-import com.sk89q.commandbook.components.ComponentInformation;
-import com.sk89q.commandbook.components.Depend;
-import com.sk89q.commandbook.components.InjectComponent;
-import com.sk89q.commandbook.config.ConfigurationBase;
-import com.sk89q.commandbook.config.Setting;
+import com.zachsthings.libcomponents.bukkit.BukkitComponent;
+import com.zachsthings.libcomponents.ComponentInformation;
+import com.zachsthings.libcomponents.Depend;
+import com.zachsthings.libcomponents.InjectComponent;
+import com.zachsthings.libcomponents.config.ConfigurationBase;
+import com.zachsthings.libcomponents.config.Setting;
 import com.sk89q.commandbook.session.SessionComponent;
 import com.sk89q.commandbook.util.PlayerUtil;
 import com.sk89q.minecraft.util.commands.Command;
@@ -47,7 +47,7 @@ import java.util.Set;
 
 @ComponentInformation(friendlyName = "Thor", desc = "Thor's hammer and other lightning effects.")
 @Depend(components = SessionComponent.class)
-public class ThorComponent extends AbstractComponent implements Listener {
+public class ThorComponent extends BukkitComponent implements Listener {
 
     @InjectComponent private SessionComponent sessions;
     

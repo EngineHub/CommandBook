@@ -18,12 +18,12 @@
 
 package com.sk89q.commandbook;
 
-import com.sk89q.commandbook.components.AbstractComponent;
-import com.sk89q.commandbook.components.ComponentInformation;
-import com.sk89q.commandbook.components.Depend;
-import com.sk89q.commandbook.components.InjectComponent;
-import com.sk89q.commandbook.config.ConfigurationBase;
-import com.sk89q.commandbook.config.Setting;
+import com.zachsthings.libcomponents.bukkit.BukkitComponent;
+import com.zachsthings.libcomponents.ComponentInformation;
+import com.zachsthings.libcomponents.Depend;
+import com.zachsthings.libcomponents.InjectComponent;
+import com.zachsthings.libcomponents.config.ConfigurationBase;
+import com.zachsthings.libcomponents.config.Setting;
 import com.sk89q.commandbook.events.CommandSenderMessageEvent;
 import com.sk89q.commandbook.events.SharedMessageEvent;
 import com.sk89q.commandbook.session.SessionComponent;
@@ -45,7 +45,7 @@ import static com.sk89q.commandbook.CommandBookUtil.replaceColorMacros;
 @ComponentInformation(friendlyName = "Messaging", desc = "Commands that involve direct player <-> player or player <-> admin" +
         "communication are handled through this component.")
 @Depend(components = SessionComponent.class)
-public class MessagingComponent extends AbstractComponent implements Listener {
+public class MessagingComponent extends BukkitComponent implements Listener {
 
     @InjectComponent private SessionComponent sessions;
     

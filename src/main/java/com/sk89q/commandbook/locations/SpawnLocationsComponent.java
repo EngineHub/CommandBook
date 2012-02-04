@@ -19,10 +19,10 @@
 package com.sk89q.commandbook.locations;
 
 import com.sk89q.commandbook.CommandBook;
-import com.sk89q.commandbook.components.AbstractComponent;
-import com.sk89q.commandbook.components.ComponentInformation;
-import com.sk89q.commandbook.config.ConfigurationBase;
-import com.sk89q.commandbook.config.Setting;
+import com.zachsthings.libcomponents.bukkit.BukkitComponent;
+import com.zachsthings.libcomponents.ComponentInformation;
+import com.zachsthings.libcomponents.config.ConfigurationBase;
+import com.zachsthings.libcomponents.config.Setting;
 import com.sk89q.commandbook.util.LocationUtil;
 import com.sk89q.commandbook.util.PlayerIteratorAction;
 import com.sk89q.commandbook.util.PlayerUtil;
@@ -45,7 +45,7 @@ import java.io.File;
 
 @ComponentInformation(friendlyName = "Spawn Locations", desc = "Allows exact spawn locations for players, " +
         "as well as getting and setting the world's spawn.")
-public class SpawnLocationsComponent extends AbstractComponent implements Listener {
+public class SpawnLocationsComponent extends BukkitComponent implements Listener {
 
     private WrappedSpawnManager spawns;
 

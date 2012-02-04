@@ -36,6 +36,12 @@
       <version>5.1</version>
     </dependency>
 
+    <dependency>
+        <groupId>com.zachsthings</groupId>
+        <artifactId>libcomponents</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </dependency>
+
     <!-- Bukkit -->
     <dependency>
       <groupId>org.bukkit</groupId>
@@ -127,6 +133,7 @@
               <artifactSet>
                 <includes>
                   <include>net.sf.opencsv:opencsv</include>
+                  <include>com.zachsthings:libcomponents</include>
                 </includes>
               </artifactSet>
             </configuration>

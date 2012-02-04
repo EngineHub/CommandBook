@@ -20,8 +20,8 @@ package com.sk89q.commandbook.locations;
 
 import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.commands.PaginatedResult;
-import com.sk89q.commandbook.components.ComponentInformation;
-import com.sk89q.commandbook.components.InjectComponent;
+import com.zachsthings.libcomponents.ComponentInformation;
+import com.zachsthings.libcomponents.InjectComponent;
 import com.sk89q.commandbook.session.SessionComponent;
 import com.sk89q.commandbook.util.LocationUtil;
 import com.sk89q.commandbook.util.PlayerUtil;

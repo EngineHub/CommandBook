@@ -18,8 +18,8 @@
 
 package com.sk89q.commandbook;
 
-import com.sk89q.commandbook.components.AbstractComponent;
-import com.sk89q.commandbook.components.ComponentInformation;
+import com.zachsthings.libcomponents.bukkit.BukkitComponent;
+import com.zachsthings.libcomponents.ComponentInformation;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
@@ -27,7 +27,7 @@ import org.bukkit.event.player.PlayerLoginEvent;
 import java.util.regex.Pattern;
 
 @ComponentInformation(friendlyName = "Name Verification", desc = "This component verifies that player names are valid when they join.")
-public class NameVerificationComponent extends AbstractComponent implements Listener {
+public class NameVerificationComponent extends BukkitComponent implements Listener {
     protected final static Pattern namePattern = Pattern.compile(
             "^[a-zA-Z0-9_]{1,16}$");
 

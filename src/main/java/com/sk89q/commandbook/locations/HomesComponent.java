@@ -20,7 +20,7 @@ package com.sk89q.commandbook.locations;
 
 import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.commands.PaginatedResult;
-import com.sk89q.commandbook.components.ComponentInformation;
+import com.zachsthings.libcomponents.ComponentInformation;
 import com.sk89q.commandbook.util.LocationUtil;
 import com.sk89q.commandbook.util.PlayerUtil;
 import com.sk89q.commandbook.util.TeleportPlayerIterator;

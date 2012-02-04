@@ -18,10 +18,10 @@
 
 package com.sk89q.commandbook;
 
-import com.sk89q.commandbook.components.AbstractComponent;
-import com.sk89q.commandbook.components.ComponentInformation;
-import com.sk89q.commandbook.config.ConfigurationBase;
-import com.sk89q.commandbook.config.Setting;
+import com.zachsthings.libcomponents.bukkit.BukkitComponent;
+import com.zachsthings.libcomponents.ComponentInformation;
+import com.zachsthings.libcomponents.config.ConfigurationBase;
+import com.zachsthings.libcomponents.config.Setting;
 import com.sk89q.commandbook.events.OnlineListSendEvent;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
@@ -41,7 +41,7 @@ import java.util.List;
 import java.util.Map;
 
 @ComponentInformation(friendlyName = "Online List", desc = "Lists online players both on command and on player join.")
-public class OnlineListComponent extends AbstractComponent implements Listener {
+public class OnlineListComponent extends BukkitComponent implements Listener {
 
     private LocalConfiguration config;
 

@@ -20,9 +20,9 @@ package com.sk89q.commandbook;
 
 import com.sk89q.commandbook.bans.BansComponent;
 import com.sk89q.commandbook.commands.PaginatedResult;
-import com.sk89q.commandbook.components.AbstractComponent;
-import com.sk89q.commandbook.components.ComponentInformation;
-import com.sk89q.commandbook.components.InjectComponent;
+import com.zachsthings.libcomponents.bukkit.BukkitComponent;
+import com.zachsthings.libcomponents.ComponentInformation;
+import com.zachsthings.libcomponents.InjectComponent;
 import com.sk89q.commandbook.util.LocationUtil;
 import com.sk89q.commandbook.util.PlayerUtil;
 import com.sk89q.minecraft.util.commands.Command;
@@ -45,7 +45,7 @@ import static com.sk89q.commandbook.CommandBookUtil.getCardinalDirection;
 
 @ComponentInformation(friendlyName = "Info", desc = "Info contains commands that allow users to gather " +
         "information about the world, without being able to make changes.")
-public class InfoComponent extends AbstractComponent {
+public class InfoComponent extends BukkitComponent {
 
     @Override
     public void enable() {

@@ -19,10 +19,10 @@
 package com.sk89q.commandbook.locations;
 
 import com.sk89q.commandbook.CommandBook;
-import com.sk89q.commandbook.components.AbstractComponent;
-import com.sk89q.commandbook.components.ComponentInformation;
-import com.sk89q.commandbook.components.Depend;
-import com.sk89q.commandbook.components.InjectComponent;
+import com.zachsthings.libcomponents.bukkit.BukkitComponent;
+import com.zachsthings.libcomponents.ComponentInformation;
+import com.zachsthings.libcomponents.Depend;
+import com.zachsthings.libcomponents.InjectComponent;
 import com.sk89q.commandbook.session.SessionComponent;
 import com.sk89q.commandbook.util.LocationUtil;
 import com.sk89q.commandbook.util.PlayerUtil;
@@ -42,7 +42,7 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 
 @ComponentInformation(friendlyName = "Teleports", desc = "Teleport-related commands")
 @Depend(components = SessionComponent.class)
-public class TeleportComponent extends AbstractComponent implements Listener {
+public class TeleportComponent extends BukkitComponent implements Listener {
     
     @InjectComponent private SessionComponent sessions;
 

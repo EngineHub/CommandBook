@@ -19,22 +19,18 @@
 package com.sk89q.commandbook.config;
 
 import com.sk89q.util.yaml.YAMLProcessor;
+import com.zachsthings.libcomponents.config.ConfigurationMigrator;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * @author zml2008
+ * Converts pre-2.0 configurations to the 2.0 format
  */
 public class LegacyCommandBookConfigurationMigrator extends ConfigurationMigrator {
     public LegacyCommandBookConfigurationMigrator(File configFile, YAMLProcessor processor) {
         super(configFile, processor);
-    }
-
-    public LegacyCommandBookConfigurationMigrator(File configFile) {
-        super(configFile);
     }
     
     private static final Map<String, String> migrationKeys = new LinkedHashMap<String, String>();

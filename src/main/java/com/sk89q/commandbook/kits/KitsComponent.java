@@ -19,8 +19,8 @@
 package com.sk89q.commandbook.kits;
 
 import com.sk89q.commandbook.CommandBook;
-import com.sk89q.commandbook.components.AbstractComponent;
-import com.sk89q.commandbook.components.ComponentInformation;
+import com.zachsthings.libcomponents.bukkit.BukkitComponent;
+import com.zachsthings.libcomponents.ComponentInformation;
 import com.sk89q.commandbook.util.PlayerUtil;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
@@ -33,7 +33,7 @@ import java.io.File;
 import java.util.Map;
 
 @ComponentInformation(friendlyName = "Kits", desc = "Distributes kits to players on command (with cooldowns)")
-public class KitsComponent extends AbstractComponent {
+public class KitsComponent extends BukkitComponent {
     private KitManager kits;
 
     @Override

@@ -18,8 +18,8 @@
 
 package com.sk89q.commandbook;
 
-import com.sk89q.commandbook.components.AbstractComponent;
-import com.sk89q.commandbook.components.ComponentInformation;
+import com.zachsthings.libcomponents.bukkit.BukkitComponent;
+import com.zachsthings.libcomponents.ComponentInformation;
 import com.sk89q.commandbook.util.LocationUtil;
 import com.sk89q.commandbook.util.PlayerUtil;
 import com.sk89q.minecraft.util.commands.Command;
@@ -31,7 +31,7 @@ import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 
 @ComponentInformation(friendlyName = "World Tools", desc = "Various world-related commands.")
-public class WorldComponent extends AbstractComponent {
+public class WorldComponent extends BukkitComponent {
     @Override
     public void enable() {
         registerCommands(Commands.class);

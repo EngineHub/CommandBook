@@ -18,10 +18,10 @@
 
 package com.sk89q.commandbook;
 
-import com.sk89q.commandbook.components.AbstractComponent;
-import com.sk89q.commandbook.components.ComponentInformation;
-import com.sk89q.commandbook.config.ConfigurationBase;
-import com.sk89q.commandbook.config.Setting;
+import com.zachsthings.libcomponents.bukkit.BukkitComponent;
+import com.zachsthings.libcomponents.ComponentInformation;
+import com.zachsthings.libcomponents.config.ConfigurationBase;
+import com.zachsthings.libcomponents.config.Setting;
 import com.sk89q.commandbook.util.PlayerUtil;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
@@ -45,7 +45,7 @@ import static com.sk89q.commandbook.CommandBookUtil.takeItem;
 
 @ComponentInformation(friendlyName = "Inventory",
         desc = "Inventory-related commands, such as /give and /clear, are handled in this component.")
-public class InventoryComponent extends AbstractComponent {
+public class InventoryComponent extends BukkitComponent {
     protected LocalConfiguration config;
 
     @Override

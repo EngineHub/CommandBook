@@ -18,8 +18,8 @@
 
 package com.sk89q.commandbook;
 
-import com.sk89q.commandbook.components.AbstractComponent;
-import com.sk89q.commandbook.components.ComponentInformation;
+import com.zachsthings.libcomponents.bukkit.BukkitComponent;
+import com.zachsthings.libcomponents.ComponentInformation;
 import com.sk89q.commandbook.util.ItemUtil;
 import com.sk89q.commandbook.util.LocationUtil;
 import com.sk89q.commandbook.util.PlayerUtil;
@@ -38,7 +38,7 @@ import static com.sk89q.commandbook.util.EntityUtil.matchCreatureType;
 import java.util.Random;
 
 @ComponentInformation(friendlyName = "Fun", desc = "Provides some fun commands to toy with users. (/rocket and /pong are two fun ones)")
-public class FunComponent extends AbstractComponent {
+public class FunComponent extends BukkitComponent {
     private static final Random random = new Random();
 
     @Override

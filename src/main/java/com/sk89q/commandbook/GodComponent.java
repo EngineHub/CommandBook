@@ -18,10 +18,10 @@
 
 package com.sk89q.commandbook;
 
-import com.sk89q.commandbook.components.AbstractComponent;
-import com.sk89q.commandbook.components.ComponentInformation;
-import com.sk89q.commandbook.config.ConfigurationBase;
-import com.sk89q.commandbook.config.Setting;
+import com.zachsthings.libcomponents.bukkit.BukkitComponent;
+import com.zachsthings.libcomponents.ComponentInformation;
+import com.zachsthings.libcomponents.config.ConfigurationBase;
+import com.zachsthings.libcomponents.config.Setting;
 import com.sk89q.commandbook.util.PlayerUtil;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
@@ -40,7 +40,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @ComponentInformation(friendlyName = "God", desc = "God mode support")
-public class GodComponent extends AbstractComponent implements Listener {
+public class GodComponent extends BukkitComponent implements Listener {
     /**
      * List of people with god mode.
      */

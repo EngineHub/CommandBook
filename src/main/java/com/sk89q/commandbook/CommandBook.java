@@ -21,34 +21,28 @@ package com.sk89q.commandbook;
 
 import java.io.*;
 import java.util.*;
-import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.zip.ZipEntry;
 
 import com.sk89q.bukkit.util.CommandsManagerRegistration;
-import com.sk89q.commandbook.components.*;
-import com.sk89q.commandbook.components.loader.ClassLoaderComponentLoader;
-import com.sk89q.commandbook.components.loader.ConfigListedComponentLoader;
-import com.sk89q.commandbook.components.loader.JarFilesComponentLoader;
-import com.sk89q.commandbook.components.loader.StaticComponentLoader;
-import com.sk89q.commandbook.config.DefaultsFileYAMLProcessor;
 import com.sk89q.commandbook.config.LegacyCommandBookConfigurationMigrator;
-import com.sk89q.commandbook.events.ComponentManagerInitEvent;
+import com.zachsthings.libcomponents.*;
+import com.zachsthings.libcomponents.bukkit.BasePlugin;
+import com.zachsthings.libcomponents.loader.ClassLoaderComponentLoader;
+import com.zachsthings.libcomponents.loader.ConfigListedComponentLoader;
+import com.zachsthings.libcomponents.loader.JarFilesComponentLoader;
+import com.zachsthings.libcomponents.loader.StaticComponentLoader;
+import com.zachsthings.libcomponents.config.DefaultsFileYAMLProcessor;
 import com.sk89q.commandbook.session.SessionComponent;
 import com.sk89q.util.yaml.YAMLFormat;
 import com.sk89q.util.yaml.YAMLProcessor;
-import com.sk89q.wepif.PermissionsResolverManager;
 import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.java.JavaPlugin;
 import com.sk89q.commandbook.commands.*;
 import com.sk89q.minecraft.util.commands.*;
 import com.sk89q.worldedit.blocks.ItemType;
@@ -60,7 +54,7 @@ import static com.sk89q.commandbook.util.ItemUtil.matchItemData;
  * 
  * @author sk89q
  */
-public final class CommandBook extends JavaPlugin {
+public final class CommandBook extends BasePlugin {
     
     private static CommandBook instance;
 
@@ -68,14 +62,9 @@ public final class CommandBook extends JavaPlugin {
     
     protected Map<String, Integer> itemNames;
     public boolean broadcastChanges;
-    private boolean opPermissions;
     public boolean useDisplayNames;
     public boolean lookupWithDisplayNames;
     public boolean crappyWrapperCompat;
-    public boolean lowPriorityCommandRegistration;
-
-    protected YAMLProcessor config;
-    protected ComponentManager componentManager;
 
     
     public CommandBook() {
@@ -87,10 +76,6 @@ public final class CommandBook extends JavaPlugin {
         return instance;
     }
     
-    public static Server server() {
-        return Bukkit.getServer();
-    }
-    
     public static Logger logger() {
         return inst().getLogger();
     }
@@ -98,21 +83,13 @@ public final class CommandBook extends JavaPlugin {
     public static void registerEvents(Listener listener) {
         server().getPluginManager().registerEvents(listener, inst());
     }
-    
-    public static <T extends Event> T callEvent(T event) {
-        server().getPluginManager().callEvent(event);
-        return event;
-    }
 
     /**
      * Called when the plugin is enabled. This is where configuration is loaded,
      * and the plugin is setup.
      */
     public void onEnable() {
-        
-        // Make the data folder for the plugin where configuration files
-        // and other data files will be stored
-        getDataFolder().mkdirs();
+        super.onEnable();
 
         // Register the commands that we want to use
         final CommandBook plugin = this;
@@ -122,44 +99,6 @@ public final class CommandBook extends JavaPlugin {
                 return plugin.hasPermission(player, perm);
             }
         };
-
-        // Prepare permissions
-        PermissionsResolverManager.initialize(this);
-
-        // Load configuration
-        populateConfiguration();
-        
-        componentManager = new ComponentManager();
-
-        
-        // -- Component loaders
-        final File configDir = new File(plugin.getDataFolder(), "config/");
-        componentManager.addComponentLoader(new StaticComponentLoader(configDir, new SessionComponent()));
-        componentManager.addComponentLoader(new ConfigListedComponentLoader(
-                new DefaultsFileYAMLProcessor("components.yml", false), configDir));
-
-        for (String dir : config.getStringList("component-class-dirs", Arrays.asList("component-classes"))) {
-            final File classesDir = new File(plugin.getDataFolder(), dir);
-            if (!classesDir.exists() || !classesDir.isDirectory()) {
-                classesDir.mkdirs();
-            }
-            componentManager.addComponentLoader(new ClassLoaderComponentLoader(classesDir, configDir));
-        }
-
-        for (String dir : config.getStringList("component-jar-dirs", Arrays.asList("component-jars"))) {
-            final File classesDir = new File(plugin.getDataFolder(), dir);
-            if (!classesDir.exists() || !classesDir.isDirectory()) {
-                classesDir.mkdirs();
-            }
-            componentManager.addComponentLoader(new JarFilesComponentLoader(classesDir, configDir));
-        }
-        
-        // -- Annotation handlers
-        componentManager.registerAnnotationHandler(InjectComponent.class, new InjectComponentAnnotationHandler());
-
-        getServer().getPluginManager().callEvent(new ComponentManagerInitEvent(componentManager));
-
-        componentManager.loadComponents();
         
 		final CommandsManagerRegistration cmdRegister = new CommandsManagerRegistration(this, commands);
         if (lowPriorityCommandRegistration) {
@@ -172,19 +111,33 @@ public final class CommandBook extends JavaPlugin {
         } else {
             cmdRegister.register(CommandBookCommands.CommandBookParentCommand.class);
         }
-
-        componentManager.enableComponents();
-
-        config.save();
     }
 
-    /**
-     * Called when the plugin is disabled. Shutdown and clearing of any
-     * temporary data occurs here.
-     */
-    public void onDisable() {
-        this.getServer().getScheduler().cancelTasks(this);
-        componentManager.unloadComponents();
+    public void registerComponentLoaders() {
+        // -- Component loaders
+        final File configDir = new File(getDataFolder(), "config/");
+        componentManager.addComponentLoader(new StaticComponentLoader(getLogger(), configDir, new SessionComponent()));
+        componentManager.addComponentLoader(new ConfigListedComponentLoader(getLogger(), config,
+                new DefaultsFileYAMLProcessor("components.yml", false), configDir));
+
+        for (String dir : config.getStringList("component-class-dirs", Arrays.asList("component-classes"))) {
+            final File classesDir = new File(getDataFolder(), dir);
+            if (!classesDir.exists() || !classesDir.isDirectory()) {
+                classesDir.mkdirs();
+            }
+            componentManager.addComponentLoader(new ClassLoaderComponentLoader(getLogger(), classesDir, configDir));
+        }
+
+        for (String dir : config.getStringList("component-jar-dirs", Arrays.asList("component-jars"))) {
+            final File classesDir = new File(getDataFolder(), dir);
+            if (!classesDir.exists() || !classesDir.isDirectory()) {
+                classesDir.mkdirs();
+            }
+            componentManager.addComponentLoader(new JarFilesComponentLoader(getLogger(), classesDir, configDir));
+        }
+
+        // -- Annotation handlers
+        componentManager.registerAnnotationHandler(InjectComponent.class, new InjectComponentAnnotationHandler(componentManager));
     }
     
     /**
@@ -219,8 +172,8 @@ public final class CommandBook extends JavaPlugin {
     /**
      * Loads the configuration.
      */
-    @SuppressWarnings({"unchecked", "ResultOfMethodCallIgnored"})
-    public void populateConfiguration() {
+    @SuppressWarnings({"unchecked"})
+    public YAMLProcessor populateConfiguration() {
         final File configFile = new File(getDataFolder(), "config.yml");
         YAMLProcessor config = new YAMLProcessor(configFile, true, YAMLFormat.EXTENDED);
         YAMLProcessor comments = new DefaultsFileYAMLProcessor("config-comments.yml", false);
@@ -234,7 +187,6 @@ public final class CommandBook extends JavaPlugin {
         } catch (Exception e) {
             getLogger().log(Level.WARNING, "Error loading configuration: ", e);
         }
-        this.config = config;
 
         for (Map.Entry<String, Object> e : comments.getMap().entrySet()) {
             if (e.getValue() != null) {
@@ -248,30 +200,30 @@ public final class CommandBook extends JavaPlugin {
             logger().severe("Error migrating CommandBook configuration: " + result);
         }
 
-        loadItemList();
+        loadItemList(config);
 
-        opPermissions = config.getBoolean("op-permissions", true);
         useDisplayNames = config.getBoolean("use-display-names", true);
         lookupWithDisplayNames = config.getBoolean("lookup-with-display-names", true);
         broadcastChanges = config.getBoolean("broadcast-changes", true);
 
         crappyWrapperCompat = config.getBoolean("crappy-wrapper-compat", true);
         
-        lowPriorityCommandRegistration = config.getBoolean("low-priority-command-registration", false);
-        
         if (crappyWrapperCompat) {
             getLogger().info("Maximum wrapper compatibility is enabled. " +
                     "Some features have been disabled to be compatible with " +
                     "poorly written server wrappers.");
         }
+        
+        return config;
     }
 
     /**
      * Loads the item list.
+     *
+     * @param config The {@link YAMLProcessor} to load from
      */
     @SuppressWarnings({ "unchecked" })
-    protected void loadItemList() {
-        YAMLProcessor config = getGlobalConfiguration();
+    protected void loadItemList(YAMLProcessor config) {
 
         // Load item names aliases list
         Object itemNamesTemp = config.getProperty("item-names");
@@ -293,103 +245,6 @@ public final class CommandBook extends JavaPlugin {
             }
         } else {
             itemNames = new HashMap<String, Integer>();
-        }
-    }
-    
-    /**
-     * Create a default configuration file from the .jar.
-     * 
-     * @param name
-     */
-    public void createDefaultConfiguration(String name) {
-        File actual = new File(getDataFolder(), name);
-        if (!actual.exists()) {
-
-            InputStream input = null;
-            try {
-                JarFile file = new JarFile(getFile());
-                ZipEntry copy = file.getEntry("defaults/" + name);
-                if (copy == null) throw new FileNotFoundException();
-                input = file.getInputStream(copy);
-            } catch (IOException e) {
-                getLogger().severe("Unable to read default configuration: " + name);
-            }
-            if (input != null) {
-                FileOutputStream output = null;
-
-                try {
-                    output = new FileOutputStream(actual);
-                    byte[] buf = new byte[8192];
-                    int length;
-                    while ((length = input.read(buf)) > 0) {
-                        output.write(buf, 0, length);
-                    }
-                    
-                    getLogger().info("Default configuration file written: " + name);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally {
-                    try {
-                        if (input != null)
-                            input.close();
-                    } catch (IOException e) {}
-
-                    try {
-                        if (output != null)
-                            output.close();
-                    } catch (IOException e) {}
-                }
-            }
-        }
-    }
-    
-    /**
-     * Checks permissions.
-     * 
-     * @param sender
-     * @param perm
-     * @return 
-     */
-    public boolean hasPermission(CommandSender sender, String perm) {
-        if (!(sender instanceof Player)) {
-            return ((sender.isOp() && (opPermissions || sender instanceof ConsoleCommandSender)) 
-                    || getPermissionsResolver().hasPermission(sender.getName(), perm));
-        } 
-        return hasPermission(sender, ((Player) sender).getWorld(), perm);
-    }
-
-    public boolean hasPermission(CommandSender sender, World world, String perm) {
-        if ((sender.isOp() && opPermissions) || sender instanceof ConsoleCommandSender) {
-            return true;
-        }
-
-        // Invoke the permissions resolver
-        if (sender instanceof Player) {
-            Player player = (Player) sender;
-            return getPermissionsResolver().hasPermission(world.getName(), player.getName(), perm);
-        }
-
-        return false;
-    }
-
-    /**
-     * Checks permissions and throws an exception if permission is not met.
-     * 
-     * @param sender
-     * @param perm
-     * @throws CommandPermissionsException 
-     */
-    public void checkPermission(CommandSender sender, String perm)
-            throws CommandPermissionsException {
-        if (!hasPermission(sender, perm)) {
-            throw new CommandPermissionsException();
-        }
-    }
-    
-    public void checkPermission(CommandSender sender, World world, String perm)
-            throws CommandPermissionsException {
-        if (!hasPermission(sender, world, perm)) {
-            throw new CommandPermissionsException();
         }
     }
 
@@ -510,22 +365,5 @@ public final class CommandBook extends JavaPlugin {
         } else {
             return "127.0.0.1";
         }
-    }
-
-    /**
-     * Get the permissions resolver.
-     * 
-     * @return
-     */
-    public PermissionsResolverManager getPermissionsResolver() {
-        return PermissionsResolverManager.getInstance();
-    }
-
-    public YAMLProcessor getGlobalConfiguration() {
-        return config;
-    }
-
-    public ComponentManager getComponentManager() {
-        return componentManager;
     }
 }

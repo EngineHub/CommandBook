@@ -20,11 +20,11 @@ package com.sk89q.commandbook.bans;
 
 import com.sk89q.commandbook.CommandBookUtil;
 import com.sk89q.commandbook.InfoComponent;
-import com.sk89q.commandbook.components.AbstractComponent;
+import com.zachsthings.libcomponents.bukkit.BukkitComponent;
 import com.sk89q.commandbook.CommandBook;
-import com.sk89q.commandbook.components.ComponentInformation;
-import com.sk89q.commandbook.config.ConfigurationBase;
-import com.sk89q.commandbook.config.Setting;
+import com.zachsthings.libcomponents.ComponentInformation;
+import com.zachsthings.libcomponents.config.ConfigurationBase;
+import com.zachsthings.libcomponents.config.Setting;
 import com.sk89q.commandbook.util.PlayerUtil;
 import com.sk89q.minecraft.util.commands.*;
 import org.bukkit.ChatColor;
@@ -39,7 +39,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @ComponentInformation(friendlyName = "Bans", desc = "A system for kicks and bans.")
-public class BansComponent extends AbstractComponent implements Listener {
+public class BansComponent extends BukkitComponent implements Listener {
     private BanDatabase bans;
     private LocalConfiguration config;
 

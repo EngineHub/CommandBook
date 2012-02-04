@@ -20,10 +20,10 @@ package com.sk89q.commandbook.time;
 
 import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.CommandBookUtil;
-import com.sk89q.commandbook.components.AbstractComponent;
-import com.sk89q.commandbook.components.ComponentInformation;
-import com.sk89q.commandbook.config.ConfigurationBase;
-import com.sk89q.commandbook.config.Setting;
+import com.zachsthings.libcomponents.bukkit.BukkitComponent;
+import com.zachsthings.libcomponents.ComponentInformation;
+import com.zachsthings.libcomponents.config.ConfigurationBase;
+import com.zachsthings.libcomponents.config.Setting;
 import com.sk89q.commandbook.util.LocationUtil;
 import com.sk89q.commandbook.util.PlayerUtil;
 import com.sk89q.minecraft.util.commands.Command;
@@ -36,6 +36,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.WorldLoadEvent;
+import org.bukkit.event.world.WorldUnloadEvent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -46,7 +47,7 @@ import java.util.regex.Pattern;
  * TimeComponent contains commands and functions related to time management. These include
  */
 @ComponentInformation(friendlyName = "Time Control", desc = "Commands to manage and lock time for a world.")
-public class TimeComponent extends AbstractComponent implements Listener {
+public class TimeComponent extends BukkitComponent implements Listener {
 
     /**
      * A pattern that matches time given in 12-hour form (xx:xx(am|pm))
@@ -87,6 +88,7 @@ public class TimeComponent extends AbstractComponent implements Listener {
                 } catch (CommandException e) {
                     CommandBook.logger().warning("Time lock: Failed to parse time '"
                             + entry.getValue() + "'");
+                    continue;
                 }
 
                 lockedTimes.put(entry.getKey(), time);
@@ -111,15 +113,9 @@ public class TimeComponent extends AbstractComponent implements Listener {
     @Override
     public void reload() {
         super.reload();
-        disable();
         configureWorldLocks();
     }
 
-    @Override
-    public void disable() {
-        saveConfig(config);
-    }
-    
     private static class LocalConfiguration extends ConfigurationBase {
         @Setting("time-lock") public Map<String, Object> timeLocks;
         @Setting("time-lock-delay") public int timeLockDelay;
@@ -140,6 +136,11 @@ public class TimeComponent extends AbstractComponent implements Listener {
                     + CommandBookUtil.getTimeString(lockedTime) + "' for world '"
                     + world.getName() + "'");
         }
+    }
+
+    @EventHandler
+    public void onWorldUnload(WorldUnloadEvent event) {
+        unlock(event.getWorld());
     }
 
     /**

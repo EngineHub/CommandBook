@@ -18,15 +18,15 @@
 
 package com.sk89q.commandbook;
 
-import com.sk89q.commandbook.components.AbstractComponent;
-import com.sk89q.commandbook.components.ComponentInformation;
+import com.zachsthings.libcomponents.bukkit.BukkitComponent;
+import com.zachsthings.libcomponents.ComponentInformation;
 import com.sk89q.minecraft.util.commands.*;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 
 @ComponentInformation(friendlyName = "Debug", desc = "Provides useful debugging information for server owners.")
-public class DebugComponent extends AbstractComponent {
+public class DebugComponent extends BukkitComponent {
     @Override
     public void enable() {
         registerCommands(Commands.class);

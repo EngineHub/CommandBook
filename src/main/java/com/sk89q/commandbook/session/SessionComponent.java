@@ -19,8 +19,8 @@
 package com.sk89q.commandbook.session;
 
 import com.sk89q.commandbook.CommandBook;
-import com.sk89q.commandbook.components.AbstractComponent;
-import com.sk89q.commandbook.components.ComponentInformation;
+import com.zachsthings.libcomponents.bukkit.BukkitComponent;
+import com.zachsthings.libcomponents.ComponentInformation;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
@@ -39,7 +39,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 @ComponentInformation(friendlyName = "Sessions", desc = "Handles player sessions")
-public class SessionComponent extends AbstractComponent implements Runnable, Listener {
+public class SessionComponent extends BukkitComponent implements Runnable, Listener {
 
     public static final long CHECK_FREQUENCY = 1200;
 

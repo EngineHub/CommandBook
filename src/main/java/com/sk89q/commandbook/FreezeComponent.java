@@ -18,16 +18,16 @@
 
 package com.sk89q.commandbook;
 
-import com.sk89q.commandbook.components.Depend;
+import com.zachsthings.libcomponents.Depend;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.Location;
-import com.sk89q.commandbook.components.AbstractComponent;
-import com.sk89q.commandbook.components.ComponentInformation;
-import com.sk89q.commandbook.components.InjectComponent;
+import com.zachsthings.libcomponents.bukkit.BukkitComponent;
+import com.zachsthings.libcomponents.ComponentInformation;
+import com.zachsthings.libcomponents.InjectComponent;
 import com.sk89q.commandbook.session.SessionComponent;
 import com.sk89q.commandbook.util.PlayerUtil;
 import com.sk89q.minecraft.util.commands.Command;
@@ -48,7 +48,7 @@ import org.bukkit.event.Listener;
 
 @Depend(components = SessionComponent.class)
 @ComponentInformation(friendlyName = "Freeze", desc = "Blocks a specified player's movement on command")
-public class FreezeComponent extends AbstractComponent implements Listener {
+public class FreezeComponent extends BukkitComponent implements Listener {
 
     @InjectComponent private SessionComponent sessions;
        

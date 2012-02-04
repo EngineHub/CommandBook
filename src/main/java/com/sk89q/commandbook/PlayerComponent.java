@@ -18,8 +18,8 @@
 
 package com.sk89q.commandbook;
 
-import com.sk89q.commandbook.components.AbstractComponent;
-import com.sk89q.commandbook.components.ComponentInformation;
+import com.zachsthings.libcomponents.bukkit.BukkitComponent;
+import com.zachsthings.libcomponents.ComponentInformation;
 import com.sk89q.commandbook.util.PlayerUtil;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
@@ -34,7 +34,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 @ComponentInformation(friendlyName = "Player Commands", desc = "Various player-related commands.")
-public class PlayerComponent extends AbstractComponent {
+public class PlayerComponent extends BukkitComponent {
     @Override
     public void enable() {
         registerCommands(Commands.class);

@@ -18,10 +18,10 @@
 
 package com.sk89q.commandbook;
 
-import com.sk89q.commandbook.components.AbstractComponent;
-import com.sk89q.commandbook.components.ComponentInformation;
-import com.sk89q.commandbook.config.ConfigurationBase;
-import com.sk89q.commandbook.config.Setting;
+import com.zachsthings.libcomponents.bukkit.BukkitComponent;
+import com.zachsthings.libcomponents.ComponentInformation;
+import com.zachsthings.libcomponents.config.ConfigurationBase;
+import com.zachsthings.libcomponents.config.Setting;
 import com.sk89q.commandbook.events.MOTDSendEvent;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
@@ -41,7 +41,7 @@ import static com.sk89q.commandbook.CommandBookUtil.replaceColorMacros;
 import static com.sk89q.commandbook.CommandBookUtil.sendMessage;
 
 @ComponentInformation(friendlyName = "Stored Messages", desc = "Handles stored messages, such as the MOTD and rules pages.")
-public class StoredMessagesComponent extends AbstractComponent implements Listener {
+public class StoredMessagesComponent extends BukkitComponent implements Listener {
 
     protected final Map<String, String> messages = new HashMap<String, String>();
     
