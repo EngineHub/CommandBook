@@ -21,5 +21,8 @@ low-priority-command-registration: |
     /commandbook:<command>, and the other plugin's command will be accessible 
     with /<command>
     
-op-permissions: Give ops all permissions
+op-permissions: Give operators (set with the Minecraft /op command) all permissions.
 crappy-wrapper-compat: Disables some features to be compatible with badly-written server wrappers.
+use-display-names: Use users' display names rather than than their raw username in various messages. Display names are set by other plugins.
+lookup-with-display-names: Similar to use-display-names, this allows usage of users' display names when looking up players.
+broadcast-changes: For /time, /weather, and other commands, broadcast change messages to everyone when you change world information with the commands.
