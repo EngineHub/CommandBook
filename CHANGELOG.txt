@@ -1,3 +1,42 @@
+2.0
+
+- Fixed /home permissions checks. commandbook.home.other to teleport anybody to a home owned by a user who is not the sender commandbook.howe.teleport.other to teleport other users to homes.
+- Add permissions to exempt kick/ban/mute for specific players.
+- Created PlayerWhoisEvent, components can add information to the whois output by listening to it. Ban and God components use it currently.
+- Added enchantment support to item operations. Closes #986
+- Added more information to /whois and made it work on offline players too.
+- Added -s flag to kick/ban commands to override broadcastKicks/Bans settings and not broadcast.
+- Fixed playertime -r not working for other players.
+- Added the ability for /midi and /intro to affect other players.
+- Require confirmation to override warps. The permission commandbook.warp.set.override is required to replace existing warps created by other users. The command to confirm actions is /confirm and requires no permission to use.
+- Added a configuration migrator to convert pre-1.8 configurations to the new format
+- Use the new Bukkit events system
+- Added a /cmdbook help|doc command to provide ingame help for components
+- Added low-priority-command-registration setting - see configuration for more details
+- Only check .other permissions if any of the involved players are not the sender
+- Added /help command that provides help from a user-defined file and about commands (with the -c flag)
+- Added -s flag (silent) to /warp and /tp.
+- Removed redundant message when teleporting other player(s).
+- Refactored bans system to use a CSV storage format, allow IP bans, and allow temporary bans.
+- Allow using display names when looking up names.
+- Adding the old /cannon command, that was replaced with firebarrage. This is the one that shoots the Fireball at the player, versus away from him.
+- Moved /heal, /stack, /locate, /slay, and /god from WorldGuard
+- Improve handling of warps stored in unloaded worlds. This fixes #701 (well it should, but I don't have a fancy multiworld setup to test with).
+- Added twitter-style pm's, using the @name syntax
+- /take command to remove items from a player's inventory
+- /freeze component
+- Added support for loading components from a directory of class files.
+- Added .other permission to /return
+- Allow return to be used with a player different than the sender.
+- Fixed /pos command to work correctly on other players. Thanks AgentME!
+- Fixed /compass's permissions. Thanks gicode!
+- Converted CommandBook over to using a component-based system, similar in design to the one used in sk's server plugin (see more about that at http://www.sk89q.com/2011/10/how-i-stay-sane-while-updating-my-minecraft-server/)
+- Fixed coloring of /gamemode
+- Fixed fireball + arrow  blocking in WorldGuard by setting shooter of projectiles.
+
+Thanks to contributions by: gicode, AgentMe, DarkArc, famerdave, and mrapple
+
+
 1.7
 - Added /gamemode command to change player game modes
 - Added commands to list and remove homes and warps
