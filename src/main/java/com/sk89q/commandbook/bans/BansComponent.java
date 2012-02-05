@@ -35,6 +35,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.EventHandler;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -54,6 +55,8 @@ public class BansComponent extends BukkitComponent implements Listener {
             BanDatabase banDb = new FlatFileBanDatabase(CommandBook.inst().getDataFolder(), this);
             banDb.load();
             bans.importFrom(banDb);
+            final File oldBansFile = new File(CommandBook.inst().getDataFolder(), "banned_names.txt");
+            oldBansFile.renameTo(new File(oldBansFile.getAbsolutePath() + ".old"));
         }
         CommandBook.registerEvents(this);
         registerCommands(Commands.class);
