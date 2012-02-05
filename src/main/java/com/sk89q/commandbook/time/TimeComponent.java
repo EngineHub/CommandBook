@@ -332,14 +332,15 @@ public class TimeComponent extends BukkitComponent implements Listener {
 
             if (args.argsLength() < 2) {
                 if (args.argsLength() == 1) {
-                    if (!reset) {
+                    timeStr = args.getString(0);
+                    if (reset) {
                         players = PlayerUtil.matchPlayers(sender, timeStr);
-                    } else {
-                        timeStr = args.getString(0);
                     }
                 }
-                if (players == null)
-                players = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
+                
+                if (players == null) {
+                    players = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
+                }
             } else {
                 players = PlayerUtil.matchPlayers(sender, args.getString(0));
                 timeStr = args.getString(1);
