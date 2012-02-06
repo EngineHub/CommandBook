@@ -110,7 +110,7 @@ public class FlatFileKitsManager implements KitManager {
                 ItemStack item = CommandBook.inst().getItem(parts[0].replace(" ", ""));
                 
                 if (item == null) {
-                    logger().warning(" Unknown kit item '" + item + "'");
+                    logger().warning(" Unknown kit item '" + parts[0].replaceAll(" ", "") + "'");
                     continue;
                 }
                 

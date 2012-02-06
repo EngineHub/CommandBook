@@ -28,11 +28,14 @@ import com.sk89q.bukkit.util.CommandsManagerRegistration;
 import com.sk89q.commandbook.config.LegacyCommandBookConfigurationMigrator;
 import com.zachsthings.libcomponents.*;
 import com.zachsthings.libcomponents.bukkit.BasePlugin;
+import com.zachsthings.libcomponents.bukkit.YAMLNodeConfigurationNode;
+import com.zachsthings.libcomponents.bukkit.YAMLProcessorConfigurationFile;
+import com.zachsthings.libcomponents.config.ConfigurationFile;
 import com.zachsthings.libcomponents.loader.ClassLoaderComponentLoader;
 import com.zachsthings.libcomponents.loader.ConfigListedComponentLoader;
 import com.zachsthings.libcomponents.loader.JarFilesComponentLoader;
 import com.zachsthings.libcomponents.loader.StaticComponentLoader;
-import com.zachsthings.libcomponents.config.DefaultsFileYAMLProcessor;
+import com.zachsthings.libcomponents.bukkit.DefaultsFileYAMLProcessor;
 import com.sk89q.commandbook.session.SessionComponent;
 import com.sk89q.util.yaml.YAMLFormat;
 import com.sk89q.util.yaml.YAMLProcessor;
@@ -46,6 +49,7 @@ import org.bukkit.inventory.ItemStack;
 import com.sk89q.commandbook.commands.*;
 import com.sk89q.minecraft.util.commands.*;
 import com.sk89q.worldedit.blocks.ItemType;
+import org.yaml.snakeyaml.error.YAMLException;
 
 import static com.sk89q.commandbook.util.ItemUtil.matchItemData;
 
@@ -116,16 +120,37 @@ public final class CommandBook extends BasePlugin {
     public void registerComponentLoaders() {
         // -- Component loaders
         final File configDir = new File(getDataFolder(), "config/");
-        componentManager.addComponentLoader(new StaticComponentLoader(getLogger(), configDir, new SessionComponent()));
-        componentManager.addComponentLoader(new ConfigListedComponentLoader(getLogger(), config,
-                new DefaultsFileYAMLProcessor("components.yml", false), configDir));
+        componentManager.addComponentLoader(new StaticComponentLoader(getLogger(), configDir, new SessionComponent()) {
+            @Override
+            public ConfigurationFile createConfigurationNode(File file) {
+                return new YAMLProcessorConfigurationFile(new YAMLProcessor(file, true, YAMLFormat.EXTENDED));
+            }
+        });
+        final YAMLProcessor jarComponentAliases = new DefaultsFileYAMLProcessor("components.yml", false);
+        try {
+            jarComponentAliases.load();
+        } catch (IOException e) {
+            getLogger().severe("Error loading component aliases!");
+            e.printStackTrace();
+        } catch (YAMLException e) {
+            getLogger().severe("Error loading component aliases!");
+            e.printStackTrace();
+        }
+        componentManager.addComponentLoader(new ConfigListedComponentLoader(getLogger(),
+                new YAMLNodeConfigurationNode(config),
+                new YAMLNodeConfigurationNode(jarComponentAliases), configDir));
 
         for (String dir : config.getStringList("component-class-dirs", Arrays.asList("component-classes"))) {
             final File classesDir = new File(getDataFolder(), dir);
             if (!classesDir.exists() || !classesDir.isDirectory()) {
                 classesDir.mkdirs();
             }
-            componentManager.addComponentLoader(new ClassLoaderComponentLoader(getLogger(), classesDir, configDir));
+            componentManager.addComponentLoader(new ClassLoaderComponentLoader(getLogger(), classesDir, configDir) {
+                @Override
+                public ConfigurationFile createConfigurationNode(File file) {
+                    return new YAMLProcessorConfigurationFile(new YAMLProcessor(file, true, YAMLFormat.EXTENDED));
+                }
+            });
         }
 
         for (String dir : config.getStringList("component-jar-dirs", Arrays.asList("component-jars"))) {
@@ -133,7 +158,12 @@ public final class CommandBook extends BasePlugin {
             if (!classesDir.exists() || !classesDir.isDirectory()) {
                 classesDir.mkdirs();
             }
-            componentManager.addComponentLoader(new JarFilesComponentLoader(getLogger(), classesDir, configDir));
+            componentManager.addComponentLoader(new JarFilesComponentLoader(getLogger(), classesDir, configDir) {
+                @Override
+                public ConfigurationFile createConfigurationNode(File file) {
+                    return new YAMLProcessorConfigurationFile(new YAMLProcessor(file, true, YAMLFormat.EXTENDED));
+                }
+            });
         }
 
         // -- Annotation handlers

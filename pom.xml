@@ -41,8 +41,8 @@
     </dependency>
 
     <dependency>
-        <groupId>com.zachsthings</groupId>
-        <artifactId>libcomponents</artifactId>
+        <groupId>com.zachsthings.libcomponents</groupId>
+        <artifactId>libcomponents-bukkit</artifactId>
         <version>1.0-SNAPSHOT</version>
     </dependency>
 
@@ -137,7 +137,7 @@
               <artifactSet>
                 <includes>
                   <include>net.sf.opencsv:opencsv</include>
-                  <include>com.zachsthings:libcomponents</include>
+                  <include>com.zachsthings.libcomponents:libcomponents-bukkit</include>
                 </includes>
               </artifactSet>
             </configuration>

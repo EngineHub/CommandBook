@@ -19,6 +19,7 @@
 package com.sk89q.commandbook.config;
 
 import com.sk89q.util.yaml.YAMLProcessor;
+import com.zachsthings.libcomponents.bukkit.YAMLProcessorConfigurationFile;
 import com.zachsthings.libcomponents.config.ConfigurationMigrator;
 
 import java.io.File;
@@ -30,7 +31,7 @@ import java.util.Map;
  */
 public class LegacyCommandBookConfigurationMigrator extends ConfigurationMigrator {
     public LegacyCommandBookConfigurationMigrator(File configFile, YAMLProcessor processor) {
-        super(configFile, processor);
+        super(configFile, new YAMLProcessorConfigurationFile(processor));
     }
     
     private static final Map<String, String> migrationKeys = new LinkedHashMap<String, String>();
