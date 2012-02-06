@@ -43,7 +43,7 @@
     <dependency>
         <groupId>com.zachsthings.libcomponents</groupId>
         <artifactId>libcomponents-bukkit</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0</version>
     </dependency>
 
     <!-- Bukkit -->
@@ -162,6 +162,7 @@
         <configuration>
           <preparationGoals>assembly:assembly</preparationGoals>
           <goals>assembly:assembly</goals>
+          <tagNameFormat>@{project.version}</tagNameFormat>
         </configuration>
       </plugin>
     </plugins>
