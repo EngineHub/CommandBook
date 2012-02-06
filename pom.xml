@@ -7,7 +7,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.sk89q</groupId>
   <artifactId>commandbook</artifactId>
-  <version>1.8-SNAPSHOT</version>
+  <version>2.0</version>
   <name>CommandBook</name>
   <description>CommandBook brings general commands to Bukkit</description>
 
@@ -50,7 +50,7 @@
     <dependency>
       <groupId>org.bukkit</groupId>
       <artifactId>bukkit</artifactId>
-      <version>1.1-R1-SNAPSHOT</version>
+      <version>1.1-R3</version>
     </dependency>
 
     <!-- Other dependencies -->
