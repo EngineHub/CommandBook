@@ -1,7 +1,6 @@
-2.0
-
-- Fixed /home permissions checks. commandbook.home.other to teleport anybody to a home owned by a user who is not the sender commandbook.howe.teleport.other to teleport other users to homes.
-- Add permissions to exempt kick/ban/mute for specific players.
+2.0ß
+- Fixed /home permissions checks. commandbook.home.other to teleport anybody to a home owned by a user who is not the sender commandbook.home.teleport.other to teleport other users to homes.
+- Add permissions to exempt kick/ban/mute for specific players - see wiki for detairs
 - Created PlayerWhoisEvent, components can add information to the whois output by listening to it. Ban and God components use it currently.
 - Added enchantment support to item operations. Closes #986
 - Added more information to /whois and made it work on offline players too.
