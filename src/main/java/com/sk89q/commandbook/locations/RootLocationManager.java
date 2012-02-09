@@ -22,14 +22,13 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
+import static com.sk89q.commandbook.CommandBook.logger;
+
 public class RootLocationManager<T> {
-    
-    private static final Logger logger = Logger.getLogger("Minecraft.CommandBook");
 
     private LocationManager<T> rootManager;
     private Map<String, LocationManager<T>> managers;
@@ -48,12 +47,16 @@ public class RootLocationManager<T> {
             try {
                 rootManager.load();
             } catch (IOException e) {
-                logger.warning("Failed to load warps: " + e.getMessage());
+                logger().warning("Failed to load warps: " + e.getMessage());
             }
         }
     }
     
     private LocationManager<T> getManager(World world) {
+		if (!perWorld) {
+			return rootManager;
+		}
+		
         LocationManager<T> manager = managers.get(world.getName());
         
         if (manager != null) {
@@ -61,11 +64,12 @@ public class RootLocationManager<T> {
         }
         
         manager = factory.createManager(world);
+		manager.castWorld(world);
         
         try {
             manager.load();
         } catch (IOException e) {
-            logger.warning("Failed to load warps for world " + world.getName()
+            logger().warning("Failed to load warps for world " + world.getName()
                     + ": " + e.getMessage());
         }
         
@@ -74,53 +78,33 @@ public class RootLocationManager<T> {
     }
     
     public T get(World world, String id) {
-        if (perWorld) {
-            return getManager(world).get(id);
-        } else {
-            return rootManager.get(id);
-        }
+		return getManager(world).get(id);
     }
-    
-    public T create(String id, Location loc, Player player) {
-        if (perWorld) {
-            LocationManager<T> manager = getManager(loc.getWorld());
-            T ret = manager.create(id, loc, player);
-            save(manager);
-            return ret;
-        } else {
-            T ret = rootManager.create(id, loc, player);
-            save(rootManager);
-            return ret;
-        }
-    }
-    
-    public boolean remove(World world, String id) {
-        if (perWorld) {
-            LocationManager<T> manager = getManager(world);
-            boolean ret = getManager(world).remove(id);
-            save(manager);
-            return ret;
-        } else {
-            boolean ret = rootManager.remove(id);
-            save(rootManager);
-            return ret;
-        }
-    }
+
+	public T create(String id, Location loc, Player player) {
+		LocationManager<T> manager = getManager(loc.getWorld());
+		T ret = manager.create(id, loc, player);
+		save(manager);
+		return ret;
+	}
+
+	public boolean remove(World world, String id) {
+		LocationManager<T> manager = getManager(world);
+		boolean ret = getManager(world).remove(id);
+		save(manager);
+		return ret;
+	}
     
     private void save(LocationManager<T> manager) {
         try {
             manager.save();
         } catch (IOException e) {
-            logger.warning("Failed to save warps: " + e.getMessage());
+            logger().warning("Failed to save warps: " + e.getMessage());
         }
     }
 
     public List<T> getLocations(World world) {
-        if (perWorld) {
-            return getManager(world).getLocations();
-        } else {
-            return rootManager.getLocations();
-        }
+		return getManager(world).getLocations();
     }
     
     public boolean isPerWorld() {
@@ -128,10 +112,6 @@ public class RootLocationManager<T> {
     }
     
     public void updateWorlds(World world) {
-        if (perWorld) {
-            getManager(world).updateWorlds();
-        } else {
-            rootManager.updateWorlds();
-        }
+		getManager(world).updateWorlds();
     }
 }
