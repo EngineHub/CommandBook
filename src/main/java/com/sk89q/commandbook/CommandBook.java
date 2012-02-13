@@ -55,35 +55,35 @@ import static com.sk89q.commandbook.util.ItemUtil.matchItemData;
 
 /**
  * Base plugin class for CommandBook.
- * 
+ *
  * @author sk89q
  */
 public final class CommandBook extends BasePlugin {
-    
+
     private static CommandBook instance;
 
     private CommandsManager<CommandSender> commands;
-    
+
     protected Map<String, Integer> itemNames;
     public boolean broadcastChanges;
     public boolean useDisplayNames;
     public boolean lookupWithDisplayNames;
     public boolean crappyWrapperCompat;
 
-    
+
     public CommandBook() {
         super();
         instance = this;
     }
-    
+
     public static CommandBook inst() {
         return instance;
     }
-    
+
     public static Logger logger() {
         return inst().getLogger();
     }
-    
+
     public static void registerEvents(Listener listener) {
         server().getPluginManager().registerEvents(listener, inst());
     }
@@ -103,7 +103,7 @@ public final class CommandBook extends BasePlugin {
                 return plugin.hasPermission(player, perm);
             }
         };
-        
+
 		final CommandsManagerRegistration cmdRegister = new CommandsManagerRegistration(this, commands);
         if (lowPriorityCommandRegistration) {
             getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
@@ -111,7 +111,7 @@ public final class CommandBook extends BasePlugin {
                 public void run() {
                     cmdRegister.register(CommandBookCommands.CommandBookParentCommand.class);
                 }
-            }, 0L);
+            }, 1L);
         } else {
             cmdRegister.register(CommandBookCommands.CommandBookParentCommand.class);
         }
@@ -169,7 +169,7 @@ public final class CommandBook extends BasePlugin {
         // -- Annotation handlers
         componentManager.registerAnnotationHandler(InjectComponent.class, new InjectComponentAnnotationHandler(componentManager));
     }
-    
+
     /**
      * Called on a command.
      */
@@ -195,14 +195,13 @@ public final class CommandBook extends BasePlugin {
         } catch (CommandException e) {
             sender.sendMessage(ChatColor.RED + e.getMessage());
         }
-        
+
         return true;
     }
-    
+
     /**
      * Loads the configuration.
      */
-    @SuppressWarnings({"unchecked"})
     public YAMLProcessor populateConfiguration() {
         final File configFile = new File(getDataFolder(), "config.yml");
         YAMLProcessor config = new YAMLProcessor(configFile, true, YAMLFormat.EXTENDED);
@@ -237,13 +236,13 @@ public final class CommandBook extends BasePlugin {
         broadcastChanges = config.getBoolean("broadcast-changes", true);
 
         crappyWrapperCompat = config.getBoolean("crappy-wrapper-compat", true);
-        
+
         if (crappyWrapperCompat) {
             getLogger().info("Maximum wrapper compatibility is enabled. " +
                     "Some features have been disabled to be compatible with " +
                     "poorly written server wrappers.");
         }
-        
+
         return config;
     }
 
@@ -252,7 +251,6 @@ public final class CommandBook extends BasePlugin {
      *
      * @param config The {@link YAMLProcessor} to load from
      */
-    @SuppressWarnings({ "unchecked" })
     protected void loadItemList(YAMLProcessor config) {
 
         // Load item names aliases list
@@ -261,9 +259,9 @@ public final class CommandBook extends BasePlugin {
             itemNames = new HashMap<String, Integer>();
 
             try {
-                Map<Object, Object> temp = (Map<Object, Object>) itemNamesTemp;
+                Map<?, ?> temp = (Map<?, ?>) itemNamesTemp;
 
-                for (Map.Entry<Object, Object> entry : temp.entrySet()) {
+                for (Map.Entry<?, ?> entry : temp.entrySet()) {
                     String name = entry.getKey().toString().toLowerCase();
 
                     // Check if the item ID is a number
@@ -271,7 +269,7 @@ public final class CommandBook extends BasePlugin {
                         itemNames.put(name, (Integer) entry.getValue());
                     }
                 }
-            } catch (ClassCastException e) {
+            } catch (ClassCastException ignore) {
             }
         } else {
             itemNames = new HashMap<String, Integer>();
@@ -281,8 +279,9 @@ public final class CommandBook extends BasePlugin {
     /**
      * Returns a matched item.
      *
-     * @param name
+     * @param name The name to match
      * @return item
+     * @see  #getCommandItem(String)
      */
     public ItemStack getItem(String name) {
         try {
@@ -291,8 +290,8 @@ public final class CommandBook extends BasePlugin {
             return null;
         }
     }
-    
-    
+
+
     public ItemStack getCommandItem(String name) throws CommandException {
         int id;
         int dmg = 0;
@@ -382,12 +381,12 @@ public final class CommandBook extends BasePlugin {
 
         return stack;
     }
-    
+
     /**
      * Gets the IP address of a command sender.
-     * 
-     * @param sender
-     * @return
+     *
+     * @param sender The sender to get an address for
+     * @return The address string of the sender
      */
     public String toInetAddressString(CommandSender sender) {
         if (sender instanceof Player) {

@@ -59,7 +59,7 @@ public class KitsComponent extends BukkitComponent {
     /**
      * Return the kit manager.
      *
-     * @return
+     * @return the kit manager currently active
      */
     public KitManager getKitManager() {
         return kits;
