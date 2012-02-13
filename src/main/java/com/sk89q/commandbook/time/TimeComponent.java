@@ -118,7 +118,7 @@ public class TimeComponent extends BukkitComponent implements Listener {
 
     private static class LocalConfiguration extends ConfigurationBase {
         @Setting("time-lock") public Map<String, Object> timeLocks;
-        @Setting("time-lock-delay") public int timeLockDelay;
+        @Setting("time-lock-delay") public int timeLockDelay = 20;
     }
 
     /**
