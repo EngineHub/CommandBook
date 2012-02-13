@@ -59,7 +59,7 @@ public class KitsComponent extends BukkitComponent {
     /**
      * Return the kit manager.
      *
-     * @return
+     * @return the kit manager currently active
      */
     public KitManager getKitManager() {
         return kits;
@@ -117,11 +117,11 @@ public class KitsComponent extends BukkitComponent {
                 }
 
                 for (Player player : targets) {
-                    if (player != sender) {
-                        // Check permissions!
-                        CommandBook.inst().checkPermission(sender, "commandbook.kit.other");
-                    } else {
+                    if (player == sender) {
                         CommandBook.inst().checkPermission(sender, "commandbook.kit");
+                    } else {
+                        CommandBook.inst().checkPermission(sender, "commandbook.kit.other");
+                        break;
                     }
                 }
 
