@@ -37,9 +37,10 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
+import org.spout.api.command.CommandSource;
 import com.sk89q.commandbook.CommandBook;
+import org.spout.api.player.Player;
+
 import static com.sk89q.commandbook.util.PlayerUtil.toUniqueName;
 
 import static com.sk89q.commandbook.CommandBook.logger;
@@ -219,7 +220,7 @@ public class FlatFileBanDatabase implements BanDatabase {
         return "You have been banned";
     }
 
-    public synchronized void banName(String name, CommandSender source, String reason) {
+    public synchronized void banName(String name, CommandSource source, String reason) {
         auditLogger.info(String.format("BAN: %s (%s) banned name '%s': %s",
                 toUniqueName(source),
                 CommandBook.inst().toInetAddressString(source),
@@ -229,19 +230,19 @@ public class FlatFileBanDatabase implements BanDatabase {
         bannedNames.put(name, new Ban(name.toLowerCase(), null, null, System.currentTimeMillis(), 0L));
     }
 
-    public synchronized void banAddress(String address, CommandSender source, String reason) {
+    public synchronized void banAddress(String address, CommandSource source, String reason) {
         throw new UnsupportedOperationException("Not supported.");
     }
 
-    public void ban(Player player, CommandSender source, String reason, long end) {
+    public void ban(Player player, CommandSource source, String reason, long end) {
         banName(player.getName(), source, reason);
     }
 
-    public void ban(String name, String address, CommandSender source, String reason, long end) {
+    public void ban(String name, String address, CommandSource source, String reason, long end) {
         banName(name, source, reason);
     }
 
-    public boolean unbanName(String name, CommandSender source, String reason) {
+    public boolean unbanName(String name, CommandSource source, String reason) {
         boolean removed = bannedNames.remove(name.toLowerCase()) != null;
         
         if (removed) {
@@ -255,15 +256,15 @@ public class FlatFileBanDatabase implements BanDatabase {
         return removed;
     }
 
-    public boolean unbanAddress(String address, CommandSender source, String reason) {
+    public boolean unbanAddress(String address, CommandSource source, String reason) {
         return false;
     }
 
-    public boolean unban(String name, String address, CommandSender source, String reason) {
+    public boolean unban(String name, String address, CommandSource source, String reason) {
         return unbanName(name, source, reason);
     }
 
-    public void logKick(Player player, CommandSender source, String reason) {
+    public void logKick(Player player, CommandSource source, String reason) {
         auditLogger.info(String.format("KICKED: %s (%s) kicked player '%s': %s",
                 toUniqueName(source),
                 CommandBook.inst().toInetAddressString(source),

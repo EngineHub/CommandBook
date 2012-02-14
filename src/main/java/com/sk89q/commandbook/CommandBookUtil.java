@@ -34,18 +34,17 @@ import java.util.regex.Pattern;
 
 import com.sk89q.commandbook.util.ItemUtil;
 import com.sk89q.commandbook.util.PlayerUtil;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Arrow;
-import org.bukkit.entity.CreatureType;
-import org.bukkit.entity.Fireball;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Vector;
-import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.blocks.BlockType;
+import org.spout.api.ChatColor;
+import org.spout.api.command.CommandSource;
+import org.spout.api.exception.CommandException;
+import org.spout.api.geo.World;
+import org.spout.api.geo.discrete.Point;
+import org.spout.api.geo.discrete.Pointm;
+import org.spout.api.inventory.ItemStack;
+import org.spout.api.math.MathHelper;
+import org.spout.api.math.Vector3;
+import org.spout.api.player.Player;
 
 import static com.sk89q.commandbook.util.PlayerUtil.toColoredName;
 import static com.sk89q.commandbook.util.PlayerUtil.toName;
@@ -76,17 +75,17 @@ public class CommandBookUtil {
         str = str.replace("`y", ChatColor.YELLOW.toString());
         str = str.replace("`Y", ChatColor.GOLD.toString());
 
-        str = str.replace("`g", ChatColor.GREEN.toString());
+        str = str.replace("`g", ChatColor.BRIGHT_GREEN.toString());
         str = str.replace("`G", ChatColor.DARK_GREEN.toString());
         
-        str = str.replace("`c", ChatColor.AQUA.toString());
-        str = str.replace("`C", ChatColor.DARK_AQUA.toString());
+        str = str.replace("`c", ChatColor.CYAN.toString());
+        str = str.replace("`C", ChatColor.DARK_CYAN.toString());
         
         str = str.replace("`b", ChatColor.BLUE.toString());
         str = str.replace("`B", ChatColor.DARK_BLUE.toString());
         
-        str = str.replace("`p", ChatColor.LIGHT_PURPLE.toString());
-        str = str.replace("`P", ChatColor.DARK_PURPLE.toString());
+        str = str.replace("`p", ChatColor.PINK.toString());
+        str = str.replace("`P", ChatColor.PURPLE.toString());
 
         str = str.replace("`0", ChatColor.BLACK.toString());
         str = str.replace("`1", ChatColor.DARK_GRAY.toString());
@@ -142,7 +141,7 @@ public class CommandBookUtil {
      * @return
      */
     public static String getCardinalDirection(Player player) {
-        double rot = (player.getLocation().getYaw() - 90) % 360;
+        double rot = (player.getEntity().getTransform().getRotation().getAxisAngles().getX() - 90) % 360;
         if (rot < 0) {
             rot += 360.0;
         }
@@ -191,15 +190,16 @@ public class CommandBookUtil {
      * @throws CommandException
      */
     @SuppressWarnings("deprecation")
-    public static void giveItem(CommandSender sender, ItemStack item, int amt,
+    public static void giveItem(CommandSource sender, ItemStack item, int amt,
             Iterable<Player> targets, InventoryComponent component, boolean drop, boolean overrideStackSize)
             throws CommandException {
         
         boolean included = false; // Is the command sender also receiving items?
 
-        int maxStackSize = overrideStackSize ? 64 : item.getType().getMaxStackSize();
+        //int maxStackSize = overrideStackSize ? 64 : item.getMaterial().getMaxStackSize();
+        int maxStackSize = 64;
         
-        component.checkAllowedItem(sender, item.getTypeId());
+        component.checkAllowedItem(sender, item.getMaterial().getId());
         
         // Check for invalid amounts
         if (amt == 0 || amt < -1) {
@@ -211,7 +211,7 @@ public class CommandBookUtil {
             CommandBook.inst().checkPermission(sender, "commandbook.override.maxstacksize");
         } else if (amt > maxStackSize * 5) {
             // Check to see if the player can give stacks of this size
-            if (!CommandBook.inst().hasPermission(sender, "commandbook.give.stacks.unlimited")) {
+            if (!sender.hasPermission("commandbook.give.stacks.unlimited")) {
                 throw new CommandException("More than 5 stacks is too excessive.");
             }
         } else if (amt > maxStackSize /* && amt < max * 5 */) {
@@ -234,9 +234,9 @@ public class CommandBookUtil {
                 // The -d flag drops the items naturally on the ground instead
                 // of directly giving the player the item
                 if (drop) {
-                    player.getWorld().dropItemNaturally(player.getLocation(), item);
+                    //player.getEntity().getWorld().dropItemNaturally(player.getLocation(), item);
                 } else {
-                    player.getInventory().addItem(item);
+                    player.getEntity().getInventory().addItem(item);
                 }
                 
                 if (amt == -1) {
@@ -245,12 +245,12 @@ public class CommandBookUtil {
             }
             
             // workaround for having inventory open while giving items (eg TMI mod)
-            player.updateInventory();
+            //player.updateInventory();
             
             // Tell the user about the given item
             if (player.equals(sender)) {
                 player.sendMessage(ChatColor.YELLOW + "You've been given " + amtText + " "
-                        + ItemUtil.toItemName(item.getTypeId()) + ".");
+                        + ItemUtil.toItemName(item.getMaterial().getId()) + ".");
                 
                 // Keep track of this
                 included = true;
@@ -258,7 +258,7 @@ public class CommandBookUtil {
                 player.sendMessage(ChatColor.YELLOW + "Given from "
                         + PlayerUtil.toName(sender) + ": "
                         + amtText + " "
-                        + ItemUtil.toItemName(item.getTypeId()) + ".");
+                        + ItemUtil.toItemName(item.getMaterial().getId()) + ".");
                 
             }
         }
@@ -267,7 +267,7 @@ public class CommandBookUtil {
         // user a message so s/he know that something is indeed working
         if (!included) {
             sender.sendMessage(ChatColor.YELLOW.toString() + amtText + " "
-                    + ItemUtil.toItemName(item.getTypeId()) + " has been given.");
+                    + ItemUtil.toItemName(item.getMaterial().getId()) + " has been given.");
         }
     }
     
@@ -280,7 +280,7 @@ public class CommandBookUtil {
      * @param target
      * @throws CommandException
      */
-    public static void takeItem(CommandSender sender, ItemStack item, int amt,
+    public static void takeItem(CommandSource sender, ItemStack item, int amt,
             Player target)
             throws CommandException {
         
@@ -291,8 +291,8 @@ public class CommandBookUtil {
             
         
         item.setAmount(amt);              
-        if (target.getInventory().contains(item.getTypeId())) {
-            target.getInventory().removeItem(item);           
+        /*if (target.getEntity().getInventory().contains(item.getTypeId())) {
+            target.getEntity().getInventory().removeItem(item);           
 
             target.sendMessage(ChatColor.YELLOW + "Taken from "
                             + PlayerUtil.toName(sender) + ": "
@@ -304,7 +304,7 @@ public class CommandBookUtil {
         } else {
             sender.sendMessage(ChatColor.YELLOW.toString() + target.getName() 
                     + " has no " + ItemUtil.toItemName(item.getTypeId()) + ".");
-        }
+        }*/
     }
 
     /**
@@ -316,18 +316,18 @@ public class CommandBookUtil {
      * @param searchPos search position
      * @return 
      */
-    public static Location findFreePosition(Location searchPos) {
+    public static Point findFreePosition(Point searchPos) {
         World world = searchPos.getWorld();
-        Location loc = searchPos.clone();
-        int x = searchPos.getBlockX();
-        int y = Math.max(0, searchPos.getBlockY());
+        Pointm loc = new Pointm(searchPos);
+        int x = MathHelper.floor(searchPos.getX());
+        int y = MathHelper.floor(Math.max(0, searchPos.getY()));
         int origY = y;
-        int z = searchPos.getBlockZ();
+        int z = MathHelper.floor(searchPos.getZ());
 
         byte free = 0;
 
-        while (y <= world.getMaxHeight() + 2) {
-            if (BlockType.canPassThrough(world.getBlockTypeIdAt(x, y, z))) {
+        while (y <= world.getHeight() + 2) {
+            if (BlockType.canPassThrough(world.getBlockId(x, y, z))) {
                 free++;
             } else {
                 free = 0;
@@ -335,9 +335,9 @@ public class CommandBookUtil {
 
             if (free == 2) {
                 if (y - 1 != origY) {
-                    loc.setX(x + 0.5);
+                    loc.setX(x + 0.5F);
                     loc.setY(y - 1);
-                    loc.setZ(z + 0.5);
+                    loc.setZ(z + 0.5F);
                 }
 
                 return loc;
@@ -357,8 +357,8 @@ public class CommandBookUtil {
      * @param speed
      */
     public static void sendArrowFromPlayer(Player player,
-            Vector dir, float speed) {
-        Location loc = player.getEyeLocation();
+            Vector3 dir, float speed) {
+        /*Location loc = player.getEyeLocation();
         Vector actualDir = dir.clone().normalize();
         Vector finalVecLoc = loc.toVector().add(actualDir.multiply(2));
         loc.setX(finalVecLoc.getX());
@@ -366,7 +366,7 @@ public class CommandBookUtil {
         loc.setZ(finalVecLoc.getZ());
         Arrow arrow = player.getWorld().spawn(loc, Arrow.class);
         arrow.setShooter(player);
-        arrow.setVelocity(dir.multiply(speed));
+        arrow.setVelocity(dir.multiply(speed));*/
     }
 
     /**
@@ -376,24 +376,26 @@ public class CommandBookUtil {
      * @param amt number of fireballs to shoot (evenly spaced)
      */
     public static void sendFireballsFromPlayer(Player player, int amt) {
-        Location loc = player.getEyeLocation();
+        throw new UnsupportedOperationException("Not supported yet");
+        /*Pointm loc = player.getEyeLocation();
         final double tau = 2 * Math.PI;
         double arc = tau / amt;
         for (double a = 0; a < tau; a += arc) {
-            Vector dir = new Vector(Math.cos(a), 0, Math.sin(a));
-            Location spawn = loc.toVector().add(dir.multiply(2)).toLocation(loc.getWorld(), 0.0F, 0.0F);
-            Fireball fball = player.getWorld().spawn(spawn, Fireball.class);
+            Vector3 dir = new Vector3(Math.cos(a), 0, Math.sin(a));
+            Point spawn = new Point(loc).add(dir.multiply(2));
+            Fireball fball = player.getEntity().getWorld().createAndSpawnEntity(spawn, Fireball.class);
             fball.setShooter(player);
             fball.setDirection(dir.multiply(10));
         }
+        */
     }
     
     public static void sendCannonToPlayer(Player player) {
-    	Location loc = player.getEyeLocation();
+    	Pointm loc = null;//player.getEyeLocation();
     	loc.setX(loc.getX());
     	loc.setY(loc.getY());
     	loc.setZ(loc.getZ());
-    	player.getWorld().spawn(loc, Fireball.class); 
+    	//player.getEntity().getWorld().createAndSpawnEntity(loc, Fireball.class); 
     }
 
     /**
@@ -403,12 +405,12 @@ public class CommandBookUtil {
      */
     public static String getCreatureTypeNameList() {
         StringBuilder str = new StringBuilder();
-        for (CreatureType type : CreatureType.values()) {
+        /*for (CreatureType type : CreatureType.values()) {
             if (str.length() > 0) {
                 str.append(", ");
             }
             str.append(type.getName());
-        }
+        }*/
         
         return str.toString();
     }
@@ -419,7 +421,7 @@ public class CommandBookUtil {
      * @param sender
      * @param message
      */
-    public static void sendMessage(CommandSender sender, String message) {
+    public static void sendMessage(CommandSource sender, String message) {
         for (String line : message.split("\n")) {
             sender.sendMessage(line.replaceAll("[\r\n]", ""));
         }
@@ -432,28 +434,21 @@ public class CommandBookUtil {
      * @param infinite
      */
     public static void expandStack(ItemStack item, boolean infinite, boolean overrideStackSize) {
-        if (item == null || item.getAmount() == 0 || item.getTypeId() <= 0) {
+        if (item == null || item.getAmount() == 0 || item.getMaterial().getId() <= 0) {
             return;
         }
-        
-        int stackSize = overrideStackSize ? 64 : item.getType().getMaxStackSize();
+
+        final int stackSize = 64; // TODO : getMakStackSize
+        /*int stackSize = overrideStackSize ? 64 : item.getType().getMaxStackSize();
         
         if (item.getType().getMaxStackSize() == 1) {
             return;
-        }
+        }*/
         
         if (infinite) {
             item.setAmount(-1);
         } else if (item.getAmount() < stackSize){
             item.setAmount(stackSize);
-        }
-    }
-
-    public static World.Environment getSkylandsEnvironment() {
-        try {
-            return World.Environment.THE_END;
-        } catch (Throwable t) {
-            return World.Environment.getEnvironment(1);
         }
     }
 
@@ -464,8 +459,8 @@ public class CommandBookUtil {
      * @param message
      * @return
      */
-    public static String replaceMacros(CommandSender sender, String message) {
-        Player[] online = CommandBook.server().getOnlinePlayers();
+    public static String replaceMacros(CommandSource sender, String message) {
+        Player[] online = CommandBook.game().getOnlinePlayers();
 
         message = message.replace("%name%", toName(sender));
         message = message.replace("%cname%", toColoredName(sender, null));
@@ -480,9 +475,9 @@ public class CommandBookUtil {
 
         if (sender instanceof Player) {
             Player player = (Player) sender;
-            World world = player.getWorld();
+            World world = player.getEntity().getWorld();
 
-            message = message.replace("%time%", getTimeString(world.getTime()));
+            message = message.replace("%time%", getTimeString(world.getAge()));
             message = message.replace("%world%", world.getName());
         }
 

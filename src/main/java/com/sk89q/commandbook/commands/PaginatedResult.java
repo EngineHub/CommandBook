@@ -18,9 +18,9 @@
 
 package com.sk89q.commandbook.commands;
 
-import com.sk89q.minecraft.util.commands.CommandException;
-import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
+import org.spout.api.ChatColor;
+import org.spout.api.command.CommandSource;
+import org.spout.api.exception.CommandException;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -39,11 +39,11 @@ public abstract class PaginatedResult<T> {
         this.header = header;
     }
     
-    public void display(CommandSender sender, Collection<? extends T> results, int page) throws CommandException {
+    public void display(CommandSource sender, Collection<? extends T> results, int page) throws CommandException {
         display(sender, new ArrayList<T>(results), page);
     }
     
-    public void display(CommandSender sender, List<? extends T> results, int page) throws CommandException {
+    public void display(CommandSource sender, List<? extends T> results, int page) throws CommandException {
         if (results.size() == 0) throw new CommandException("No results match!");
         --page;
 

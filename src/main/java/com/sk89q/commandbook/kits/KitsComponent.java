@@ -19,21 +19,21 @@
 package com.sk89q.commandbook.kits;
 
 import com.sk89q.commandbook.CommandBook;
-import com.zachsthings.libcomponents.bukkit.BukkitComponent;
+import com.zachsthings.libcomponents.spout.SpoutComponent;
 import com.zachsthings.libcomponents.ComponentInformation;
 import com.sk89q.commandbook.util.PlayerUtil;
-import com.sk89q.minecraft.util.commands.Command;
-import com.sk89q.minecraft.util.commands.CommandContext;
-import com.sk89q.minecraft.util.commands.CommandException;
-import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
+import org.spout.api.ChatColor;
+import org.spout.api.command.CommandContext;
+import org.spout.api.command.CommandSource;
+import org.spout.api.command.annotated.Command;
+import org.spout.api.exception.CommandException;
+import org.spout.api.player.Player;
 
 import java.io.File;
 import java.util.Map;
 
 @ComponentInformation(friendlyName = "Kits", desc = "Distributes kits to players on command (with cooldowns)")
-public class KitsComponent extends BukkitComponent {
+public class KitsComponent extends SpoutComponent {
     private KitManager kits;
 
     @Override
@@ -44,7 +44,7 @@ public class KitsComponent extends BukkitComponent {
         kits = new FlatFileKitsManager(new File(CommandBook.inst().getDataFolder(), "kits.txt"));
         kits.load();
 
-        CommandBook.server().getScheduler().scheduleAsyncRepeatingTask(
+        CommandBook.game().getScheduler().scheduleAsyncRepeatingTask(
                 CommandBook.inst(), new GarbageCollector(this),
                 GarbageCollector.CHECK_FREQUENCY, GarbageCollector.CHECK_FREQUENCY);
         registerCommands(Commands.class);
@@ -68,9 +68,9 @@ public class KitsComponent extends BukkitComponent {
     public class Commands {
 
         @Command(aliases = {"kit"}, usage = "<id> [target]", desc = "Get a kit", flags = "", min = 0, max = 2)
-        public void kit(CommandContext args, CommandSender sender) throws CommandException {
+        public void kit(CommandContext args, CommandSource sender) throws CommandException {
             // List kits
-            if (args.argsLength() == 0) {
+            if (args.length() == 0) {
                 CommandBook.inst().checkPermission(sender, "commandbook.kit.list");
 
                 Map<String, Kit> kits = getKitManager().getKits();
@@ -83,7 +83,7 @@ public class KitsComponent extends BukkitComponent {
                 int count = 0;
 
                 for (String id : kits.keySet()) {
-                    if (!CommandBook.inst().hasPermission(sender,
+                    if (!sender.hasPermission(
                             "commandbook.kit.kits." + id.replace(".", ""))) {
                         continue;
                     }
@@ -110,7 +110,7 @@ public class KitsComponent extends BukkitComponent {
                 String id = args.getString(0).toLowerCase();
                 boolean included = false;
 
-                if (args.argsLength() == 2) {
+                if (args.length() == 2) {
                     targets = PlayerUtil.matchPlayers(sender, args.getString(1));
                 } else {
                     targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));

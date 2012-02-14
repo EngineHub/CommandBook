@@ -10,10 +10,12 @@ package com.sk89q.jinglenote;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.entity.Player;
 import com.sk89q.worldedit.blocks.BlockType;
+import org.spout.api.geo.World;
+import org.spout.api.geo.discrete.Point;
+import org.spout.api.geo.discrete.Pointm;
+import org.spout.api.math.MathHelper;
+import org.spout.api.player.Player;
 
 /**
  * A manager of play instances.
@@ -29,17 +31,14 @@ public class JingleNoteManager {
     
     public void play(Player player, JingleSequencer sequencer, int delay) {
         String name = player.getName();
-        Location loc = findLocation(player);
+        Point loc = findLocation(player);
         
         // Existing player found!
         if (instances.containsKey(name)) {
             JingleNotePlayer existing = instances.get(name);
-            Location existingLoc = existing.getLocation();
+            Point existingLoc = existing.getLocation();
             
-            existing.stop(
-                    existingLoc.getBlockX() == loc.getBlockX()
-                    && existingLoc.getBlockY() == loc.getBlockY()
-                    && existingLoc.getBlockZ() == loc.getBlockZ());
+            existing.stop(existingLoc.equals(loc));
             
             instances.remove(name);
         }
@@ -73,12 +72,14 @@ public class JingleNoteManager {
         instances.clear();
     }
     
-    private Location findLocation(Player player) {
-        World world = player.getWorld();
-        Location loc = player.getLocation();
+    private Point findLocation(Player player) {
+        World world = player.getEntity().getWorld();
+        Pointm loc = new Pointm(player.getEntity().getTransform().getPosition());
         loc.setY(loc.getY() - 2);
         
-        if (!BlockType.canPassThrough(world.getBlockTypeIdAt(loc))) {
+        if (!BlockType.canPassThrough(world.getBlockId(MathHelper.floor(loc.getX()), 
+                MathHelper.floor(loc.getY()), 
+                MathHelper.floor(loc.getZ())))) {
             return loc;
         }
         

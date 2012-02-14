@@ -21,19 +21,18 @@ package com.sk89q.jinglenote;
 import com.sk89q.commandbook.CommandBook;
 import com.zachsthings.libcomponents.ComponentInformation;
 import com.sk89q.commandbook.util.PlayerUtil;
-import com.sk89q.minecraft.util.commands.Command;
-import com.sk89q.minecraft.util.commands.CommandContext;
-import com.sk89q.minecraft.util.commands.CommandException;
-import com.sk89q.minecraft.util.commands.CommandPermissions;
-import com.zachsthings.libcomponents.bukkit.BukkitComponent;
-import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import com.zachsthings.libcomponents.spout.SpoutComponent;
+import org.spout.api.ChatColor;
+import org.spout.api.command.CommandContext;
+import org.spout.api.command.CommandSource;
+import org.spout.api.command.annotated.Command;
+import org.spout.api.command.annotated.CommandPermissions;
+import org.spout.api.event.EventHandler;
+import org.spout.api.event.Listener;
+import org.spout.api.event.player.PlayerJoinEvent;
+import org.spout.api.event.player.PlayerLeaveEvent;
+import org.spout.api.exception.CommandException;
+import org.spout.api.player.Player;
 
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiUnavailableException;
@@ -43,7 +42,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 
 @ComponentInformation(friendlyName = "JingleNote", desc = "MIDI sequencer for note blocks with commands.")
-public class JingleNoteComponent extends BukkitComponent implements Listener {
+public class JingleNoteComponent extends SpoutComponent implements Listener {
 
     private JingleNoteManager jingleNoteManager;
 
@@ -53,7 +52,7 @@ public class JingleNoteComponent extends BukkitComponent implements Listener {
         jingleNoteManager = new JingleNoteManager();
         
         registerCommands(Commands.class);
-        CommandBook.registerEvents(this);
+        CommandBook.game().getEventManager().registerEvents(this, this);
     }
 
     @Override
@@ -94,7 +93,7 @@ public class JingleNoteComponent extends BukkitComponent implements Listener {
     }
 
     @EventHandler
-    public void onQuit(PlayerQuitEvent event) {
+    public void onQuit(PlayerLeaveEvent event) {
         getJingleNoteManager().stop(event.getPlayer());
     }
 
@@ -103,10 +102,10 @@ public class JingleNoteComponent extends BukkitComponent implements Listener {
                 usage = "", desc = "Play the introduction song",
                 min = 0, max = 0)
         @CommandPermissions({"commandbook.intro"})
-        public void intro(CommandContext args, CommandSender sender) throws CommandException {
+        public void intro(CommandContext args, CommandSource sender) throws CommandException {
 
             Iterable<Player> targets;
-            if (args.argsLength() == 0) {
+            if (args.length() == 0) {
                 targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
             } else {
                 targets = PlayerUtil.matchPlayers(sender, args.getString(0));
@@ -143,7 +142,7 @@ public class JingleNoteComponent extends BukkitComponent implements Listener {
         @Command(aliases = {"midi", "play"},
                 usage = "[-p player] [midi]", desc = "Play a MIDI file", flags = "p:",
                 min = 0, max = 1)
-        public void midi(CommandContext args, CommandSender sender) throws CommandException {
+        public void midi(CommandContext args, CommandSource sender) throws CommandException {
             Iterable<Player> targets;
             if (args.hasFlag('p')) {
                 targets = PlayerUtil.matchPlayers(sender, args.getFlag('p'));
@@ -158,7 +157,7 @@ public class JingleNoteComponent extends BukkitComponent implements Listener {
                 }
             }
 
-            if (args.argsLength() == 0) {
+            if (args.length() == 0) {
                 for (Player target : targets) {
                     if (getJingleNoteManager().stop(target)) {
                         target.sendMessage(ChatColor.YELLOW + "All music stopped.");

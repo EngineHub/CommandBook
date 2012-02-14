@@ -24,12 +24,16 @@ import com.zachsthings.libcomponents.ComponentInformation;
 import com.sk89q.commandbook.util.LocationUtil;
 import com.sk89q.commandbook.util.PlayerUtil;
 import com.sk89q.commandbook.util.TeleportPlayerIterator;
-import com.sk89q.minecraft.util.commands.*;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
+import org.spout.api.ChatColor;
+import org.spout.api.command.CommandContext;
+import org.spout.api.command.CommandSource;
+import org.spout.api.command.annotated.Command;
+import org.spout.api.command.annotated.CommandPermissions;
+import org.spout.api.command.annotated.NestedCommand;
+import org.spout.api.exception.CommandException;
+import org.spout.api.geo.World;
+import org.spout.api.geo.discrete.atomic.Transform;
+import org.spout.api.player.Player;
 
 @ComponentInformation(friendlyName = "Homes", desc = "Home management system")
 public class HomesComponent extends LocationsComponent {
@@ -45,25 +49,25 @@ public class HomesComponent extends LocationsComponent {
     public class Commands {
         @Command(aliases = {"home"}, usage = "[world] [target] [owner]", desc = "Teleport to a home", min = 0, max = 3)
         @CommandPermissions({"commandbook.home.teleport"})
-        public void home(CommandContext args, CommandSender sender) throws CommandException {
+        public void home(CommandContext args, CommandSource sender) throws CommandException {
             Iterable<Player> targets = null;
             NamedLocation home = null;
-            Location loc;
+            Transform loc;
 
             // Detect arguments based on the number of arguments provided
-            if (args.argsLength() == 0) {
+            if (args.length() == 0) {
                 Player player = PlayerUtil.checkPlayer(sender);
                 targets = PlayerUtil.matchPlayers(player);
-                home = getManager().get(player.getWorld(), player.getName());
-            } else if (args.argsLength() == 1) {
+                home = getManager().get(player.getEntity().getWorld(), player.getName());
+            } else if (args.length() == 1) {
                 Player player = PlayerUtil.checkPlayer(sender);
                 targets = PlayerUtil.matchPlayers(player);
-                home = getManager().get(player.getWorld(), args.getString(0));
-            } else if (args.argsLength() == 2) {
+                home = getManager().get(player.getEntity().getWorld(), args.getString(0));
+            } else if (args.length() == 2) {
                 targets = PlayerUtil.matchPlayers(sender, args.getString(0));
                 if (getManager().isPerWorld()) {
                     Player player = PlayerUtil.checkPlayer(sender);
-                    home = getManager().get(player.getWorld(), args.getString(1));
+                    home = getManager().get(player.getEntity().getWorld(), args.getString(1));
                 } else {
                     home = getManager().get(null, args.getString(1));
                 }
@@ -75,7 +79,7 @@ public class HomesComponent extends LocationsComponent {
                         break;
                     }
                 }
-            } else if (args.argsLength() == 3) {
+            } else if (args.length() == 3) {
                 targets = PlayerUtil.matchPlayers(sender, args.getString(1));
                 home = getManager().get(
                         LocationUtil.matchWorld(sender, args.getString(0)), args.getString(2));
@@ -103,20 +107,20 @@ public class HomesComponent extends LocationsComponent {
 
         @Command(aliases = {"sethome"}, usage = "[owner] [location]", desc = "Set a home", min = 0, max = 2)
         @CommandPermissions({"commandbook.home.set"})
-        public void setHome(CommandContext args, CommandSender sender) throws CommandException {
+        public void setHome(CommandContext args, CommandSource sender) throws CommandException {
             String homeName;
-            Location loc;
+            Transform loc;
             Player player = null;
 
             // Detect arguments based on the number of arguments provided
-            if (args.argsLength() == 0) {
+            if (args.length() == 0) {
                 player = PlayerUtil.checkPlayer(sender);
                 homeName = player.getName();
-                loc = player.getLocation();
-            } else if (args.argsLength() == 1) {
+                loc = player.getEntity().getTransform();
+            } else if (args.length() == 1) {
                 homeName = args.getString(0);
                 player = PlayerUtil.checkPlayer(sender);
-                loc = player.getLocation();
+                loc = player.getEntity().getTransform();
 
                 // Check permissions!
                 if (!homeName.equals(sender.getName())) {
@@ -147,36 +151,36 @@ public class HomesComponent extends LocationsComponent {
         @Command(aliases = {"del", "delete", "remove", "rem"},
                 usage = "[name] [world]", desc = "Remove a home", min = 0, max = 2 )
         @CommandPermissions({"commandbook.home.remove"})
-        public void removeCmd(CommandContext args, CommandSender sender) throws CommandException {
+        public void removeCmd(CommandContext args, CommandSource sender) throws CommandException {
             World world;
             String name = sender.getName();
-            if (args.argsLength() == 2) {
+            if (args.length() == 2) {
                 world = LocationUtil.matchWorld(sender, args.getString(1));
             } else {
-                world = PlayerUtil.checkPlayer(sender).getWorld();
+                world = PlayerUtil.checkPlayer(sender).getEntity().getWorld();
             }
-            if (args.argsLength() > 0) name = args.getString(0);
+            if (args.length() > 0) name = args.getString(0);
             remove(name, world, sender);
         }
 
         @Command(aliases = {"list", "show"}, usage = "[-w world] [page]", desc = "List homes",
                 flags = "w:", min = 0, max = 1 )
         @CommandPermissions({"commandbook.home.list"})
-        public void listCmd(CommandContext args, CommandSender sender) throws CommandException {
+        public void listCmd(CommandContext args, CommandSource sender) throws CommandException {
             list(args, sender);
         }
     }
 
     @Override
     public PaginatedResult<NamedLocation> getListResult() {
-        final String defaultWorld = CommandBook.server().getWorlds().get(0).getName();
+        final String defaultWorld = CommandBook.game().getWorlds().iterator().next().getName();
         return new PaginatedResult<NamedLocation>("Owner - World  - Location") {
             @Override
             public String format(NamedLocation entry) {
                 return entry.getCreatorName()
                         + " - " + (entry.getWorldName() == null ? defaultWorld : entry.getWorldName())
-                        + " - " + entry.getLocation().getBlockX() + "," + entry.getLocation().getBlockY()
-                        + "," + entry.getLocation().getBlockZ();
+                        + " - " + entry.getLocation().getPosition().getX() + "," + entry.getLocation().getPosition().getY()
+                        + "," + entry.getLocation().getPosition().getZ();
             }
         };
     }

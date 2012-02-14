@@ -22,10 +22,10 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
-import org.bukkit.Location;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import com.sk89q.minecraft.util.commands.CommandException;
+import org.spout.api.command.CommandSource;
+import org.spout.api.exception.CommandException;
+import org.spout.api.geo.discrete.atomic.Transform;
+import org.spout.api.player.Player;
 
 public class UserSession implements PersistentSession {
 
@@ -44,8 +44,8 @@ public class UserSession implements PersistentSession {
     private String commandToConfirm;
     private Map<String, Long> bringable = new HashMap<String, Long>();
     private final Map<String, Long> teleportRequests = new HashMap<String, Long>();
-    private final LinkedList<Location> locationHistory = new LinkedList<Location>();
-    private Location ignoreTeleportLocation;
+    private final LinkedList<Transform> locationHistory = new LinkedList<Transform>();
+    private Transform ignoreTeleportLocation;
     
     public boolean isRecent() {
         return (System.currentTimeMillis() - lastUpdate) < MAX_AGE;
@@ -68,7 +68,7 @@ public class UserSession implements PersistentSession {
         return lastRecipient;
     }
 
-    public void setLastRecipient(CommandSender target) {
+    public void setLastRecipient(CommandSource target) {
         if (target instanceof Player) {
             lastRecipient = target.getName();
         } else {
@@ -76,7 +76,7 @@ public class UserSession implements PersistentSession {
         }
     }
     
-    public void setNewLastRecipient(CommandSender target) {
+    public void setNewLastRecipient(CommandSource target) {
         long now = System.currentTimeMillis();
         
         if (lastRecipient == null || (now - lastRecipientTime) > 1000) {
@@ -116,7 +116,7 @@ public class UserSession implements PersistentSession {
         teleportRequests.put(target.getName(), now);
     }
     
-    public void rememberLocation(Location location) {
+    public void rememberLocation(Transform location) {
         if (locationHistory.size() > 0 && locationHistory.peek().equals(location)) {
             return;
         }
@@ -128,10 +128,10 @@ public class UserSession implements PersistentSession {
     }
     
     public void rememberLocation(Player player) {
-        rememberLocation(player.getLocation());
+        rememberLocation(player.getEntity().getTransform());
     }
     
-    public Location popLastLocation() {
+    public Transform popLastLocation() {
         return locationHistory.poll();
     }
     
@@ -143,11 +143,11 @@ public class UserSession implements PersistentSession {
         this.idleStatus = status;
     }
 
-    public void setIgnoreLocation(Location loc) {
+    public void setIgnoreLocation(Transform loc) {
         this.ignoreTeleportLocation = loc;
     }
 
-    public Location getIgnoreLocation() {
+    public Transform getIgnoreLocation() {
         return ignoreTeleportLocation;
     }
 

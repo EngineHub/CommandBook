@@ -18,25 +18,22 @@
 
 package com.sk89q.commandbook;
 
-import com.sk89q.commandbook.bans.BansComponent;
 import com.sk89q.commandbook.commands.PaginatedResult;
-import com.zachsthings.libcomponents.bukkit.BukkitComponent;
+import com.zachsthings.libcomponents.spout.SpoutComponent;
 import com.zachsthings.libcomponents.ComponentInformation;
-import com.zachsthings.libcomponents.InjectComponent;
 import com.sk89q.commandbook.util.LocationUtil;
 import com.sk89q.commandbook.util.PlayerUtil;
-import com.sk89q.minecraft.util.commands.Command;
-import com.sk89q.minecraft.util.commands.CommandContext;
-import com.sk89q.minecraft.util.commands.CommandException;
-import com.sk89q.minecraft.util.commands.CommandPermissions;
-import org.apache.commons.lang.Validate;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
-import org.bukkit.event.HandlerList;
+import org.spout.api.ChatColor;
+import org.spout.api.command.CommandContext;
+import org.spout.api.command.CommandSource;
+import org.spout.api.command.annotated.Command;
+import org.spout.api.command.annotated.CommandPermissions;
+import org.spout.api.event.Event;
+import org.spout.api.event.HandlerList;
+import org.spout.api.exception.CommandException;
+import org.spout.api.geo.discrete.atomic.Transform;
+import org.spout.api.math.MathHelper;
+import org.spout.api.player.Player;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -45,7 +42,7 @@ import static com.sk89q.commandbook.CommandBookUtil.getCardinalDirection;
 
 @ComponentInformation(friendlyName = "Info", desc = "Info contains commands that allow users to gather " +
         "information about the world, without being able to make changes.")
-public class InfoComponent extends BukkitComponent {
+public class InfoComponent extends SpoutComponent {
 
     @Override
     public void enable() {
@@ -53,22 +50,21 @@ public class InfoComponent extends BukkitComponent {
     }
     
     public static class PlayerWhoisEvent extends Event {
-        private static final long serialVersionUID = -2894521895117036252L;
-        private final OfflinePlayer player;
-        private final CommandSender source;
+        private final Player player;
+        private final CommandSource source;
         private final Map<String, String> taggedWhoisInformation = new LinkedHashMap<String, String>();
         private final List<String> taglessWhoisInformation = new ArrayList<String>();
         
-        public PlayerWhoisEvent(OfflinePlayer player, CommandSender source) {
+        public PlayerWhoisEvent(Player player, CommandSource source) {
             this.player = player;
             this.source = source;
         }
         
-        public OfflinePlayer getPlayer() {
+        public Player getPlayer() {
             return player;
         }
         
-        public CommandSender getSource() {
+        public CommandSource getSource() {
             return source;
         }
         
@@ -116,11 +112,11 @@ public class InfoComponent extends BukkitComponent {
                 usage = "[player]", desc = "Show your current location",
                 flags = "", min = 0, max = 1)
         @CommandPermissions({"commandbook.whereami"})
-        public void whereAmI(CommandContext args, CommandSender sender) throws CommandException {
+        public void whereAmI(CommandContext args, CommandSource sender) throws CommandException {
 
             Player player;
 
-            if (args.argsLength() == 0) {
+            if (args.length() == 0) {
                 player = PlayerUtil.checkPlayer(sender);
             } else {
                 player = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
@@ -129,18 +125,18 @@ public class InfoComponent extends BukkitComponent {
                 }
             }
 
-            Location pos = player.getLocation();
+            Transform pos = player.getEntity().getTransform();
 
             sender.sendMessage(ChatColor.YELLOW + "Player: " + player.getName() + (player == sender ? "(That's you!)" : ""));
             sender.sendMessage(ChatColor.YELLOW +
-                    "World: " + player.getWorld().getName());
+                    "World: " + pos.getPosition().getWorld().getName());
             sender.sendMessage(ChatColor.YELLOW +
                     String.format("Location: (%.4f, %.4f, %.4f)",
-                            pos.getX(), pos.getY(), pos.getZ()));
+                            pos.getPosition().getX(), pos.getPosition().getY(), pos.getPosition().getZ()));
             sender.sendMessage(ChatColor.YELLOW +
-                    "Depth: " + (int) Math.floor(pos.getY()));
+                    "Depth: " + MathHelper.floor(pos.getPosition().getY()));
 
-            if (CommandBook.inst().hasPermission(sender, "commandbook.whereami.compass")) {
+            if (sender.hasPermission("commandbook.whereami.compass")) {
                 sender.sendMessage(ChatColor.YELLOW +
                         String.format("Direction: %s",
                                 getCardinalDirection(player)));
@@ -154,18 +150,18 @@ public class InfoComponent extends BukkitComponent {
                 usage = "[-p page] [player]", desc = "Tell information about a player",
                 flags = "op:", min = 0, max = 1)
         @CommandPermissions({"commandbook.whois"})
-        public void whois(CommandContext args, CommandSender sender) throws CommandException {
+        public void whois(CommandContext args, CommandSource sender) throws CommandException {
 
-            OfflinePlayer offline;
+            Player offline;
 
-            if (args.argsLength() == 0) {
+            if (args.length() == 0) {
                 offline = PlayerUtil.checkPlayer(sender);
             } else {
                 try {
                     offline = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
                 } catch (CommandException e) {
                     if (args.hasFlag('o')) {
-                        offline = CommandBook.server().getOfflinePlayer(args.getString(0));
+                        offline = CommandBook.game().getPlayer(args.getString(0), false);
                     } else {
                         throw e;
                     }
@@ -178,20 +174,19 @@ public class InfoComponent extends BukkitComponent {
             
             PlayerWhoisEvent event = new PlayerWhoisEvent(offline, sender);
 
-            if (offline instanceof Player) {
-                Player player = (Player) offline;
-                event.addWhoisInformation("Display name", player.getDisplayName());
-                event.addWhoisInformation("Entity ID #", player.getEntityId());
-                event.addWhoisInformation("Current vehicle", player.getVehicle());
+            if (offline.isOnline()) {
+                event.addWhoisInformation("Display name", offline.getDisplayName());
+                event.addWhoisInformation("Entity ID #", offline.getEntity().getId());
+                //event.addWhoisInformation("Current vehicle", player.getVehicle());
                 
 
-                if (CommandBook.inst().hasPermission(sender, "commandbook.ip-address")) {
-                    event.addWhoisInformation("Address", player.getAddress().toString());
+                if (sender.hasPermission("commandbook.ip-address")) {
+                    event.addWhoisInformation("Address", offline.getAddress().toString());
                 }
-                event.addWhoisInformation("Game mode", player.getGameMode());
+                //event.addWhoisInformation("Game mode", offline.getGameMode());
             }
             
-            Location bedSpawn = offline.getBedSpawnLocation();
+            /*Location bedSpawn = offline.getBedSpawnLocation();
             if (bedSpawn != null) {
                 event.addWhoisInformation("Bed spawn location",
                         LocationUtil.toFriendlyString(bedSpawn));
@@ -202,7 +197,7 @@ public class InfoComponent extends BukkitComponent {
             if (offline.hasPlayedBefore()) {
                 event.addWhoisInformation(null, "First joined: " + dateFormat.format(offline.getFirstPlayed())
                         + "; Last joined: " + dateFormat.format(offline.getLastPlayed()));
-            }
+            }*/
             
             
             CommandBook.callEvent(event);
@@ -225,11 +220,11 @@ public class InfoComponent extends BukkitComponent {
                 usage = "[player]", desc = "Show your current compass direction",
                 flags = "", min = 0, max = 1)
         @CommandPermissions({"commandbook.whereami.compass"})
-        public void compass(CommandContext args, CommandSender sender) throws CommandException {
+        public void compass(CommandContext args, CommandSource sender) throws CommandException {
 
             Player player;
 
-            if (args.argsLength() == 0) {
+            if (args.length() == 0) {
                 player = PlayerUtil.checkPlayer(sender);
             } else {
                 player = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
@@ -243,15 +238,15 @@ public class InfoComponent extends BukkitComponent {
                             getCardinalDirection(player)));
         }
 
-        @Command(aliases = {"biome"},
+        /*@Command(aliases = {"biome"},
                 usage = "[player]", desc = "Get your current biome",
                 flags = "", min = 0, max = 1)
         @CommandPermissions({"commandbook.biome"})
-        public void biome(CommandContext args, CommandSender sender) throws CommandException {
+        public void biome(CommandContext args, CommandSource sender) throws CommandException {
 
             Player player;
 
-            if (args.argsLength() == 0) {
+            if (args.length() == 0) {
                 player = PlayerUtil.checkPlayer(sender);
             } else {
                 player = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
@@ -262,6 +257,6 @@ public class InfoComponent extends BukkitComponent {
 
             sender.sendMessage(ChatColor.YELLOW + player.getLocation().getBlock().getBiome().name().toLowerCase().replace("_"," ")+" biome.");
 
-        }
+        }*/
     }
 }

@@ -18,12 +18,12 @@
 
 package com.sk89q.commandbook.locations;
 
+import org.spout.api.geo.World;
+import org.spout.api.geo.discrete.atomic.Transform;
+import org.spout.api.player.Player;
+
 import java.io.IOException;
 import java.util.List;
-
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.entity.Player;
 
 public interface LocationManager<T> {
     
@@ -69,7 +69,7 @@ public interface LocationManager<T> {
      * @param player
      * @return
      */
-    public T create(String id, Location loc, Player player);
+    public T create(String id, Transform loc, Player player);
 
     /**
      * Removes a location.

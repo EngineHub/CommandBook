@@ -18,13 +18,14 @@
 
 package com.sk89q.commandbook.locations;
 
+import org.spout.api.geo.World;
+import org.spout.api.geo.discrete.atomic.Transform;
+import org.spout.api.player.Player;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.entity.Player;
 
 import static com.sk89q.commandbook.CommandBook.logger;
 
@@ -81,8 +82,8 @@ public class RootLocationManager<T> {
 		return getManager(world).get(id);
     }
 
-	public T create(String id, Location loc, Player player) {
-		LocationManager<T> manager = getManager(loc.getWorld());
+	public T create(String id, Transform loc, Player player) {
+		LocationManager<T> manager = getManager(loc.getPosition().getWorld());
 		T ret = manager.create(id, loc, player);
 		save(manager);
 		return ret;

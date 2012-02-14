@@ -18,13 +18,14 @@
 
 package com.sk89q.commandbook.kits;
 
+import org.spout.api.inventory.ItemStack;
+import org.spout.api.player.Player;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 /**
  * Specifies the kit.
@@ -86,8 +87,7 @@ public class Kit {
         }
         
         for (ItemStack item : items) {
-            player.getInventory().addItem(new ItemStack(item.getType(),
-                    item.getAmount(), item.getDurability()));
+            player.getEntity().getInventory().addItem(item.clone());
         }
         
         return true;

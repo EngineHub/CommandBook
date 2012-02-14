@@ -19,27 +19,25 @@
 package com.sk89q.commandbook.session;
 
 import com.sk89q.commandbook.CommandBook;
-import com.zachsthings.libcomponents.bukkit.BukkitComponent;
+import com.zachsthings.libcomponents.spout.SpoutComponent;
 import com.zachsthings.libcomponents.ComponentInformation;
-import com.sk89q.minecraft.util.commands.Command;
-import com.sk89q.minecraft.util.commands.CommandContext;
-import com.sk89q.minecraft.util.commands.CommandException;
-import com.sk89q.minecraft.util.commands.CommandPermissions;
-import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerLoginEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.spout.api.ChatColor;
+import org.spout.api.command.CommandContext;
+import org.spout.api.command.CommandSource;
+import org.spout.api.command.annotated.Command;
+import org.spout.api.event.EventHandler;
+import org.spout.api.event.Listener;
+import org.spout.api.event.player.PlayerLeaveEvent;
+import org.spout.api.event.player.PlayerLoginEvent;
+import org.spout.api.exception.CommandException;
+import org.spout.api.player.Player;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
 @ComponentInformation(friendlyName = "Sessions", desc = "Handles player sessions")
-public class SessionComponent extends BukkitComponent implements Runnable, Listener {
+public class SessionComponent extends SpoutComponent implements Runnable, Listener {
 
     public static final long CHECK_FREQUENCY = 1200;
 
@@ -50,8 +48,8 @@ public class SessionComponent extends BukkitComponent implements Runnable, Liste
 
     @Override
     public void enable() {
-        CommandBook.server().getScheduler().scheduleSyncRepeatingTask(CommandBook.inst(), this, CHECK_FREQUENCY, CHECK_FREQUENCY);
-        CommandBook.registerEvents(this);
+        CommandBook.game().getScheduler().scheduleSyncRepeatingTask(CommandBook.inst(), this, CHECK_FREQUENCY, CHECK_FREQUENCY);
+        CommandBook.game().getEventManager().registerEvents(this, this);
         registerCommands(Commands.class);
     }
 
@@ -63,7 +61,7 @@ public class SessionComponent extends BukkitComponent implements Runnable, Liste
      * @param user
      * @return
      */
-    public UserSession getSession(CommandSender user) {
+    public UserSession getSession(CommandSource user) {
         synchronized (sessions) {
             String key;
 
@@ -135,7 +133,7 @@ public class SessionComponent extends BukkitComponent implements Runnable, Liste
         while (it.hasNext()) {
             Map.Entry<String, T> entry = it.next();
             if (entry.getKey().equals(UserSession.CONSOLE_NAME)) continue;
-            Player player = CommandBook.server().getPlayerExact(entry.getKey());
+            Player player = CommandBook.game().getPlayer(entry.getKey(), true);
             if (player != null && player.isOnline()) continue;
 
             if (!entry.getValue().isRecent()) {
@@ -156,7 +154,7 @@ public class SessionComponent extends BukkitComponent implements Runnable, Liste
      * Called on player disconnect.
      */
     @EventHandler
-    public void onPlayerQuit(PlayerQuitEvent event) {
+    public void onPlayerQuit(PlayerLeaveEvent event) {
         getSession(event.getPlayer()).handleDisconnect();
         getAdminSession(event.getPlayer()).handleDisconnect();
     }
@@ -165,7 +163,7 @@ public class SessionComponent extends BukkitComponent implements Runnable, Liste
         @Command(aliases = {"confirm", "conf"},
                 desc = "Confirm an action",
                 max = 0, flags = "vc")
-        public void confirm(CommandContext args, CommandSender sender) throws CommandException {
+        public void confirm(CommandContext args, CommandSource sender) throws CommandException {
             UserSession session = getSession(sender);
             final String cmd = session.getCommandToConfirm(false);
             if (cmd == null) throw new CommandException("No command to confirm!");
@@ -176,7 +174,7 @@ public class SessionComponent extends BukkitComponent implements Runnable, Liste
                 sender.sendMessage(ChatColor.YELLOW + "Cleared command to confirm");
             } else {
                 sender.sendMessage(ChatColor.YELLOW + "Command confirmed: " + cmd);
-                CommandBook.server().dispatchCommand(sender, cmd);
+                CommandBook.game().processCommand(sender, cmd);
                 session.getCommandToConfirm(true);
             }
         }

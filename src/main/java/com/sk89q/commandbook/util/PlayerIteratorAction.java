@@ -18,9 +18,8 @@
 
 package com.sk89q.commandbook.util;
 
-import com.sk89q.commandbook.CommandBook;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
+import org.spout.api.command.CommandSource;
+import org.spout.api.player.Player;
 
 /**
  * Performs an action over a list of players.
@@ -29,7 +28,7 @@ import org.bukkit.entity.Player;
  */
 public abstract class PlayerIteratorAction {
 
-    protected final CommandSender sender;
+    protected final CommandSource sender;
     
     private boolean included;
     private int affected = 0;
@@ -39,7 +38,7 @@ public abstract class PlayerIteratorAction {
      *
      * @param sender
      */
-    public PlayerIteratorAction(CommandSender sender) {
+    public PlayerIteratorAction(CommandSource sender) {
         this.sender = sender;
     }
     
@@ -80,7 +79,7 @@ public abstract class PlayerIteratorAction {
      * 
      * @return
      */
-    public CommandSender getSender() {
+    public CommandSource getSender() {
         return sender;
     }
     
@@ -104,7 +103,7 @@ public abstract class PlayerIteratorAction {
      * @param sender 
      * @param player
      */
-    public abstract void onVictim(CommandSender sender, Player player);
+    public abstract void onVictim(CommandSource sender, Player player);
     
     /**
      * Called on informing of the sender of the action. This is only called
@@ -113,7 +112,7 @@ public abstract class PlayerIteratorAction {
      * @param sender
      * @param affected 
      */
-    public void onInform(CommandSender sender, int affected) {
+    public void onInform(CommandSource sender, int affected) {
     }
     
     /**
@@ -123,7 +122,7 @@ public abstract class PlayerIteratorAction {
      * @param sender
      * @param affected 
      */
-    public void onInformMany(CommandSender sender, int affected) {
+    public void onInformMany(CommandSource sender, int affected) {
     }
     
     /**
@@ -132,6 +131,6 @@ public abstract class PlayerIteratorAction {
      * @param sender
      * @param affected 
      */
-    public void onComplete(CommandSender sender, int affected) {
+    public void onComplete(CommandSource sender, int affected) {
     }
 }

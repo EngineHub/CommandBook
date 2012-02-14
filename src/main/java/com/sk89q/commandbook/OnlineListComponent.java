@@ -18,22 +18,22 @@
 
 package com.sk89q.commandbook;
 
-import com.zachsthings.libcomponents.bukkit.BukkitComponent;
+import com.zachsthings.libcomponents.spout.SpoutComponent;
 import com.zachsthings.libcomponents.ComponentInformation;
 import com.zachsthings.libcomponents.config.ConfigurationBase;
 import com.zachsthings.libcomponents.config.Setting;
 import com.sk89q.commandbook.events.OnlineListSendEvent;
-import com.sk89q.minecraft.util.commands.Command;
-import com.sk89q.minecraft.util.commands.CommandContext;
-import com.sk89q.minecraft.util.commands.CommandException;
-import com.sk89q.minecraft.util.commands.CommandPermissions;
-import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
+import org.spout.api.ChatColor;
+import org.spout.api.command.CommandContext;
+import org.spout.api.command.CommandSource;
+import org.spout.api.command.annotated.Command;
+import org.spout.api.command.annotated.CommandPermissions;
+import org.spout.api.event.EventHandler;
+import org.spout.api.event.Listener;
+import org.spout.api.event.Order;
+import org.spout.api.event.player.PlayerJoinEvent;
+import org.spout.api.exception.CommandException;
+import org.spout.api.player.Player;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,14 +41,14 @@ import java.util.List;
 import java.util.Map;
 
 @ComponentInformation(friendlyName = "Online List", desc = "Lists online players both on command and on player join.")
-public class OnlineListComponent extends BukkitComponent implements Listener {
+public class OnlineListComponent extends SpoutComponent implements Listener {
 
     private LocalConfiguration config;
 
     @Override
     public void enable() {
         config = configure(new LocalConfiguration());
-        CommandBook.registerEvents(this);
+        CommandBook.game().getEventManager().registerEvents(this, this);
         registerCommands(Commands.class);
     }
 
@@ -71,7 +71,7 @@ public class OnlineListComponent extends BukkitComponent implements Listener {
      * @param online
      * @param sender
      */
-    public void sendOnlineList(Player[] online, CommandSender sender) {
+    public void sendOnlineList(Player[] online, CommandSource sender) {
 
         StringBuilder out = new StringBuilder();
 
@@ -86,7 +86,7 @@ public class OnlineListComponent extends BukkitComponent implements Listener {
         out.append(online.length);
         if (config.playersListMaxPlayers) {
             out.append("/");
-            out.append(CommandBook.server().getMaxPlayers());
+            out.append(CommandBook.game().getMaxPlayers());
         }
         out.append("): ");
         out.append(ChatColor.WHITE);
@@ -95,8 +95,7 @@ public class OnlineListComponent extends BukkitComponent implements Listener {
             Map<String, List<Player>> groups = new HashMap<String, List<Player>>();
 
             for (Player player : online) {
-                String[] playerGroups = CommandBook.inst().getPermissionsResolver().getGroups(
-                        player.getName());
+                String[] playerGroups = player.getGroups();
                 String group = playerGroups.length > 0 ? playerGroups[0] : "Default";
 
                 if (groups.containsKey(group)) {
@@ -157,14 +156,14 @@ public class OnlineListComponent extends BukkitComponent implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(order = Order.LATE)
     public void onPlayerJoin(PlayerJoinEvent event) {
         if (!config.listOnJoin) return;
         Player player = event.getPlayer();
         CommandBook.callEvent(new OnlineListSendEvent(player));
 
         sendOnlineList(
-                CommandBook.server().getOnlinePlayers(), player);
+                CommandBook.game().getOnlinePlayers(), player);
     }
 
     public class Commands {
@@ -172,8 +171,8 @@ public class OnlineListComponent extends BukkitComponent implements Listener {
                 usage = "[filter]", desc = "Get the list of online users",
                 min = 0, max = 1)
         @CommandPermissions({"commandbook.who"})
-        public void who(CommandContext args, CommandSender sender) throws CommandException {
-            Player[] online = CommandBook.server().getOnlinePlayers();
+        public void who(CommandContext args, CommandSource sender) throws CommandException {
+            Player[] online = CommandBook.game().getOnlinePlayers();
 
             // Some crappy wrappers uses this to detect if the server is still
             // running, even though this is a very unreliable way to do it
@@ -219,7 +218,7 @@ public class OnlineListComponent extends BukkitComponent implements Listener {
             // For filtered queries, we say something a bit different
             if (filter == null) {
                 sendOnlineList(
-                        CommandBook.server().getOnlinePlayers(), sender);
+                        CommandBook.game().getOnlinePlayers(), sender);
                 return;
 
             }

@@ -7,9 +7,6 @@ homes:
 warps:
     class: com.sk89q.commandbook.locations.WarpsComponent
     default: true
-freeze:
-    class: com.sk89q.commandbook.FreezeComponent
-    default: false
 messaging:
     class: com.sk89q.commandbook.MessagingComponent
     default: true
@@ -25,20 +22,11 @@ kits:
 midi:
     class: com.sk89q.jinglenote.JingleNoteComponent
     default: true
-time:
-    class: com.sk89q.commandbook.time.TimeComponent
-    default: true
 name-verification:
     class: com.sk89q.commandbook.NameVerificationComponent
     default: true
-fun:
-    class: com.sk89q.commandbook.FunComponent
-    default: true
 debug:
     class: com.sk89q.commandbook.DebugComponent
-    default: true
-thor:
-    class: com.sk89q.commandbook.ThorComponent
     default: true
 online-list:
     class: com.sk89q.commandbook.OnlineListComponent
@@ -46,17 +34,8 @@ online-list:
 stored-messages:
     class: com.sk89q.commandbook.StoredMessagesComponent
     default: true
-spawn-locations:
-    class: com.sk89q.commandbook.locations.SpawnLocationsComponent
-    default: true
 info:
     class: com.sk89q.commandbook.InfoComponent
-    default: true
-world:
-    class: com.sk89q.commandbook.WorldComponent
-    default: true
-player:
-    class: com.sk89q.commandbook.PlayerComponent
     default: true
 help:
     class: com.sk89q.commandbook.HelpComponent
@@ -64,3 +43,26 @@ help:
 god:
     class: com.sk89q.commandbook.GodComponent
     default: true
+    
+# NOT YET PORTED
+# spawn-locations:
+#     class: com.sk89q.commandbook.locations.SpawnLocationsComponent
+#     default: true
+# time:
+#     class: com.sk89q.commandbook.time.TimeComponent
+#     default: true
+# freeze:
+#     class: com.sk89q.commandbook.FreezeComponent
+#     default: false
+# fun:
+#     class: com.sk89q.commandbook.FunComponent
+#     default: true
+# player:
+#     class: com.sk89q.commandbook.PlayerComponent
+#     default: true
+# thor:
+#     class: com.sk89q.commandbook.ThorComponent
+#     default: true
+# world:
+#     class: com.sk89q.commandbook.WorldComponent
+#     default: true

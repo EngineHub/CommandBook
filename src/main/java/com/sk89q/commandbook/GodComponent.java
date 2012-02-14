@@ -18,29 +18,29 @@
 
 package com.sk89q.commandbook;
 
-import com.zachsthings.libcomponents.bukkit.BukkitComponent;
+import com.zachsthings.libcomponents.spout.SpoutComponent;
 import com.zachsthings.libcomponents.ComponentInformation;
 import com.zachsthings.libcomponents.config.ConfigurationBase;
 import com.zachsthings.libcomponents.config.Setting;
 import com.sk89q.commandbook.util.PlayerUtil;
-import com.sk89q.minecraft.util.commands.Command;
-import com.sk89q.minecraft.util.commands.CommandContext;
-import com.sk89q.minecraft.util.commands.CommandException;
-import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityCombustEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.player.PlayerChangedWorldEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
+import org.spout.api.ChatColor;
+import org.spout.api.command.CommandContext;
+import org.spout.api.command.CommandSource;
+import org.spout.api.command.annotated.Command;
+import org.spout.api.entity.PlayerController;
+import org.spout.api.event.EventHandler;
+import org.spout.api.event.Listener;
+import org.spout.api.event.entity.EntityHealthChangeEvent;
+import org.spout.api.event.entity.EntityTeleportEvent;
+import org.spout.api.event.player.PlayerJoinEvent;
+import org.spout.api.exception.CommandException;
+import org.spout.api.player.Player;
 
 import java.util.HashSet;
 import java.util.Set;
 
 @ComponentInformation(friendlyName = "God", desc = "God mode support")
-public class GodComponent extends BukkitComponent implements Listener {
+public class GodComponent extends SpoutComponent implements Listener {
     /**
      * List of people with god mode.
      */
@@ -53,10 +53,10 @@ public class GodComponent extends BukkitComponent implements Listener {
         config = configure(new LocalConfiguration());
         registerCommands(Commands.class);
         // Check god mode for existing players, if any
-        for (Player player : CommandBook.server().getOnlinePlayers()) {
+        for (Player player : CommandBook.game().getOnlinePlayers()) {
             checkAutoEnable(player);
         }
-        CommandBook.registerEvents(this);
+        CommandBook.game().getEventManager().registerEvents(this, this);
     }
     
     @Override
@@ -64,7 +64,7 @@ public class GodComponent extends BukkitComponent implements Listener {
         super.reload();
         config = configure(config);
         // Check god mode for existing players, if any
-        for (Player player : CommandBook.server().getOnlinePlayers()) {
+        for (Player player : CommandBook.game().getOnlinePlayers()) {
             checkAutoEnable(player);
         }
     }
@@ -107,9 +107,8 @@ public class GodComponent extends BukkitComponent implements Listener {
     }
 
     private boolean checkAutoEnable(Player player) {
-        if (config.autoEnable && (CommandBook.inst().getPermissionsResolver()
-                .inGroup(player, "cb-invincible")
-                || CommandBook.inst().hasPermission(player, "commandbook.god.auto-invincible"))) {
+        if (config.autoEnable && (player.isInGroup("cb-invincible")
+                || player.hasPermission("commandbook.god.auto-invincible"))) {
             enableGodMode(player);
             return true;
         }
@@ -119,7 +118,7 @@ public class GodComponent extends BukkitComponent implements Listener {
     /**
      * Called on entity combust.
      */
-    @EventHandler
+    /*@EventHandler
     public void onCombust(EntityCombustEvent event) {
         if (event.isCancelled()) {
             return;
@@ -133,35 +132,38 @@ public class GodComponent extends BukkitComponent implements Listener {
                 player.setFireTicks(0);
             }
         }
-    }
+    }*/
     
     @EventHandler
-    public void onDamage(EntityDamageEvent event) {
+    public void onDamage(EntityHealthChangeEvent event) {
         if (event.isCancelled()) {
             return;
         }
 
-        if (event.getEntity() instanceof Player) {
+        if (event.getEntity() instanceof Player && event.getChange() < 0) {
             Player player = (Player) event.getEntity();
 
             if (hasGodMode(player)) {
                 event.setCancelled(true);
-                player.setFireTicks(0);
             }
         }
     }
     
     @EventHandler
-    public void playerChangedWorld(PlayerChangedWorldEvent event) {
-        if (!CommandBook.inst().hasPermission(event.getPlayer(), "commandbook.god")) {
-            disableGodMode(event.getPlayer());
+    public void playerChangedWorld(EntityTeleportEvent event) {
+        if (!event.getFrom().getWorld().equals(event.getTo().getWorld()) 
+                && event.getEntity().getController() instanceof PlayerController) {
+            final Player player = ((PlayerController)event.getEntity().getController()).getPlayer();
+            if (!player.hasPermission(event.getTo().getWorld(), "commandbook.god")) {
+                disableGodMode(player);
+            }
         }
     }
     
     @EventHandler
     public void playerWhois(InfoComponent.PlayerWhoisEvent event) {
         if (event.getPlayer() instanceof Player) {
-            if (CommandBook.inst().hasPermission(event.getSource(), "commandbook.god.check")) {
+            if (event.getSource().hasPermission( "commandbook.god.check")) {
                 event.addWhoisInformation(null, "Player " + (hasGodMode((Player) event.getPlayer())
                         ? "has" : "does not have") + " god mode");
             }
@@ -171,15 +173,15 @@ public class GodComponent extends BukkitComponent implements Listener {
     public class Commands {
         @Command(aliases = {"god"}, usage = "[player]",
                 desc = "Enable godmode on a player", flags = "s", max = 1)
-        public void god(CommandContext args, CommandSender sender) throws CommandException {
+        public void god(CommandContext args, CommandSource sender) throws CommandException {
 
             Iterable<Player> targets = null;
             boolean included = false;
 
             // Detect arguments based on the number of arguments provided
-            if (args.argsLength() == 0) {
+            if (args.length() == 0) {
                 targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
-            } else if (args.argsLength() == 1) {
+            } else if (args.length() == 1) {
                 targets = PlayerUtil.matchPlayers(sender, args.getString(0));
             }
 
@@ -196,7 +198,6 @@ public class GodComponent extends BukkitComponent implements Listener {
             for (Player player : targets) {
                 if (!hasGodMode(player)) {
                     enableGodMode(player);
-                    player.setFireTicks(0);
                 } else {
                     if (player == sender) {
                         player.sendMessage(ChatColor.RED + "You already have god mode!");
@@ -230,15 +231,15 @@ public class GodComponent extends BukkitComponent implements Listener {
 
         @Command(aliases = {"ungod"}, usage = "[player]",
                 desc = "Disable godmode on a player", flags = "s", max = 1)
-        public void ungod(CommandContext args, CommandSender sender) throws CommandException {
+        public void ungod(CommandContext args, CommandSource sender) throws CommandException {
 
             Iterable<Player> targets = null;
             boolean included = false;
 
             // Detect arguments based on the number of arguments provided
-            if (args.argsLength() == 0) {
+            if (args.length() == 0) {
                 targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
-            } else if (args.argsLength() == 1) {
+            } else if (args.length() == 1) {
                 targets = PlayerUtil.matchPlayers(sender, args.getString(0));
             }
 

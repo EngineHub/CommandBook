@@ -18,17 +18,17 @@
 
 package com.sk89q.commandbook.locations;
 
-import org.bukkit.Location;
-import org.bukkit.entity.Player;
+import org.spout.api.entity.Entity;
+import org.spout.api.geo.discrete.atomic.Transform;
 
 public class NamedLocation {
 
     private String name;
     private String creatorName;
     private String worldName;
-    private Location loc;
+    private Transform loc;
 
-    public NamedLocation(String name, Location loc) {
+    public NamedLocation(String name, Transform loc) {
         this.name = name;
         this.loc = loc;
     }
@@ -57,16 +57,16 @@ public class NamedLocation {
         this.creatorName = creatorName;
     }
 
-    public Location getLocation() {
+    public Transform getLocation() {
         return loc;
     }
 
-    public void setLocation(Location loc) {
+    public void setLocation(Transform loc) {
         this.loc = loc;
     }
     
-    public void teleport(Player player) {
-        player.teleport(loc);
+    public void teleport(Entity player) {
+        player.setTransform(loc);
     }
     
 }

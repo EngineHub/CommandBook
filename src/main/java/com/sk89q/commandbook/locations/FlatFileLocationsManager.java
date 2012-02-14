@@ -34,11 +34,14 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import com.sk89q.commandbook.CommandBook;
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.entity.Player;
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
+import org.spout.api.geo.World;
+import org.spout.api.geo.discrete.Point;
+import org.spout.api.geo.discrete.atomic.Transform;
+import org.spout.api.math.Quaternion;
+import org.spout.api.math.Vector3;
+import org.spout.api.player.Player;
 
 import static com.sk89q.commandbook.CommandBookUtil.getNestedList;
 import static com.sk89q.commandbook.CommandBook.logger;
@@ -90,13 +93,15 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
                         String name = line[0].trim().replace(" ", "");
                         String worldName = line[1]; // Set to null if the world exists
                         String creator = line[2];
-                        double x = Double.parseDouble(line[3]);
-                        double y = Double.parseDouble(line[4]);
-                        double z = Double.parseDouble(line[5]);
-                        float pitch = Float.parseFloat(line[6]);
-                        float yaw = Float.parseFloat(line[7]);
+                        float x = Float.parseFloat(line[3]);
+                        float y = Float.parseFloat(line[4]);
+                        float z = Float.parseFloat(line[5]);
+                        float quatX = Float.parseFloat(line[6]);
+                        float quatY = Float.parseFloat(line[7]);
+                        float quatZ = Float.parseFloat(line[8]);
+                        float quatW = Float.parseFloat(line[9]);
                         
-                        World world = CommandBook.server().getWorld(worldName);
+                        World world = CommandBook.game().getWorld(worldName);
                         
                       
                         if (world != null) {
@@ -106,7 +111,7 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
                             }
                         }
                         
-                        Location loc = new Location(world, x, y, z, yaw, pitch);
+                        Transform loc = new Transform(new Point(world, x, y, z), new Quaternion(quatX, quatY, quatZ, quatW), Vector3.ONE);
                         NamedLocation warp = new NamedLocation(name, loc);
                         warp.setWorldName(worldName);
                         warp.setCreatorName(creator);
@@ -156,13 +161,15 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
                     csv.writeNext(new String[] {
                             warp.getName(),
                             warp.getWorldName() != null ? warp.getWorldName()
-                                    : warp.getLocation().getWorld().getName(),
+                                    : warp.getLocation().getPosition().getWorld().getName(),
                             warp.getCreatorName(),
-                            String.valueOf(warp.getLocation().getX()),
-                            String.valueOf(warp.getLocation().getY()),
-                            String.valueOf(warp.getLocation().getZ()),
-                            String.valueOf(warp.getLocation().getPitch()),
-                            String.valueOf(warp.getLocation().getYaw()),
+                            String.valueOf(warp.getLocation().getPosition().getX()),
+                            String.valueOf(warp.getLocation().getPosition().getY()),
+                            String.valueOf(warp.getLocation().getPosition().getZ()),
+                            String.valueOf(warp.getLocation().getRotation().getX()),
+                            String.valueOf(warp.getLocation().getRotation().getY()),
+                            String.valueOf(warp.getLocation().getRotation().getZ()),
+                            String.valueOf(warp.getLocation().getRotation().getW())
                             });
                 }
             }
@@ -182,17 +189,17 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
     public void updateWorlds() {
         for (Iterator<Map.Entry<String, List<NamedLocation>>> i = unloadedLocs.entrySet().iterator(); i.hasNext();) {
             Map.Entry<String, List<NamedLocation>> entry = i.next();
-            World world = CommandBook.server().getWorld(entry.getKey());
+            World world = CommandBook.game().getWorld(entry.getKey());
             if (world == null) continue;
             i.remove();
             for (NamedLocation warp : entry.getValue()) {
-                warp.getLocation().setWorld(world);
+                warp.getLocation().getPosition().setWorld(world);
                 locs.put(warp.getName().toLowerCase(), warp);
             }
         }
         for (Iterator<NamedLocation> i = locs.values().iterator(); i.hasNext();) {
             NamedLocation loc = i.next();
-            if (CommandBook.server().getWorld(loc.getWorldName()) == null) {
+            if (CommandBook.game().getWorld(loc.getWorldName()) == null) {
                 i.remove();
                 getNestedList(unloadedLocs, loc.getWorldName()).add(loc);
             }
@@ -211,7 +218,7 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
         return new ArrayList<NamedLocation>(locs.values());
     }
 
-    public NamedLocation create(String id, Location loc, Player player) {
+    public NamedLocation create(String id, Transform loc, Player player) {
         id = id.trim();
         NamedLocation warp = new NamedLocation(id, loc);
         locs.put(id.toLowerCase(), warp);

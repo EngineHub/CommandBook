@@ -8,19 +8,19 @@
 package com.sk89q.jinglenote;
 
 import com.sk89q.commandbook.CommandBook;
-import org.bukkit.Location;
-import org.bukkit.entity.Player;
+import org.spout.api.geo.discrete.Point;
+import org.spout.api.player.Player;
 
 public class JingleNotePlayer implements Runnable {
     protected final Player player;
-    protected final Location loc;
+    protected final Point loc;
     protected JingleSequencer sequencer;
     protected final int delay;
     
     protected boolean keepMusicBlock = false;
     
     public JingleNotePlayer(Player player,
-            Location loc, JingleSequencer seq,  int delay) {
+            Point loc, JingleSequencer seq,  int delay) {
         this.player = player;
         this.loc = loc;
         this.sequencer = seq;
@@ -34,7 +34,7 @@ public class JingleNotePlayer implements Runnable {
             }
             
             // Create a fake note block
-            player.sendBlockChange(loc, 25, (byte) 0);
+            //player.sendBlockChange(loc, 25, (byte) 0);
             Thread.sleep(100);
             
             try {
@@ -47,12 +47,12 @@ public class JingleNotePlayer implements Runnable {
             
             if (!keepMusicBlock) {
                 // Restore music block
-                CommandBook.server().getScheduler().scheduleSyncDelayedTask(CommandBook.inst(), new Runnable() {
+                CommandBook.game().getScheduler().scheduleSyncDelayedTask(CommandBook.inst(), new Runnable() {
                     
                     public void run() {
-                        int prevId = player.getWorld().getBlockTypeIdAt(loc);
-                        byte prevData = player.getWorld().getBlockAt(loc).getData();
-                        player.sendBlockChange(loc, prevId, prevData);
+                        //int prevId = player.getEntity().getWorld().getBlockTypeIdAt(loc);
+                        //byte prevData = player.getEntity().getWorld().getBlockData(loc)
+                        //player.sendBlockChange(loc, prevId, prevData);
                     }
                 });
             }
@@ -72,7 +72,7 @@ public class JingleNotePlayer implements Runnable {
         return player;
     }
 
-    public Location getLocation() {
+    public Point getLocation() {
         return loc;
     }
 
@@ -89,6 +89,6 @@ public class JingleNotePlayer implements Runnable {
             return;
         }
         
-        player.playNote(loc, instrument, note);
+        //player.playNote(loc, instrument, note);
     }
 }

@@ -21,9 +21,13 @@ package com.sk89q.commandbook.commands;
 import com.sk89q.commandbook.CommandBook;
 import com.zachsthings.libcomponents.AbstractComponent;
 import com.zachsthings.libcomponents.ComponentInformation;
-import com.sk89q.minecraft.util.commands.*;
-import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
+import org.spout.api.ChatColor;
+import org.spout.api.command.CommandContext;
+import org.spout.api.command.CommandSource;
+import org.spout.api.command.annotated.Command;
+import org.spout.api.command.annotated.CommandPermissions;
+import org.spout.api.command.annotated.NestedCommand;
+import org.spout.api.exception.CommandException;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -39,14 +43,14 @@ public class CommandBookCommands {
     }
     
     @Command(aliases = {"version"}, usage = "", desc = "CommandBook version information", min = 0, max = 0)
-    public static void version(CommandContext args, CommandSender sender) throws CommandException {
+    public static void version(CommandContext args, CommandSource sender) throws CommandException {
         sender.sendMessage(ChatColor.YELLOW + "CommandBook " + CommandBook.inst().getDescription().getVersion());
         sender.sendMessage(ChatColor.YELLOW + "http://www.sk89q.com");
     }
     
     @Command(aliases = {"reload"}, usage = "", desc = "Reload CommandBook's settings", min = 0, max = 0)
     @CommandPermissions({"commandbook.reload"})
-    public static void reload(CommandContext args, CommandSender sender) throws CommandException {
+    public static void reload(CommandContext args, CommandSource sender) throws CommandException {
         CommandBook.inst().populateConfiguration();
         CommandBook.inst().getComponentManager().reloadComponents();
         
@@ -55,7 +59,7 @@ public class CommandBookCommands {
 
     @Command(aliases = {"save"}, usage = "", desc = "Save CommandBook's settings", min = 0, max = 0)
     @CommandPermissions({"commandbook.save"})
-    public static void save(CommandContext args, CommandSender sender) throws CommandException {
+    public static void save(CommandContext args, CommandSource sender) throws CommandException {
         CommandBook.inst().getGlobalConfiguration().save();
 
         sender.sendMessage(ChatColor.YELLOW + "CommandBook's configuration has been reloaded.");
@@ -64,8 +68,8 @@ public class CommandBookCommands {
     @Command(aliases = {"help", "doc"}, usage = "<component>", desc = "Get documentation for a component",
             flags = "p:", min = 0, max = 1)
     @CommandPermissions("commandbook.component.help")
-    public static void help(CommandContext args, CommandSender sender) throws CommandException {
-        if (args.argsLength() == 0) {
+    public static void help(CommandContext args, CommandSource sender) throws CommandException {
+        if (args.length() == 0) {
             new PaginatedResult<AbstractComponent>("Name - Description") {
                 @Override
                 public String format(AbstractComponent entry) {

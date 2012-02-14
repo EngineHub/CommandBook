@@ -21,13 +21,17 @@ package com.sk89q.commandbook.util;
 import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.CommandBookUtil;
 import com.sk89q.commandbook.locations.*;
-import com.sk89q.minecraft.util.commands.CommandException;
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.block.Block;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
+import org.spout.api.command.CommandSource;
+import org.spout.api.exception.CommandException;
+import org.spout.api.geo.World;
+import org.spout.api.geo.cuboid.Block;
+import org.spout.api.geo.discrete.Point;
+import org.spout.api.geo.discrete.atomic.Transform;
+import org.spout.api.math.Quaternion;
+import org.spout.api.math.Vector3;
+import org.spout.api.player.Player;
 
+import java.util.Collection;
 import java.util.List;
 
 import static com.sk89q.commandbook.util.PlayerUtil.checkPlayer;
@@ -46,17 +50,17 @@ public class LocationUtil {
      * @return
      * @throws com.sk89q.minecraft.util.commands.CommandException
      */
-    public static World matchWorld(CommandSender sender, String filter) throws CommandException {
-        List<World> worlds = CommandBook.server().getWorlds();
+    public static World matchWorld(CommandSource sender, String filter) throws CommandException {
+        Collection<World> worlds = CommandBook.game().getWorlds();
 
         // Handle special hash tag groups
         if (filter.charAt(0) == '#') {
             // #main for the main world
             if (filter.equalsIgnoreCase("#main")) {
-                return worlds.get(0);
+                return worlds.iterator().next();
 
                 // #normal for the first normal world
-            } else if (filter.equalsIgnoreCase("#normal")) {
+            } /*else if (filter.equalsIgnoreCase("#normal")) {
                 for (World world : worlds) {
                     if (world.getEnvironment() == World.Environment.NORMAL) {
                         return world;
@@ -86,7 +90,7 @@ public class LocationUtil {
 
                 throw new CommandException("No skylands world found.");
                 // Handle getting a world from a player
-            } else if (filter.matches("^#player$")) {
+            } */else if (filter.matches("^#player$")) {
                 String parts[] = filter.split(":", 2);
 
                 // They didn't specify an argument for the player!
@@ -94,7 +98,7 @@ public class LocationUtil {
                     throw new CommandException("Argument expected for #player.");
                 }
 
-                return matchPlayers(sender, parts[1]).iterator().next().getWorld();
+                return matchPlayers(sender, parts[1]).iterator().next().getEntity().getWorld();
             } else {
                 throw new CommandException("Invalid identifier '" + filter + "'.");
             }
@@ -117,7 +121,7 @@ public class LocationUtil {
      * @return iterator for players
      * @throws CommandException no matches found
      */
-    public static Location matchLocation(CommandSender source, String filter)
+    public static Transform matchLocation(CommandSource source, String filter)
             throws CommandException {
 
         // Handle coordinates
@@ -126,21 +130,21 @@ public class LocationUtil {
 
             String[] args = filter.split(":");
             String[] parts = args[0].split(",");
-            double x, y, z;
+            float x, y, z;
 
             try {
-                x = Double.parseDouble(parts[0]);
-                y = Double.parseDouble(parts[1]);
-                z = Double.parseDouble(parts[2]);
+                x = Float.parseFloat(parts[0]);
+                y = Float.parseFloat(parts[1]);
+                z = Float.parseFloat(parts[2]);
             } catch (NumberFormatException e) {
                 throw new CommandException("Coordinates expected numbers!");
             }
 
             if (args.length > 1) {
-                return new Location(matchWorld(source, args[1]), x, y, z);
+                return new Transform(new Point(matchWorld(source, args[1]), x, y, z), new Quaternion(0, Vector3.UNIT_Y), Vector3.ONE);
             } else {
                 Player player = checkPlayer(source);
-                return new Location(player.getWorld(), x, y, z);
+                return new Transform(new Point(player.getEntity().getWorld(), x, y, z), new Quaternion(0, Vector3.UNIT_Y), Vector3.ONE);
             }
 
             // Handle special hash tag groups
@@ -153,27 +157,27 @@ public class LocationUtil {
             // calling source
             if (args[0].equalsIgnoreCase("#spawn")) {
                 if (args.length > 1) {
-                    return matchWorld(source, args[1]).getSpawnLocation();
+                    return matchWorld(source, args[1]).getSpawnPoint();
                 } else {
                     Player sourcePlayer = checkPlayer(source);
-                    return sourcePlayer.getLocation().getWorld().getSpawnLocation();
+                    return sourcePlayer.getEntity().getWorld().getSpawnPoint();
                 }
 
                 // Handle #target, which matches the player's target position
             } else if (args[0].equalsIgnoreCase("#target")) {
-                Player player = checkPlayer(source);
-                Location playerLoc = player.getLocation();
-                Block targetBlock = player.getTargetBlock(null, 100);
+                /*Player player = checkPlayer(source);
+                Transform playerLoc = player.getEntity().getTransform();
+                Block targetBlock = player.ge
 
                 if (targetBlock == null) {
                     throw new CommandException("Failed to find a block in your target!");
                 } else {
-                    Location loc = targetBlock.getLocation();
+                    Transform loc = targetBlock.getLocation();
                     playerLoc.setX(loc.getX());
                     playerLoc.setY(loc.getY());
                     playerLoc.setZ(loc.getZ());
                     return CommandBookUtil.findFreePosition(playerLoc);
-                }
+                }*/
                 // Handle #home and #warp, which matches a player's home or a warp point
             } else if (args[0].equalsIgnoreCase("#home")
                     || args[0].equalsIgnoreCase("#warp")) {
@@ -192,7 +196,7 @@ public class LocationUtil {
                     }
                     // source player home
                     Player ply = checkPlayer(source);
-                    NamedLocation loc = manager.get(ply.getWorld(), ply.getName());
+                    NamedLocation loc = manager.get(ply.getEntity().getWorld(), ply.getName());
                     if (loc == null) {
                         throw new CommandException("You have not set your home yet.");
                     }
@@ -200,12 +204,12 @@ public class LocationUtil {
                 } else if (args.length == 2) {
                     if (source instanceof Player) {
                         Player player = (Player) source;
-                        NamedLocation loc = manager.get(player.getWorld(), args[1]);
+                        NamedLocation loc = manager.get(player.getEntity().getWorld(), args[1]);
                         if (loc != null && !(loc.getCreatorName().equalsIgnoreCase(player.getName()))) {
                             CommandBook.inst().checkPermission(source, "commandbook.locations." + type + ".other");
                         }
                     }
-                    return getManagedLocation(manager, checkPlayer(source).getWorld(), args[1]);
+                    return getManagedLocation(manager, checkPlayer(source).getEntity().getWorld(), args[1]);
                 } else if (args.length == 3) {
                     if (source instanceof Player) {
                         Player player = (Player) source;
@@ -218,7 +222,7 @@ public class LocationUtil {
                 }
                 // Handle #me, which is for when a location argument is required
             } else if (args[0].equalsIgnoreCase("#me")) {
-                return checkPlayer(source).getLocation();
+                return checkPlayer(source).getEntity().getTransform();
             } else {
                 throw new CommandException("Invalid group '" + filter + "'.");
             }
@@ -231,7 +235,7 @@ public class LocationUtil {
             throw new CommandException("No players matched query.");
         }
 
-        return players.get(0).getLocation();
+        return players.get(0).getEntity().getTransform();
     }
 
     /**
@@ -243,17 +247,17 @@ public class LocationUtil {
      * @return a Bukkit location
      * @throws CommandException if the location by said id does not exist
      */
-    public static Location getManagedLocation(RootLocationManager<NamedLocation> manager,
+    public static Transform getManagedLocation(RootLocationManager<NamedLocation> manager,
                                        World world, String id) throws CommandException {
         NamedLocation loc = manager.get(world, id);
         if (loc == null) throw new CommandException("A location by that name could not be found.");
         return loc.getLocation();
     }
     
-    public static String toFriendlyString(Location location) {
-        return location.getBlockX() + "," + 
-                location.getBlockY() + "," + 
-                location.getBlockZ() + "@" + 
+    public static String toFriendlyString(Point location) {
+        return location.getX() + "," + 
+                location.getY() + "," + 
+                location.getZ() + "@" + 
                 location.getWorld().getName();
     }
 }

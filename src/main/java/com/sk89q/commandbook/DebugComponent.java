@@ -18,15 +18,19 @@
 
 package com.sk89q.commandbook;
 
-import com.zachsthings.libcomponents.bukkit.BukkitComponent;
+import com.zachsthings.libcomponents.spout.SpoutComponent;
 import com.zachsthings.libcomponents.ComponentInformation;
-import com.sk89q.minecraft.util.commands.*;
-import org.bukkit.ChatColor;
-import org.bukkit.World;
-import org.bukkit.command.CommandSender;
+import org.spout.api.ChatColor;
+import org.spout.api.command.CommandContext;
+import org.spout.api.command.CommandSource;
+import org.spout.api.command.annotated.Command;
+import org.spout.api.command.annotated.CommandPermissions;
+import org.spout.api.command.annotated.NestedCommand;
+import org.spout.api.exception.CommandException;
+import org.spout.api.geo.World;
 
 @ComponentInformation(friendlyName = "Debug", desc = "Provides useful debugging information for server owners.")
-public class DebugComponent extends BukkitComponent {
+public class DebugComponent extends SpoutComponent {
     @Override
     public void enable() {
         registerCommands(Commands.class);
@@ -35,7 +39,7 @@ public class DebugComponent extends BukkitComponent {
     public class Commands {
         @Command(aliases = {"debug"}, desc = "Debugging commands")
         @NestedCommand({DebugCommands.class})
-        public void debug(CommandContext args, CommandSender sender) throws CommandException {
+        public void debug(CommandContext args, CommandSource sender) throws CommandException {
         }
     }
 
@@ -43,10 +47,10 @@ public class DebugComponent extends BukkitComponent {
         @Command(aliases = {"clock"}, usage = "", desc = "Tests the clock rate of your server",
                 flags = "", min = 0, max = 1)
         @CommandPermissions({"commandbook.debug.clock"})
-        public void testClock(CommandContext args, final CommandSender sender) throws CommandException {
+        public void testClock(CommandContext args, final CommandSource sender) throws CommandException {
             int expected = 5;
 
-            if (args.argsLength() == 1) {
+            if (args.length() == 1) {
                 expected = Math.min(30, Math.max(1, args.getInteger(0)));
             }
 
@@ -55,17 +59,17 @@ public class DebugComponent extends BukkitComponent {
             sender.sendMessage(ChatColor.DARK_RED
                     + "DO NOT CHANGE A WORLD'S TIME OR PERFORM A HEAVY OPERATION.");
 
-            final World world = CommandBook.server().getWorlds().get(0);
+            final World world = CommandBook.game().getWorlds().iterator().next();
             final double expectedTime = expected * 1000;
             final double expectedSecs = expected;
             final int expectedTicks = 20 * (int)expectedSecs;
             final long start = System.currentTimeMillis();
-            final long startTicks = world.getFullTime();
+            final long startTicks = world.getAge();
 
             Runnable task = new Runnable() {
                 public void run() {
                     long now = System.currentTimeMillis();
-                    long nowTicks = world.getFullTime();
+                    long nowTicks = world.getAge();
 
                     long elapsedTime = now - start;
                     double elapsedSecs = elapsedTime / 1000.0;
@@ -82,7 +86,7 @@ public class DebugComponent extends BukkitComponent {
 
                     if (Math.round(clockRate) == 20) {
                         sender.sendMessage(ChatColor.YELLOW + "Clock test result: "
-                                + ChatColor.GREEN + "EXCELLENT");
+                                + ChatColor.BRIGHT_GREEN + "EXCELLENT");
                     } else {
                         if (elapsedSecs > expectedSecs) {
                             if (clockRate < 19) {
@@ -108,13 +112,13 @@ public class DebugComponent extends BukkitComponent {
                 }
             };
 
-            CommandBook.server().getScheduler().scheduleSyncDelayedTask(CommandBook.inst(), task, expectedTicks);
+            CommandBook.game().getScheduler().scheduleSyncDelayedTask(CommandBook.inst(), task, expectedTicks);
         }
 
         @Command(aliases = {"info"}, usage = "", desc = "Get server information",
                 flags = "", min = 0, max = 0)
         @CommandPermissions({"commandbook.debug.info"})
-        public void serverInfo(CommandContext args, CommandSender sender) throws CommandException {
+        public void serverInfo(CommandContext args, CommandSource sender) throws CommandException {
             Runtime rt = Runtime.getRuntime();
 
             sender.sendMessage(ChatColor.YELLOW

@@ -18,23 +18,22 @@
 
 package com.sk89q.commandbook;
 
-import com.zachsthings.libcomponents.bukkit.BukkitComponent;
 import com.zachsthings.libcomponents.ComponentInformation;
 import com.zachsthings.libcomponents.config.ConfigurationBase;
 import com.zachsthings.libcomponents.config.Setting;
 import com.sk89q.commandbook.util.PlayerUtil;
-import com.sk89q.minecraft.util.commands.Command;
-import com.sk89q.minecraft.util.commands.CommandContext;
-import com.sk89q.minecraft.util.commands.CommandException;
-import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.worldedit.blocks.ItemType;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.command.CommandSender;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
+import com.zachsthings.libcomponents.spout.SpoutComponent;
+import org.spout.api.ChatColor;
+import org.spout.api.command.CommandContext;
+import org.spout.api.command.CommandSource;
+import org.spout.api.command.annotated.Command;
+import org.spout.api.command.annotated.CommandPermissions;
+import org.spout.api.exception.CommandException;
+import org.spout.api.inventory.Inventory;
+import org.spout.api.inventory.ItemStack;
+import org.spout.api.material.MaterialData;
+import org.spout.api.player.Player;
 
 import java.util.Collections;
 import java.util.Set;
@@ -45,7 +44,7 @@ import static com.sk89q.commandbook.CommandBookUtil.takeItem;
 
 @ComponentInformation(friendlyName = "Inventory",
         desc = "Inventory-related commands, such as /give and /clear, are handled in this component.")
-public class InventoryComponent extends BukkitComponent {
+public class InventoryComponent extends SpoutComponent {
     protected LocalConfiguration config;
 
     @Override
@@ -76,19 +75,19 @@ public class InventoryComponent extends BukkitComponent {
      * @param id
      * @throws CommandException
      */
-    public void checkAllowedItem(CommandSender sender, int id)
+    public void checkAllowedItem(CommandSource sender, short id)
             throws CommandException {
 
-        if (Material.getMaterial(id) == null || id == 0) {
+        if (MaterialData.getMaterial(id) == null || id == 0) {
             throw new CommandException("Non-existent item specified.");
         }
 
         // Check if the user has an override
-        if (CommandBook.inst().hasPermission(sender, "commandbook.override.any-item")) {
+        if (sender.hasPermission("commandbook.override.any-item")) {
             return;
         }
 
-        boolean hasPermissions = CommandBook.inst().hasPermission(sender, "commandbook.items." + id);
+        boolean hasPermissions = sender.hasPermission("commandbook.items." + id);
 
         // Also check the permissions system
         if (hasPermissions) {
@@ -119,7 +118,7 @@ public class InventoryComponent extends BukkitComponent {
                 usage = "[target] <item[:data][|enchantment:level]> [amount]", desc = "Give an item",
                 flags = "do", min = 1, max = 3)
         @CommandPermissions({"commandbook.give"})
-        public void item(CommandContext args, CommandSender sender) throws CommandException {
+        public void item(CommandContext args, CommandSource sender) throws CommandException {
             ItemStack item = null;
             int amt = config.defaultItemStackSize;
             Iterable<Player> targets = null;
@@ -129,16 +128,16 @@ public class InventoryComponent extends BukkitComponent {
             // into three different possibilities
 
             // One argument: Just the item type and amount 1
-            if (args.argsLength() == 1) {
+            if (args.length() == 1) {
                 item = matchItem(args.getString(0));
                 targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
                 // Two arguments: Item type and amount
-            } else if (args.argsLength() == 2) {
+            } else if (args.length() == 2) {
                 item = matchItem(args.getString(0));
                 amt = args.getInteger(1);
                 targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
                 // Three arguments: Player, item type, and item amount
-            } else if (args.argsLength() == 3) {
+            } else if (args.length() == 3) {
                 item = matchItem(args.getString(1));
                 amt = args.getInteger(2);
                 targets = PlayerUtil.matchPlayers(sender, args.getString(0));
@@ -162,7 +161,7 @@ public class InventoryComponent extends BukkitComponent {
                 usage = "[-d] <target> <item[:data]> [amount]", desc = "Give an item",
                 flags = "do", min = 2, max = 3)
         @CommandPermissions({"commandbook.give", "commandbook.give.other"})
-        public void give(CommandContext args, CommandSender sender) throws CommandException {
+        public void give(CommandContext args, CommandSource sender) throws CommandException {
             ItemStack item = null;
             int amt = config.defaultItemStackSize;
             Iterable<Player> targets = null;
@@ -172,11 +171,11 @@ public class InventoryComponent extends BukkitComponent {
             // into three different possibilities
 
             // Two arguments: Player, item type
-            if (args.argsLength() == 2) {
+            if (args.length() == 2) {
                 targets = PlayerUtil.matchPlayers(sender, args.getString(0));
                 item = matchItem(args.getString(1));
                 // Three arguments: Player, item type, and item amount
-            } else if (args.argsLength() == 3) {
+            } else if (args.length() == 3) {
                 targets = PlayerUtil.matchPlayers(sender, args.getString(0));
                 item = matchItem(args.getString(1));
                 amt = args.getInteger(2);
@@ -200,14 +199,14 @@ public class InventoryComponent extends BukkitComponent {
                 usage = "[target]", desc = "Clear your inventory",
                 flags = "as", min = 0, max = 1)
         @CommandPermissions({"commandbook.clear"})
-        public void clear(CommandContext args, CommandSender sender) throws CommandException {
+        public void clear(CommandContext args, CommandSource sender) throws CommandException {
 
             Iterable<Player> targets;
             boolean clearAll = args.hasFlag('a');
             boolean clearSingle = args.hasFlag('s');
             boolean included = false;
 
-            if (args.argsLength() == 0) {
+            if (args.length() == 0) {
                 targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
                 // A different player
             } else {
@@ -223,19 +222,19 @@ public class InventoryComponent extends BukkitComponent {
             }
 
             for (Player player : targets) {
-                Inventory inventory = player.getInventory();
+                Inventory inventory = player.getEntity().getInventory();
 
                 if (clearSingle) {
-                    player.setItemInHand(null);
+                    player.getEntity().getInventory().setItem(null, inventory.getCurrentSlot());
                 } else {
                     for (int i = (clearAll ? 0 : 9); i < 36; i++) {
-                        inventory.setItem(i, null);
+                        inventory.setItem(null, i);
                     }
 
                     if (clearAll) {
                         // Armor slots
                         for (int i = 36; i <= 39; i++) {
-                            inventory.setItem(i, null);
+                            inventory.setItem(null, i);
                         }
                     }
                 }
@@ -272,7 +271,7 @@ public class InventoryComponent extends BukkitComponent {
                 usage = "[player]", desc = "Gets more of an item",
                 flags = "aio", min = 0, max = 1)
         @CommandPermissions({"commandbook.more"})
-        public void more(CommandContext args, CommandSender sender) throws CommandException {
+        public void more(CommandContext args, CommandSource sender) throws CommandException {
 
             Iterable<Player> targets;
             boolean moreAll = args.hasFlag('a');
@@ -286,7 +285,7 @@ public class InventoryComponent extends BukkitComponent {
 
             boolean included = false;
         
-            if (args.argsLength() == 0) {
+            if (args.length() == 0) {
                 targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
             // A different player
             } else {
@@ -303,14 +302,14 @@ public class InventoryComponent extends BukkitComponent {
             }
         
             for (Player player : targets) {
-                Inventory inventory = player.getInventory();
+                Inventory inventory = player.getEntity().getInventory();
             
                 if (moreAll) {
                     for (int i = 0; i < 39; i++) {
                         CommandBookUtil.expandStack(inventory.getItem(i), infinite, overrideStackSize);
                     }
                 } else {
-                    CommandBookUtil.expandStack(player.getItemInHand(), infinite, overrideStackSize);
+                    CommandBookUtil.expandStack(player.getEntity().getInventory().getCurrentItem(), infinite, overrideStackSize);
                 }
         
                 // Tell the user about the given item
@@ -340,17 +339,17 @@ public class InventoryComponent extends BukkitComponent {
                 usage = "<target> <item[:data]> [amount]", desc = "Take an item",
                 flags = "", min = 2, max = 3)
         @CommandPermissions({"commandbook.take"})
-        public void take(CommandContext args, CommandSender sender) throws CommandException {
+        public void take(CommandContext args, CommandSource sender) throws CommandException {
             ItemStack item = null;
             int amt = config.defaultItemStackSize;
             Player target = null;
 
             // Two arguments: Player, item type
-            if (args.argsLength() == 2) {
+            if (args.length() == 2) {
                 target = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
                 item = matchItem(args.getString(1));
                 // Three arguments: Player, item type, and item amount
-            } else if (args.argsLength() == 3) {
+            } else if (args.length() == 3) {
                 target = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
                 item = matchItem(args.getString(1));
                 amt = args.getInteger(2);
@@ -373,13 +372,13 @@ public class InventoryComponent extends BukkitComponent {
                 usage = "", desc = "Stack items",
                 max = 0)
         @CommandPermissions({"commandbook.stack"})
-        public void stack(CommandContext args, CommandSender sender) throws CommandException {
+        public void stack(CommandContext args, CommandSource sender) throws CommandException {
 
             Player player = PlayerUtil.checkPlayer(sender);
-            boolean ignoreMax = CommandBook.inst().hasPermission(player, "commandbook.stack.illegitimate");
-            boolean ignoreDamaged = CommandBook.inst().hasPermission(player, "commandbook.stack.damaged");
+            boolean ignoreMax = player.hasPermission("commandbook.stack.illegitimate");
+            boolean ignoreDamaged = player.hasPermission("commandbook.stack.damaged");
 
-            ItemStack[] items = player.getInventory().getContents();
+            ItemStack[] items = player.getEntity().getInventory().getContents();
             int len = items.length;
 
             int affected = 0;
@@ -389,11 +388,12 @@ public class InventoryComponent extends BukkitComponent {
 
                 // Avoid infinite stacks and stacks with durability
                 if (item == null || item.getAmount() <= 0
-                        || (!ignoreMax && item.getMaxStackSize() == 1)) {
+                        /*|| (!ignoreMax && item.getMaxStackSize() == 1)*/) {
                     continue;
                 }
-
-                int max = ignoreMax ? 64 : item.getMaxStackSize();
+                
+                int max = 64;
+                //int max = ignoreMax ? 64 : item.getMaxStackSize();
 
                 if (item.getAmount() < max) {
                     int needed = max - item.getAmount(); // Number of needed items until max
@@ -404,16 +404,16 @@ public class InventoryComponent extends BukkitComponent {
 
                         // Avoid infinite stacks and stacks with durability
                         if (item2 == null || item2.getAmount() <= 0
-                                || (!ignoreMax && item.getMaxStackSize() == 1)) {
+                                || (!ignoreMax /*&& item.getMaxStackSize() == 1*/)) {
                             continue;
                         }
 
                         // Same type?
                         // Blocks store their color in the damage value
-                        if (item2.getTypeId() == item.getTypeId() &&
-                                ((!ItemType.usesDamageValue(item.getTypeId()) && ignoreDamaged)
-                                        || item.getDurability() == item2.getDurability()) &&
-                                item.getEnchantments().equals(item2.getEnchantments())) {
+                        if (item2.getMaterial().getId() == item.getMaterial().getId() &&
+                                ((!item.getMaterial().hasSubtypes() && ignoreDamaged)
+                                        || item.getDamage() == item2.getDamage()) /*&&
+                                item.getEnchantments().equals(item2.getEnchantments())*/) {
                             // This stack won't fit in the parent stack
                             if (item2.getAmount() > needed) {
                                 item.setAmount(64);
@@ -433,7 +433,9 @@ public class InventoryComponent extends BukkitComponent {
             }
 
             if (affected > 0) {
-                player.getInventory().setContents(items);
+                for (int i = 0; i < items.length; ++i) {
+                    player.getEntity().getInventory().setItem(items[1], i);
+                }
             }
 
             player.sendMessage(ChatColor.YELLOW + "Items compacted into stacks!");

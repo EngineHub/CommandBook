@@ -18,23 +18,22 @@
 
 package com.sk89q.commandbook.util;
 
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import com.sk89q.commandbook.CommandBook;
+import org.spout.api.ChatColor;
+import org.spout.api.command.CommandSource;
+import org.spout.api.geo.discrete.atomic.Transform;
+import org.spout.api.player.Player;
 
 public class TeleportPlayerIterator extends PlayerIteratorAction {
     
-    protected final Location loc;
-    protected Location oldLoc;
+    protected final Transform loc;
+    protected Transform oldLoc;
     protected final boolean silent;
     
-    public TeleportPlayerIterator(CommandSender sender, Location loc) {
+    public TeleportPlayerIterator(CommandSource sender, Transform loc) {
         this(sender, loc, false);
     }
 
-    public TeleportPlayerIterator(CommandSender sender, Location loc, boolean silent) {
+    public TeleportPlayerIterator(CommandSource sender, Transform loc, boolean silent) {
         super(sender);
         this.loc = loc;
         this.silent = silent;
@@ -42,8 +41,8 @@ public class TeleportPlayerIterator extends PlayerIteratorAction {
     
     @Override
     public void perform(Player player) {
-        oldLoc = player.getLocation();
-        player.teleport(loc);
+        oldLoc = player.getEntity().getTransform();
+        player.getEntity().setTransform(loc);
     }
     
     @Override
@@ -52,22 +51,22 @@ public class TeleportPlayerIterator extends PlayerIteratorAction {
     }
     
     @Override
-    public void onVictim(CommandSender sender, Player player) {
+    public void onVictim(CommandSource sender, Player player) {
         if (silent)
             return;
 
-        if (oldLoc.getWorld().equals(loc.getWorld())) {
+        if (oldLoc.getPosition().getWorld().equals(loc.getPosition().getWorld())) {
             player.sendMessage(ChatColor.YELLOW + "You've been teleported by "
                     + PlayerUtil.toName(sender) + ".");
         } else {
             player.sendMessage(ChatColor.YELLOW + "You've been teleported by "
                     + PlayerUtil.toName(sender) + " to world '"
-                    + loc.getWorld().getName() + "'.");
+                    + loc.getPosition().getWorld().getName() + "'.");
         }
     }
     
     @Override
-    public void onInformMany(CommandSender sender, int affected) {
+    public void onInformMany(CommandSource sender, int affected) {
         sender.sendMessage(ChatColor.YELLOW.toString()
                 + affected + " teleported.");
     }

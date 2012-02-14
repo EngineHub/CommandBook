@@ -42,15 +42,15 @@
 
     <dependency>
         <groupId>com.zachsthings.libcomponents</groupId>
-        <artifactId>libcomponents-bukkit</artifactId>
-        <version>1.0</version>
+        <artifactId>libcomponents-spout</artifactId>
+        <version>1.1-SNAPSHOT</version>
     </dependency>
 
     <!-- Bukkit -->
     <dependency>
-      <groupId>org.bukkit</groupId>
-      <artifactId>bukkit</artifactId>
-      <version>1.1-R3</version>
+      <groupId>org.spout</groupId>
+      <artifactId>spoutapi</artifactId>
+      <version>dev-SNAPSHOT</version>
     </dependency>
 
     <!-- Other dependencies -->
@@ -137,7 +137,7 @@
               <artifactSet>
                 <includes>
                   <include>net.sf.opencsv:opencsv</include>
-                  <include>com.zachsthings.libcomponents:libcomponents-bukkit</include>
+                  <include>com.zachsthings.libcomponents:libcomponents-spout</include>
                 </includes>
               </artifactSet>
             </configuration>

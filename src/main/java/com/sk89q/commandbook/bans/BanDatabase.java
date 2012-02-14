@@ -18,9 +18,10 @@
 
 package com.sk89q.commandbook.bans;
 
+import org.spout.api.command.CommandSource;
+import org.spout.api.player.Player;
+
 import java.net.InetAddress;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 /**
  * Interface for a ban database.
@@ -89,7 +90,7 @@ public interface BanDatabase extends Iterable<Ban> {
      * @param reason 
      */
     @Deprecated
-    public void banName(String name, CommandSender source, String reason);
+    public void banName(String name, CommandSource source, String reason);
     
     /**
      * Bans an address.
@@ -99,7 +100,7 @@ public interface BanDatabase extends Iterable<Ban> {
      * @param reason 
      */
     @Deprecated
-    public void banAddress(String address, CommandSender source, String reason);
+    public void banAddress(String address, CommandSource source, String reason);
 
     /**
      * Bans a player by name and address
@@ -109,7 +110,7 @@ public interface BanDatabase extends Iterable<Ban> {
      * @param reason
      * @param end
      */
-    public void ban(Player player, CommandSender source, String reason, long end);
+    public void ban(Player player, CommandSource source, String reason, long end);
 
     /**
      * Bans a name and or address.
@@ -119,7 +120,7 @@ public interface BanDatabase extends Iterable<Ban> {
      * @param reason
      * @param end
      */
-    public void ban(String name, String address, CommandSender source, String reason, long end);
+    public void ban(String name, String address, CommandSource source, String reason, long end);
     
     /**
      * Unbans a name.
@@ -130,7 +131,7 @@ public interface BanDatabase extends Iterable<Ban> {
      * @return whether the name was found
      */
     @Deprecated
-    public boolean unbanName(String name, CommandSender source, String reason);
+    public boolean unbanName(String name, CommandSource source, String reason);
     
     /**
      * Unbans an address.
@@ -141,7 +142,7 @@ public interface BanDatabase extends Iterable<Ban> {
      * @return whether the address was found
      */
     @Deprecated
-    public boolean unbanAddress(String address, CommandSender source, String reason);
+    public boolean unbanAddress(String address, CommandSource source, String reason);
 
     /**
      * Unban a name and/or address. First looks up by name, then if not found looks up by address.
@@ -152,7 +153,7 @@ public interface BanDatabase extends Iterable<Ban> {
      * @param reason
      * @return
      */
-    public boolean unban(String name, String address, CommandSender source, String reason);
+    public boolean unban(String name, String address, CommandSource source, String reason);
     
     /**
      * Unbans a name.
@@ -161,7 +162,7 @@ public interface BanDatabase extends Iterable<Ban> {
      * @param source 
      * @param reason 
      */
-    public void logKick(Player player, CommandSender source, String reason);
+    public void logKick(Player player, CommandSource source, String reason);
 
     /**
      * Imports the bans from another ban database.

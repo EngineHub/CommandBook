@@ -20,7 +20,7 @@ package com.sk89q.commandbook.util;
 
 import com.sk89q.commandbook.CommandBookUtil;
 import com.sk89q.minecraft.util.commands.CommandException;
-import org.bukkit.command.CommandSender;
+import org.spout.api.command.CommandSource;
 import org.bukkit.entity.CreatureType;
 
 public class EntityUtil {
@@ -32,7 +32,7 @@ public class EntityUtil {
      * @return
      * @throws com.sk89q.minecraft.util.commands.CommandException
      */
-    public static CreatureType matchCreatureType(CommandSender sender,
+    public static CreatureType matchCreatureType(CommandSource sender,
                                           String filter) throws CommandException {
         CreatureType type = CreatureType.fromName(filter);
         if (type != null) {

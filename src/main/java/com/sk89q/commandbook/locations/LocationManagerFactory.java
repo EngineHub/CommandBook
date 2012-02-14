@@ -18,7 +18,7 @@
 
 package com.sk89q.commandbook.locations;
 
-import org.bukkit.World;
+import org.spout.api.geo.World;
 
 public interface LocationManagerFactory<T> {
 

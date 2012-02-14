@@ -14,8 +14,8 @@ import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
 import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.util.PlayerUtil;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
+import org.spout.api.command.CommandSource;
+import org.spout.api.player.Player;
 
 import static com.sk89q.commandbook.CommandBook.logger;
 
@@ -197,11 +197,11 @@ public class CSVBanDatabase implements BanDatabase {
         return false;
     }
 
-    public void ban(Player player, CommandSender source, String reason, long end) {
-        ban(player.getName(), player.getAddress().getAddress().getHostAddress(), source, reason, end);
+    public void ban(Player player, CommandSource source, String reason, long end) {
+        ban(player.getName(), player.getAddress().getHostAddress(), source, reason, end);
     }
 
-    public void ban(String name, String address, CommandSender source, String reason, long end) {
+    public void ban(String name, String address, CommandSource source, String reason, long end) {
         Ban ban = new Ban(name, address, reason, System.currentTimeMillis(), end);
         String banned = null;
         String bannedName = null;
@@ -227,15 +227,15 @@ public class CSVBanDatabase implements BanDatabase {
         }
     }
 
-    public void banName(String name, CommandSender source, String reason) {
+    public void banName(String name, CommandSource source, String reason) {
         ban(name, null, source, reason, 0L);
     }
 
-    public void banAddress(String address, CommandSender source, String reason) {
+    public void banAddress(String address, CommandSource source, String reason) {
         ban(null, address, source, reason, 0L);
     }
 
-    public boolean unban(String name, String address, CommandSender source, String reason) {
+    public boolean unban(String name, String address, CommandSource source, String reason) {
         Ban ban = null;
         String banned = null;
         String bannedName = null;
@@ -275,11 +275,11 @@ public class CSVBanDatabase implements BanDatabase {
         return false;
     }
 
-    public boolean unbanName(String name, CommandSender source, String reason) {
+    public boolean unbanName(String name, CommandSource source, String reason) {
         return unban(name, null, source, reason);
     }
 
-    public boolean unbanAddress(String address, CommandSender source, String reason) {
+    public boolean unbanAddress(String address, CommandSource source, String reason) {
         return unban(null, address, source, reason);
     }
 
@@ -295,7 +295,7 @@ public class CSVBanDatabase implements BanDatabase {
         return ban.getReason();
     }
 
-    public void logKick(Player player, CommandSender source, String reason) {
+    public void logKick(Player player, CommandSource source, String reason) {
         auditLogger.info(String.format("KICKED: %s (%s) kicked player '%s': %s",
                 PlayerUtil.toUniqueName(source),
                 CommandBook.inst().toInetAddressString(source),

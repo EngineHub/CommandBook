@@ -18,20 +18,20 @@
 
 package com.sk89q.commandbook.events;
 
-import org.bukkit.command.CommandSender;
-import org.bukkit.event.Event;
-import org.bukkit.event.HandlerList;
+import org.spout.api.command.CommandSource;
+import org.spout.api.event.Event;
+import org.spout.api.event.HandlerList;
 
 public class OnlineListSendEvent extends Event {
     
     private static final long serialVersionUID = -2101268576268728497L;
-    private final CommandSender target;
+    private final CommandSource target;
 
-    public OnlineListSendEvent(CommandSender target) {
+    public OnlineListSendEvent(CommandSource target) {
         this.target = target;
     }
 
-    public CommandSender getTarget() {
+    public CommandSource getTarget() {
         return target;
     }
 

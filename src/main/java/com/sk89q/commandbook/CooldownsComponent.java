@@ -19,16 +19,15 @@
 package com.sk89q.commandbook;
 
 import com.zachsthings.libcomponents.ComponentInformation;
-import com.zachsthings.libcomponents.bukkit.BukkitComponent;
+import com.zachsthings.libcomponents.spout.SpoutComponent;
 import com.zachsthings.libcomponents.config.ConfigurationBase;
 import com.zachsthings.libcomponents.config.Setting;
-import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.event.server.ServerCommandEvent;
+import org.spout.api.ChatColor;
+import org.spout.api.command.CommandSource;
+import org.spout.api.event.EventHandler;
+import org.spout.api.event.Listener;
+import org.spout.api.event.Order;
+import org.spout.api.event.server.PreCommandEvent;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -46,15 +45,15 @@ import static com.sk89q.commandbook.CommandBookUtil.getNestedMap;
  * configuration, removing the entry if the warmup/cooldown has been removed from the configuration
  */
 @ComponentInformation(friendlyName = "Warmups and Cooldowns", desc = "Allows warmups and cooldowns for commands, specified in seconds.")
-public class CooldownsComponent extends BukkitComponent implements Listener, Runnable {
+public class CooldownsComponent extends SpoutComponent implements Listener, Runnable {
     private LocalConfiguration config;
     private final Map<String, CooldownState> states = new ConcurrentHashMap<String, CooldownState>();
     
     @Override
     public void enable() {
         config = configure(new LocalConfiguration());
-        CommandBook.registerEvents(this);
-        CommandBook.server().getScheduler().scheduleAsyncRepeatingTask(CommandBook.inst(), this, 20L, 20L);
+        CommandBook.game().getEventManager().registerEvents(this, this);
+        CommandBook.game().getScheduler().scheduleAsyncRepeatingTask(CommandBook.inst(), this, 20L, 20L);
     }
     
     private static String firstWord(final String str) {
@@ -96,10 +95,10 @@ public class CooldownsComponent extends BukkitComponent implements Listener, Run
                 } else if (entry.getValue().remainingTime == warmupTime) { 
                     // Reached the needed time, run a scheduler task to execute the command 
                     // back on the main thread.
-                    CommandBook.server().getScheduler().scheduleSyncDelayedTask(CommandBook.inst(), new Runnable() {
+                    CommandBook.game().getScheduler().scheduleSyncDelayedTask(CommandBook.inst(), new Runnable() {
                         @Override
                         public void run() {
-                            CommandBook.server().dispatchCommand(state.sender, entry.getValue().fullCommand);
+                            CommandBook.game().processCommand(state.sender, entry.getValue().fullCommand);
                         }
                     }, 0L);
                 }
@@ -123,23 +122,15 @@ public class CooldownsComponent extends BukkitComponent implements Listener, Run
         }
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void playerHandler(PlayerCommandPreprocessEvent event) {
-        if (!checkCooldown(event.getPlayer(), event.getMessage().substring(1)) 
-                || !checkWarmup(event.getPlayer(), event.getMessage().substring(1))) {
+    @EventHandler(order = Order.EARLIEST)
+    public void playerHandler(PreCommandEvent event) {
+        if (!checkCooldown(event.getCommandSource(), event.getMessage()) 
+                || !checkWarmup(event.getCommandSource(), event.getMessage())) {
             event.setCancelled(true);
         }
     }
     
-    //@EventHandler(priority = EventPriority.LOWEST) // TODO: Make ServerCommandEvent Cancellable
-    public void serverCommandHandler(ServerCommandEvent event) {
-        if (!checkCooldown(event.getSender(), event.getCommand())
-                || !checkWarmup(event.getSender(), event.getCommand())) {
-            event.setCommand(null);
-        }
-    }
-    
-    public boolean checkCooldown(CommandSender sender, String command) {
+    public boolean checkCooldown(CommandSource sender, String command) {
         CooldownState state = getState(sender);
         command = firstWord(command);
         synchronized (state.cooldownCommands) {
@@ -160,7 +151,7 @@ public class CooldownsComponent extends BukkitComponent implements Listener, Run
             }
             
             if (passedCooldownTime >= requiredCooldownTime 
-                    || CommandBook.inst().hasPermission(sender, "commandbook.cooldown.override." + command)) {
+                    || sender.hasPermission("commandbook.cooldown.override." + command)) {
                 state.cooldownCommands.remove(command);
                 return true;
             } else {
@@ -170,7 +161,7 @@ public class CooldownsComponent extends BukkitComponent implements Listener, Run
         }
     }
     
-    public boolean checkWarmup(CommandSender sender, String command) {
+    public boolean checkWarmup(CommandSource sender, String command) {
         CooldownState state = getState(sender);
         synchronized (state.warmupCommands) {
             Map<String, Integer> storedTimes = config.registeredActions.get(firstWord(command));
@@ -202,7 +193,7 @@ public class CooldownsComponent extends BukkitComponent implements Listener, Run
         }
     }
     
-    public CooldownState getState(CommandSender sender) {
+    public CooldownState getState(CommandSource sender) {
         CooldownState state = states.get(sender.getName());
         if (state == null) {
             state = new CooldownState();
@@ -222,7 +213,7 @@ public class CooldownsComponent extends BukkitComponent implements Listener, Run
     } 
     
     private static class CooldownState {
-        public CommandSender sender;
+        public CommandSource sender;
         public final Map<String, WarmupInfo> warmupCommands = new ConcurrentHashMap<String, WarmupInfo>();
         public final Map<String, Integer> cooldownCommands = new ConcurrentHashMap<String, Integer>();
     }

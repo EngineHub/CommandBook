@@ -18,21 +18,21 @@
 
 package com.sk89q.commandbook;
 
-import com.zachsthings.libcomponents.bukkit.BukkitComponent;
+import com.zachsthings.libcomponents.spout.SpoutComponent;
 import com.zachsthings.libcomponents.ComponentInformation;
 import com.zachsthings.libcomponents.config.ConfigurationBase;
 import com.zachsthings.libcomponents.config.Setting;
 import com.sk89q.commandbook.events.MOTDSendEvent;
-import com.sk89q.minecraft.util.commands.Command;
-import com.sk89q.minecraft.util.commands.CommandContext;
-import com.sk89q.minecraft.util.commands.CommandException;
-import com.sk89q.minecraft.util.commands.CommandPermissions;
-import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
+import org.spout.api.ChatColor;
+import org.spout.api.command.CommandContext;
+import org.spout.api.command.CommandSource;
+import org.spout.api.command.annotated.Command;
+import org.spout.api.command.annotated.CommandPermissions;
+import org.spout.api.event.EventHandler;
+import org.spout.api.event.Listener;
+import org.spout.api.event.player.PlayerJoinEvent;
+import org.spout.api.exception.CommandException;
+import org.spout.api.player.Player;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,7 +41,7 @@ import static com.sk89q.commandbook.CommandBookUtil.replaceColorMacros;
 import static com.sk89q.commandbook.CommandBookUtil.sendMessage;
 
 @ComponentInformation(friendlyName = "Stored Messages", desc = "Handles stored messages, such as the MOTD and rules pages.")
-public class StoredMessagesComponent extends BukkitComponent implements Listener {
+public class StoredMessagesComponent extends SpoutComponent implements Listener {
 
     protected final Map<String, String> messages = new HashMap<String, String>();
     
@@ -51,7 +51,7 @@ public class StoredMessagesComponent extends BukkitComponent implements Listener
     public void enable() {
         config = new LocalConfiguration();
         loadMessages();
-        CommandBook.registerEvents(this);
+        CommandBook.game().getEventManager().registerEvents(this, this);
         registerCommands(Commands.class);
     }
     
@@ -111,7 +111,7 @@ public class StoredMessagesComponent extends BukkitComponent implements Listener
                 usage = "", desc = "Show the message of the day",
                 min = 0, max = 0)
         @CommandPermissions({"commandbook.motd"})
-        public void motd(CommandContext args, CommandSender sender) throws CommandException {
+        public void motd(CommandContext args, CommandSource sender) throws CommandException {
 
             String motd = getMessage("motd");
 
@@ -131,7 +131,7 @@ public class StoredMessagesComponent extends BukkitComponent implements Listener
                 usage = "", desc = "Show the rules",
                 min = 0, max = 0)
         @CommandPermissions({"commandbook.rules"})
-        public void rules(CommandContext args, CommandSender sender) throws CommandException {
+        public void rules(CommandContext args, CommandSource sender) throws CommandException {
 
             String motd = getMessage("rules");
 

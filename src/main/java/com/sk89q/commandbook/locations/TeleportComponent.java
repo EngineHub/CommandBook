@@ -19,7 +19,7 @@
 package com.sk89q.commandbook.locations;
 
 import com.sk89q.commandbook.CommandBook;
-import com.zachsthings.libcomponents.bukkit.BukkitComponent;
+import com.zachsthings.libcomponents.spout.SpoutComponent;
 import com.zachsthings.libcomponents.ComponentInformation;
 import com.zachsthings.libcomponents.Depend;
 import com.zachsthings.libcomponents.InjectComponent;
@@ -27,51 +27,53 @@ import com.sk89q.commandbook.session.SessionComponent;
 import com.sk89q.commandbook.util.LocationUtil;
 import com.sk89q.commandbook.util.PlayerUtil;
 import com.sk89q.commandbook.util.TeleportPlayerIterator;
-import com.sk89q.minecraft.util.commands.Command;
-import com.sk89q.minecraft.util.commands.CommandContext;
-import com.sk89q.minecraft.util.commands.CommandException;
-import com.sk89q.minecraft.util.commands.CommandPermissions;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerRespawnEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
+import org.spout.api.ChatColor;
+import org.spout.api.command.CommandContext;
+import org.spout.api.command.CommandSource;
+import org.spout.api.command.annotated.Command;
+import org.spout.api.command.annotated.CommandPermissions;
+import org.spout.api.entity.PlayerController;
+import org.spout.api.event.EventHandler;
+import org.spout.api.event.Listener;
+import org.spout.api.event.entity.EntityTeleportEvent;
+import org.spout.api.exception.CommandException;
+import org.spout.api.geo.discrete.Point;
+import org.spout.api.geo.discrete.atomic.Transform;
+import org.spout.api.player.Player;
 
 @ComponentInformation(friendlyName = "Teleports", desc = "Teleport-related commands")
 @Depend(components = SessionComponent.class)
-public class TeleportComponent extends BukkitComponent implements Listener {
+public class TeleportComponent extends SpoutComponent implements Listener {
     
     @InjectComponent private SessionComponent sessions;
 
     @Override
     public void enable() {
-        CommandBook.registerEvents(this);
+        CommandBook.game().getEventManager().registerEvents(this, this);
         registerCommands(Commands.class);
     }
 
     // -- Event handlers
     
-    @EventHandler
+    /*@EventHandler
     public void onRespawn(PlayerRespawnEvent event) {
         sessions.getSession(event.getPlayer()).rememberLocation(event.getPlayer());
-    }
+    }*/
     
     @EventHandler
-    public void onTeleport(PlayerTeleportEvent event) {
-
-        Location loc = event.getTo();
-        Player player = event.getPlayer();
-        if (event.isCancelled()) {
-            return;
+    public void onTeleport(EntityTeleportEvent event) {
+        if (event.getEntity().is(PlayerController.class)) {
+            Player player = ((PlayerController) event.getEntity().getController()).getPlayer();
+            Point loc = event.getTo();
+            if (event.isCancelled()) {
+                return;
+            }
+            if (loc.equals(sessions.getSession(player).getIgnoreLocation().getPosition())) {
+                sessions.getSession(player).setIgnoreLocation(null);
+                return;
+            }
+            sessions.getSession(player).rememberLocation(player);
         }
-        if (loc == sessions.getSession(player).getIgnoreLocation()) {
-            sessions.getSession(player).setIgnoreLocation(null);
-            return;
-        }
-        sessions.getSession(event.getPlayer()).rememberLocation(event.getPlayer());
     }
 
     public class Commands {
@@ -80,17 +82,17 @@ public class TeleportComponent extends BukkitComponent implements Listener {
                 desc = "Teleport to a location",
                 flags = "s", min = 1, max = 2)
         @CommandPermissions({"commandbook.teleport"})
-        public void teleport(CommandContext args, CommandSender sender) throws CommandException {
+        public void teleport(CommandContext args, CommandSource sender) throws CommandException {
 
             Iterable<Player> targets;
-            final Location loc;
+            final Transform loc;
 
             // Detect arguments based on the number of arguments provided
-            if (args.argsLength() == 1) {
+            if (args.length() == 1) {
                 targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
                 loc = LocationUtil.matchLocation(sender, args.getString(0));
                 if (sender instanceof Player) {
-                    CommandBook.inst().checkPermission(sender, loc.getWorld(), "commandbook.teleport");
+                    CommandBook.inst().checkPermission(sender, loc.getPosition().getWorld(), "commandbook.teleport");
                 }
             } else {
                 targets = PlayerUtil.matchPlayers(sender, args.getString(0));
@@ -101,7 +103,7 @@ public class TeleportComponent extends BukkitComponent implements Listener {
                     if (target != sender) {
                         CommandBook.inst().checkPermission(sender, "commandbook.teleport.other");
                         if (sender instanceof Player) {
-                            CommandBook.inst().checkPermission(sender, loc.getWorld(), "commandbook.teleport.other");
+                            CommandBook.inst().checkPermission(sender, loc.getPosition().getWorld(), "commandbook.teleport.other");
                         }
                         break;
                     }
@@ -113,31 +115,31 @@ public class TeleportComponent extends BukkitComponent implements Listener {
 
         @Command(aliases = {"call"}, usage = "<target>", desc = "Request a teleport", min = 1, max = 1)
         @CommandPermissions({"commandbook.call"})
-        public void requestTeleport(CommandContext args, CommandSender sender) throws CommandException {
+        public void requestTeleport(CommandContext args, CommandSource sender) throws CommandException {
             Player player = PlayerUtil.checkPlayer(sender);
             Player target = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
 
-            CommandBook.inst().checkPermission(sender, target.getWorld(), "commandbook.call");
+            CommandBook.inst().checkPermission(sender, target.getEntity().getWorld(), "commandbook.call");
 
             sessions.getSession(player).checkLastTeleportRequest(target);
             sessions.getSession(target).addBringable(player);
 
             sender.sendMessage(ChatColor.YELLOW.toString() + "Teleport request sent.");
-            target.sendMessage(ChatColor.AQUA + "**TELEPORT** " + PlayerUtil.toName(sender)
+            target.sendMessage(ChatColor.CYAN + "**TELEPORT** " + PlayerUtil.toName(sender)
                     + " requests a teleport! Use /bring <name> to accept.");
         }
 
         @Command(aliases = {"bring", "tphere", "summon", "s"}, usage = "<target>", desc = "Bring a player to you", min = 1, max = 1)
-        public void bring(CommandContext args, CommandSender sender) throws CommandException {
+        public void bring(CommandContext args, CommandSource sender) throws CommandException {
             Player player = PlayerUtil.checkPlayer(sender);
-            if (!CommandBook.inst().hasPermission(sender, "commandbook.teleport.other")) {
+            if (!sender.hasPermission("commandbook.teleport.other")) {
                 Player target = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
 
                 if (sessions.getSession(player).isBringable(target)) {
                     sender.sendMessage(ChatColor.YELLOW + "Player teleported.");
                     target.sendMessage(ChatColor.YELLOW + "Your teleport request to "
                             + PlayerUtil.toName(sender) + " was accepted.");
-                    target.teleport(player);
+                    target.getEntity().setTransform(player.getEntity().getTransform());
                 } else {
                     throw new CommandException("That person didn't request a " +
                             "teleport (recently) and you don't have " +
@@ -148,20 +150,20 @@ public class TeleportComponent extends BukkitComponent implements Listener {
             }
 
             Iterable<Player> targets = PlayerUtil.matchPlayers(sender, args.getString(0));
-            Location loc = player.getLocation();
+            Transform loc = player.getEntity().getTransform();
 
             (new TeleportPlayerIterator(sender, loc) {
                 @Override
                 public void perform(Player player) {
                     if (sender instanceof Player) {
-                        if (!player.getWorld().getName().equals(((Player) sender).getWorld().getName())) {
-                            if (!CommandBook.inst().hasPermission(sender, player.getWorld(), "commandbook.teleport.other")) {
+                        if (!player.getEntity().getWorld().getName().equals(((Player) sender).getEntity().getWorld().getName())) {
+                            if (!sender.hasPermission(player.getEntity().getWorld(), "commandbook.teleport.other")) {
                                 return;
                             }
                         }
                     }
-                    oldLoc = player.getLocation();
-                    player.teleport(loc);
+                    oldLoc = player.getEntity().getTransform();
+                    player.getEntity().setTransform(loc);
                 }
             }).iterate(targets);
         }
@@ -169,19 +171,18 @@ public class TeleportComponent extends BukkitComponent implements Listener {
         @Command(aliases = {"put", "place"}, usage = "<target>",
                 desc = "Put a player at where you are looking", min = 1, max = 1)
         @CommandPermissions({"commandbook.teleport.other"})
-        public void put(CommandContext args, CommandSender sender) throws CommandException {
+        public void put(CommandContext args, CommandSource sender) throws CommandException {
             Iterable<Player> targets = PlayerUtil.matchPlayers(sender, args.getString(0));
-            Location loc = LocationUtil.matchLocation(sender, "#target");
+            Transform loc = LocationUtil.matchLocation(sender, "#target");
 
             (new TeleportPlayerIterator(sender, loc) {
                 @Override
                 public void perform(Player player) {
-                    oldLoc = player.getLocation();
+                    oldLoc = player.getEntity().getTransform();
 
-                    Location playerLoc = player.getLocation();
-                    loc.setPitch(playerLoc.getPitch());
-                    loc.setYaw(playerLoc.getYaw());
-                    player.teleport(loc);
+                    Transform playerLoc = player.getEntity().getTransform();
+                    loc.setRotation(playerLoc.getRotation());
+                    player.getEntity().setTransform(loc);
                 }
 
             }).iterate(targets);
@@ -189,9 +190,9 @@ public class TeleportComponent extends BukkitComponent implements Listener {
 
         @Command(aliases = {"return", "ret"}, usage = "[player]", desc = "Teleport back to your last location", min = 0, max = 1)
         @CommandPermissions({"commandbook.return"})
-        public void ret(CommandContext args, CommandSender sender) throws CommandException {
+        public void ret(CommandContext args, CommandSource sender) throws CommandException {
             Player player;
-            if (args.argsLength() > 0) {
+            if (args.length() > 0) {
                 player = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
                 if (player != sender) {
                     CommandBook.inst().checkPermission(sender, "commandbook.return.other");
@@ -199,11 +200,11 @@ public class TeleportComponent extends BukkitComponent implements Listener {
             } else {
                 player = PlayerUtil.checkPlayer(sender);
             }
-            Location lastLoc = sessions.getSession(player).popLastLocation();
+            Transform lastLoc = sessions.getSession(player).popLastLocation();
 
             if (lastLoc != null) {
                 sessions.getSession(player).setIgnoreLocation(lastLoc);
-                player.teleport(lastLoc);
+                player.getEntity().setTransform(lastLoc);
                 sender.sendMessage(ChatColor.YELLOW + "You've been returned.");
             } else {
                 sender.sendMessage(ChatColor.RED + "There's no past location in your history.");

@@ -18,23 +18,23 @@
 
 package com.sk89q.commandbook.events;
 
-import org.bukkit.command.CommandSender;
-import org.bukkit.event.Event;
-import org.bukkit.event.HandlerList;
+import org.spout.api.command.CommandSource;
+import org.spout.api.event.Event;
+import org.spout.api.event.HandlerList;
 
-public class CommandSenderMessageEvent extends Event {
+public class CommandSourceMessageEvent extends Event {
     
     private static final long serialVersionUID = 1724483171471625110L;
     
-    private final CommandSender sender;
+    private final CommandSource sender;
     private final String message;
 
-    public CommandSenderMessageEvent(CommandSender sender, String message) {
+    public CommandSourceMessageEvent(CommandSource sender, String message) {
         this.sender = sender;
         this.message = message;
     }
 
-    public CommandSender getSender() {
+    public CommandSource getSender() {
         return sender;
     }
 

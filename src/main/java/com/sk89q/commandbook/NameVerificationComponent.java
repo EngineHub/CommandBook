@@ -18,22 +18,22 @@
 
 package com.sk89q.commandbook;
 
-import com.zachsthings.libcomponents.bukkit.BukkitComponent;
+import com.zachsthings.libcomponents.spout.SpoutComponent;
 import com.zachsthings.libcomponents.ComponentInformation;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerLoginEvent;
+import org.spout.api.event.EventHandler;
+import org.spout.api.event.Listener;
+import org.spout.api.event.player.PlayerLoginEvent;
 
 import java.util.regex.Pattern;
 
 @ComponentInformation(friendlyName = "Name Verification", desc = "This component verifies that player names are valid when they join.")
-public class NameVerificationComponent extends BukkitComponent implements Listener {
+public class NameVerificationComponent extends SpoutComponent implements Listener {
     protected final static Pattern namePattern = Pattern.compile(
             "^[a-zA-Z0-9_]{1,16}$");
 
     @Override
     public void enable() {
-        CommandBook.registerEvents(this);
+        CommandBook.game().getEventManager().registerEvents(this, this);
     }
 
     @EventHandler
@@ -41,7 +41,7 @@ public class NameVerificationComponent extends BukkitComponent implements Listen
         if (!namePattern.matcher(event.getPlayer().getName()).matches()) {
             CommandBook.logger().info("Name verification: " + event.getPlayer().getName() + " was kicked " +
                     "for having an invalid name (to disable, turn off the name-verification component in CommandBook)");
-            event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "Invalid player name detected!");
+            event.disallow("Invalid player name detected!");
         }
     }
 }

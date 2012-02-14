@@ -18,12 +18,12 @@
 
 package com.sk89q.commandbook.util;
 
-import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.blocks.BlockID;
 import com.sk89q.worldedit.blocks.BlockType;
 import com.sk89q.worldedit.blocks.ClothColor;
 import com.sk89q.worldedit.blocks.ItemType;
 import org.bukkit.DyeColor;
+import org.spout.api.exception.CommandException;
 
 import java.util.Random;
 

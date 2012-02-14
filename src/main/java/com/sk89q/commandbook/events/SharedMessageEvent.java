@@ -18,8 +18,8 @@
 
 package com.sk89q.commandbook.events;
 
-import org.bukkit.event.Event;
-import org.bukkit.event.HandlerList;
+import org.spout.api.event.Event;
+import org.spout.api.event.HandlerList;
 
 public class SharedMessageEvent extends Event {
     

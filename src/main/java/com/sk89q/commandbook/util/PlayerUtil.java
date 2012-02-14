@@ -19,12 +19,12 @@
 package com.sk89q.commandbook.util;
 
 import com.sk89q.commandbook.CommandBook;
-import com.sk89q.minecraft.util.commands.CommandException;
-import org.bukkit.ChatColor;
-import org.bukkit.World;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.entity.Player;
+import org.spout.api.ChatColor;
+import org.spout.api.command.CommandSource;
+import org.spout.api.exception.CommandException;
+import org.spout.api.geo.World;
+import org.spout.api.geo.discrete.atomic.AtomicPoint;
+import org.spout.api.player.Player;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,7 +42,7 @@ public class PlayerUtil {
      * @return
      * @throws com.sk89q.minecraft.util.commands.CommandException
      */
-    public static Player checkPlayer(CommandSender sender)
+    public static Player checkPlayer(CommandSource sender)
             throws CommandException {
         if (sender instanceof Player) {
             return (Player) sender;
@@ -58,7 +58,7 @@ public class PlayerUtil {
      * @return
      */
     public static List<Player> matchPlayerNames(String filter) {
-        Player[] players = CommandBook.server().getOnlinePlayers();
+        Player[] players = CommandBook.game().getOnlinePlayers();
         boolean useDisplayNames = CommandBook.inst().lookupWithDisplayNames;
 
         filter = filter.toLowerCase();
@@ -70,7 +70,7 @@ public class PlayerUtil {
             for (Player player : players) {
                 if (player.getName().equalsIgnoreCase(filter)
                     || (useDisplayNames 
-                        && ChatColor.stripColor(player.getDisplayName()).equalsIgnoreCase(filter))) {
+                        && ChatColor.strip(player.getDisplayName()).equalsIgnoreCase(filter))) {
                     List<Player> list = new ArrayList<Player>();
                     list.add(player);
                     return list;
@@ -87,7 +87,7 @@ public class PlayerUtil {
             for (Player player : players) {
                 if (player.getName().toLowerCase().contains(filter)
                     || (useDisplayNames 
-                        && ChatColor.stripColor(player.getDisplayName().toLowerCase()).contains(filter))) {
+                        && ChatColor.strip(player.getDisplayName().toLowerCase()).contains(filter))) {
                     list.add(player);
                 }
             }
@@ -101,7 +101,7 @@ public class PlayerUtil {
             for (Player player : players) {
                 if (player.getName().toLowerCase().startsWith(filter)
                     || (useDisplayNames 
-                        && ChatColor.stripColor(player.getDisplayName().toLowerCase()).startsWith(filter))) {
+                        && ChatColor.strip(player.getDisplayName().toLowerCase()).startsWith(filter))) {
                     list.add(player);
                 }
             }
@@ -136,15 +136,15 @@ public class PlayerUtil {
      * @return iterator for players
      * @throws CommandException no matches found
      */
-    public static Iterable<Player> matchPlayers(CommandSender source, String filter)
+    public static Iterable<Player> matchPlayers(CommandSource source, String filter)
             throws CommandException {
 
-        if (CommandBook.server().getOnlinePlayers().length == 0) {
+        if (CommandBook.game().getOnlinePlayers().length == 0) {
             throw new CommandException("No players matched query.");
         }
 
         if (filter.equals("*")) {
-            return checkPlayerMatch(Arrays.asList(CommandBook.server().getOnlinePlayers()));
+            return checkPlayerMatch(Arrays.asList(CommandBook.game().getOnlinePlayers()));
         }
 
         // Handle special hash tag groups
@@ -154,10 +154,10 @@ public class PlayerUtil {
             if (filter.equalsIgnoreCase("#world")) {
                 List<Player> players = new ArrayList<Player>();
                 Player sourcePlayer = checkPlayer(source);
-                World sourceWorld = sourcePlayer.getWorld();
+                World sourceWorld = sourcePlayer.getEntity().getWorld();
 
-                for (Player player : CommandBook.server().getOnlinePlayers()) {
-                    if (player.getWorld().equals(sourceWorld)) {
+                for (Player player : CommandBook.game().getOnlinePlayers()) {
+                    if (player.getEntity().getWorld().equals(sourceWorld)) {
                         players.add(player);
                     }
                 }
@@ -168,14 +168,14 @@ public class PlayerUtil {
             } else if (filter.equalsIgnoreCase("#near")) {
                 List<Player> players = new ArrayList<Player>();
                 Player sourcePlayer = checkPlayer(source);
-                World sourceWorld = sourcePlayer.getWorld();
-                org.bukkit.util.Vector sourceVector
-                        = sourcePlayer.getLocation().toVector();
+                World sourceWorld = sourcePlayer.getEntity().getWorld();
+                AtomicPoint sourceVector
+                        = sourcePlayer.getEntity().getTransform().getPosition();
 
-                for (Player player : CommandBook.server().getOnlinePlayers()) {
-                    if (player.getWorld().equals(sourceWorld)
-                            && player.getLocation().toVector().distanceSquared(
-                            sourceVector) < 900) { // 30 * 30
+                for (Player player : CommandBook.game().getOnlinePlayers()) {
+                    if (player.getEntity().getWorld().equals(sourceWorld)
+                            && player.getEntity().getTransform().getPosition().distance(
+                            sourceVector) < 30) { // 30 * 30
                         players.add(player);
                     }
                 }
@@ -200,9 +200,9 @@ public class PlayerUtil {
      * @return
      * @throws CommandException
      */
-    public static Player matchPlayerExactly(CommandSender sender, String filter)
+    public static Player matchPlayerExactly(CommandSource sender, String filter)
             throws CommandException {
-        Player[] players = CommandBook.server().getOnlinePlayers();
+        Player[] players = CommandBook.game().getOnlinePlayers();
         for (Player player : players) {
             if (player.getName().equalsIgnoreCase(filter)
                 || (CommandBook.inst().lookupWithDisplayNames 
@@ -222,7 +222,7 @@ public class PlayerUtil {
      * @return
      * @throws CommandException
      */
-    public static Player matchSinglePlayer(CommandSender sender, String filter)
+    public static Player matchSinglePlayer(CommandSource sender, String filter)
             throws CommandException {
         // This will throw an exception if there are no matches
         Iterator<Player> players = matchPlayers(sender, filter).iterator();
@@ -248,19 +248,14 @@ public class PlayerUtil {
      * @return
      * @throws CommandException
      */
-    public static CommandSender matchPlayerOrConsole(CommandSender sender, String filter)
+    public static CommandSource matchPlayerOrConsole(CommandSource sender, String filter)
             throws CommandException {
 
         // Let's see if console is wanted
         if (filter.equalsIgnoreCase("#console")
                 || filter.equalsIgnoreCase("*console*")
                 || filter.equalsIgnoreCase("!")) {
-            try {
-                return CommandBook.server().getConsoleSender();
-            } catch (Throwable t) {
-                // Legacy support
-                return new LegacyConsoleSender(CommandBook.server());
-            }
+            //return CommandBook.game().getConsoleSender();
         }
 
         return matchSinglePlayer(sender, filter);
@@ -282,14 +277,12 @@ public class PlayerUtil {
      * @param sender
      * @return
      */
-    public static String toName(CommandSender sender) {
+    public static String toName(CommandSource sender) {
         if (sender instanceof Player) {
             String name = CommandBook.inst().useDisplayNames
                     ? ((Player) sender).getDisplayName()
                     : (sender).getName();
-            return ChatColor.stripColor(name);
-        } else if (sender instanceof ConsoleCommandSender) {
-            return "*Console*";
+            return ChatColor.strip(name);
         } else {
             return sender.getName();
         }
@@ -302,7 +295,7 @@ public class PlayerUtil {
      * @param endColor
      * @return
      */
-    public static String toColoredName(CommandSender sender, ChatColor endColor) {
+    public static String toColoredName(CommandSource sender, ChatColor endColor) {
         if (sender instanceof Player) {
             String name = CommandBook.inst().useDisplayNames
                     ? ((Player) sender).getDisplayName()
@@ -311,8 +304,6 @@ public class PlayerUtil {
                 name = name + endColor;
             }
             return name;
-        } else if (sender instanceof ConsoleCommandSender) {
-            return "*Console*";
         } else {
             return sender.getName();
         }
@@ -325,9 +316,9 @@ public class PlayerUtil {
      * @param sender
      * @return
      */
-    public static String toUniqueName(CommandSender sender) {
+    public static String toUniqueName(CommandSource sender) {
         if (sender instanceof Player) {
-            return (sender).getName();
+            return sender.getName();
         } else {
             return "*Console*";
         }

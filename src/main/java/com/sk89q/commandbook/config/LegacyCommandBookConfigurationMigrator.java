@@ -19,8 +19,8 @@
 package com.sk89q.commandbook.config;
 
 import com.sk89q.util.yaml.YAMLProcessor;
-import com.zachsthings.libcomponents.bukkit.YAMLProcessorConfigurationFile;
 import com.zachsthings.libcomponents.config.ConfigurationMigrator;
+import com.zachsthings.libcomponents.spout.YAMLProcessorConfigurationFile;
 
 import java.io.File;
 import java.util.LinkedHashMap;

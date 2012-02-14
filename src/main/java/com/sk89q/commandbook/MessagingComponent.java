@@ -18,34 +18,33 @@
 
 package com.sk89q.commandbook;
 
-import com.zachsthings.libcomponents.bukkit.BukkitComponent;
+import com.zachsthings.libcomponents.spout.SpoutComponent;
 import com.zachsthings.libcomponents.ComponentInformation;
 import com.zachsthings.libcomponents.Depend;
 import com.zachsthings.libcomponents.InjectComponent;
 import com.zachsthings.libcomponents.config.ConfigurationBase;
 import com.zachsthings.libcomponents.config.Setting;
-import com.sk89q.commandbook.events.CommandSenderMessageEvent;
+import com.sk89q.commandbook.events.CommandSourceMessageEvent;
 import com.sk89q.commandbook.events.SharedMessageEvent;
 import com.sk89q.commandbook.session.SessionComponent;
 import com.sk89q.commandbook.util.PlayerUtil;
-import com.sk89q.minecraft.util.commands.Command;
-import com.sk89q.minecraft.util.commands.CommandContext;
-import com.sk89q.minecraft.util.commands.CommandException;
-import com.sk89q.minecraft.util.commands.CommandPermissions;
-import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerChatEvent;
+import org.spout.api.ChatColor;
+import org.spout.api.command.CommandContext;
+import org.spout.api.command.CommandSource;
+import org.spout.api.command.annotated.Command;
+import org.spout.api.command.annotated.CommandPermissions;
+import org.spout.api.event.EventHandler;
+import org.spout.api.event.Listener;
+import org.spout.api.event.player.PlayerChatEvent;
+import org.spout.api.exception.CommandException;
+import org.spout.api.player.Player;
 
 import static com.sk89q.commandbook.CommandBookUtil.replaceColorMacros;
 
 @ComponentInformation(friendlyName = "Messaging", desc = "Commands that involve direct player <-> player or player <-> admin" +
         "communication are handled through this component.")
 @Depend(components = SessionComponent.class)
-public class MessagingComponent extends BukkitComponent implements Listener {
+public class MessagingComponent extends SpoutComponent implements Listener {
 
     @InjectComponent private SessionComponent sessions;
     
@@ -55,7 +54,7 @@ public class MessagingComponent extends BukkitComponent implements Listener {
     public void enable() {
         config = configure(new LocalConfiguration());
         registerCommands(Commands.class);
-        CommandBook.registerEvents(this);
+        CommandBook.game().getEventManager().registerEvents(this, this);
     }
 
     @Override
@@ -70,8 +69,8 @@ public class MessagingComponent extends BukkitComponent implements Listener {
         @Setting("twitter-style") public boolean twitterStyle = true;
     }
     
-    public void messagePlayer(CommandSender sender, String target, String message) throws CommandException {
-        CommandSender receiver =
+    public void messagePlayer(CommandSource sender, String target, String message) throws CommandException {
+        CommandSource receiver =
                 PlayerUtil.matchPlayerOrConsole(sender, target);
         String status = sessions.getSession(receiver).getIdleStatus();
         if (status != null) {
@@ -126,30 +125,30 @@ public class MessagingComponent extends BukkitComponent implements Listener {
     public class Commands {
         @Command(aliases = {"me"}, usage = "<message...>", desc = "Send an action message", min = 1, max = -1)
         @CommandPermissions({"commandbook.say.me"})
-        public void me(CommandContext args, CommandSender sender) throws CommandException {
-            if (sender instanceof Player && sessions.getAdminSession((Player) sender).isMute()) {
+        public void me(CommandContext args, CommandSource sender) throws CommandException {
+            if (sender instanceof Player && sessions.getAdminSession((Player)sender).isMute()) {
                 sender.sendMessage(ChatColor.RED + "You are muted.");
                 return;
             }
 
             String name = PlayerUtil.toName(sender);
-            String msg = args.getJoinedStrings(0);
+            String msg = args.getJoinedString(0);
 
             CommandBook.callEvent(
                     new SharedMessageEvent(name + " " + msg));
 
-            CommandBook.server().broadcastMessage("* " + name + " " + msg);
+            CommandBook.game().broadcastMessage("* " + name + " " + msg);
         }
 
         @Command(aliases = {"say"}, usage = "<message...>", desc = "Send a message", min = 1, max = -1)
         @CommandPermissions({"commandbook.say"})
-        public void say(CommandContext args, CommandSender sender) throws CommandException {
+        public void say(CommandContext args, CommandSource sender) throws CommandException {
             if (sender instanceof Player && sessions.getAdminSession((Player) sender).isMute()) {
                 sender.sendMessage(ChatColor.RED + "You are muted.");
                 return;
             }
 
-            String msg = args.getJoinedStrings(0);
+            String msg = args.getJoinedString(0);
 
             if (sender instanceof Player) {
                 if (CommandBook.callEvent(
@@ -159,31 +158,31 @@ public class MessagingComponent extends BukkitComponent implements Listener {
             }
 
             CommandBook.callEvent(
-                    new CommandSenderMessageEvent(sender, msg));
+                    new CommandSourceMessageEvent(sender, msg));
 
             if (sender instanceof Player) {
-                CommandBook.server().broadcastMessage(
+                CommandBook.game().broadcastMessage(
                         "<" + PlayerUtil.toColoredName(sender, ChatColor.WHITE)
-                                + "> " + args.getJoinedStrings(0));
+                                + "> " + args.getJoinedString(0));
             } else {
-                CommandBook.server().broadcastMessage(
+                CommandBook.game().broadcastMessage(
                         replaceColorMacros(config.consoleSayFormat).replace(
-                                "%s", args.getJoinedStrings(0)));
+                                "%s", args.getJoinedString(0)));
             }
         }
 
         @Command(aliases = {"msg", "message", "whisper", "pm", "tell"}, usage = "<target> <message...>", desc = "Private message a user", min = 2, max = -1)
         @CommandPermissions({"commandbook.msg"})
-        public void msg(CommandContext args, CommandSender sender) throws CommandException {
+        public void msg(CommandContext args, CommandSource sender) throws CommandException {
             // This will throw errors as needed
-            messagePlayer(sender, args.getString(0), args.getJoinedStrings(1));
+            messagePlayer(sender, args.getString(0), args.getJoinedString(1));
         }
 
         @Command(aliases = {"reply", "r"}, usage = "<message...>", desc = "Reply to last user", min = 1, max = -1)
         @CommandPermissions({"commandbook.msg"})
-        public void reply(CommandContext args, CommandSender sender) throws CommandException {
-            String message = args.getJoinedStrings(0);
-            CommandSender receiver;
+        public void reply(CommandContext args, CommandSource sender) throws CommandException {
+            String message = args.getJoinedString(0);
+            CommandSource receiver;
 
             String lastRecipient = sessions.getSession(sender).getLastRecipient();
 
@@ -223,14 +222,14 @@ public class MessagingComponent extends BukkitComponent implements Listener {
                 usage = "", desc = "Set yourself as away",
                 flags = "", min = 0, max = -1)
         @CommandPermissions({"commandbook.away"})
-        public void afk(CommandContext args, CommandSender sender) throws CommandException {
+        public void afk(CommandContext args, CommandSource sender) throws CommandException {
 
             Player player = PlayerUtil.checkPlayer(sender);
 
             if (sessions.getSession(player).getIdleStatus() == null) {
                 String status = "";
-                if (args.argsLength() > 0) {
-                    status = args.getJoinedStrings(0);
+                if (args.length() > 0) {
+                    status = args.getJoinedString(0);
                     sessions.getSession(player).setIdleStatus(status);
                 }
 
@@ -245,13 +244,13 @@ public class MessagingComponent extends BukkitComponent implements Listener {
 
         @Command(aliases = {"mute"}, usage = "<target>", desc = "Mute a player", flags = "o", min = 1, max = 1)
         @CommandPermissions({"commandbook.mute"})
-        public void mute(CommandContext args, CommandSender sender) throws CommandException {
+        public void mute(CommandContext args, CommandSource sender) throws CommandException {
 
             Player player = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
 
-            if (CommandBook.inst().hasPermission(player, "commandbook.mute.exempt") 
+            if (player.hasPermission("commandbook.mute.exempt") 
                     && !(args.hasFlag('o') 
-                    && CommandBook.inst().hasPermission(sender, "commandbook.mute.exempt.override"))) {
+                    && sender.hasPermission("commandbook.mute.exempt.override"))) {
                 throw new CommandException("Player " + PlayerUtil.toName(sender) + " is exempt from being muted!");
             }
 
@@ -268,7 +267,7 @@ public class MessagingComponent extends BukkitComponent implements Listener {
 
         @Command(aliases = {"unmute"}, usage = "<target>", desc = "Unmute a player", min = 1, max = 1)
         @CommandPermissions({"commandbook.mute"})
-        public void unmute(CommandContext args, CommandSender sender) throws CommandException {
+        public void unmute(CommandContext args, CommandSource sender) throws CommandException {
             Player player = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
 
             if (sessions.getAdminSession(player).setMute(false)) {
@@ -284,10 +283,10 @@ public class MessagingComponent extends BukkitComponent implements Listener {
 
         @Command(aliases = {"broadcast"}, usage = "<message...>", desc = "Broadcast a message", min = 1, max = -1)
         @CommandPermissions({"commandbook.broadcast"})
-        public void broadcast(CommandContext args, CommandSender sender) throws CommandException {
-            CommandBook.server().broadcastMessage(
+        public void broadcast(CommandContext args, CommandSource sender) throws CommandException {
+            CommandBook.game().broadcastMessage(
                     replaceColorMacros(config.broadcastFormat).replace(
-                            "%s", args.getJoinedStrings(0)));
+                            "%s", args.getJoinedString(0)));
         }
     }
 }

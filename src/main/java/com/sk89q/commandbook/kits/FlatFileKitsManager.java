@@ -31,7 +31,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.sk89q.commandbook.CommandBook;
-import org.bukkit.inventory.ItemStack;
+import org.spout.api.inventory.ItemStack;
 
 import static com.sk89q.commandbook.CommandBook.logger;
 

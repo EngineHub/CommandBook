@@ -20,25 +20,23 @@ package com.sk89q.commandbook.locations;
 
 import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.commands.PaginatedResult;
-import com.zachsthings.libcomponents.bukkit.BukkitComponent;
+import com.zachsthings.libcomponents.spout.SpoutComponent;
 import com.zachsthings.libcomponents.config.ConfigurationBase;
 import com.zachsthings.libcomponents.config.Setting;
 import com.sk89q.commandbook.util.LocationUtil;
 import com.sk89q.commandbook.util.PlayerUtil;
-import com.sk89q.minecraft.util.commands.CommandContext;
-import com.sk89q.minecraft.util.commands.CommandException;
-import org.bukkit.ChatColor;
-import org.bukkit.World;
-import org.bukkit.command.CommandSender;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.world.WorldLoadEvent;
-import org.bukkit.event.world.WorldUnloadEvent;
+import org.spout.api.ChatColor;
+import org.spout.api.command.CommandContext;
+import org.spout.api.command.CommandSource;
+import org.spout.api.event.EventHandler;
+import org.spout.api.event.Listener;
+import org.spout.api.exception.CommandException;
+import org.spout.api.geo.World;
 
 /**
  * Parent class for components that use a RootLocationManager<NamedLocation> and deal with locations
  */
-public abstract class LocationsComponent extends BukkitComponent implements Listener {
+public abstract class LocationsComponent extends SpoutComponent implements Listener {
     
     private final String name;
 
@@ -54,7 +52,7 @@ public abstract class LocationsComponent extends BukkitComponent implements List
         LocationManagerFactory<LocationManager<NamedLocation>> warpsFactory =
                 new FlatFileLocationsManager.LocationsFactory(CommandBook.inst().getDataFolder(), name + "s");
         manager = new RootLocationManager<NamedLocation>(warpsFactory, config.perWorld);
-        CommandBook.registerEvents(this);
+        CommandBook.game().getEventManager().registerEvents(this, this);
     }
 
     private static class LocalConfiguration extends ConfigurationBase {
@@ -66,7 +64,7 @@ public abstract class LocationsComponent extends BukkitComponent implements List
         return manager;
     }
     
-    @EventHandler
+    /*@EventHandler
     public void loadWorld(WorldLoadEvent event) {
         manager.updateWorlds(event.getWorld());
     }
@@ -74,11 +72,11 @@ public abstract class LocationsComponent extends BukkitComponent implements List
     @EventHandler
     public void unloadWorld(WorldUnloadEvent event) {
         manager.updateWorlds(event.getWorld());
-    }
+    }*/
 
     // -- Command helper methods
 
-    public void remove(String name, World world, CommandSender sender) throws CommandException {
+    public void remove(String name, World world, CommandSource sender) throws CommandException {
         NamedLocation loc = getManager().get(world, name);
         if (loc == null) {
             throw new CommandException("No " + name.toLowerCase() + " found for " + name + " in world " + world.getName());
@@ -91,13 +89,13 @@ public abstract class LocationsComponent extends BukkitComponent implements List
         sender.sendMessage(ChatColor.YELLOW + name + " for " + name + " removed.");
     }
 
-    public void list(CommandContext args, CommandSender sender) throws CommandException {
+    public void list(CommandContext args, CommandSource sender) throws CommandException {
         World world = null;
         if (getManager().isPerWorld()) {
             if (args.hasFlag('w')) {
                 world = LocationUtil.matchWorld(sender, args.getFlag('w'));
             } else {
-                world = PlayerUtil.checkPlayer(sender).getWorld();
+                world = PlayerUtil.checkPlayer(sender).getEntity().getWorld();
             }
             if (world == null) throw new CommandException("Error finding world to use!");
         }
