@@ -124,7 +124,8 @@ public class HelpComponent extends SpoutComponent {
         if (aliases.length() > 0) {
             sender.sendMessage(ChatColor.YELLOW + "Aliases: " + aliases);
         }
-        sender.sendMessage(ChatColor.YELLOW + "Usage: " + cmd.getUsage(new String[0], 0));
+        sender.sendMessage(ChatColor.YELLOW + "Usage: " + cmd.getUsage());
+        sender.sendMessage(ChatColor.YELLOW + "Description: " + cmd.getHelp());
         sender.sendMessage(ChatColor.YELLOW + "Owner: " + cmd.getOwnerName());
     }
 
@@ -150,7 +151,7 @@ public class HelpComponent extends SpoutComponent {
                     new PaginatedResult<org.spout.api.command.Command>("Usage - Description") {
                         @Override
                         public String format(org.spout.api.command.Command entry) {
-                            return entry.getUsage(new String[0], 0);
+                            return entry.getUsage() + " - " + entry.getHelp();
                         }
                     }.display(sender, serverCommands, args.getFlagInteger('p', 1));
                 } else {

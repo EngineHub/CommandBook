@@ -139,7 +139,7 @@ public class TeleportComponent extends SpoutComponent implements Listener {
                     sender.sendMessage(ChatColor.YELLOW + "Player teleported.");
                     target.sendMessage(ChatColor.YELLOW + "Your teleport request to "
                             + PlayerUtil.toName(sender) + " was accepted.");
-                    target.getEntity().setTransform(player.getEntity().getTransform());
+                    target.getEntity().setPosition(player.getEntity());
                 } else {
                     throw new CommandException("That person didn't request a " +
                             "teleport (recently) and you don't have " +
@@ -162,8 +162,7 @@ public class TeleportComponent extends SpoutComponent implements Listener {
                             }
                         }
                     }
-                    oldLoc = player.getEntity().getTransform();
-                    player.getEntity().setTransform(loc);
+                    super.perform(player);
                 }
             }).iterate(targets);
         }

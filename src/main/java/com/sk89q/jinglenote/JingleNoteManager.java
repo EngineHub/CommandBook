@@ -74,7 +74,8 @@ public class JingleNoteManager {
     
     private Point findLocation(Player player) {
         World world = player.getEntity().getWorld();
-        Pointm loc = new Pointm(player.getEntity().getTransform().getPosition());
+        
+        Pointm loc = new Pointm(player.getEntity().getPosition());
         loc.setY(loc.getY() - 2);
         
         if (!BlockType.canPassThrough(world.getBlockId(MathHelper.floor(loc.getX()), 

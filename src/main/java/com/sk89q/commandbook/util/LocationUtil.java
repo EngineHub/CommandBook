@@ -22,6 +22,7 @@ import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.CommandBookUtil;
 import com.sk89q.commandbook.locations.*;
 import org.spout.api.command.CommandSource;
+import org.spout.api.entity.Entity;
 import org.spout.api.exception.CommandException;
 import org.spout.api.geo.World;
 import org.spout.api.geo.cuboid.Block;
@@ -222,7 +223,8 @@ public class LocationUtil {
                 }
                 // Handle #me, which is for when a location argument is required
             } else if (args[0].equalsIgnoreCase("#me")) {
-                return checkPlayer(source).getEntity().getTransform();
+                final Entity entity = checkPlayer(source).getEntity();
+                return new Transform(entity.getPosition(), new Quaternion(0, entity.getPitch(), entity.getYaw(), entity.getRoll()), entity.getScale());
             } else {
                 throw new CommandException("Invalid group '" + filter + "'.");
             }
@@ -235,7 +237,8 @@ public class LocationUtil {
             throw new CommandException("No players matched query.");
         }
 
-        return players.get(0).getEntity().getTransform();
+        final Entity entity = players.get(0).getEntity();
+        return new Transform(entity.getPosition(), new Quaternion(0, entity.getPitch(), entity.getYaw(), entity.getRoll()), entity.getScale());
     }
 
     /**
