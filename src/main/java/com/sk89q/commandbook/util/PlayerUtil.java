@@ -23,6 +23,7 @@ import org.spout.api.ChatColor;
 import org.spout.api.command.CommandSource;
 import org.spout.api.exception.CommandException;
 import org.spout.api.geo.World;
+import org.spout.api.geo.discrete.Point;
 import org.spout.api.geo.discrete.atomic.AtomicPoint;
 import org.spout.api.player.Player;
 
@@ -169,12 +170,12 @@ public class PlayerUtil {
                 List<Player> players = new ArrayList<Player>();
                 Player sourcePlayer = checkPlayer(source);
                 World sourceWorld = sourcePlayer.getEntity().getWorld();
-                AtomicPoint sourceVector
-                        = sourcePlayer.getEntity().getTransform().getPosition();
+                Point sourceVector
+                        = sourcePlayer.getEntity().getPoint();
 
                 for (Player player : CommandBook.game().getOnlinePlayers()) {
                     if (player.getEntity().getWorld().equals(sourceWorld)
-                            && player.getEntity().getTransform().getPosition().distance(
+                            && player.getEntity().getPoint().distance(
                             sourceVector) < 30) { // 30 * 30
                         players.add(player);
                     }

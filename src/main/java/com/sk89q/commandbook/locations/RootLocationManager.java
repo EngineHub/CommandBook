@@ -18,8 +18,8 @@
 
 package com.sk89q.commandbook.locations;
 
+import org.spout.api.entity.Position;
 import org.spout.api.geo.World;
-import org.spout.api.geo.discrete.atomic.Transform;
 import org.spout.api.player.Player;
 
 import java.io.IOException;
@@ -82,7 +82,7 @@ public class RootLocationManager<T> {
 		return getManager(world).get(id);
     }
 
-	public T create(String id, Transform loc, Player player) {
+	public T create(String id, Position loc, Player player) {
 		LocationManager<T> manager = getManager(loc.getPosition().getWorld());
 		T ret = manager.create(id, loc, player);
 		save(manager);

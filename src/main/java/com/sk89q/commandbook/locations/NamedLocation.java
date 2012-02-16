@@ -19,16 +19,16 @@
 package com.sk89q.commandbook.locations;
 
 import org.spout.api.entity.Entity;
-import org.spout.api.geo.discrete.atomic.Transform;
+import org.spout.api.entity.Position;
 
 public class NamedLocation {
 
     private String name;
     private String creatorName;
     private String worldName;
-    private Transform loc;
+    private Position loc;
 
-    public NamedLocation(String name, Transform loc) {
+    public NamedLocation(String name, Position loc) {
         this.name = name;
         this.loc = loc;
     }
@@ -57,16 +57,16 @@ public class NamedLocation {
         this.creatorName = creatorName;
     }
 
-    public Transform getLocation() {
+    public Position getLocation() {
         return loc;
     }
 
-    public void setLocation(Transform loc) {
+    public void setLocation(Position loc) {
         this.loc = loc;
     }
     
     public void teleport(Entity player) {
-        player.setTransform(loc);
+        player.setPosition(loc);
     }
     
 }

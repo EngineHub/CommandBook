@@ -28,6 +28,8 @@ import org.spout.api.command.CommandContext;
 import org.spout.api.command.CommandSource;
 import org.spout.api.command.annotated.Command;
 import org.spout.api.command.annotated.CommandPermissions;
+import org.spout.api.entity.Entity;
+import org.spout.api.entity.Position;
 import org.spout.api.event.Event;
 import org.spout.api.event.HandlerList;
 import org.spout.api.exception.CommandException;
@@ -125,16 +127,16 @@ public class InfoComponent extends SpoutComponent {
                 }
             }
 
-            Transform pos = player.getEntity().getTransform();
+            Entity playerEntity = player.getEntity();
 
             sender.sendMessage(ChatColor.YELLOW + "Player: " + player.getName() + (player == sender ? "(That's you!)" : ""));
             sender.sendMessage(ChatColor.YELLOW +
-                    "World: " + pos.getPosition().getWorld().getName());
+                    "World: " + playerEntity.getWorld().getName());
             sender.sendMessage(ChatColor.YELLOW +
                     String.format("Location: (%.4f, %.4f, %.4f)",
-                            pos.getPosition().getX(), pos.getPosition().getY(), pos.getPosition().getZ()));
+                            playerEntity.getX(), playerEntity.getY(), playerEntity.getZ()));
             sender.sendMessage(ChatColor.YELLOW +
-                    "Depth: " + MathHelper.floor(pos.getPosition().getY()));
+                    "Depth: " + MathHelper.floor(playerEntity.getY()));
 
             if (sender.hasPermission("commandbook.whereami.compass")) {
                 sender.sendMessage(ChatColor.YELLOW +

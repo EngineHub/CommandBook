@@ -23,6 +23,7 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import org.spout.api.command.CommandSource;
+import org.spout.api.entity.Position;
 import org.spout.api.exception.CommandException;
 import org.spout.api.geo.discrete.atomic.Transform;
 import org.spout.api.player.Player;
@@ -44,8 +45,8 @@ public class UserSession implements PersistentSession {
     private String commandToConfirm;
     private Map<String, Long> bringable = new HashMap<String, Long>();
     private final Map<String, Long> teleportRequests = new HashMap<String, Long>();
-    private final LinkedList<Transform> locationHistory = new LinkedList<Transform>();
-    private Transform ignoreTeleportLocation;
+    private final LinkedList<Position> locationHistory = new LinkedList<Position>();
+    private Position ignoreTeleportLocation;
     
     public boolean isRecent() {
         return (System.currentTimeMillis() - lastUpdate) < MAX_AGE;
@@ -116,7 +117,7 @@ public class UserSession implements PersistentSession {
         teleportRequests.put(target.getName(), now);
     }
     
-    public void rememberLocation(Transform location) {
+    public void rememberLocation(Position location) {
         if (locationHistory.size() > 0 && locationHistory.peek().equals(location)) {
             return;
         }
@@ -128,10 +129,10 @@ public class UserSession implements PersistentSession {
     }
     
     public void rememberLocation(Player player) {
-        rememberLocation(player.getEntity().getTransform());
+        rememberLocation(player.getEntity().getPosition());
     }
     
-    public Transform popLastLocation() {
+    public Position popLastLocation() {
         return locationHistory.poll();
     }
     
@@ -143,11 +144,11 @@ public class UserSession implements PersistentSession {
         this.idleStatus = status;
     }
 
-    public void setIgnoreLocation(Transform loc) {
+    public void setIgnoreLocation(Position loc) {
         this.ignoreTeleportLocation = loc;
     }
 
-    public Transform getIgnoreLocation() {
+    public Position getIgnoreLocation() {
         return ignoreTeleportLocation;
     }
 

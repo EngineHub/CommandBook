@@ -18,6 +18,7 @@
 
 package com.sk89q.commandbook.locations;
 
+import org.spout.api.entity.Position;
 import org.spout.api.geo.World;
 import org.spout.api.geo.discrete.atomic.Transform;
 import org.spout.api.player.Player;
@@ -69,7 +70,7 @@ public interface LocationManager<T> {
      * @param player
      * @return
      */
-    public T create(String id, Transform loc, Player player);
+    public T create(String id, Position loc, Player player);
 
     /**
      * Removes a location.

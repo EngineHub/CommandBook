@@ -33,12 +33,12 @@ import org.spout.api.command.CommandSource;
 import org.spout.api.command.annotated.Command;
 import org.spout.api.command.annotated.CommandPermissions;
 import org.spout.api.entity.PlayerController;
+import org.spout.api.entity.Position;
 import org.spout.api.event.EventHandler;
 import org.spout.api.event.Listener;
 import org.spout.api.event.entity.EntityTeleportEvent;
 import org.spout.api.exception.CommandException;
 import org.spout.api.geo.discrete.Point;
-import org.spout.api.geo.discrete.atomic.Transform;
 import org.spout.api.player.Player;
 
 @ComponentInformation(friendlyName = "Teleports", desc = "Teleport-related commands")
@@ -85,7 +85,7 @@ public class TeleportComponent extends SpoutComponent implements Listener {
         public void teleport(CommandContext args, CommandSource sender) throws CommandException {
 
             Iterable<Player> targets;
-            final Transform loc;
+            final Position loc;
 
             // Detect arguments based on the number of arguments provided
             if (args.length() == 1) {
@@ -150,7 +150,7 @@ public class TeleportComponent extends SpoutComponent implements Listener {
             }
 
             Iterable<Player> targets = PlayerUtil.matchPlayers(sender, args.getString(0));
-            Transform loc = player.getEntity().getTransform();
+            Position loc = player.getEntity().getPosition();
 
             (new TeleportPlayerIterator(sender, loc) {
                 @Override
@@ -172,16 +172,14 @@ public class TeleportComponent extends SpoutComponent implements Listener {
         @CommandPermissions({"commandbook.teleport.other"})
         public void put(CommandContext args, CommandSource sender) throws CommandException {
             Iterable<Player> targets = PlayerUtil.matchPlayers(sender, args.getString(0));
-            Transform loc = LocationUtil.matchLocation(sender, "#target");
+            Position loc = LocationUtil.matchLocation(sender, "#target");
 
             (new TeleportPlayerIterator(sender, loc) {
                 @Override
                 public void perform(Player player) {
-                    oldLoc = player.getEntity().getTransform();
+                    oldLoc = player.getEntity().getPosition();
 
-                    Transform playerLoc = player.getEntity().getTransform();
-                    loc.setRotation(playerLoc.getRotation());
-                    player.getEntity().setTransform(loc);
+                    player.getEntity().setPosition(loc.getPosition(), oldLoc.getPitch(), oldLoc.getYaw(), oldLoc.getRoll());
                 }
 
             }).iterate(targets);
@@ -199,11 +197,11 @@ public class TeleportComponent extends SpoutComponent implements Listener {
             } else {
                 player = PlayerUtil.checkPlayer(sender);
             }
-            Transform lastLoc = sessions.getSession(player).popLastLocation();
+            Position lastLoc = sessions.getSession(player).popLastLocation();
 
             if (lastLoc != null) {
                 sessions.getSession(player).setIgnoreLocation(lastLoc);
-                player.getEntity().setTransform(lastLoc);
+                player.getEntity().setPosition(lastLoc);
                 sender.sendMessage(ChatColor.YELLOW + "You've been returned.");
             } else {
                 sender.sendMessage(ChatColor.RED + "There's no past location in your history.");

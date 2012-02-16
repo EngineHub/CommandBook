@@ -30,6 +30,7 @@ import org.spout.api.command.CommandSource;
 import org.spout.api.command.annotated.Command;
 import org.spout.api.command.annotated.CommandPermissions;
 import org.spout.api.command.annotated.NestedCommand;
+import org.spout.api.entity.Position;
 import org.spout.api.exception.CommandException;
 import org.spout.api.geo.World;
 import org.spout.api.geo.discrete.atomic.Transform;
@@ -52,7 +53,7 @@ public class HomesComponent extends LocationsComponent {
         public void home(CommandContext args, CommandSource sender) throws CommandException {
             Iterable<Player> targets = null;
             NamedLocation home = null;
-            Transform loc;
+            Position loc;
 
             // Detect arguments based on the number of arguments provided
             if (args.length() == 0) {
@@ -109,18 +110,18 @@ public class HomesComponent extends LocationsComponent {
         @CommandPermissions({"commandbook.home.set"})
         public void setHome(CommandContext args, CommandSource sender) throws CommandException {
             String homeName;
-            Transform loc;
+            Position loc;
             Player player = null;
 
             // Detect arguments based on the number of arguments provided
             if (args.length() == 0) {
                 player = PlayerUtil.checkPlayer(sender);
                 homeName = player.getName();
-                loc = player.getEntity().getTransform();
+                loc = player.getEntity().getPosition();
             } else if (args.length() == 1) {
                 homeName = args.getString(0);
                 player = PlayerUtil.checkPlayer(sender);
-                loc = player.getEntity().getTransform();
+                loc = player.getEntity().getPosition();
 
                 // Check permissions!
                 if (!homeName.equals(sender.getName())) {

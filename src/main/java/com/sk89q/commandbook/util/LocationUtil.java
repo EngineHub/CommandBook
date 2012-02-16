@@ -23,6 +23,7 @@ import com.sk89q.commandbook.CommandBookUtil;
 import com.sk89q.commandbook.locations.*;
 import org.spout.api.command.CommandSource;
 import org.spout.api.entity.Entity;
+import org.spout.api.entity.Position;
 import org.spout.api.exception.CommandException;
 import org.spout.api.geo.World;
 import org.spout.api.geo.cuboid.Block;
@@ -122,7 +123,7 @@ public class LocationUtil {
      * @return iterator for players
      * @throws CommandException no matches found
      */
-    public static Transform matchLocation(CommandSource source, String filter)
+    public static Position matchLocation(CommandSource source, String filter)
             throws CommandException {
 
         // Handle coordinates
@@ -142,10 +143,10 @@ public class LocationUtil {
             }
 
             if (args.length > 1) {
-                return new Transform(new Point(matchWorld(source, args[1]), x, y, z), new Quaternion(0, Vector3.UNIT_Y), Vector3.ONE);
+                return new Position(new Point(matchWorld(source, args[1]), x, y, z), 0, 0, 0);
             } else {
                 Player player = checkPlayer(source);
-                return new Transform(new Point(player.getEntity().getWorld(), x, y, z), new Quaternion(0, Vector3.UNIT_Y), Vector3.ONE);
+                return new Position(new Point(player.getEntity().getWorld(), x, y, z), 0, 0, 0);
             }
 
             // Handle special hash tag groups
@@ -158,10 +159,10 @@ public class LocationUtil {
             // calling source
             if (args[0].equalsIgnoreCase("#spawn")) {
                 if (args.length > 1) {
-                    return matchWorld(source, args[1]).getSpawnPoint();
+                    return toPosition(matchWorld(source, args[1]).getSpawnPoint());
                 } else {
                     Player sourcePlayer = checkPlayer(source);
-                    return sourcePlayer.getEntity().getWorld().getSpawnPoint();
+                    return toPosition(sourcePlayer.getEntity().getWorld().getSpawnPoint());
                 }
 
                 // Handle #target, which matches the player's target position
@@ -224,7 +225,7 @@ public class LocationUtil {
                 // Handle #me, which is for when a location argument is required
             } else if (args[0].equalsIgnoreCase("#me")) {
                 final Entity entity = checkPlayer(source).getEntity();
-                return new Transform(entity.getPosition(), new Quaternion(0, entity.getPitch(), entity.getYaw(), entity.getRoll()), entity.getScale());
+                return entity.getPosition();
             } else {
                 throw new CommandException("Invalid group '" + filter + "'.");
             }
@@ -238,7 +239,7 @@ public class LocationUtil {
         }
 
         final Entity entity = players.get(0).getEntity();
-        return new Transform(entity.getPosition(), new Quaternion(0, entity.getPitch(), entity.getYaw(), entity.getRoll()), entity.getScale());
+        return entity.getPosition();
     }
 
     /**
@@ -250,7 +251,7 @@ public class LocationUtil {
      * @return a Bukkit location
      * @throws CommandException if the location by said id does not exist
      */
-    public static Transform getManagedLocation(RootLocationManager<NamedLocation> manager,
+    public static Position getManagedLocation(RootLocationManager<NamedLocation> manager,
                                        World world, String id) throws CommandException {
         NamedLocation loc = manager.get(world, id);
         if (loc == null) throw new CommandException("A location by that name could not be found.");
@@ -262,5 +263,10 @@ public class LocationUtil {
                 location.getY() + "," + 
                 location.getZ() + "@" + 
                 location.getWorld().getName();
+    }
+    
+    public static Position toPosition(Transform loc) {
+        Vector3 angles = loc.getRotation().getAxisAngles();
+        return new Position(loc.getPosition(), angles.getZ(), angles.getY(), angles.getX());
     }
 }

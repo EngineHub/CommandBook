@@ -141,7 +141,7 @@ public class CommandBookUtil {
      * @return
      */
     public static String getCardinalDirection(Player player) {
-        double rot = (player.getEntity().getTransform().getRotation().getAxisAngles().getX() - 90) % 360;
+        double rot = (player.getEntity().getYaw() - 90) % 360;
         if (rot < 0) {
             rot += 360.0;
         }

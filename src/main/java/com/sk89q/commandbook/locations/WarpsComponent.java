@@ -32,6 +32,7 @@ import org.spout.api.command.CommandContext;
 import org.spout.api.command.CommandSource;
 import org.spout.api.command.annotated.Command;
 import org.spout.api.command.annotated.CommandPermissions;
+import org.spout.api.entity.Position;
 import org.spout.api.exception.CommandException;
 import org.spout.api.geo.World;
 import org.spout.api.geo.discrete.atomic.Transform;
@@ -58,7 +59,7 @@ public class WarpsComponent extends LocationsComponent {
         public void warp(CommandContext args, CommandSource sender) throws CommandException {
             Iterable<Player> targets = null;
             NamedLocation warp = null;
-            Transform loc;
+            Position loc;
 
             // Detect arguments based on the number of arguments provided
             if (args.length() == 1) {
@@ -100,13 +101,13 @@ public class WarpsComponent extends LocationsComponent {
         @CommandPermissions({"commandbook.warp.set"})
         public void setWarp(CommandContext args, CommandSource sender) throws CommandException {
             String warpName = args.getString(0);
-            Transform loc;
+            Position loc;
             Player player = null;
 
             // Detect arguments based on the number of arguments provided
             if (args.length() == 1) {
                 player = PlayerUtil.checkPlayer(sender);
-                loc = player.getEntity().getTransform();
+                loc = player.getEntity().getPosition();
             } else {
                 loc = LocationUtil.matchLocation(sender, args.getString(1));
             }

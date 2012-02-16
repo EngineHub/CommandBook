@@ -20,20 +20,21 @@ package com.sk89q.commandbook.util;
 
 import org.spout.api.ChatColor;
 import org.spout.api.command.CommandSource;
+import org.spout.api.entity.Position;
 import org.spout.api.geo.discrete.atomic.Transform;
 import org.spout.api.player.Player;
 
 public class TeleportPlayerIterator extends PlayerIteratorAction {
     
-    protected final Transform loc;
-    protected Transform oldLoc;
+    protected final Position loc;
+    protected Position oldLoc;
     protected final boolean silent;
     
-    public TeleportPlayerIterator(CommandSource sender, Transform loc) {
+    public TeleportPlayerIterator(CommandSource sender, Position loc) {
         this(sender, loc, false);
     }
 
-    public TeleportPlayerIterator(CommandSource sender, Transform loc, boolean silent) {
+    public TeleportPlayerIterator(CommandSource sender, Position loc, boolean silent) {
         super(sender);
         this.loc = loc;
         this.silent = silent;
@@ -41,8 +42,8 @@ public class TeleportPlayerIterator extends PlayerIteratorAction {
     
     @Override
     public void perform(Player player) {
-        oldLoc = player.getEntity().getTransform();
-        player.getEntity().setTransform(loc);
+        oldLoc = player.getEntity().getPosition();
+        player.getEntity().setPosition(loc);
     }
     
     @Override

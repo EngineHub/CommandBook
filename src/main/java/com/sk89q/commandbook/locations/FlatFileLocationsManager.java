@@ -36,6 +36,7 @@ import java.util.logging.Logger;
 import com.sk89q.commandbook.CommandBook;
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
+import org.spout.api.entity.Position;
 import org.spout.api.geo.World;
 import org.spout.api.geo.discrete.Point;
 import org.spout.api.geo.discrete.atomic.Transform;
@@ -86,7 +87,7 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
             CSVReader csv = new CSVReader(reader);
             String[] line;
             while ((line = csv.readNext()) != null) {
-                if (line.length < 7) {
+                if (line.length < 9) {
                     logger().warning(type + " data file has an invalid line with < 7 fields");
                 } else {
                     try {
@@ -96,10 +97,9 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
                         float x = Float.parseFloat(line[3]);
                         float y = Float.parseFloat(line[4]);
                         float z = Float.parseFloat(line[5]);
-                        float quatX = Float.parseFloat(line[6]);
-                        float quatY = Float.parseFloat(line[7]);
-                        float quatZ = Float.parseFloat(line[8]);
-                        float quatW = Float.parseFloat(line[9]);
+                        float pitch = Float.parseFloat(line[6]);
+                        float yaw = Float.parseFloat(line[7]);
+                        float roll = Float.parseFloat(line[8]);
                         
                         World world = CommandBook.game().getWorld(worldName);
                         
@@ -111,7 +111,7 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
                             }
                         }
                         
-                        Transform loc = new Transform(new Point(world, x, y, z), new Quaternion(quatX, quatY, quatZ, quatW), Vector3.ONE);
+                        Position loc = new Position(new Point(world, x, y, z), pitch, yaw, roll);
                         NamedLocation warp = new NamedLocation(name, loc);
                         warp.setWorldName(worldName);
                         warp.setCreatorName(creator);
@@ -166,10 +166,9 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
                             String.valueOf(warp.getLocation().getPosition().getX()),
                             String.valueOf(warp.getLocation().getPosition().getY()),
                             String.valueOf(warp.getLocation().getPosition().getZ()),
-                            String.valueOf(warp.getLocation().getRotation().getX()),
-                            String.valueOf(warp.getLocation().getRotation().getY()),
-                            String.valueOf(warp.getLocation().getRotation().getZ()),
-                            String.valueOf(warp.getLocation().getRotation().getW())
+                            String.valueOf(warp.getLocation().getPitch()),
+                            String.valueOf(warp.getLocation().getYaw()),
+                            String.valueOf(warp.getLocation().getRoll())
                             });
                 }
             }
@@ -193,7 +192,13 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
             if (world == null) continue;
             i.remove();
             for (NamedLocation warp : entry.getValue()) {
-                warp.getLocation().getPosition().setWorld(world);
+                Position old = warp.getLocation();
+                warp.setLocation(new Position(new Point(world, old.getPosition().getX(), 
+                        old.getPosition().getY(), 
+                        old.getPosition().getZ()), 
+                        old.getPitch(), 
+                        old.getYaw(), 
+                        old.getRoll()));
                 locs.put(warp.getName().toLowerCase(), warp);
             }
         }
@@ -218,7 +223,7 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
         return new ArrayList<NamedLocation>(locs.values());
     }
 
-    public NamedLocation create(String id, Transform loc, Player player) {
+    public NamedLocation create(String id, Position loc, Player player) {
         id = id.trim();
         NamedLocation warp = new NamedLocation(id, loc);
         locs.put(id.toLowerCase(), warp);

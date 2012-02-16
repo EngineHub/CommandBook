@@ -151,7 +151,7 @@ public class HelpComponent extends SpoutComponent {
                     new PaginatedResult<org.spout.api.command.Command>("Usage - Description") {
                         @Override
                         public String format(org.spout.api.command.Command entry) {
-                            return entry.getUsage() + " - " + entry.getHelp();
+                            return entry.getUsage() + (entry.getHelp() == null ? "" : " - " + entry.getHelp());
                         }
                     }.display(sender, serverCommands, args.getFlagInteger('p', 1));
                 } else {
