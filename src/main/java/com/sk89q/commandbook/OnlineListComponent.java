@@ -61,7 +61,6 @@ public class OnlineListComponent extends BukkitComponent implements Listener {
     private static class LocalConfiguration extends ConfigurationBase {
         @Setting("show-max-players") public boolean playersListMaxPlayers = true;
         @Setting("grouped-names") public boolean playersListGroupedNames;
-        @Setting("colored-names") public boolean playersListColoredNames;
         @Setting("list-on-join") public boolean listOnJoin = true;
     }
 
@@ -121,7 +120,7 @@ public class OnlineListComponent extends BukkitComponent implements Listener {
                         out.append(", ");
                     }
 
-                    if (config.playersListColoredNames) {
+                    if (CommandBook.inst().useDisplayNames) {
                         out.append(player.getDisplayName()).append(ChatColor.WHITE);
                     } else {
                         out.append(player.getName());
@@ -140,7 +139,7 @@ public class OnlineListComponent extends BukkitComponent implements Listener {
                     out.append(", ");
                 }
 
-                if (config.playersListColoredNames) {
+                if (CommandBook.inst().useDisplayNames) {
                     out.append(player.getDisplayName()).append(ChatColor.WHITE);
                 } else {
                     out.append(player.getName());

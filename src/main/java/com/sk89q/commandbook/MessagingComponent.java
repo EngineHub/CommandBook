@@ -257,8 +257,10 @@ public class MessagingComponent extends BukkitComponent implements Listener {
 
             if (!sessions.getAdminSession(player).setMute(true)) {
 
-                player.sendMessage(ChatColor.YELLOW + "You've been muted by "
-                        + PlayerUtil.toName(sender));
+                if (player != sender) {
+                    player.sendMessage(ChatColor.YELLOW + "You've been muted by "
+                            + PlayerUtil.toName(sender));
+                }
                 sender.sendMessage(ChatColor.YELLOW + "You've muted "
                         + PlayerUtil.toName(player));
             } else {
@@ -272,11 +274,12 @@ public class MessagingComponent extends BukkitComponent implements Listener {
             Player player = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
 
             if (sessions.getAdminSession(player).setMute(false)) {
-
-            player.sendMessage(ChatColor.YELLOW + "You've been unmuted by "
-                    + PlayerUtil.toName(sender));
-            sender.sendMessage(ChatColor.YELLOW + "You've unmuted "
-                    + PlayerUtil.toName(player));
+                if (player != sender) {
+                    player.sendMessage(ChatColor.YELLOW + "You've been unmuted by "
+                        + PlayerUtil.toName(sender));
+                }
+                sender.sendMessage(ChatColor.YELLOW + "You've unmuted "
+                        + PlayerUtil.toName(player));
             } else {
                 throw new CommandException("Player " + PlayerUtil.toName(player) + " was not muted!");
             }

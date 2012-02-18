@@ -110,13 +110,18 @@ public class CommandBookUtil {
                 hours < 12 ? "am" : "pm");
     }
     
+    public static String getOnlineList(Player[] online) {
+        return getOnlineList(online, null);
+    }
+    
     /**
      * Returns a comma-delimited list of players.
      * 
      * @param online
+     * @param color
      * @return
      */
-    public static String getOnlineList(Player[] online) {
+    public static String getOnlineList(Player[] online, ChatColor color) {
         StringBuilder out = new StringBuilder();
         
         // To keep track of commas
@@ -127,8 +132,16 @@ public class CommandBookUtil {
                 out.append(", ");
             }
             
-            out.append(player.getName());
+            if (CommandBook.inst().useDisplayNames) {
+                out.append(player.getDisplayName());
+            } else {
+                out.append(player.getName());
+            }
             
+            if (color != null) {
+                out.append(color);
+            }
+
             first = false;
         }
         
@@ -475,7 +488,7 @@ public class CommandBookUtil {
         // Don't want to build the list unless we need to
         if (message.contains("%players%")) {
             message = message.replace("%players%",
-                    CommandBookUtil.getOnlineList(online));
+                    CommandBookUtil.getOnlineList(online, null));
         }
 
         if (sender instanceof Player) {
