@@ -27,16 +27,19 @@ public class EntityUtil {
     /**
      * Attempts to match a creature type.
      *
-     * @param sender
-     * @param filter
-     * @return
-     * @throws com.sk89q.minecraft.util.commands.CommandException
+     * @param sender The sender requesting a creature type match. Can be null.
+     * @param filter The filter string for the match
+     * @return The matched creature type. Never null.
+     * @throws com.sk89q.minecraft.util.commands.CommandException if no CreatureType could be found
      */
     public static CreatureType matchCreatureType(CommandSender sender,
                                           String filter) throws CommandException {
-        CreatureType type = CreatureType.fromName(filter);
-        if (type != null) {
-            return type;
+        
+        for (CreatureType type : CreatureType.values()) {
+            if (type.name().replace("_", "").equalsIgnoreCase(filter.replace("_", ""))
+                    || type.getName().equalsIgnoreCase(filter)) {
+                return type;
+            }
         }
 
         for (CreatureType testType : CreatureType.values()) {

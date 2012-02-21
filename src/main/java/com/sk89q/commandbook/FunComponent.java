@@ -59,7 +59,7 @@ public class FunComponent extends BukkitComponent {
             creature.setVelocity(new Vector(0, 2, 0));
         }
         if (args.hasFlag('b') && creature instanceof Animals) {
-            ((Animals) creature).setAge(-24000);
+            ((Animals) creature).setBaby();
         }
         if (!specialType.equals("")) {
             if (creature instanceof Wolf) {
