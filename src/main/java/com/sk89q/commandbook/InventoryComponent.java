@@ -31,7 +31,6 @@ import com.sk89q.worldedit.blocks.ItemType;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -76,7 +75,7 @@ public class InventoryComponent extends BukkitComponent {
      * @param id
      * @throws CommandException
      */
-    public void checkAllowedItem(CommandSender sender, int id)
+    public void checkAllowedItem(CommandSender sender, int id, int damage)
             throws CommandException {
 
         if (Material.getMaterial(id) == null || id == 0) {
@@ -88,7 +87,8 @@ public class InventoryComponent extends BukkitComponent {
             return;
         }
 
-        boolean hasPermissions = CommandBook.inst().hasPermission(sender, "commandbook.items." + id);
+        boolean hasPermissions = CommandBook.inst().hasPermission(sender, "commandbook.items." + id)
+                || CommandBook.inst().hasPermission(sender, "commandbook.items." + id + "." + damage);
 
         // Also check the permissions system
         if (hasPermissions) {
@@ -144,7 +144,7 @@ public class InventoryComponent extends BukkitComponent {
                 targets = PlayerUtil.matchPlayers(sender, args.getString(0));
 
                 // Make sure that this player has permission to give items to other
-                /// players!
+                // players!
                 for (Player player : targets) {
                     if (player != sender) {
                         CommandBook.inst().checkPermission(sender, "commandbook.give.other");

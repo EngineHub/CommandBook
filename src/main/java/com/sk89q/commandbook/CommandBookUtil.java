@@ -212,7 +212,7 @@ public class CommandBookUtil {
 
         int maxStackSize = overrideStackSize ? 64 : item.getType().getMaxStackSize();
         
-        component.checkAllowedItem(sender, item.getTypeId());
+        component.checkAllowedItem(sender, item.getTypeId(), item.getDurability());
         
         // Check for invalid amounts
         if (amt == 0 || amt < -1) {
