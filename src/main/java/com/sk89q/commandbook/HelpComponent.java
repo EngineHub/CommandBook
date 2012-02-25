@@ -88,7 +88,7 @@ public class HelpComponent extends BukkitComponent {
                 for (int i = 0; i < split.length; i++) {
                     split[i] = split[i].replaceAll("[\\r\\n]", "");
                 }
-                messages.put(key, split);
+                messages.put(key.toLowerCase(), split);
             }
 
         }
@@ -243,7 +243,7 @@ public class HelpComponent extends BukkitComponent {
                 } else {
                     String chosen = args.getString(0);
                     CommandBook.inst().checkPermission(sender, "commandbook.help.topic." + chosen);
-                    String[] lines = messages.get(chosen);
+                    String[] lines = messages.get(chosen.toLowerCase());
                     sender.sendMessage(ChatColor.YELLOW + "Help about " + chosen + ":");
                     for (String line : lines) {
                         sender.sendMessage(ChatColor.AQUA + line.replaceAll(ChatColor.WHITE.toString(), ChatColor.AQUA.toString()));
