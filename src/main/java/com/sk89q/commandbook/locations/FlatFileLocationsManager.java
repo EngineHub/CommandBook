@@ -28,9 +28,11 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import com.sk89q.commandbook.CommandBook;
@@ -44,16 +46,16 @@ import static com.sk89q.commandbook.CommandBookUtil.getNestedList;
 import static com.sk89q.commandbook.CommandBook.logger;
 
 public class FlatFileLocationsManager implements LocationManager<NamedLocation> {
-    
+
     private World castWorld;
     private final File file;
     private Map<String, NamedLocation> locs = new HashMap<String, NamedLocation>();
     private final Map<String, List<NamedLocation>> unloadedLocs = new HashMap<String, List<NamedLocation>>();
     private final String type;
-    
+
     /**
      * Construct the manager.
-     * 
+     *
      * @param file
      * @param type
      */
@@ -65,7 +67,7 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
     public void castWorld(World world) {
         castWorld = world;
     }
-    
+
     public void load() throws IOException {
         FileInputStream input = null;
         Map<String, NamedLocation> locs = new HashMap<String, NamedLocation>();
@@ -79,7 +81,7 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
             input = new FileInputStream(file);
             InputStreamReader streamReader = new InputStreamReader(input, "utf-8");
             BufferedReader reader = new BufferedReader(streamReader);
-            
+
             CSVReader csv = new CSVReader(reader);
             String[] line;
             while ((line = csv.readNext()) != null) {
@@ -95,17 +97,17 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
                         double z = Double.parseDouble(line[5]);
                         float pitch = Float.parseFloat(line[6]);
                         float yaw = Float.parseFloat(line[7]);
-                        
+
                         World world = CommandBook.server().getWorld(worldName);
-                        
-                      
+
+
                         if (world != null) {
                             // We shouldn't have this warp
                             if (castWorld != null && !castWorld.equals(world)) {
                                 continue;
                             }
                         }
-                        
+
                         Location loc = new Location(world, x, y, z, yaw, pitch);
                         NamedLocation warp = new NamedLocation(name, loc);
                         warp.setWorldName(worldName);
@@ -120,9 +122,9 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
                     }
                 }
             }
-            
+
             this.locs = locs;
-            
+
             if (castWorld != null) {
                 logger().info(locs.size() + " " + type + "(s) loaded for "
                         + castWorld.getName());
@@ -141,18 +143,23 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
 
     public void save() throws IOException {
         FileOutputStream output = null;
-        
+
         try {
             output = new FileOutputStream(file);
             OutputStreamWriter streamWriter = new OutputStreamWriter(output, "utf-8");
             BufferedWriter writer = new BufferedWriter(streamWriter);
-            
+
             CSVWriter csv = new CSVWriter(writer);
-            
+
             synchronized (this) {
-                for (Map.Entry<String, NamedLocation> entry : locs.entrySet()) {
-                    NamedLocation warp = entry.getValue();
-                    
+                Set<NamedLocation> toStore = new HashSet<NamedLocation>();
+                for (List<NamedLocation> locList : unloadedLocs.values()) {
+                    toStore.addAll(locList);
+                }
+                toStore.addAll(locs.values());
+
+                for (NamedLocation warp : toStore) {
+
                     csv.writeNext(new String[] {
                             warp.getName(),
                             warp.getWorldName() != null ? warp.getWorldName()
@@ -165,8 +172,9 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
                             String.valueOf(warp.getLocation().getYaw()),
                             });
                 }
+
             }
-            
+
             csv.flush();
             csv.close();
         } finally {
@@ -194,6 +202,7 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
             NamedLocation loc = i.next();
             if (CommandBook.server().getWorld(loc.getWorldName()) == null) {
                 i.remove();
+                loc.getLocation().setWorld(null);
                 getNestedList(unloadedLocs, loc.getWorldName()).add(loc);
             }
         }
