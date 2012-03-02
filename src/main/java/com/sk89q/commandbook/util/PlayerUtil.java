@@ -255,12 +255,7 @@ public class PlayerUtil {
         if (filter.equalsIgnoreCase("#console")
                 || filter.equalsIgnoreCase("*console*")
                 || filter.equalsIgnoreCase("!")) {
-            try {
-                return CommandBook.server().getConsoleSender();
-            } catch (Throwable t) {
-                // Legacy support
-                return new LegacyConsoleSender(CommandBook.server());
-            }
+            return CommandBook.server().getConsoleSender();
         }
 
         return matchSinglePlayer(sender, filter);

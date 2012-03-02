@@ -50,7 +50,7 @@
     <dependency>
       <groupId>org.bukkit</groupId>
       <artifactId>bukkit</artifactId>
-      <version>1.1-R3</version>
+      <version>1.1-R6</version>
     </dependency>
 
     <!-- Other dependencies -->
@@ -115,7 +115,7 @@
               <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
             </manifest>
             <manifestEntries>
-              <Class-Path>WorldEdit.jar CommandBook/WorldEdit.jar lib/WorldEdit.jar ../lib/WorldEdit.jar ../WorldEdit.jar</Class-Path>
+              <Class-Path>CommandBook/WorldEdit.jar lib/WorldEdit.jar ../lib/WorldEdit.jar ../WorldEdit.jar</Class-Path>
             </manifestEntries>
           </archive>
         </configuration>
