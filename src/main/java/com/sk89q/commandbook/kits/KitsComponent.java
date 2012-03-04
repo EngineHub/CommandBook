@@ -120,8 +120,6 @@ public class KitsComponent extends BukkitComponent {
                     if (player != sender) {
                         // Check permissions!
                         CommandBook.inst().checkPermission(sender, "commandbook.kit.other");
-                    } else {
-                        CommandBook.inst().checkPermission(sender, "commandbook.kit");
                     }
                 }
 
