@@ -54,7 +54,7 @@ import static com.sk89q.commandbook.util.PlayerUtil.toUniqueName;
 /**
  * Utility methods for CommandBook, borrowed from Tetsuuuu (the plugin
  * for SK's server).
- * 
+ *
  * @author sk89q
  */
 public class CommandBookUtil {
@@ -65,26 +65,26 @@ public class CommandBookUtil {
      * The uppercase versions of those are the darker shades, while the
      * lowercase versions are the lighter shades. For white, it's 'w', and
      * 0-2 are black, dark grey, and grey, respectively.
-     * 
+     *
      * @param str
      * @return color-coded string
      */
     public static String replaceColorMacros(String str) {
         str = str.replace("`r", ChatColor.RED.toString());
         str = str.replace("`R", ChatColor.DARK_RED.toString());
-        
+
         str = str.replace("`y", ChatColor.YELLOW.toString());
         str = str.replace("`Y", ChatColor.GOLD.toString());
 
         str = str.replace("`g", ChatColor.GREEN.toString());
         str = str.replace("`G", ChatColor.DARK_GREEN.toString());
-        
+
         str = str.replace("`c", ChatColor.AQUA.toString());
         str = str.replace("`C", ChatColor.DARK_AQUA.toString());
-        
+
         str = str.replace("`b", ChatColor.BLUE.toString());
         str = str.replace("`B", ChatColor.DARK_BLUE.toString());
-        
+
         str = str.replace("`p", ChatColor.LIGHT_PURPLE.toString());
         str = str.replace("`P", ChatColor.DARK_PURPLE.toString());
 
@@ -92,13 +92,13 @@ public class CommandBookUtil {
         str = str.replace("`1", ChatColor.DARK_GRAY.toString());
         str = str.replace("`2", ChatColor.GRAY.toString());
         str = str.replace("`w", ChatColor.WHITE.toString());
-        
+
         return str;
     }
-    
+
     /**
      * Get the 24-hour time string for a given Minecraft time.
-     * 
+     *
      * @param time
      * @return
      */
@@ -109,48 +109,48 @@ public class CommandBookUtil {
                 hours, minutes, (hours % 12) == 0 ? 12 : hours % 12, minutes,
                 hours < 12 ? "am" : "pm");
     }
-    
+
     public static String getOnlineList(Player[] online) {
         return getOnlineList(online, null);
     }
-    
+
     /**
      * Returns a comma-delimited list of players.
-     * 
+     *
      * @param online
      * @param color
      * @return
      */
     public static String getOnlineList(Player[] online, ChatColor color) {
         StringBuilder out = new StringBuilder();
-        
+
         // To keep track of commas
         boolean first = true;
-        
+
         for (Player player : online) {
             if (!first) {
                 out.append(", ");
             }
-            
+
             if (CommandBook.inst().useDisplayNames) {
                 out.append(player.getDisplayName());
             } else {
                 out.append(player.getName());
             }
-            
+
             if (color != null) {
                 out.append(color);
             }
 
             first = false;
         }
-        
+
         return out.toString();
     }
-    
+
     /**
      * Get the cardinal compass direction of a player.
-     * 
+     *
      * @param player
      * @return
      */
@@ -164,7 +164,7 @@ public class CommandBookUtil {
 
     /**
      * Converts a rotation to a cardinal direction name.
-     * 
+     *
      * @param rot
      * @return
      */
@@ -191,10 +191,10 @@ public class CommandBookUtil {
             return null;
         }
     }
-    
+
     /**
      * Process an item give request.
-     * 
+     *
      * @param sender
      * @param item
      * @param amt
@@ -207,13 +207,13 @@ public class CommandBookUtil {
     public static void giveItem(CommandSender sender, ItemStack item, int amt,
             Iterable<Player> targets, InventoryComponent component, boolean drop, boolean overrideStackSize)
             throws CommandException {
-        
+
         boolean included = false; // Is the command sender also receiving items?
 
         int maxStackSize = overrideStackSize ? 64 : item.getType().getMaxStackSize();
-        
+
         component.checkAllowedItem(sender, item.getTypeId(), item.getDurability());
-        
+
         // Check for invalid amounts
         if (amt == 0 || amt < -1) {
             throw new CommandException("Invalid item amount!");
@@ -234,16 +234,16 @@ public class CommandBookUtil {
 
         // Get a nice amount name
         String amtText = amt == -1 ? "an infinite stack of" : String.valueOf(amt);
-        
+
         for (Player player : targets) {
             int left = amt;
-            
+
             // Give individual stacks
             while (left > 0 || amt == -1) {
                 int givenAmt = Math.min(maxStackSize, left);
                 item.setAmount(givenAmt);
                 left -= givenAmt;
-                
+
                 // The -d flag drops the items naturally on the ground instead
                 // of directly giving the player the item
                 if (drop) {
@@ -251,20 +251,20 @@ public class CommandBookUtil {
                 } else {
                     player.getInventory().addItem(item);
                 }
-                
+
                 if (amt == -1) {
                     break;
                 }
             }
-            
+
             // workaround for having inventory open while giving items (eg TMI mod)
             player.updateInventory();
-            
+
             // Tell the user about the given item
             if (player.equals(sender)) {
                 player.sendMessage(ChatColor.YELLOW + "You've been given " + amtText + " "
                         + ItemUtil.toItemName(item.getTypeId()) + ".");
-                
+
                 // Keep track of this
                 included = true;
             } else {
@@ -272,10 +272,10 @@ public class CommandBookUtil {
                         + PlayerUtil.toName(sender) + ": "
                         + amtText + " "
                         + ItemUtil.toItemName(item.getTypeId()) + ".");
-                
+
             }
         }
-        
+
         // The player didn't receive any items, then we need to send the
         // user a message so s/he know that something is indeed working
         if (!included) {
@@ -283,10 +283,10 @@ public class CommandBookUtil {
                     + ItemUtil.toItemName(item.getTypeId()) + " has been given.");
         }
     }
-    
+
     /**
      * Process an item give request.
-     * 
+     *
      * @param sender
      * @param item
      * @param amt
@@ -296,26 +296,26 @@ public class CommandBookUtil {
     public static void takeItem(CommandSender sender, ItemStack item, int amt,
             Player target)
             throws CommandException {
-        
+
         // Check for invalid amounts
         if (amt <= 0) {
             throw new CommandException("Invalid item amount!");
         }
-            
-        
-        item.setAmount(amt);              
+
+
+        item.setAmount(amt);
         if (target.getInventory().contains(item.getTypeId())) {
-            target.getInventory().removeItem(item);           
+            target.getInventory().removeItem(item);
 
             target.sendMessage(ChatColor.YELLOW + "Taken from "
                             + PlayerUtil.toName(sender) + ": "
                             + amt + " "
                             + ItemUtil.toItemName(item.getTypeId()) + ".");
-        
+
             sender.sendMessage(ChatColor.YELLOW.toString() + amt + " "
                         + ItemUtil.toItemName(item.getTypeId()) + " has been taken.");
         } else {
-            sender.sendMessage(ChatColor.YELLOW.toString() + target.getName() 
+            sender.sendMessage(ChatColor.YELLOW.toString() + target.getName()
                     + " has no " + ItemUtil.toItemName(item.getTypeId()) + ".");
         }
     }
@@ -325,9 +325,9 @@ public class CommandBookUtil {
      * Blocks above the player will be iteratively tested until there is
      * a series of two free blocks. The player will be teleported to
      * that free position.
-     * 
+     *
      * @param searchPos search position
-     * @return 
+     * @return
      */
     public static Location findFreePosition(Location searchPos) {
         World world = searchPos.getWorld();
@@ -358,13 +358,13 @@ public class CommandBookUtil {
 
             y++;
         }
-        
+
         return null;
     }
-    
+
     /**
      * Send an arrow from a player eye level.
-     * 
+     *
      * @param player
      * @param dir
      * @param speed
@@ -384,7 +384,7 @@ public class CommandBookUtil {
 
     /**
      * Send fireballs from a player eye level.
-     * 
+     *
      * @param player
      * @param amt number of fireballs to shoot (evenly spaced)
      */
@@ -400,35 +400,18 @@ public class CommandBookUtil {
             fball.setDirection(dir.multiply(10));
         }
     }
-    
+
     public static void sendCannonToPlayer(Player player) {
     	Location loc = player.getEyeLocation();
     	loc.setX(loc.getX());
     	loc.setY(loc.getY());
     	loc.setZ(loc.getZ());
-    	player.getWorld().spawn(loc, Fireball.class); 
+    	player.getWorld().spawn(loc, Fireball.class);
     }
 
     /**
-     * Get a list of creature names.
-     * 
-     * @return
-     */
-    public static String getCreatureTypeNameList() {
-        StringBuilder str = new StringBuilder();
-        for (CreatureType type : CreatureType.values()) {
-            if (str.length() > 0) {
-                str.append(", ");
-            }
-            str.append(type.getName());
-        }
-        
-        return str.toString();
-    }
-    
-    /**
      * Send a complex message properly.
-     * 
+     *
      * @param sender
      * @param message
      */
@@ -437,10 +420,10 @@ public class CommandBookUtil {
             sender.sendMessage(line.replaceAll("[\r\n]", ""));
         }
     }
-    
+
     /**
      * Expand a stack of items.
-     * 
+     *
      * @param item
      * @param infinite
      */
@@ -448,13 +431,13 @@ public class CommandBookUtil {
         if (item == null || item.getAmount() == 0 || item.getTypeId() <= 0) {
             return;
         }
-        
+
         int stackSize = overrideStackSize ? 64 : item.getType().getMaxStackSize();
-        
+
         if (item.getType().getMaxStackSize() == 1) {
             return;
         }
-        
+
         if (infinite) {
             item.setAmount(-1);
         } else if (item.getAmount() < stackSize){

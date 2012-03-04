@@ -18,10 +18,10 @@
 
 package com.sk89q.commandbook.util;
 
-import com.sk89q.commandbook.CommandBookUtil;
 import com.sk89q.minecraft.util.commands.CommandException;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.CreatureType;
+import org.bukkit.entity.EntityType;
 
 public class EntityUtil {
     /**
@@ -29,27 +29,48 @@ public class EntityUtil {
      *
      * @param sender The sender requesting a creature type match. Can be null.
      * @param filter The filter string for the match
+     * @param requireSpawnable Whether to only allow EntityTypes that are spawnable
      * @return The matched creature type. Never null.
      * @throws com.sk89q.minecraft.util.commands.CommandException if no CreatureType could be found
      */
-    public static CreatureType matchCreatureType(CommandSender sender,
-                                          String filter) throws CommandException {
-        
-        for (CreatureType type : CreatureType.values()) {
+    public static EntityType matchCreatureType(CommandSender sender,
+                                          String filter, boolean requireSpawnable) throws CommandException {
+
+        for (EntityType type : EntityType.values()) {
             if (type.name().replace("_", "").equalsIgnoreCase(filter.replace("_", ""))
-                    || type.getName().equalsIgnoreCase(filter)) {
+                    || type.getName().equalsIgnoreCase(filter) && (type.isSpawnable() || !requireSpawnable)) {
                 return type;
             }
         }
 
-        for (CreatureType testType : CreatureType.values()) {
-            if (testType.getName().toLowerCase().startsWith(filter.toLowerCase())) {
+        for (EntityType testType : EntityType.values()) {
+            if (testType.getName().toLowerCase().startsWith(filter.toLowerCase()) && (testType.isSpawnable() || !requireSpawnable)) {
                 return testType;
             }
         }
 
         throw new CommandException("Unknown mob specified! You can "
                 + "choose from the list of: "
-                + CommandBookUtil.getCreatureTypeNameList());
+                + getEntityTypeNameList(requireSpawnable));
+    }
+
+    /**
+     * Get a list of creature names.
+     *
+     * @param requireSpawnable Whether to only show entries that are spawnable
+     * @return
+     */
+    public static String getEntityTypeNameList(boolean requireSpawnable) {
+        StringBuilder str = new StringBuilder();
+        for (EntityType type : EntityType.values()) {
+            if (!requireSpawnable || type.isSpawnable()) {
+                if (str.length() > 0) {
+                    str.append(", ");
+                }
+                str.append(type.getName());
+            }
+        }
+
+        return str.toString();
     }
 }

@@ -46,7 +46,7 @@ public class FunComponent extends BukkitComponent {
         registerCommands(Commands.class);
     }
 
-    public LivingEntity spawn(Location loc, CreatureType type, String specialType,
+    public LivingEntity spawn(Location loc, EntityType type, String specialType,
                                CommandContext args, CommandSender sender) throws CommandException {
         LivingEntity creature = loc.getWorld().spawnCreature(loc, type);
         if (args.hasFlag('d')) {
@@ -162,10 +162,10 @@ public class FunComponent extends BukkitComponent {
             }
 
             int count = Math.max(1, args.getInteger(1, 1));
-            CreatureType type = matchCreatureType(sender, creatureName);
-            CreatureType riderType = null;
+            EntityType type = matchCreatureType(sender, creatureName, true);
+            EntityType riderType = null;
             if (hasRider) {
-                riderType = matchCreatureType(sender, riderName);
+                riderType = matchCreatureType(sender, riderName, true);
                 CommandBook.inst().checkPermission(sender, "commandbook.spawnmob." + riderType.getName());
             }
             CommandBook.inst().checkPermission(sender, "commandbook.spawnmob." + type.getName());
@@ -457,11 +457,11 @@ public class FunComponent extends BukkitComponent {
             Iterable<Player> targets = null;
             boolean included = false;
             int count = 0;
-            
+
             // Detect arguments based on the number of arguments provided
             if (args.argsLength() == 0) {
                 targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
-            } else if (args.argsLength() == 1) {            
+            } else if (args.argsLength() == 1) {
                 targets = PlayerUtil.matchPlayers(sender, args.getString(0));
             }
 
@@ -485,13 +485,13 @@ public class FunComponent extends BukkitComponent {
                     // Tell the user
                     if (player.equals(sender)) {
                         player.sendMessage(ChatColor.YELLOW + "Fireball attack!");
-                        
+
                         // Keep track of this
                         included = true;
                     } else {
                         player.sendMessage(ChatColor.YELLOW + "Fireball attack from "
                                 + PlayerUtil.toName(sender) + ".");
-                        
+
                     }
                 } else {
                     if (count < 6) {
@@ -505,7 +505,7 @@ public class FunComponent extends BukkitComponent {
                     }
                 }
             }
-            
+
             // The player didn't receive any items, then we need to send the
             // user a message so s/he know that something is indeed working
             if (!included && args.hasFlag('s')) {
