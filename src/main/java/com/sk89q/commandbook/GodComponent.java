@@ -70,7 +70,7 @@ public class GodComponent extends BukkitComponent implements Listener {
     }
     
     private static class LocalConfiguration extends ConfigurationBase {
-        @Setting("auto-enable") public boolean autoEnable = true;
+        @Setting("auto-enable") public boolean autoEnable = false;
     }
 
     /**
