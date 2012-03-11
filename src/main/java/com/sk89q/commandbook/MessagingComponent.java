@@ -48,9 +48,9 @@ import static com.sk89q.commandbook.CommandBookUtil.replaceColorMacros;
 public class MessagingComponent extends BukkitComponent implements Listener {
 
     @InjectComponent private SessionComponent sessions;
-    
+
     private LocalConfiguration config;
-    
+
     @Override
     public void enable() {
         config = configure(new LocalConfiguration());
@@ -69,7 +69,7 @@ public class MessagingComponent extends BukkitComponent implements Listener {
         @Setting("broadcast-format") public String broadcastFormat = "`r[Broadcast] %s";
         @Setting("twitter-style") public boolean twitterStyle = true;
     }
-    
+
     public void messagePlayer(CommandSender sender, String target, String message) throws CommandException {
         CommandSender receiver =
                 PlayerUtil.matchPlayerOrConsole(sender, target);
@@ -101,7 +101,7 @@ public class MessagingComponent extends BukkitComponent implements Listener {
 
     /**
      * Called on player chat.
-     * 
+     *
      * @param event Relevant event details
      */
     @EventHandler
@@ -114,7 +114,12 @@ public class MessagingComponent extends BukkitComponent implements Listener {
             int spaceIndex = message.indexOf(" ");
             if (spaceIndex > -1) {
                 try {
-                    messagePlayer(event.getPlayer(), message.substring(1, spaceIndex), message.substring(spaceIndex + 1));
+                    String name = message.substring(1, spaceIndex);
+                    if (name.length() <= 0) {
+                        return;
+                    }
+                    
+                    messagePlayer(event.getPlayer(), name, message.substring(spaceIndex + 1));
                 } catch (CommandException e) {
                     event.getPlayer().sendMessage(ChatColor.RED + e.getMessage());
                 }
@@ -249,8 +254,8 @@ public class MessagingComponent extends BukkitComponent implements Listener {
 
             Player player = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
 
-            if (CommandBook.inst().hasPermission(player, "commandbook.mute.exempt") 
-                    && !(args.hasFlag('o') 
+            if (CommandBook.inst().hasPermission(player, "commandbook.mute.exempt")
+                    && !(args.hasFlag('o')
                     && CommandBook.inst().hasPermission(sender, "commandbook.mute.exempt.override"))) {
                 throw new CommandException("Player " + PlayerUtil.toName(sender) + " is exempt from being muted!");
             }
