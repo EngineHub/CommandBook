@@ -35,7 +35,7 @@ import org.bukkit.entity.Player;
 
 @ComponentInformation(friendlyName = "Warps", desc = "Provides warps functionality")
 public class WarpsComponent extends LocationsComponent {
-    
+
     @InjectComponent private SessionComponent sessions;
     public WarpsComponent() {
         super("Warp");
@@ -126,11 +126,11 @@ public class WarpsComponent extends LocationsComponent {
         public void warps(CommandContext args, CommandSender sender) throws CommandException {
         }
     }
-    
+
     public class ManagementCommands {
         @Command(aliases = {"del", "delete", "remove", "rem"}, usage = "<warpname> [world]",
                 desc = "Remove a warp", min = 1, max = 2 )
-        @CommandPermissions({"commandbook.remove"})
+        @CommandPermissions({"commandbook.warp.remove"})
         public void removeCmd(CommandContext args, CommandSender sender) throws CommandException {
             World world;
             String warpName = args.getString(0);
