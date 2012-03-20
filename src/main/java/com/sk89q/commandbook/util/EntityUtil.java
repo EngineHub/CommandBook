@@ -38,13 +38,13 @@ public class EntityUtil {
 
         for (EntityType type : EntityType.values()) {
             if (type.name().replace("_", "").equalsIgnoreCase(filter.replace("_", ""))
-                    || type.getName().equalsIgnoreCase(filter) && (type.isSpawnable() || !requireSpawnable)) {
+                    || (type.getName() != null && type.getName().equalsIgnoreCase(filter)) && (type.isSpawnable() || !requireSpawnable)) {
                 return type;
             }
         }
 
         for (EntityType testType : EntityType.values()) {
-            if (testType.getName().toLowerCase().startsWith(filter.toLowerCase()) && (testType.isSpawnable() || !requireSpawnable)) {
+            if (testType.getName() != null && testType.getName().toLowerCase().startsWith(filter.toLowerCase()) && (testType.isSpawnable() || !requireSpawnable)) {
                 return testType;
             }
         }
