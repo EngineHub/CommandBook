@@ -24,29 +24,29 @@ import com.zachsthings.libcomponents.ComponentInformation;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
-import com.sk89q.minecraft.util.commands.CommandPermissions;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @ComponentInformation(friendlyName = "Sessions", desc = "Handles player sessions")
 public class SessionComponent extends BukkitComponent implements Runnable, Listener {
+    public static final long CHECK_FREQUENCY = 60 * 20;
 
-    public static final long CHECK_FREQUENCY = 1200;
-
-    protected final Map<String, UserSession> sessions =
-            new HashMap<String, UserSession>();
-    protected final Map<String, AdministrativeSession> adminSessions =
-            new HashMap<String, AdministrativeSession>();
+    private final Map<String, Map<Class<? extends PersistentSession>, PersistentSession>>
+            sessions = new ConcurrentHashMap<String, Map<Class<? extends PersistentSession>, PersistentSession>>();
+    private final Map<Class<? extends PersistentSession>, SessionFactory<?>>
+            sessionFactories = new ConcurrentHashMap<Class<? extends PersistentSession>, SessionFactory<?>>();
 
     @Override
     public void enable() {
@@ -60,113 +60,204 @@ public class SessionComponent extends BukkitComponent implements Runnable, Liste
     /**
      * Get a session.
      *
-     * @param user
-     * @return
+     * @param user The user to get a session for
+     * @return The user's session
+     * @deprecated see {@link #getSession(Class, org.bukkit.command.CommandSender)} with args (UserSession.class, user)
      */
+    @Deprecated
     public UserSession getSession(CommandSender user) {
-        synchronized (sessions) {
-            String key;
-
-            if (user instanceof Player) {
-                key = user.getName();
-            } else {
-                key = UserSession.CONSOLE_NAME;
-            }
-
-            UserSession session = sessions.get(key);
-            if (session != null) {
-                return session;
-            }
-            session = new UserSession();
-            sessions.put(key, session);
-            return session;
-        }
+        return getSession(UserSession.class, user);
     }
 
     /**
      * Get sessions.
      *
-     * @return
+     * @return UserSessions
+     * @deprecated use {@link #getSessions(Class)} with UserSession.class
      */
+    @Deprecated
     public Map<String, UserSession> getSessions() {
-        return sessions;
+        return getSessions(UserSession.class);
     }
 
     /**
      * Get a session.
      *
-     * @param user
-     * @return
+     * @param user The player to get this session for
+     * @return The user's session
+     * @deprecated see {@link #getSession(Class, org.bukkit.command.CommandSender)} with args (AdministrativeSession.class, user)
      */
+    @Deprecated
     public AdministrativeSession getAdminSession(Player user) {
-        synchronized (adminSessions) {
-            String key = user.getName();
-
-            AdministrativeSession session = adminSessions.get(key);
-            if (session != null) {
-                return session;
-            }
-            session = new AdministrativeSession();
-            adminSessions.put(key, session);
-            return session;
-        }
+        return getSession(AdministrativeSession.class, user);
     }
 
     /**
      * Get sessions.
      *
-     * @return
+     * @return Administrative sessions which currently exist
+     * @deprecated use {@link #getSessions(Class)} with UserSession.class
      */
+    @Deprecated
     public Map<String, AdministrativeSession> getAdminSessions() {
-        return adminSessions;
+        return getSessions(AdministrativeSession.class);
+    }
+
+    /**
+     * Return all the currently registered sessions of the given type
+     * @param type The type of session to get
+     * @param <T> The type parameter for the session
+     * @return The currently registered session types
+     */
+    public <T extends PersistentSession> Map<String, T> getSessions(Class<T> type) {
+        Map<String, T> ret = new HashMap<String, T>();
+        for (Map.Entry<String, Map<Class<? extends PersistentSession>, PersistentSession>> entry : sessions.entrySet()) {
+            PersistentSession session = entry.getValue().get(type);
+            if (session != null) {
+                ret.put(entry.getKey(), type.cast(session));
+            }
+        }
+        return ret;
+    }
+
+    /**
+     * Return the sessions which currently exist for the specified user
+     * @param user The user to get a session for
+     * @return The sessions which currently exist for this user
+     */
+    public Collection<PersistentSession> getSessions(CommandSender user) {
+        Map<Class<? extends PersistentSession>, PersistentSession> ret = sessions.get(user.getName());
+        if (ret == null) {
+            ret = Collections.emptyMap();
+        }
+        return Collections.unmodifiableCollection(ret.values());
+    }
+
+    /**
+     * Gets the session of type for user, creating a new instance if none currently exists
+     *
+     * @see #getSessionFactory(Class)
+     * @param type The type of session to get
+     * @param user The user to get the session for
+     * @param <T> The type of session
+     * @return The player's session, or null if the session could not be correctly created
+     */
+    public <T extends PersistentSession> T getSession(Class<T> type, CommandSender user) {
+        synchronized (sessions) {
+            Map<Class<? extends PersistentSession>, PersistentSession> userSessions = sessions.get(user.getName());
+            if (userSessions == null) {
+                userSessions = new HashMap<Class<? extends PersistentSession>, PersistentSession>();
+                sessions.put(user.getName(), userSessions);
+            }
+
+            // Do we have an existing session?
+            T session = type.cast(userSessions.get(type));
+            if (session == null) {
+                session = getSessionFactory(type).createSession(user);
+                if (session != null) {
+                    session.handleReconnect(user);
+                    userSessions.put(type, session);
+                }
+            }
+            return session;
+        }
+    }
+
+    /**
+     * Return a SessionFactory used to create new instances of a certain type of session.
+     * If no SessionFactory has been previously registered with {@link #registerSessionFactory(Class, SessionFactory)},
+     * a new {@link ReflectiveSessionFactory} will be instantiated. This will only create
+     * sessions for PersistentSession subclasses with an empty constructor.
+     * @param type The subclass of PersistentSession to get a SessionFactory for
+     * @param <T> The type of PersistentSession
+     * @return The required SessionFactory
+     */
+    @SuppressWarnings("unchecked")
+    public <T extends PersistentSession> SessionFactory<T> getSessionFactory(Class<T> type) {
+        synchronized (sessionFactories) {
+            SessionFactory<?> factory = sessionFactories.get(type);
+            if (factory == null) {
+                factory = new ReflectiveSessionFactory(type);
+                sessionFactories.put(type, factory);
+            }
+            return (SessionFactory<T>) factory;
+        }
+    }
+
+    public <T extends PersistentSession> void registerSessionFactory(Class<T> type, SessionFactory<T> factory) {
+        sessionFactories.put(type, factory);
+    }
+
+    /**
+     * Add {@code session} to the sessions list for {@code user}, overwriting any sessions with the same class.
+     * @param session The session to add
+     * @param user The user to add the session to
+     */
+    public void addSession(PersistentSession session, CommandSender user) {
+        Map<Class<? extends PersistentSession>, PersistentSession> userSessions = sessions.get(user.getName());
+        if (userSessions == null) {
+            userSessions = new HashMap<Class<? extends PersistentSession>, PersistentSession>();
+            sessions.put(user.getName(), userSessions);
+        }
+        userSessions.put(session.getClass(), session);
+
     }
 
 
     // -- Garbage collection
-
     public void run() {
-        cleanUpSessions(getSessions());
-        cleanUpSessions(getAdminSessions());
-    }
+        synchronized (sessions) {
+            for (Iterator<Map.Entry<String, Map<Class<? extends PersistentSession>, PersistentSession>>>
+                         i = sessions.entrySet().iterator(); i.hasNext();) {
+                Map.Entry<String, Map<Class<? extends PersistentSession>, PersistentSession>> entry = i.next();
+                if (entry.getKey().equals(CommandBook.server().getConsoleSender().getName())) { // TODO: Better player check!
+                    continue;
+                }
+                final Player player = CommandBook.server().getPlayerExact(entry.getKey());
+                if (player != null && player.isOnline()) {
+                    continue;
+                }
 
-    public <T extends PersistentSession> void cleanUpSessions(final Map<String, T> map) {
-        Iterator<Map.Entry<String, T>> it = map.entrySet().iterator();
+                for (Iterator<PersistentSession> i2 = entry.getValue().values().iterator(); i2.hasNext(); ) {
+                    if (!i2.next().isRecent()) {
+                        i2.remove();
+                    }
+                }
 
-        while (it.hasNext()) {
-            Map.Entry<String, T> entry = it.next();
-            if (entry.getKey().equals(UserSession.CONSOLE_NAME)) continue;
-            Player player = CommandBook.server().getPlayerExact(entry.getKey());
-            if (player != null && player.isOnline()) continue;
-
-            if (!entry.getValue().isRecent()) {
-                it.remove();
+                if (entry.getValue().size() == 0) {
+                    i.remove();
+                }
             }
         }
     }
 
     // -- Events
-
     @EventHandler
-    public void onLoin(PlayerLoginEvent event) {
+    public void onLogin(PlayerLoginEvent event) {
         // Trigger the session
-        getSession(event.getPlayer()).handleReconnect();
+        for (PersistentSession session : getSessions(event.getPlayer())) {
+            session.handleReconnect(event.getPlayer());
+        }
     }
 
     /**
      * Called on player disconnect.
+     *
+     * @param event Relevant event details
      */
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
-        getSession(event.getPlayer()).handleDisconnect();
-        getAdminSession(event.getPlayer()).handleDisconnect();
+        for (PersistentSession session : getSessions(event.getPlayer())) {
+            session.handleDisconnect();
+        }
     }
-    
+
     public class Commands {
         @Command(aliases = {"confirm", "conf"},
                 desc = "Confirm an action",
                 max = 0, flags = "vc")
         public void confirm(CommandContext args, CommandSender sender) throws CommandException {
-            UserSession session = getSession(sender);
+            UserSession session = getSession(UserSession.class, sender);
             final String cmd = session.getCommandToConfirm(false);
             if (cmd == null) throw new CommandException("No command to confirm!");
             if (args.hasFlag('v')) {

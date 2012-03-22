@@ -18,9 +18,33 @@
 
 package com.sk89q.commandbook.session;
 
-public interface PersistentSession {
+import org.bukkit.command.CommandSender;
 
-    public boolean isRecent();
-    public void handleDisconnect();
-    
+import java.util.concurrent.TimeUnit;
+
+public abstract class PersistentSession {
+    public static final long THIRTY_MINUTES = TimeUnit.MINUTES.toMillis(30);
+    public static final long ONE_HOUR = TimeUnit.HOURS.toMillis(1);
+
+    private final long maxTime;
+    private long lastUpdate;
+
+    protected PersistentSession(long maxTime) {
+        this.maxTime = maxTime;
+    }
+
+    public long getGoneTime() {
+        return (System.currentTimeMillis() - lastUpdate);
+    }
+
+    public boolean isRecent() {
+        return getGoneTime() < maxTime;
+    }
+
+    public void handleDisconnect() {
+        lastUpdate = System.currentTimeMillis();
+    }
+
+    public abstract void handleReconnect(CommandSender player);
+
 }

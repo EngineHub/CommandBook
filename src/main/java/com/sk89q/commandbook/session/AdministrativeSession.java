@@ -18,20 +18,17 @@
 
 package com.sk89q.commandbook.session;
 
-public class AdministrativeSession implements PersistentSession {
-    
-    private static final int MAX_AGE = 3600000;
-    
-    private long lastUpdate;
+import org.bukkit.command.CommandSender;
+
+public class AdministrativeSession extends PersistentSession {
     private boolean isMute;
     private boolean isFrozen;
-    
-    public boolean isRecent() {
-        return (System.currentTimeMillis() - lastUpdate) < MAX_AGE;
+
+    protected AdministrativeSession() {
+        super(ONE_HOUR);
     }
-    
-    public void handleDisconnect() {
-        lastUpdate = System.currentTimeMillis();
+
+    public void handleReconnect(CommandSender player) {
     }
 
     public boolean isMute() {
@@ -43,11 +40,13 @@ public class AdministrativeSession implements PersistentSession {
         this.isMute = isMute;
         return previous;
     }
-    
+
+    @Deprecated
     public boolean isFrozen() {
         return isFrozen;
     }
-    
+
+    @Deprecated
     public void setFrozen(boolean isFrozen) {
         this.isFrozen = isFrozen;
     }
