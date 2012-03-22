@@ -18,12 +18,8 @@
 
 package com.sk89q.commandbook;
 
+import com.sk89q.commandbook.session.PersistentSession;
 import com.zachsthings.libcomponents.Depend;
-import org.bukkit.entity.Vehicle;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.vehicle.VehicleMoveEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.Location;
 import com.zachsthings.libcomponents.bukkit.BukkitComponent;
 import com.zachsthings.libcomponents.ComponentInformation;
@@ -37,98 +33,110 @@ import com.sk89q.minecraft.util.commands.CommandPermissions;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.event.Listener;
+
+import java.lang.ref.WeakReference;
+import java.util.concurrent.TimeUnit;
 
 
 /**
- * 
+ *
  * @author Turtle9598
  */
 
 @Depend(components = SessionComponent.class)
 @ComponentInformation(friendlyName = "Freeze", desc = "Blocks a specified player's movement on command")
-public class FreezeComponent extends BukkitComponent implements Listener {
+public class FreezeComponent extends BukkitComponent implements Listener, Runnable {
+    public static final int MOVE_THRESHOLD = 2;
+    private static final int MOVE_THRESHOLD_SQ = MOVE_THRESHOLD * MOVE_THRESHOLD;
 
     @InjectComponent private SessionComponent sessions;
-       
+
     @Override
     public void enable() {
         registerCommands(Commands.class);
         CommandBook.registerEvents(this);
+        CommandBook.server().getScheduler().scheduleSyncRepeatingTask(CommandBook.inst(), this, 20 * 2, 20 * 2);
     }
 
-    /**
-     * Called on player movement.
-     * 
-     * @param event Relevant event details
-     */
-    
-    @EventHandler
-    public void onPlayerMove(PlayerMoveEvent event) {
-        Player player = event.getPlayer();
+    public boolean freezePlayer(Player player) {
+        FreezeState session = sessions.getSession(FreezeState.class, player);
+        final boolean previous = session.isFrozen();
+        session.freeze(player.getLocation());
+        return previous;
+    }
 
-        if (player.getVehicle() != null) return; // handled in vehicle listener
-        if (event.getFrom().getBlockX() != event.getTo().getBlockX()
-                || event.getFrom().getBlockY() != event.getTo().getBlockY()
-                || event.getFrom().getBlockZ() != event.getTo().getBlockZ()) {
+    public boolean isFrozen(Player player) {
+        return sessions.getSession(FreezeState.class, player).isFrozen();
+    }
 
-            if (sessions.getAdminSession(player).isFrozen()) {
-                
+    public boolean unfreezePlayer(Player player) {
+        FreezeState session = sessions.getSession(FreezeState.class, player);
+        final boolean previous = session.isFrozen();
+        session.freeze(null);
+        return previous;
+    }
+
+    @Override
+    public void run() {
+        for (FreezeState frozenState : sessions.getSessions(FreezeState.class).values()) {
+            if (!frozenState.isFrozen()) {
+                continue;
+            }
+
+            Player player = frozenState.getPlayer();
+            if (player == null || !player.isOnline()) {
+                continue;
+            }
+
+            Location loc = player.getLocation();
+            if (loc.distanceSquared(frozenState.getFreezeLocation()) >= MOVE_THRESHOLD_SQ) {
+                loc.setX(frozenState.getFreezeLocation().getX());
+                loc.setY(frozenState.getFreezeLocation().getY());
+                loc.setZ(frozenState.getFreezeLocation().getZ());
                 player.sendMessage(ChatColor.RED + "You are frozen.");
-            
-                Location newLoc = event.getFrom();
-                newLoc.setX(newLoc.getBlockX() + 0.5);
-                newLoc.setY(newLoc.getBlockY());
-                newLoc.setZ(newLoc.getBlockZ() + 0.5);
-                event.setTo(newLoc);
+                player.teleport(loc);
+            }
+
+        }
+    }
+
+    private static class FreezeState extends PersistentSession {
+        public static final long MAX_AGE = TimeUnit.MINUTES.toMillis(30);
+
+        private WeakReference<Player> player;
+        private Location freezeLocation;
+
+        protected FreezeState() {
+            super(MAX_AGE);
+        }
+
+        public boolean isFrozen() {
+            return freezeLocation != null;
+        }
+
+        public Location getFreezeLocation() {
+            return freezeLocation;
+        }
+
+        public void freeze(Location loc) {
+            freezeLocation = loc.clone();
+        }
+
+        public Player getPlayer() {
+            return this.player.get();
+        }
+
+        public void handleDisconnect() {
+            super.handleDisconnect();
+            if (this.player != null) {
+                this.player.clear();
             }
         }
-    }
-    
-    /**
-     * Called on player teleport.
-     * 
-     * @param event Relevant event details
-     */
-    
-    @EventHandler
-    public void onPlayerTeleport(PlayerTeleportEvent event) {
-        Player player = event.getPlayer();
-        
-        if (event.getCause() == PlayerTeleportEvent.TeleportCause.UNKNOWN) {
-            return; // Must check to see if the event is UNKNOWN as the Vehicle Move & Player Move events both use unknown teleport causes.
-        }
 
-        if (sessions.getAdminSession(player).isFrozen()) {
-            player.sendMessage(ChatColor.RED + "You are frozen.");
-            event.setCancelled(true);
-        }
-    }
-    
-    /**
-     * Called on vehicle movement.
-     * 
-     * @param event Relevant event details
-     */
-    
-    @EventHandler
-    public void onVehicleMove(VehicleMoveEvent event) {
-        Vehicle vehicle = event.getVehicle();
-        if (vehicle.getPassenger() == null
-                || !(vehicle.getPassenger() instanceof Player)) return;
-        Player player = (Player) vehicle.getPassenger();
-
-        if (event.getFrom().getBlockX() != event.getTo().getBlockX()
-                || event.getFrom().getBlockY() != event.getTo().getBlockY()
-                || event.getFrom().getBlockZ() != event.getTo().getBlockZ()) {
-
-            if (sessions.getAdminSession(player).isFrozen()) {
-                
-                player.sendMessage(ChatColor.RED + "You are frozen.");
-
-                vehicle.setVelocity(new org.bukkit.util.Vector(0,0,0));
-                vehicle.teleport(event.getFrom());
+        public void handleReconnect(CommandSender player) {
+            if (player instanceof Player) {
+                this.player = new WeakReference<Player>((Player) player);
             }
         }
     }
@@ -137,15 +145,19 @@ public class FreezeComponent extends BukkitComponent implements Listener {
         @Command(aliases = {"freeze"}, usage = "<target>", desc = "Freeze a player", min = 1, max = 1)
         @CommandPermissions({"commandbook.freeze"})
         public void freeze(CommandContext args, CommandSender sender) throws CommandException {
-
             Player player = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
 
-            sessions.getAdminSession(player).setFrozen(true);
-
-            player.sendMessage(ChatColor.YELLOW + "You've been frozen by "
-                    + PlayerUtil.toName(sender));
-            sender.sendMessage(ChatColor.YELLOW + "You've frozen "
-                    + PlayerUtil.toName(player));
+            if (!freezePlayer(player)) {
+                player.sendMessage(ChatColor.YELLOW + "You've been frozen by "
+                        + PlayerUtil.toName(sender));
+                sender.sendMessage(ChatColor.YELLOW + "You've frozen "
+                        + PlayerUtil.toName(player));
+            } else {
+                player.sendMessage(ChatColor.YELLOW + "Your freeze location has been updated by "
+                        + PlayerUtil.toName(sender));
+                sender.sendMessage(ChatColor.YELLOW + "You have updated the freeze location of "
+                        + PlayerUtil.toName(player));
+            }
         }
 
         @Command(aliases = {"unfreeze"}, usage = "<target>", desc = "Unmute a player", min = 1, max = 1)
@@ -153,12 +165,15 @@ public class FreezeComponent extends BukkitComponent implements Listener {
         public void unfreeze(CommandContext args, CommandSender sender) throws CommandException {
             Player player = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
 
-            sessions.getAdminSession(player).setFrozen(false);
+            if (unfreezePlayer(player)) {
 
-            player.sendMessage(ChatColor.YELLOW + "You've been unfrozen by "
-                    + PlayerUtil.toName(sender));
-            sender.sendMessage(ChatColor.YELLOW + "You've unfrozen "
-                    + PlayerUtil.toName(player));
+                player.sendMessage(ChatColor.YELLOW + "You've been unfrozen by "
+                        + PlayerUtil.toName(sender));
+                sender.sendMessage(ChatColor.YELLOW + "You've unfrozen "
+                        + PlayerUtil.toName(player));
+            } else {
+                throw new CommandException(PlayerUtil.toName(player) + " was not frozen");
+            }
         }
     }
 }
