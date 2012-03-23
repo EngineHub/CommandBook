@@ -33,7 +33,7 @@ public class HelpComponent extends BukkitComponent {
     private YAMLProcessor help;
     private final Map<String, String[]> messages = new HashMap<String, String[]>();
     private LocalConfiguration config;
-    
+
     @Override
     public void enable() {
         config = configure(new LocalConfiguration());
@@ -47,19 +47,19 @@ public class HelpComponent extends BukkitComponent {
         reloadMessages();
         registerCommands(HelpCommands.class);
     }
-    
+
     @Override
     public void reload() {
         super.reload();
         reloadMessages();
         configure(config);
     }
-    
+
     private static class LocalConfiguration extends ConfigurationBase {
         @Setting("help-file") public String helpFile = "help.yml";
         @Setting("command-help") public boolean commandHelp = true;
     }
-    
+
     private static final String demoHelpMessage =
             "This is a component to provide help for servers\n" +
             "`r/help -c <commandname>`w gives help for a command\n" +
@@ -71,7 +71,7 @@ public class HelpComponent extends BukkitComponent {
         } catch (IOException e) {
             return false;
         }
-        
+
         List<String> keys = help.getKeys("topics");
         if (keys == null) {
             help.setProperty("topics.help", demoHelpMessage);
@@ -79,7 +79,7 @@ public class HelpComponent extends BukkitComponent {
             keys.add("help");
             help.save();
         }
-        
+
         for (String key : keys) {
             String information = help.getString("topics." + key);
             if (information != null && information.trim().length() != 0) {
@@ -102,8 +102,14 @@ public class HelpComponent extends BukkitComponent {
         boolean first = true;
         int count = 0;
         for (String key : messages.keySet()) {
-            if (!CommandBook.inst().hasPermission(sender, "commandbook.help.topic." + key)) continue;
-            if (!first) sb.append(ChatColor.YELLOW).append(", ");
+            if (!CommandBook.inst().hasPermission(sender, "commandbook.help.topic." + key)) {
+                continue;
+            }
+
+            if (!first) {
+                sb.append(ChatColor.YELLOW).append(", ");
+            }
+
             sb.append(ChatColor.LIGHT_PURPLE).append(key);
             first = false;
             ++count;
@@ -115,71 +121,27 @@ public class HelpComponent extends BukkitComponent {
         }
     }
 
-    /**
-     * The method that returns fallback commands in SimpleCommandMap. 
-     * Cached here for better performance when running commands
-     */
-    private static final Method SimpleCommandMap_getFallback;
-    private static final Field SimpleCommandMap_knownCommands;
-    static {
-        Method method = null;
-        try {
-            method = SimpleCommandMap.class.getDeclaredMethod("getFallback", String.class);
-            method.setAccessible(true);
-            if (!org.bukkit.command.Command.class.isAssignableFrom(method.getReturnType())) {
-                method = null;
-                CommandBook.logger().severe("SimpleCommandMap.getFallback does not return a Command!");
-            }
-        } catch (NoSuchMethodException e) {
-            CommandBook.logger().severe("Unable to find getFallback method in SimpleCommandMap!");
-        }
-        SimpleCommandMap_getFallback = method;
-
-        Field field = null;
-        try {
-            field = SimpleCommandMap.class.getDeclaredField("knownCommands");
-            field.setAccessible(true);
-            if (!Map.class.isAssignableFrom(field.getType())) {
-                field = null;
-                CommandBook.logger().severe("SimpleCommandMap.knownCommands is not a Map!");
-            }
-        } catch (NoSuchFieldException e) {
-            CommandBook.logger().severe("Unable to find knownCommands field in SimpleCommandMap!");
-        }
-        SimpleCommandMap_knownCommands = field;
-    }
-    
-    public org.bukkit.command.Command getCommand(String name) throws CommandException {
-        CommandMap commandMap = ReflectionUtil.getField(CommandBook.server().getPluginManager(), "commandMap");
+    public org.bukkit.command.Command getCommand(String name) {
+        CommandMap commandMap = ReflectionUtil.getField(CommandBook.server().getPluginManager(),
+                "commandMap");
         if (commandMap == null) {
             return null;
         }
-        org.bukkit.command.Command command = commandMap.getCommand(name);
-        if (command == null && SimpleCommandMap_getFallback != null) {
-            try {
-                command = (org.bukkit.command.Command)SimpleCommandMap_getFallback.invoke(commandMap, name);
-            } catch (IllegalAccessException e) {
-                throw new WrappedCommandException(e);
-            } catch (InvocationTargetException e) {
-                throw new WrappedCommandException(e);
-            }
-        }
-        return command;
+        return commandMap.getCommand(name);
     }
-    
-    public Collection<org.bukkit.command.Command> getServerCommands() throws CommandException {
-        CommandMap commandMap = ReflectionUtil.getField(CommandBook.server().getPluginManager(), "commandMap");
-        if (commandMap == null || SimpleCommandMap_knownCommands == null) {
+
+    public Collection<org.bukkit.command.Command> getServerCommands() {
+        CommandMap commandMap = ReflectionUtil.getField(CommandBook.server().getPluginManager(),
+                "commandMap");
+        if (commandMap == null) {
             return Collections.emptySet();
         }
-        try {
-            return ((Map<Object, org.bukkit.command.Command>)SimpleCommandMap_knownCommands
-                    .get(commandMap)).values();
-        } catch (IllegalAccessException e) {
-            throw new WrappedCommandException(e);
-        }
+        Set<org.bukkit.command.Command> cmds =
+                new HashSet<org.bukkit.command.Command>(((SimpleCommandMap) commandMap).getFallbackCommands());
+        cmds.addAll(((SimpleCommandMap)commandMap).getCommands());
+        return cmds;
     }
-    
+
     public void printCommandHelp(CommandSender sender, org.bukkit.command.Command cmd) {
         sender.sendMessage(ChatColor.YELLOW + "Command: " + cmd.getName());
         final String aliases = cmd.getAliases().toString().replaceAll("\\[(.*)\\]", "$1");
@@ -189,10 +151,10 @@ public class HelpComponent extends BukkitComponent {
         sender.sendMessage(ChatColor.YELLOW + "Description: " + cmd.getDescription());
         sender.sendMessage(ChatColor.YELLOW + "Usage: " + cmd.getUsage());
         if (cmd instanceof PluginCommand) {
-            sender.sendMessage(ChatColor.YELLOW + "Plugin: " + 
+            sender.sendMessage(ChatColor.YELLOW + "Plugin: " +
                     ((PluginCommand)cmd).getPlugin().getDescription().getName());
         } else if (cmd instanceof DynamicPluginCommand) {
-            sender.sendMessage(ChatColor.YELLOW + "Owner: " + 
+            sender.sendMessage(ChatColor.YELLOW + "Owner: " +
                     ((DynamicPluginCommand) cmd).getOwner().getClass().getSimpleName());
         } else if (cmd instanceof VanillaCommand) {
             sender.sendMessage(ChatColor.YELLOW + "Vanilla command");
@@ -222,7 +184,7 @@ public class HelpComponent extends BukkitComponent {
                     new PaginatedResult<org.bukkit.command.Command>("Usage - Description") {
                         @Override
                         public String format(org.bukkit.command.Command entry) {
-                            return entry.getUsage() + " - " 
+                            return entry.getUsage() + " - "
                                     + entry.getDescription();
                         }
                     }.display(sender, serverCommands, args.getFlagInteger('p', 1));
