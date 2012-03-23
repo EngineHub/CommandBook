@@ -93,6 +93,16 @@ public class CommandBookUtil {
         str = str.replace("`2", ChatColor.GRAY.toString());
         str = str.replace("`w", ChatColor.WHITE.toString());
 
+        // use mojang's symbols where we can, make new ones up when they are already used
+        str = str.replace("`k", ChatColor.MAGIC.toString());
+
+        str = str.replace("`l", ChatColor.BOLD.toString());
+        str = str.replace("`m", ChatColor.STRIKETHROUGH.toString());
+        str = str.replace("`n", ChatColor.UNDERLINE.toString());
+        str = str.replace("`o", ChatColor.ITALIC.toString());
+
+        str = str.replace("`x", ChatColor.RESET.toString());
+
         return str;
     }
 
