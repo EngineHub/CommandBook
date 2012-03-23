@@ -103,6 +103,9 @@ public class FunComponent extends BukkitComponent {
                 if (item == null) return creature;
                ((Enderman) creature).setCarriedMaterial(item.getData());
                 return creature;
+            } else if (creature instanceof IronGolem
+                    && specialType.matches("(friendly|player(-created)?)")) {
+                ((IronGolem) creature).setPlayerCreated(true);
             }
         }
         return creature;
