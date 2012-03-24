@@ -106,6 +106,17 @@ public class FunComponent extends BukkitComponent {
             } else if (creature instanceof IronGolem
                     && specialType.matches("(friendly|player(-created)?)")) {
                 ((IronGolem) creature).setPlayerCreated(true);
+            } else if (creature instanceof Villager) {
+                Villager.Profession profession = null;
+                try {
+                    profession = Villager.Profession.valueOf(specialType.toUpperCase());
+                } catch (IllegalArgumentException e) {
+                   throw new CommandException("Unknown profession '" + specialType + "'");
+                }
+
+                if (profession != null) {
+                    ((Villager) creature).setProfession(profession);
+                }
             }
         }
         return creature;
