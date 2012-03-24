@@ -35,7 +35,6 @@ import com.sk89q.minecraft.util.commands.CommandPermissions;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChatEvent;
@@ -118,7 +117,7 @@ public class MessagingComponent extends BukkitComponent implements Listener {
                     if (name.length() <= 0) {
                         return;
                     }
-                    
+
                     messagePlayer(event.getPlayer(), name, message.substring(spaceIndex + 1));
                 } catch (CommandException e) {
                     event.getPlayer().sendMessage(ChatColor.RED + e.getMessage());

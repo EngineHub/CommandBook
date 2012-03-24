@@ -109,7 +109,7 @@ public class InventoryComponent extends BukkitComponent {
             throw new CommandException("That item is disallowed.");
         }
     }
-    
+
     private ItemStack matchItem(String name) throws CommandException {
         return CommandBook.inst().getCommandItem(name);
     }
@@ -181,7 +181,7 @@ public class InventoryComponent extends BukkitComponent {
                 item = matchItem(args.getString(1));
                 amt = args.getInteger(2);
             }
-            
+
             for (Player target : targets) {
                 if (target != sender) {
                     CommandBook.inst().checkPermission(sender, "commandbook.give.other");
@@ -213,7 +213,7 @@ public class InventoryComponent extends BukkitComponent {
             } else {
                 targets = PlayerUtil.matchPlayers(sender, args.getString(0));
             }
-            
+
             for (Player player : targets) {
                 if (sender != player) {
                     // Make sure that this player can clear other players!
@@ -267,7 +267,7 @@ public class InventoryComponent extends BukkitComponent {
                         + "Inventories cleared.");
             }
         }
-        
+
         @Command(aliases = {"more"},
                 usage = "[player]", desc = "Gets more of an item",
                 flags = "aio", min = 0, max = 1)
@@ -285,7 +285,7 @@ public class InventoryComponent extends BukkitComponent {
             }
 
             boolean included = false;
-        
+
             if (args.argsLength() == 0) {
                 targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
             // A different player
@@ -301,10 +301,10 @@ public class InventoryComponent extends BukkitComponent {
                     CommandBook.inst().checkPermission(sender, "commandbook.more");
                 }
             }
-        
+
             for (Player player : targets) {
                 Inventory inventory = player.getInventory();
-            
+
                 if (moreAll) {
                     for (int i = 0; i < 39; i++) {
                         CommandBookUtil.expandStack(inventory.getItem(i), infinite, overrideStackSize);
@@ -312,22 +312,22 @@ public class InventoryComponent extends BukkitComponent {
                 } else {
                     CommandBookUtil.expandStack(player.getItemInHand(), infinite, overrideStackSize);
                 }
-        
+
                 // Tell the user about the given item
                 if (player.equals(sender)) {
                     player.sendMessage(ChatColor.YELLOW
                             + "Your item(s) has been expanded in stack size.");
-                
+
                     // Keep track of this
                     included = true;
                 } else {
                     player.sendMessage(ChatColor.YELLOW
                             + "Your item(s) has been expanded in stack size by "
                             + PlayerUtil.toName(sender));
-                
+
                 }
             }
-        
+
             // The player didn't receive any items, then we need to send the
             // user a message so s/he know that something is indeed working
             if (!included) {
@@ -335,7 +335,7 @@ public class InventoryComponent extends BukkitComponent {
                         + "Stack sizes increased.");
             }
         }
-        
+
         @Command(aliases = {"take"},
                 usage = "<target> <item[:data]> [amount]", desc = "Take an item",
                 flags = "", min = 2, max = 3)
