@@ -30,24 +30,27 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.metadata.MetadataValue;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 @ComponentInformation(friendlyName = "God", desc = "God mode support")
 public class GodComponent extends BukkitComponent implements Listener {
+
     /**
-     * List of people with god mode.
+     * God status is stored in player metadata with this key
      */
-    private final Set<String> hasGodMode = new HashSet<String>();
-    
+    public static final String METADATA_KEY = "god";
     private LocalConfiguration config;
-    
+
     @Override
     public void enable() {
         config = configure(new LocalConfiguration());
@@ -58,7 +61,7 @@ public class GodComponent extends BukkitComponent implements Listener {
         }
         CommandBook.registerEvents(this);
     }
-    
+
     @Override
     public void reload() {
         super.reload();
@@ -68,7 +71,7 @@ public class GodComponent extends BukkitComponent implements Listener {
             checkAutoEnable(player);
         }
     }
-    
+
     private static class LocalConfiguration extends ConfigurationBase {
         @Setting("auto-enable") public boolean autoEnable = false;
     }
@@ -79,7 +82,9 @@ public class GodComponent extends BukkitComponent implements Listener {
      * @param player
      */
     public void enableGodMode(Player player) {
-        hasGodMode.add(player.getName());
+        if (!hasGodMode(player)) {
+            player.setMetadata(METADATA_KEY, new FixedMetadataValue(CommandBook.inst(), true));
+        }
     }
 
     /**
@@ -88,7 +93,7 @@ public class GodComponent extends BukkitComponent implements Listener {
      * @param player
      */
     public void disableGodMode(Player player) {
-        hasGodMode.remove(player.getName());
+        player.removeMetadata(METADATA_KEY, CommandBook.inst());
     }
 
     /**
@@ -98,9 +103,22 @@ public class GodComponent extends BukkitComponent implements Listener {
      * @return
      */
     public boolean hasGodMode(Player player) {
-        return hasGodMode.contains(player.getName());
+        List<MetadataValue> values = player.getMetadata(METADATA_KEY);
+        switch (values.size()) {
+        case 0:
+            return false;
+        case 1:
+            return values.get(0).asBoolean();
+        default:
+            for (MetadataValue val : values) {
+                if (val.asBoolean()) {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
-    
+
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         checkAutoEnable(event.getPlayer());
@@ -134,7 +152,7 @@ public class GodComponent extends BukkitComponent implements Listener {
             }
         }
     }
-    
+
     @EventHandler
     public void onDamage(EntityDamageEvent event) {
         if (event.isCancelled()) {
@@ -150,14 +168,24 @@ public class GodComponent extends BukkitComponent implements Listener {
             }
         }
     }
-    
+
     @EventHandler
     public void playerChangedWorld(PlayerChangedWorldEvent event) {
         if (!CommandBook.inst().hasPermission(event.getPlayer(), "commandbook.god")) {
             disableGodMode(event.getPlayer());
         }
     }
-    
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void foodLevelChange(FoodLevelChangeEvent event) {
+        if (event.getEntity() instanceof Player) {
+            Player player = (Player) event.getEntity();
+            if (event.getFoodLevel() < player.getFoodLevel() && hasGodMode(player)) {
+                event.setCancelled(true);
+            }
+        }
+    }
+
     @EventHandler
     public void playerWhois(InfoComponent.PlayerWhoisEvent event) {
         if (event.getPlayer() instanceof Player) {
@@ -167,7 +195,7 @@ public class GodComponent extends BukkitComponent implements Listener {
             }
         }
     }
-    
+
     public class Commands {
         @Command(aliases = {"god"}, usage = "[player]",
                 desc = "Enable godmode on a player", flags = "s", max = 1)
@@ -223,7 +251,7 @@ public class GodComponent extends BukkitComponent implements Listener {
 
             // The player didn't receive any items, then we need to send the
             // user a message so s/he know that something is indeed working
-            if (!included && args.hasFlag('s')) {
+            if (!included) {
                 sender.sendMessage(ChatColor.YELLOW.toString() + "Players now have god mode.");
             }
         }
@@ -280,7 +308,7 @@ public class GodComponent extends BukkitComponent implements Listener {
 
             // The player didn't receive any items, then we need to send the
             // user a message so s/he know that something is indeed working
-            if (!included && args.hasFlag('s')) {
+            if (!included) {
                 sender.sendMessage(ChatColor.YELLOW.toString() + "Players no longer have god mode.");
             }
         }
