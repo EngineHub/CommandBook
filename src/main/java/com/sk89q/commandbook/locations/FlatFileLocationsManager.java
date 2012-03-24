@@ -85,8 +85,8 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
             CSVReader csv = new CSVReader(reader);
             String[] line;
             while ((line = csv.readNext()) != null) {
-                if (line.length < 7) {
-                    logger().warning(type + " data file has an invalid line with < 7 fields");
+                if (line.length < 8) {
+                    logger().warning(type + " data file has an invalid line with < 8 fields");
                 } else {
                     try {
                         String name = line[0].trim().replace(" ", "");
