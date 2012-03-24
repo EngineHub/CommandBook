@@ -18,18 +18,15 @@
 
 package com.sk89q.commandbook;
 
-import com.sk89q.commandbook.bans.BansComponent;
 import com.sk89q.commandbook.commands.PaginatedResult;
 import com.zachsthings.libcomponents.bukkit.BukkitComponent;
 import com.zachsthings.libcomponents.ComponentInformation;
-import com.zachsthings.libcomponents.InjectComponent;
 import com.sk89q.commandbook.util.LocationUtil;
 import com.sk89q.commandbook.util.PlayerUtil;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
-import org.apache.commons.lang.Validate;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -51,27 +48,26 @@ public class InfoComponent extends BukkitComponent {
     public void enable() {
         registerCommands(Commands.class);
     }
-    
+
     public static class PlayerWhoisEvent extends Event {
-        private static final long serialVersionUID = -2894521895117036252L;
         private final OfflinePlayer player;
         private final CommandSender source;
         private final Map<String, String> taggedWhoisInformation = new LinkedHashMap<String, String>();
         private final List<String> taglessWhoisInformation = new ArrayList<String>();
-        
+
         public PlayerWhoisEvent(OfflinePlayer player, CommandSender source) {
             this.player = player;
             this.source = source;
         }
-        
+
         public OfflinePlayer getPlayer() {
             return player;
         }
-        
+
         public CommandSender getSource() {
             return source;
         }
-        
+
         public void addWhoisInformation(String key, Object value) {
             if (value == null) {
                 addWhoisInformation(key, (String)null);
@@ -79,7 +75,7 @@ public class InfoComponent extends BukkitComponent {
                 addWhoisInformation(key, String.valueOf(value));
             }
         }
-        
+
         public void addWhoisInformation(String key, String value) {
             if (key == null) {
                 taglessWhoisInformation.add(value);
@@ -91,15 +87,15 @@ public class InfoComponent extends BukkitComponent {
                 }
             }
         }
-        
+
         public Map<String, String> getTaggedWhoisInformation() {
             return Collections.unmodifiableMap(taggedWhoisInformation);
         }
-        
+
         public List<String> getTaglessWhoisInformation() {
             return Collections.unmodifiableList(taglessWhoisInformation);
         }
-        
+
         private static final HandlerList handlers = new HandlerList();
 
         public HandlerList getHandlers() {
@@ -110,7 +106,7 @@ public class InfoComponent extends BukkitComponent {
             return handlers;
         }
     }
-    
+
     public class Commands {
         @Command(aliases = {"whereami", "getpos", "pos", "where"},
                 usage = "[player]", desc = "Show your current location",
@@ -149,7 +145,7 @@ public class InfoComponent extends BukkitComponent {
 
         private final SimpleDateFormat dateFormat =
                 new SimpleDateFormat("dd/MM/yyyy HH:mm");
-        
+
         @Command(aliases = {"whois"},
                 usage = "[-p page] [player]", desc = "Tell information about a player",
                 flags = "op:", min = 0, max = 1)
@@ -170,12 +166,12 @@ public class InfoComponent extends BukkitComponent {
                         throw e;
                     }
                 }
-                
+
                 if (offline != sender) {
                     CommandBook.inst().checkPermission(sender, "commandbook.whois.other");
                 }
             }
-            
+
             PlayerWhoisEvent event = new PlayerWhoisEvent(offline, sender);
 
             if (offline instanceof Player) {
@@ -183,14 +179,14 @@ public class InfoComponent extends BukkitComponent {
                 event.addWhoisInformation("Display name", player.getDisplayName());
                 event.addWhoisInformation("Entity ID #", player.getEntityId());
                 event.addWhoisInformation("Current vehicle", player.getVehicle());
-                
+
 
                 if (CommandBook.inst().hasPermission(sender, "commandbook.ip-address")) {
                     event.addWhoisInformation("Address", player.getAddress().toString());
                 }
                 event.addWhoisInformation("Game mode", player.getGameMode());
             }
-            
+
             Location bedSpawn = offline.getBedSpawnLocation();
             if (bedSpawn != null) {
                 event.addWhoisInformation("Bed spawn location",
@@ -198,20 +194,20 @@ public class InfoComponent extends BukkitComponent {
             } else {
                 event.addWhoisInformation(null, "No bed spawn location");
             }
-            
+
             if (offline.hasPlayedBefore()) {
                 event.addWhoisInformation(null, "First joined: " + dateFormat.format(offline.getFirstPlayed())
                         + "; Last joined: " + dateFormat.format(offline.getLastPlayed()));
             }
-            
-            
+
+
             CommandBook.callEvent(event);
-            
+
             List<String> results = new ArrayList<String>(event.getTaglessWhoisInformation());
             for (Map.Entry<String, String> entry : event.getTaggedWhoisInformation().entrySet()) {
                 results.add(entry.getKey() + ": " + entry.getValue());
             }
-            
+
             new PaginatedResult<String>("Name: " + offline.getName()) {
 
                 @Override
@@ -260,7 +256,13 @@ public class InfoComponent extends BukkitComponent {
                 }
             }
 
-            sender.sendMessage(ChatColor.YELLOW + player.getLocation().getBlock().getBiome().name().toLowerCase().replace("_"," ")+" biome.");
+            Location loc = player.getLocation();
+            String biomeName = loc.getWorld().getBiome(loc.getBlockX(), loc.getBlockZ()).name().toLowerCase().replace("_"," ");
+            if (player.equals(sender)) {
+                sender.sendMessage(ChatColor.YELLOW + "You are in the " + biomeName + " biome.");
+            } else {
+                sender.sendMessage(ChatColor.YELLOW + PlayerUtil.toName(player) + " is in the " + biomeName + " biome.");
+            }
 
         }
     }
