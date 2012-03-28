@@ -42,6 +42,7 @@ import org.bukkit.event.server.ServerCommandEvent;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -104,13 +105,16 @@ public class CooldownsComponent extends BukkitComponent implements Listener, Run
         return ret.toString();
     }
 
-    private static final SimpleDateFormat timeFormat = new SimpleDateFormat("MM:SS");
+    private static final SimpleDateFormat timeFormat = new SimpleDateFormat("mm:ss");
     private static String formatTime(int timeInSeconds, TimeUnit unit) {
-        return timeFormat.format(new Date(unit.toMillis(timeInSeconds)));
+        synchronized (timeFormat) {
+            return timeFormat.format(new Date(unit.toMillis(timeInSeconds)));
+        }
     }
 
     public void run() {
         for (final CooldownState state : sessions.getSessions(CooldownState.class).values()) {
+            final HashSet<String> visitedCooldowns = new HashSet<String>();
             for (Iterator<Map.Entry<String, Integer>> i = state.cooldownCommands.entrySet().iterator(); i.hasNext();) {
                 final Map.Entry<String, Integer> entry = i.next();
                 final Integer cooldownTime = getNestedMap(config.registeredActions, entry.getKey()).get("cooldown");
@@ -121,6 +125,7 @@ public class CooldownsComponent extends BukkitComponent implements Listener, Run
                 if (entry.getValue() <= cooldownTime) { // Increment the time if it isn't already at the required time
                     entry.setValue(entry.getValue() + 1);
                 }
+                visitedCooldowns.add(entry.getKey());
             }
 
             for (Iterator<Map.Entry<String, WarmupInfo>> i = state.warmupCommands.entrySet().iterator(); i.hasNext();) {
@@ -129,18 +134,24 @@ public class CooldownsComponent extends BukkitComponent implements Listener, Run
                 if (warmupTime == null) {
                     i.remove(); // The warmup has been removed, so we can get rid of it.
                     continue;
+                } else if (visitedCooldowns.contains(entry.getKey())) {
+                    continue;
                 }
+
                 if (entry.getValue().remainingTime < warmupTime) {
                     entry.getValue().remainingTime++;
                 } else if (entry.getValue().remainingTime == warmupTime) {
                     // Reached the needed time, run a scheduler task to execute the command
                     // back on the main thread.
-                    CommandBook.server().getScheduler().scheduleSyncDelayedTask(CommandBook.inst(), new Runnable() {
-                        @Override
-                        public void run() {
-                            CommandBook.server().dispatchCommand(state.sender, entry.getValue().fullCommand);
-                        }
-                    }, 0L);
+                    final CommandSender owner = state.getOwner();
+                    if (owner != null) {
+                        CommandBook.server().getScheduler().callSyncMethod(CommandBook.inst(), new Callable<Boolean>() {
+                            @Override
+                            public Boolean call() {
+                                return CommandBook.server().dispatchCommand(owner, entry.getValue().fullCommand);
+                            }
+                        });
+                    }
                     i.remove();
                 }
             }
@@ -222,7 +233,8 @@ public class CooldownsComponent extends BukkitComponent implements Listener, Run
             }
 
             Integer requiredWarmupTime = storedTimes.get("warmup");
-            if (requiredWarmupTime == null) { // No warmup for this command
+            if (requiredWarmupTime == null || CommandBook.inst().hasPermission(sender,
+                    "commandbook.warmup.override." + firstWord(command))) { // No warmup for this command
                 return true;
             }
 
@@ -257,23 +269,11 @@ public class CooldownsComponent extends BukkitComponent implements Listener, Run
     private static class CooldownState extends PersistentSession {
         public static final long MAX_AGE = TimeUnit.MINUTES.toMillis(30);
 
-        public CommandSender sender;
         public final Map<String, WarmupInfo> warmupCommands = new ConcurrentHashMap<String, WarmupInfo>();
         public final Map<String, Integer> cooldownCommands = new ConcurrentHashMap<String, Integer>();
 
         protected CooldownState() {
             super(MAX_AGE);
-        }
-
-        @Override
-        public void handleDisconnect() {
-            super.handleDisconnect();
-            this.sender = null;
-        }
-
-        @Override
-        public void handleReconnect(CommandSender sender) {
-            this.sender = sender;
         }
     }
 

@@ -52,6 +52,7 @@ public class UserSession extends PersistentSession {
     }
 
     public void handleReconnect(CommandSender player) {
+        super.handleReconnect(player);
         if (getGoneTime() >= RECONNECT_GRACE) {
             lastRecipient = null;
             bringable = new HashMap<String, Long>();

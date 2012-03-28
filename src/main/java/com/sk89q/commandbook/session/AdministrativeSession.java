@@ -28,9 +28,6 @@ public class AdministrativeSession extends PersistentSession {
         super(ONE_HOUR);
     }
 
-    public void handleReconnect(CommandSender player) {
-    }
-
     public boolean isMute() {
         return isMute;
     }

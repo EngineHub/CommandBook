@@ -28,6 +28,7 @@ public abstract class PersistentSession {
 
     private final long maxTime;
     private long lastUpdate;
+    private CommandSender sender;
 
     protected PersistentSession(long maxTime) {
         this.maxTime = maxTime;
@@ -41,10 +42,17 @@ public abstract class PersistentSession {
         return getGoneTime() < maxTime;
     }
 
-    public void handleDisconnect() {
-        lastUpdate = System.currentTimeMillis();
+    public CommandSender getOwner() {
+        return sender;
     }
 
-    public abstract void handleReconnect(CommandSender player);
+    public void handleDisconnect() {
+        lastUpdate = System.currentTimeMillis();
+        sender = null;
+    }
+
+    public void handleReconnect(CommandSender sender) {
+        this.sender = sender;
+    }
 
 }

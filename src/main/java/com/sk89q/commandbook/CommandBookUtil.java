@@ -548,12 +548,13 @@ public class CommandBookUtil {
         return value;
     }
 
-    public static long matchFutureDate(String filter) throws CommandException {
+    public static long matchDate(String filter) throws CommandException {
+        if (filter == null) return 0L;
         if (filter.equalsIgnoreCase("now")) return System.currentTimeMillis();
         String[] groupings = filter.split("-");
         if (groupings.length == 0) throw new CommandException("Invalid date specified");
         Calendar cal = new GregorianCalendar();
-        cal.setTimeInMillis(System.currentTimeMillis());
+        cal.setTimeInMillis(0);
         for (String str : groupings) {
             int type;
             switch (str.charAt(str.length() - 1)) {
@@ -578,5 +579,9 @@ public class CommandBookUtil {
             cal.add(type, Integer.valueOf(str.substring(0, str.length() -1)));
         }
         return cal.getTimeInMillis();
+    }
+
+    public static long matchFutureDate(String filter) throws CommandException {
+        return matchDate(filter) + System.currentTimeMillis();
     }
 }

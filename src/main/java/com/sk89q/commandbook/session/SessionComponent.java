@@ -111,10 +111,12 @@ public class SessionComponent extends BukkitComponent implements Runnable, Liste
      */
     public <T extends PersistentSession> Map<String, T> getSessions(Class<T> type) {
         Map<String, T> ret = new HashMap<String, T>();
-        for (Map.Entry<String, Map<Class<? extends PersistentSession>, PersistentSession>> entry : sessions.entrySet()) {
-            PersistentSession session = entry.getValue().get(type);
-            if (session != null) {
-                ret.put(entry.getKey(), type.cast(session));
+        synchronized (sessions) {
+            for (Map.Entry<String, Map<Class<? extends PersistentSession>, PersistentSession>> entry : sessions.entrySet()) {
+                PersistentSession session = entry.getValue().get(type);
+                if (session != null) {
+                    ret.put(entry.getKey(), type.cast(session));
+                }
             }
         }
         return ret;
@@ -207,19 +209,17 @@ public class SessionComponent extends BukkitComponent implements Runnable, Liste
     // -- Garbage collection
     public void run() {
         synchronized (sessions) {
-            for (Iterator<Map.Entry<String, Map<Class<? extends PersistentSession>, PersistentSession>>>
+            outer: for (Iterator<Map.Entry<String, Map<Class<? extends PersistentSession>, PersistentSession>>>
                          i = sessions.entrySet().iterator(); i.hasNext();) {
                 Map.Entry<String, Map<Class<? extends PersistentSession>, PersistentSession>> entry = i.next();
-                if (entry.getKey().equals(CommandBook.server().getConsoleSender().getName())) { // TODO: Better player check!
-                    continue;
-                }
-                final Player player = CommandBook.server().getPlayerExact(entry.getKey());
-                if (player != null && player.isOnline()) {
-                    continue;
-                }
 
                 for (Iterator<PersistentSession> i2 = entry.getValue().values().iterator(); i2.hasNext(); ) {
-                    if (!i2.next().isRecent()) {
+                    PersistentSession sess = i2.next();
+                    if (sess.getOwner() != null) {
+                        continue outer;
+                    }
+
+                    if (!sess.isRecent()) {
                         i2.remove();
                     }
                 }

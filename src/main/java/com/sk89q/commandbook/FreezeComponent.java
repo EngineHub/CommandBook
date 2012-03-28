@@ -84,7 +84,7 @@ public class FreezeComponent extends BukkitComponent implements Listener, Runnab
                 continue;
             }
 
-            Player player = frozenState.getPlayer();
+            Player player = frozenState.getOwner();
             if (player == null || !player.isOnline()) {
                 continue;
             }
@@ -104,7 +104,6 @@ public class FreezeComponent extends BukkitComponent implements Listener, Runnab
     private static class FreezeState extends PersistentSession {
         public static final long MAX_AGE = TimeUnit.MINUTES.toMillis(30);
 
-        private WeakReference<Player> player;
         private Location freezeLocation;
 
         protected FreezeState() {
@@ -123,21 +122,9 @@ public class FreezeComponent extends BukkitComponent implements Listener, Runnab
             freezeLocation = loc.clone();
         }
 
-        public Player getPlayer() {
-            return this.player.get();
-        }
-
-        public void handleDisconnect() {
-            super.handleDisconnect();
-            if (this.player != null) {
-                this.player.clear();
-            }
-        }
-
-        public void handleReconnect(CommandSender player) {
-            if (player instanceof Player) {
-                this.player = new WeakReference<Player>((Player) player);
-            }
+        public Player getOwner() {
+            CommandSender sender = super.getOwner();
+            return sender instanceof Player ? (Player) sender : null;
         }
     }
 
