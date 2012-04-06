@@ -38,12 +38,12 @@ import org.bukkit.event.world.WorldUnloadEvent;
 /**
  * Parent class for components that use a RootLocationManager<NamedLocation> and deal with locations
  */
-public abstract class LocationsComponent extends BukkitComponent implements Listener {
-    
+public abstract class LocationsComponent extends BukkitComponent {
+
     private final String name;
 
     private RootLocationManager<NamedLocation> manager;
-    
+
     protected LocationsComponent(String name) {
         this.name = name;
     }
@@ -54,7 +54,7 @@ public abstract class LocationsComponent extends BukkitComponent implements List
         LocationManagerFactory<LocationManager<NamedLocation>> warpsFactory =
                 new FlatFileLocationsManager.LocationsFactory(CommandBook.inst().getDataFolder(), name + "s");
         manager = new RootLocationManager<NamedLocation>(warpsFactory, config.perWorld);
-        CommandBook.registerEvents(this);
+        CommandBook.registerEvents(new WorldListener());
     }
 
     private static class LocalConfiguration extends ConfigurationBase {
@@ -65,15 +65,17 @@ public abstract class LocationsComponent extends BukkitComponent implements List
     public RootLocationManager<NamedLocation> getManager() {
         return manager;
     }
-    
-    @EventHandler
-    public void loadWorld(WorldLoadEvent event) {
-        manager.updateWorlds(event.getWorld());
-    }
 
-    @EventHandler
-    public void unloadWorld(WorldUnloadEvent event) {
-        manager.updateWorlds(event.getWorld());
+    private class WorldListener implements Listener {
+        @EventHandler
+        public void loadWorld(WorldLoadEvent event) {
+            manager.updateWorlds(event.getWorld());
+        }
+
+        @EventHandler
+        public void unloadWorld(WorldUnloadEvent event) {
+            manager.updateWorlds(event.getWorld());
+        }
     }
 
     // -- Command helper methods
@@ -103,6 +105,6 @@ public abstract class LocationsComponent extends BukkitComponent implements List
         }
         getListResult().display(sender, getManager().getLocations(world), args.getInteger(0, 1));
     }
-    
+
     public abstract PaginatedResult<NamedLocation> getListResult();
 }

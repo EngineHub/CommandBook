@@ -36,7 +36,7 @@ public class HomesComponent extends LocationsComponent {
     public HomesComponent() {
         super("Home");
     }
-    
+
     public void enable() {
         super.enable();
         registerCommands(Commands.class);
@@ -79,7 +79,7 @@ public class HomesComponent extends LocationsComponent {
                 targets = PlayerUtil.matchPlayers(sender, args.getString(1));
                 home = getManager().get(
                         LocationUtil.matchWorld(sender, args.getString(0)), args.getString(2));
-                
+
                 // Check permissions!
                 for (Player target : targets) {
                     if (target != sender) {
@@ -125,7 +125,7 @@ public class HomesComponent extends LocationsComponent {
             } else {
                 homeName = args.getString(1);
                 loc = LocationUtil.matchLocation(sender, args.getString(0));
-                
+
                 // Check permissions!
                 if (!homeName.equals(sender.getName())) {
                     CommandBook.inst().checkPermission(sender, "commandbook.home.set.other");
@@ -142,7 +142,7 @@ public class HomesComponent extends LocationsComponent {
         public void homes() throws CommandException {
         }
     }
-    
+
     public class ManagementCommands {
         @Command(aliases = {"del", "delete", "remove", "rem"},
                 usage = "[name] [world]", desc = "Remove a home", min = 0, max = 2 )
