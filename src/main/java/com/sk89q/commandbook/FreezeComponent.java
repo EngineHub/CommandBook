@@ -119,7 +119,7 @@ public class FreezeComponent extends BukkitComponent implements Listener, Runnab
         }
 
         public void freeze(Location loc) {
-            freezeLocation = loc.clone();
+            freezeLocation = loc == null ? null : loc.clone();
         }
 
         public Player getOwner() {
