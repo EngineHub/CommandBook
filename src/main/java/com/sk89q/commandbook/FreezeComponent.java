@@ -20,6 +20,7 @@ package com.sk89q.commandbook;
 
 import com.sk89q.commandbook.session.PersistentSession;
 import com.zachsthings.libcomponents.Depend;
+import com.zachsthings.libcomponents.config.Setting;
 import org.bukkit.Location;
 import com.zachsthings.libcomponents.bukkit.BukkitComponent;
 import com.zachsthings.libcomponents.ComponentInformation;
@@ -35,7 +36,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 
-import java.lang.ref.WeakReference;
 import java.util.concurrent.TimeUnit;
 
 
@@ -147,7 +147,7 @@ public class FreezeComponent extends BukkitComponent implements Listener, Runnab
             }
         }
 
-        @Command(aliases = {"unfreeze"}, usage = "<target>", desc = "Unmute a player", min = 1, max = 1)
+        @Command(aliases = {"unfreeze"}, usage = "<target>", desc = "Unfreeze a player", min = 1, max = 1)
         @CommandPermissions({"commandbook.freeze"})
         public void unfreeze(CommandContext args, CommandSender sender) throws CommandException {
             Player player = PlayerUtil.matchSinglePlayer(sender, args.getString(0));

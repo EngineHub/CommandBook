@@ -18,17 +18,20 @@
 
 package com.sk89q.commandbook.session;
 
+import com.zachsthings.libcomponents.config.ConfigurationBase;
+import com.zachsthings.libcomponents.config.Setting;
 import org.bukkit.command.CommandSender;
 
 import java.util.concurrent.TimeUnit;
 
-public abstract class PersistentSession {
+public abstract class PersistentSession extends ConfigurationBase {
     public static final long THIRTY_MINUTES = TimeUnit.MINUTES.toMillis(30);
     public static final long ONE_HOUR = TimeUnit.HOURS.toMillis(1);
 
     private final long maxTime;
-    private long lastUpdate;
+    @Setting("last-update") private long lastUpdate;
     private CommandSender sender;
+    private String senderName;
 
     protected PersistentSession(long maxTime) {
         this.maxTime = maxTime;
@@ -39,11 +42,15 @@ public abstract class PersistentSession {
     }
 
     public boolean isRecent() {
-        return getGoneTime() < maxTime;
+        return maxTime == -1 || getGoneTime() < maxTime;
     }
 
     public CommandSender getOwner() {
         return sender;
+    }
+
+    public String getSenderName() {
+        return senderName;
     }
 
     public void handleDisconnect() {
@@ -52,7 +59,11 @@ public abstract class PersistentSession {
     }
 
     public void handleReconnect(CommandSender sender) {
+        if (sender == null) {
+            throw new IllegalArgumentException("sender must not be null!");
+        }
         this.sender = sender;
+        this.senderName = sender.getName();
     }
 
 }

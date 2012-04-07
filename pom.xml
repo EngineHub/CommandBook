@@ -1,6 +1,6 @@
 <!--
   Maven build file for CommandBook
-  Copyright (c) 2011 sk89q <http://www.sk89q.com> 
+  Copyright (c) 2011 sk89q <http://www.sk89q.com>
   CommandBook is available under the GNU General Public License v3
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -38,6 +38,12 @@
       <groupId>com.sk89q</groupId>
       <artifactId>worldedit</artifactId>
       <version>5.1</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.spout</groupId>
+          <artifactId>spoutapi</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>

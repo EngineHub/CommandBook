@@ -23,6 +23,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import com.zachsthings.libcomponents.config.Setting;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -31,19 +32,19 @@ import com.sk89q.minecraft.util.commands.CommandException;
 public class UserSession extends PersistentSession {
 
     public static final String CONSOLE_NAME = "#console";
-    private static final long MAX_AGE = TimeUnit.MINUTES.toMillis(10);
+    private static final long MAX_AGE = TimeUnit.DAYS.toMillis(10);
     private static final long RECONNECT_GRACE = TimeUnit.MINUTES.toMillis(1);
     private static final long BRINGABLE_TIME = TimeUnit.MINUTES.toMillis(5);
     private static final long TP_REQUEST_WAIT_TIME = TimeUnit.SECONDS.toMillis(30);
     private static final int LOCATION_HISTORY_SIZE = 10;
 
-    private String lastRecipient = null;
-    private long lastRecipientTime = 0;
+    @Setting("messaging.last-recipient") private String lastRecipient = null;
+    @Setting("messaging.last-recipient-time") private long lastRecipientTime = 0;
     private boolean hasThor = false;
-    private String idleStatus = null;
-    private String commandToConfirm;
-    private Map<String, Long> bringable = new HashMap<String, Long>();
-    private final Map<String, Long> teleportRequests = new HashMap<String, Long>();
+    @Setting("idle-status") private String idleStatus = null;
+    @Setting("confirm-command") private String commandToConfirm;
+    @Setting("teleport.bringable") private Map<String, Long> bringable = new HashMap<String, Long>();
+    @Setting("teleport.requests") private final Map<String, Long> teleportRequests = new HashMap<String, Long>();
     private final LinkedList<Location> locationHistory = new LinkedList<Location>();
     private Location ignoreTeleportLocation;
 

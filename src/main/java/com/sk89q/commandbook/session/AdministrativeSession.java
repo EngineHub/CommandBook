@@ -18,8 +18,10 @@
 
 package com.sk89q.commandbook.session;
 
+import com.zachsthings.libcomponents.config.Setting;
+
 public class AdministrativeSession extends PersistentSession {
-    private boolean isMute;
+    @Setting("mute") private boolean isMute;
     private boolean isFrozen;
 
     protected AdministrativeSession() {
