@@ -71,14 +71,17 @@ public class TimeComponent extends BukkitComponent implements Listener {
 
     @Override
     public void enable() {
+        config = configure(new LocalConfiguration());
+        if (config.timeLockDelay == 0) {
+            config.timeLockDelay = 20;
+            saveConfig(config);
+        }
         configureWorldLocks();
         registerCommands(Commands.class);
         CommandBook.registerEvents(this);
     }
 
     private void configureWorldLocks() {
-        config = configure(new LocalConfiguration());
-
         if (config.timeLocks != null) {
             for (Map.Entry<String, Object> entry : config.timeLocks.entrySet()) {
                 int time = 0;
@@ -337,7 +340,7 @@ public class TimeComponent extends BukkitComponent implements Listener {
                         players = PlayerUtil.matchPlayers(sender, timeStr);
                     }
                 }
-                
+
                 if (players == null) {
                     players = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
                 }
@@ -345,7 +348,7 @@ public class TimeComponent extends BukkitComponent implements Listener {
                 players = PlayerUtil.matchPlayers(sender, args.getString(0));
                 timeStr = args.getString(1);
             }
-            
+
             for (Player player : players) {
                 if (player != sender ) {
                     CommandBook.inst().checkPermission(sender, "commandbook.time.player.other");
