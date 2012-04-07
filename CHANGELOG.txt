@@ -1,23 +1,27 @@
 2.1:
-  - Updated sessions framework to allow it to handle multiple types of sessions (for developers!)
-  - Updated freeze component to be more efficient
-  - Added a component to handle command cooldowns (config name is cooldowns)
-  - Improve validity checks for twitter-style PM's (format is @name message)
-  - Made auto-god disabled by default.
-  - Removed commandbook.kit permissions check.
-  - Moved uses of CreatureType over to EntityType
-  - Update for 1.2
-  - Make sure that locations from unloaded worlds are saved back to their files
-  - Added a simple script to convert homes from other formats to CommandBook's
-  format. Currently only handles MyHomes and warpz0r databases. (homeconvert.py)
-  - Make sure all accesses of HelpComponent's messages field are lowercased
-  - Add a damage value check to per-item permissions. commandbook.items.<id> allows
-   id with any damage value, commandbook.items.<id>.<damage> allows item <id> with <damage>
-  - Made EntityUtil.matchCreatureType() ignore case when checking creature type names
-  - Have OnlineListComponent use the global use-dsplay-names setting instead of its colored-names one
-  - Set the time lock delay to a default value that is not 0.
-     **Warning**: To avoid issues when using existing installations, change component.time.time-lock.delay to 20 in config.yml
-  - Fix warp loading messages for per-world warps
+ - Made the god component use the "god" entity metadata tag. This allows other plugins
+    to more easily hook into CommandBook's godmode implementation.
+ - Made most session data persist. Not all session data currently persists however.
+ - Added support for spawning 'friendly' iron golems and setting villager profession
+ - Updated sessions framework to allow it to handle multiple types of sessions (for developers!)
+ - Updated freeze component to be more efficient
+ - Added a component to handle command cooldowns (config name is cooldowns)
+ - Improve validity checks for twitter-style PM's (format is @name message)
+ - Made auto-god disabled by default.
+ - Removed commandbook.kit permissions check.
+ - Moved uses of CreatureType over to EntityType
+ - Update for 1.2
+ - Make sure that locations from unloaded worlds are saved back to their files
+ - Added a simple script to convert homes from other formats to CommandBook's
+    format. Currently only handles MyHomes and warpz0r databases. (homeconvert.py)
+ - Make sure all accesses of HelpComponent's messages field are lowercased
+ - Add a damage value check to per-item permissions. commandbook.items.<id> allows
+    id with any damage value, commandbook.items.<id>.<damage> allows item <id> with <damage>
+ - Made EntityUtil.matchCreatureType() ignore case when checking creature type names
+ - Have OnlineListComponent use the global use-dsplay-names setting instead of its colored-names one
+ - Set the time lock delay to a default value that is not 0.
+    **Warning**: To avoid issues when using existing installations, change component.time.time-lock.delay to 20 in config.yml
+ - Fix warp loading messages for per-world warps
 
 2.0
  - Fixed /home permissions checks. commandbook.home.other to teleport anybody to a home owned by a user who is not the sender commandbook.home.teleport.other to teleport other users to homes.
