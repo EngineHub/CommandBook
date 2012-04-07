@@ -46,14 +46,14 @@ import static com.sk89q.commandbook.CommandBook.logger;
 
 /**
  * Flat file ban database.
- * 
+ *
  * @author sk89q
  */
 public class FlatFileBanDatabase implements BanDatabase {
-    
+
     protected final Logger auditLogger
             = Logger.getLogger("Minecraft.CommandBook.Bans");
-    
+
     protected final BansComponent component;
     protected final File dataDirectory;
     protected final File namesFile;
@@ -63,30 +63,30 @@ public class FlatFileBanDatabase implements BanDatabase {
     public static boolean toImport(File dataDirectory) {
         return new File(dataDirectory, "banned_names.txt").exists();
     }
-    
+
     public FlatFileBanDatabase(File dataDirectory, BansComponent component) {
         this.dataDirectory = dataDirectory;
         this.component = component;
 
         namesFile = new File(dataDirectory, "banned_names.txt");
-        
+
         // Set up an audit trail
         try {
             FileHandler handler = new FileHandler(
                     (new File(dataDirectory, "bans.%g.%u.log")).getAbsolutePath()
                     .replace("\\", "/"), true);
-            
+
             handler.setFormatter(new Formatter() {
                 private final SimpleDateFormat dateFormat =
                         new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-                
+
                 @Override
                 public String format(LogRecord record) {
                     return "[" + dateFormat.format(new Date())
                             + "] " + record.getMessage() + "\r\n";
                 }
             });
-            
+
             auditLogger.addHandler(handler);
         } catch (SecurityException e) {
             logger().warning("Failed to setup audit log for the "
@@ -99,7 +99,7 @@ public class FlatFileBanDatabase implements BanDatabase {
 
     public synchronized boolean load() {
         boolean successful = true;
-        
+
         try {
             bannedNames = readLowercaseList(namesFile);
             logger().info(bannedNames.size() + " banned name(s) loaded.");
@@ -123,10 +123,10 @@ public class FlatFileBanDatabase implements BanDatabase {
         }
         return false;
     }
-    
+
     /**
      * Read a list from file. Each line is trimmed and made lower case.
-     * 
+     *
      * @param file
      * @return
      * @throws IOException
@@ -134,7 +134,7 @@ public class FlatFileBanDatabase implements BanDatabase {
     protected synchronized Map<String, Ban> readLowercaseList(File file) throws IOException {
         FileInputStream input = null;
         Map<String, Ban> list = new HashMap<String, Ban>();
-        
+
         try {
             input = new FileInputStream(file);
             InputStreamReader streamReader = new InputStreamReader(input, "utf-8");
@@ -143,7 +143,7 @@ public class FlatFileBanDatabase implements BanDatabase {
 
             while ((line = reader.readLine()) != null) {
                 line = line.trim();
-                
+
                 if (line.length() > 0) {
                     list.put(line.toLowerCase().trim(),
                             new Ban(line.toLowerCase().trim(), null, null, System.currentTimeMillis(), 0L));
@@ -158,13 +158,13 @@ public class FlatFileBanDatabase implements BanDatabase {
                 }
             }
         }
-        
+
         return list;
     }
 
     public synchronized boolean save() {
         boolean successful = true;
-        
+
         try {
             writeList(namesFile, bannedNames);
             //logger.info("CommandBook: " + bannedNames.size() + " banned names written.");
@@ -175,29 +175,29 @@ public class FlatFileBanDatabase implements BanDatabase {
         }
         return successful;
     }
-    
+
     protected synchronized void writeList(File file, Map<String, Ban> list)
             throws IOException {
         FileOutputStream output = null;
-        
+
         try {
             output = new FileOutputStream(file);
             OutputStreamWriter streamWriter = new OutputStreamWriter(output, "utf-8");
             BufferedWriter writer = new BufferedWriter(streamWriter);
-            
+
             for (String line : list.keySet()) {
                 writer.write(line + "\r\n");
             }
-            
+
             writer.close();
-        } catch (FileNotFoundException e) {
+        } catch (FileNotFoundException ignore) {
         } catch (UnsupportedEncodingException e) {
             logger().log(Level.WARNING, "Failed to write list", e);
         } finally {
             if (output != null) {
                 try {
                     output.close();
-                } catch (IOException e) {
+                } catch (IOException ignore) {
                 }
             }
         }
@@ -212,6 +212,10 @@ public class FlatFileBanDatabase implements BanDatabase {
     }
 
     public String getBannedNameMesage(String name) {
+        return getBannedNameMessage(name);
+    }
+
+    public String getBannedNameMessage(String name) {
         return "You have been banned";
     }
 
@@ -225,7 +229,7 @@ public class FlatFileBanDatabase implements BanDatabase {
                 CommandBook.inst().toInetAddressString(source),
                 name,
                 reason));
-        
+
         bannedNames.put(name, new Ban(name.toLowerCase(), null, null, System.currentTimeMillis(), 0L));
     }
 
@@ -243,7 +247,7 @@ public class FlatFileBanDatabase implements BanDatabase {
 
     public boolean unbanName(String name, CommandSender source, String reason) {
         boolean removed = bannedNames.remove(name.toLowerCase()) != null;
-        
+
         if (removed) {
             auditLogger.info(String.format("UNBAN: %s (%s) unbanned name '%s': %s",
                     toUniqueName(source),
@@ -251,7 +255,7 @@ public class FlatFileBanDatabase implements BanDatabase {
                     name,
                     reason));
         }
-        
+
         return removed;
     }
 

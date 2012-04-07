@@ -23,27 +23,27 @@ public class CSVBanDatabase implements BanDatabase {
 
     protected final Logger auditLogger
             = Logger.getLogger("Minecraft.CommandBook.Bans");
-    
+
     protected final File storageFile;
-    
+
     /**
      * Used to lookup bans by name
      */
     protected Map<String, Ban> nameBan = new HashMap<String, Ban>();
-    
+
     /**
      * Used to lookup bans by ip address
      */
     protected Map<String, Ban> ipBan = new HashMap<String, Ban>();
-    
+
     /**
      * A set of all bans. No ban in the lookup maps is not in here.
      */
     protected final Set<Ban> bans = new HashSet<Ban>();
-    
-    private static final SimpleDateFormat dateFormat = 
+
+    private static final SimpleDateFormat dateFormat =
             new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-    
+
     public CSVBanDatabase(File banStorageDir) {
         storageFile = new File(banStorageDir, "bans.csv");
 
@@ -75,7 +75,7 @@ public class CSVBanDatabase implements BanDatabase {
     public synchronized boolean load() {
         FileInputStream input = null;
         boolean successful = true;
-        
+
         try {
             input = new FileInputStream(storageFile);
             InputStreamReader streamReader = new InputStreamReader(input, "utf-8");
@@ -125,7 +125,7 @@ public class CSVBanDatabase implements BanDatabase {
     public synchronized boolean save() {
         FileOutputStream output = null;
         boolean successful = true;
-        
+
         try {
             output = new FileOutputStream(storageFile);
             CSVWriter writer = new CSVWriter(new BufferedWriter(new OutputStreamWriter(output, "utf-8")));
@@ -195,6 +195,10 @@ public class CSVBanDatabase implements BanDatabase {
             return true;
         }
         return false;
+    }
+
+    public String getBannedNameMesage(String name) {
+        return getBannedNameMessage(name);
     }
 
     public void ban(Player player, CommandSender source, String reason, long end) {
@@ -283,7 +287,7 @@ public class CSVBanDatabase implements BanDatabase {
         return unban(null, address, source, reason);
     }
 
-    public String getBannedNameMesage(String name) {
+    public String getBannedNameMessage(String name) {
         Ban ban = nameBan.get(name.toLowerCase());
         if (ban == null || ban.getReason() == null) return "You are banned.";
         return ban.getReason();
@@ -332,11 +336,11 @@ public class CSVBanDatabase implements BanDatabase {
             }
         };
     }
-    
+
     public Ban getBannedName(String name) {
         return nameBan.get(name);
     }
-    
+
     public Ban getBannedAddress(String address) {
         return ipBan.get(address);
     }

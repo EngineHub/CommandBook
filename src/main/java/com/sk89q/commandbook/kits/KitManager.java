@@ -22,7 +22,7 @@ import java.util.Map;
 
 /**
  * Manager for kits.
- * 
+ *
  * @author sk89q
  */
 public interface KitManager {
@@ -34,19 +34,19 @@ public interface KitManager {
 
     /**
      * Get a kit by name.
-     * 
-     * @param id
-     * @return
+     *
+     * @param id The name to get a kit by
+     * @return The kit with the given id, if it exists.
      */
     public Kit getKit(String id);
 
     /**
      * Get a list of kits.
-     * 
-     * @return
+     *
+     * @return The kits currently loaded
      */
     public Map<String, Kit> getKits();
-    
+
     /**
      * Get rid of old information.
      */

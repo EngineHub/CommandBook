@@ -79,7 +79,7 @@ public class GodComponent extends BukkitComponent implements Listener {
     /**
      * Enable god mode for a player.
      *
-     * @param player
+     * @param player The player to enable godmode for
      */
     public void enableGodMode(Player player) {
         if (!hasGodMode(player)) {
@@ -90,7 +90,7 @@ public class GodComponent extends BukkitComponent implements Listener {
     /**
      * Disable god mode for a player.
      *
-     * @param player
+     * @param player The player to disable godmode for
      */
     public void disableGodMode(Player player) {
         player.removeMetadata(METADATA_KEY, CommandBook.inst());
@@ -99,8 +99,8 @@ public class GodComponent extends BukkitComponent implements Listener {
     /**
      * Check to see if god mode is enabled for a player.
      *
-     * @param player
-     * @return
+     * @param player The player to check
+     * @return Whether the player has godmode
      */
     public boolean hasGodMode(Player player) {
         List<MetadataValue> values = player.getMetadata(METADATA_KEY);

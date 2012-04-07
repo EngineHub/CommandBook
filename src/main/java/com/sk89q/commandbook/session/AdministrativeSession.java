@@ -18,8 +18,6 @@
 
 package com.sk89q.commandbook.session;
 
-import org.bukkit.command.CommandSender;
-
 public class AdministrativeSession extends PersistentSession {
     private boolean isMute;
     private boolean isFrozen;

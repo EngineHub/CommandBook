@@ -47,7 +47,7 @@ public class BansComponent extends BukkitComponent implements Listener {
     @Override
     public void enable() {
         config = configure(new LocalConfiguration());
-        
+
         // Setup the ban database
         bans = new CSVBanDatabase(CommandBook.inst().getDataFolder());
         bans.load();
@@ -68,7 +68,7 @@ public class BansComponent extends BukkitComponent implements Listener {
         getBanDatabase().load();
         configure(config);
     }
-    
+
     @Override
     public void disable() {
         bans.unload();
@@ -102,7 +102,7 @@ public class BansComponent extends BukkitComponent implements Listener {
             if (!CommandBook.inst().hasPermission(player, "commandbook.bans.exempt")) {
                 if (getBanDatabase().isBannedName(player.getName())) {
                     event.disallow(PlayerLoginEvent.Result.KICK_BANNED,
-                            getBanDatabase().getBannedNameMesage(player.getName()));
+                            getBanDatabase().getBannedNameMessage(player.getName()));
                 } else if (getBanDatabase().isBannedAddress(
                         player.getAddress().getAddress())) {
                     event.disallow(PlayerLoginEvent.Result.KICK_BANNED, getBanDatabase().getBannedAddressMessage(
@@ -113,7 +113,7 @@ public class BansComponent extends BukkitComponent implements Listener {
             // Bug in CraftBukkit
         }
     }
-    
+
     @EventHandler
     public void playerWhois(InfoComponent.PlayerWhoisEvent event) {
         if (CommandBook.inst().hasPermission(event.getSource(), "commandbook.bans.isbanned")) {
@@ -134,7 +134,7 @@ public class BansComponent extends BukkitComponent implements Listener {
 
             String broadcastPlayers = "";
             for (Player player : targets) {
-                if (CommandBook.inst().hasPermission(player, "commandbook.kick.exempt") 
+                if (CommandBook.inst().hasPermission(player, "commandbook.kick.exempt")
                         && !(args.hasFlag('o') && CommandBook.inst().hasPermission(sender,
                         "commandbook.kick.exempt.override"))) {
                     sender.sendMessage(ChatColor.RED + "Player " + player.getName() + ChatColor.RED + " is exempt from being kicked!");
@@ -156,7 +156,7 @@ public class BansComponent extends BukkitComponent implements Listener {
             }
         }
 
-        @Command(aliases = {"ban"}, usage = "[-t end ] <target> [reason...]", 
+        @Command(aliases = {"ban"}, usage = "[-t end ] <target> [reason...]",
                 desc = "Ban a user", flags = "set:o", min = 1, max = -1)
         @CommandPermissions({"commandbook.bans.ban"})
         public void ban(CommandContext args, CommandSender sender) throws CommandException {
@@ -165,7 +165,7 @@ public class BansComponent extends BukkitComponent implements Listener {
             long endDate = args.hasFlag('t') ? CommandBookUtil.matchFutureDate(args.getFlag('t')) : 0L;
             String message = args.argsLength() >= 2 ? args.getJoinedStrings(1)
                     : "Banned!";
-            
+
             final boolean hasExemptOverride = args.hasFlag('o')
                     && CommandBook.inst().hasPermission(sender, "commandbook.bans.exempt.override");
 
@@ -179,7 +179,7 @@ public class BansComponent extends BukkitComponent implements Listener {
                 } else {
                     player = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
                 }
-                
+
                 if (CommandBook.inst().hasPermission(player, "commandbook.bans.exempt") && !hasExemptOverride) {
                     throw new CommandException("This player is exempt from being banned! " +
                             "(use -o flag to override if you have commandbook.bans.exempt.override)");
@@ -225,16 +225,16 @@ public class BansComponent extends BukkitComponent implements Listener {
             @CommandPermissions({"commandbook.bans.ban.ip"})
             public static void banIP(CommandContext args, CommandBookPlugin plugin,
                     CommandSender sender) throws CommandException {
-                
+
                 String message = args.argsLength() >= 2 ? args.getJoinedStrings(1)
                         : "Banned!";
-                
+
                 String addr = args.getString(0)
                             .replace("\r", "")
                             .replace("\n", "")
                             .replace("\0", "")
                             .replace("\b", "");
-                
+
                 // Need to kick + log
                 for (Player player : plugin.getServer().getOnlinePlayers()) {
                     if (player.getAddress().getAddress().getHostAddress().equals(addr)) {
@@ -242,11 +242,11 @@ public class BansComponent extends BukkitComponent implements Listener {
                         plugin.getBanDatabase().logKick(player, sender, message);
                     }
                 }
-                
+
                 plugin.getBanDatabase().banAddress(addr, sender, message);
-                
+
                 sender.sendMessage(ChatColor.YELLOW + addr + " banned.");
-                
+
                 if (!plugin.getBanDatabase().save()) {
                     sender.sendMessage(ChatColor.RED + "Bans database failed to save. See console.");
                 }
@@ -328,19 +328,19 @@ public class BansComponent extends BukkitComponent implements Listener {
                     .replace("\n", "")
                     .replace("\0", "")
                     .replace("\b", "");
-            
+
             Ban ban = getBanDatabase().getBannedName(banName);
-            
+
             if (ban == null) {
                 sender.sendMessage(ChatColor.YELLOW + banName + " is NOT banned.");
             } else {
-                sender.sendMessage(ChatColor.YELLOW + "Ban for " + banName + ":"  + ban.getAddress() 
-                        + " for reason: '" + ban.getReason() + "' until " + 
+                sender.sendMessage(ChatColor.YELLOW + "Ban for " + banName + ":"  + ban.getAddress()
+                        + " for reason: '" + ban.getReason() + "' until " +
                         (ban.getEnd() == 0L ? " forever" : dateFormat.format(new Date(ban.getEnd()))));
-                
+
             }
         }
-        
+
 
         @Command(aliases = {"bans"}, desc = "Ban management")
         @NestedCommand({ManagementCommands.class})

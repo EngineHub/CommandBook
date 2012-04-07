@@ -19,6 +19,7 @@
 package com.sk89q.commandbook.locations;
 
 import com.sk89q.commandbook.CommandBook;
+import com.sk89q.commandbook.session.UserSession;
 import com.zachsthings.libcomponents.bukkit.BukkitComponent;
 import com.zachsthings.libcomponents.ComponentInformation;
 import com.zachsthings.libcomponents.Depend;
@@ -43,7 +44,7 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 @ComponentInformation(friendlyName = "Teleports", desc = "Teleport-related commands")
 @Depend(components = SessionComponent.class)
 public class TeleportComponent extends BukkitComponent implements Listener {
-    
+
     @InjectComponent private SessionComponent sessions;
 
     @Override
@@ -53,12 +54,12 @@ public class TeleportComponent extends BukkitComponent implements Listener {
     }
 
     // -- Event handlers
-    
+
     @EventHandler
     public void onRespawn(PlayerRespawnEvent event) {
-        sessions.getSession(event.getPlayer()).rememberLocation(event.getPlayer());
+        sessions.getSession(UserSession.class, event.getPlayer()).rememberLocation(event.getPlayer());
     }
-    
+
     @EventHandler
     public void onTeleport(PlayerTeleportEvent event) {
 
@@ -67,11 +68,11 @@ public class TeleportComponent extends BukkitComponent implements Listener {
         if (event.isCancelled()) {
             return;
         }
-        if (loc == sessions.getSession(player).getIgnoreLocation()) {
-            sessions.getSession(player).setIgnoreLocation(null);
+        if (loc == sessions.getSession(UserSession.class, player).getIgnoreLocation()) {
+            sessions.getSession(UserSession.class, player).setIgnoreLocation(null);
             return;
         }
-        sessions.getSession(event.getPlayer()).rememberLocation(event.getPlayer());
+        sessions.getSession(UserSession.class, player).rememberLocation(event.getPlayer());
     }
 
     public class Commands {
@@ -107,7 +108,7 @@ public class TeleportComponent extends BukkitComponent implements Listener {
                     }
                 }
             }
-            
+
             (new TeleportPlayerIterator(sender, loc, args.hasFlag('s'))).iterate(targets);
         }
 
@@ -119,8 +120,8 @@ public class TeleportComponent extends BukkitComponent implements Listener {
 
             CommandBook.inst().checkPermission(sender, target.getWorld(), "commandbook.call");
 
-            sessions.getSession(player).checkLastTeleportRequest(target);
-            sessions.getSession(target).addBringable(player);
+            sessions.getSession(UserSession.class, player).checkLastTeleportRequest(target);
+            sessions.getSession(UserSession.class, target).addBringable(player);
 
             sender.sendMessage(ChatColor.YELLOW.toString() + "Teleport request sent.");
             target.sendMessage(ChatColor.AQUA + "**TELEPORT** " + PlayerUtil.toName(sender)
@@ -133,7 +134,7 @@ public class TeleportComponent extends BukkitComponent implements Listener {
             if (!CommandBook.inst().hasPermission(sender, "commandbook.teleport.other")) {
                 Player target = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
 
-                if (sessions.getSession(player).isBringable(target)) {
+                if (sessions.getSession(UserSession.class, player).isBringable(target)) {
                     sender.sendMessage(ChatColor.YELLOW + "Player teleported.");
                     target.sendMessage(ChatColor.YELLOW + "Your teleport request to "
                             + PlayerUtil.toName(sender) + " was accepted.");
@@ -199,10 +200,10 @@ public class TeleportComponent extends BukkitComponent implements Listener {
             } else {
                 player = PlayerUtil.checkPlayer(sender);
             }
-            Location lastLoc = sessions.getSession(player).popLastLocation();
+            Location lastLoc = sessions.getSession(UserSession.class, player).popLastLocation();
 
             if (lastLoc != null) {
-                sessions.getSession(player).setIgnoreLocation(lastLoc);
+                sessions.getSession(UserSession.class, player).setIgnoreLocation(lastLoc);
                 player.teleport(lastLoc);
                 sender.sendMessage(ChatColor.YELLOW + "You've been returned.");
             } else {

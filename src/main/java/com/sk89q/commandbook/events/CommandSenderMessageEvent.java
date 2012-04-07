@@ -23,9 +23,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 public class CommandSenderMessageEvent extends Event {
-    
-    private static final long serialVersionUID = 1724483171471625110L;
-    
+
     private final CommandSender sender;
     private final String message;
 

@@ -37,7 +37,7 @@ import static com.sk89q.commandbook.CommandBook.logger;
 
 /**
  * Manages kits.
- * 
+ *
  * @author sk89q
  */
 public class FlatFileKitsManager implements KitManager {
@@ -47,20 +47,20 @@ public class FlatFileKitsManager implements KitManager {
 
     private final File file;
     private Map<String, Kit> kits = new HashMap<String, Kit>();
-    
+
     /**
      * Construct the manager.
      *
-     * @param file 
+     * @param file The file to read kits from
      */
     public FlatFileKitsManager(File file) {
         this.file = file;
     }
-    
+
     public synchronized void load() {
         FileInputStream input = null;
         Map<String, Kit> kits = new HashMap<String, Kit>();
-        
+
         try {
             input = new FileInputStream(file);
             InputStreamReader streamReader = new InputStreamReader(input, "utf-8");
@@ -70,21 +70,21 @@ public class FlatFileKitsManager implements KitManager {
 
             while ((line = reader.readLine()) != null) {
                 line = line.trim();
-                
+
                 if (line.length() == 0
                         || line.charAt(0) == '#'
                         || line.charAt(0) == ';') {
                     continue;
                 }
-                
+
                 // Match a kit's name
                 Matcher m = kitPattern.matcher(line);
-                
+
                 if (m.matches()) {
                     String id = m.group(1).replace(" ", "").trim().toLowerCase();
                     kit = new Kit();
                     kits.put(id, kit);
-                    
+
                     String coolDownTime = m.group(2);
                     if (coolDownTime != null) {
                         try {
@@ -95,25 +95,25 @@ public class FlatFileKitsManager implements KitManager {
                             continue;
                         }
                     }
-                    
+
                     continue;
                 }
-                
+
                 // No kit defined yet!
                 if (kit == null) {
                     logger().warning("Missing \"[kitname]\" section for "
                             + line);
                     continue;
                 }
-                
+
                 String[] parts = line.split(",");
                 ItemStack item = CommandBook.inst().getItem(parts[0].replace(" ", ""));
-                
+
                 if (item == null) {
                     logger().warning(" Unknown kit item '" + parts[0].replaceAll(" ", "") + "'");
                     continue;
                 }
-                
+
                 // Attempt to parse an amount
                 if (parts.length >= 2) {
                     try {
@@ -122,13 +122,13 @@ public class FlatFileKitsManager implements KitManager {
                         logger().warning("Invalid amount: '" + parts[1] + "'");
                     }
                 }
-                
+
                 kit.addItem(item);
             }
-            
+
             logger().info(kits.size() + " kit(s) loaded.");
-        } catch (FileNotFoundException e) {
-        } catch (UnsupportedEncodingException e) {
+        } catch (FileNotFoundException ignore) {
+        } catch (UnsupportedEncodingException ignore) {
         } catch (IOException e) {
             logger().warning("Failed to load kits.txt: "
                     + e.getMessage());
@@ -136,14 +136,14 @@ public class FlatFileKitsManager implements KitManager {
             if (input != null) {
                 try {
                     input.close();
-                } catch (IOException e) {
+                } catch (IOException ignore) {
                 }
             }
         }
-        
+
         this.kits = kits;
     }
-    
+
     public synchronized Kit getKit(String id) {
         return kits.get(id.toLowerCase());
     }
@@ -151,11 +151,11 @@ public class FlatFileKitsManager implements KitManager {
     public synchronized Map<String, Kit> getKits() {
         return kits;
     }
-    
+
     public synchronized void flush() {
         for (Kit kit : kits.values()) {
             kit.flush();
         }
     }
-    
+
 }

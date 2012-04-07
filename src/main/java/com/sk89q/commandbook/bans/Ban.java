@@ -37,7 +37,7 @@ public class Ban {
     public long getEnd() {
         return end;
     }
-    
+
     @Override
     public boolean equals(Object other) {
         if (!(other instanceof Ban)) {
@@ -49,13 +49,9 @@ public class Ban {
     }
 
     public static boolean potentialNullEquals(Object a, Object b) {
-        if (a == null && b == null) {
-            return true;
-        } else if (a == null || b == null) {
-            return false;
-        } else {
-            return a.equals(b);
-        }
+        return (a == null && b == null)
+                || a != null && b != null
+                && a.equals(b);
     }
 
     @Override

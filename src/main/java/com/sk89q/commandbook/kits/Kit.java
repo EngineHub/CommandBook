@@ -28,19 +28,19 @@ import org.bukkit.inventory.ItemStack;
 
 /**
  * Specifies the kit.
- * 
+ *
  * @author sk89q
  */
 public class Kit {
-    
+
     private volatile long coolDown;
     private final LinkedList<ItemStack> items = new LinkedList<ItemStack>();
     private final Map<String, Long> lastDistribution = new HashMap<String, Long>();
-    
+
     /**
-     * Set the cooldown time in milliseconds.
-     * 
-     * @return
+     * Get the cooldown time in milliseconds.
+     *
+     * @return The time of cooldown
      */
     public long getCoolDown() {
         return coolDown;
@@ -48,8 +48,8 @@ public class Kit {
 
     /**
      * Set the cooldown time in milliseconds.
-     * 
-     * @param coolDown
+     *
+     * @param coolDown The time to set the cooldown to
      */
     public void setCoolDown(long coolDown) {
         this.coolDown = coolDown;
@@ -57,56 +57,56 @@ public class Kit {
 
     /**
      * Add an item to the kit.
-     * 
-     * @param item
+     *
+     * @param item The item to add
      */
     public void addItem(ItemStack item) {
         items.add(item);
     }
-    
+
     /**
      * Distribute the kit to a player.
-     * 
-     * @param player
+     *
+     * @param player The player to distribute to
      * @return false if it has been too soon
      */
     public synchronized boolean distribute(Player player) {
         if (coolDown > 0) {
             Long time = lastDistribution.get(player.getName());
             long now = System.currentTimeMillis();
-            
+
             if (time != null) {
                 // Not enough time has passed
                 if (now - time < coolDown) {
                     return false;
                 }
             }
-            
+
             lastDistribution.put(player.getName(), now);
         }
-        
+
         for (ItemStack item : items) {
             player.getInventory().addItem(new ItemStack(item.getType(),
                     item.getAmount(), item.getDurability()));
         }
-        
+
         return true;
     }
-    
+
     /**
      * Get rid of old distribution records.
      */
     public synchronized void flush() {
         long now = System.currentTimeMillis();
         Iterator<Long> it = lastDistribution.values().iterator();
-        
+
         try {
             while (it.hasNext()) {
                 if (now - it.next() > coolDown) {
                     it.remove();
                 }
             }
-        } catch (NoSuchElementException e) {
+        } catch (NoSuchElementException ignore) {
         }
     }
 }

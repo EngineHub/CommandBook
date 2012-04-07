@@ -33,7 +33,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import com.sk89q.commandbook.CommandBook;
 import org.bukkit.Location;
@@ -49,15 +48,15 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
 
     private World castWorld;
     private final File file;
-    private Map<String, NamedLocation> locs = new HashMap<String, NamedLocation>();
-    private final Map<String, List<NamedLocation>> unloadedLocs = new HashMap<String, List<NamedLocation>>();
+    private Map<String, NamedLocation> locations = new HashMap<String, NamedLocation>();
+    private final Map<String, List<NamedLocation>> unloadedLocations = new HashMap<String, List<NamedLocation>>();
     private final String type;
 
     /**
      * Construct the manager.
      *
-     * @param file
-     * @param type
+     * @param file The file locations are stored in
+     * @param type The name for the type of location being loaded
      */
     public FlatFileLocationsManager(File file, String type) {
         this.file = file;
@@ -72,9 +71,10 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
         FileInputStream input = null;
         Map<String, NamedLocation> locs = new HashMap<String, NamedLocation>();
 
-        file.getParentFile().mkdirs();
-        if (!file.exists()) {
-            file.createNewFile();
+        if (file.getParentFile().mkdirs()) {
+            if (!file.exists()) {
+                file.createNewFile();
+            }
         }
 
         try {
@@ -113,7 +113,7 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
                         warp.setWorldName(worldName);
                         warp.setCreatorName(creator);
                         if (world == null) {
-                            getNestedList(unloadedLocs, worldName).add(warp);
+                            getNestedList(unloadedLocations, worldName).add(warp);
                         } else {
                             locs.put(name.toLowerCase(), warp);
                         }
@@ -123,7 +123,7 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
                 }
             }
 
-            this.locs = locs;
+            this.locations = locs;
 
             if (castWorld != null) {
                 logger().info(locs.size() + " " + type + "(s) loaded for "
@@ -135,7 +135,7 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
             if (input != null) {
                 try {
                     input.close();
-                } catch (IOException e) {
+                } catch (IOException ignore) {
                 }
             }
         }
@@ -153,10 +153,10 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
 
             synchronized (this) {
                 Set<NamedLocation> toStore = new HashSet<NamedLocation>();
-                for (List<NamedLocation> locList : unloadedLocs.values()) {
+                for (List<NamedLocation> locList : unloadedLocations.values()) {
                     toStore.addAll(locList);
                 }
-                toStore.addAll(locs.values());
+                toStore.addAll(locations.values());
 
                 for (NamedLocation warp : toStore) {
 
@@ -181,49 +181,49 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
             if (output != null) {
                 try {
                     output.close();
-                } catch (IOException e) {
+                } catch (IOException ignore) {
                 }
             }
         }
     }
 
     public void updateWorlds() {
-        for (Iterator<Map.Entry<String, List<NamedLocation>>> i = unloadedLocs.entrySet().iterator(); i.hasNext();) {
+        for (Iterator<Map.Entry<String, List<NamedLocation>>> i = unloadedLocations.entrySet().iterator(); i.hasNext();) {
             Map.Entry<String, List<NamedLocation>> entry = i.next();
             World world = CommandBook.server().getWorld(entry.getKey());
             if (world == null) continue;
             i.remove();
             for (NamedLocation warp : entry.getValue()) {
                 warp.getLocation().setWorld(world);
-                locs.put(warp.getName().toLowerCase(), warp);
+                locations.put(warp.getName().toLowerCase(), warp);
             }
         }
-        for (Iterator<NamedLocation> i = locs.values().iterator(); i.hasNext();) {
+        for (Iterator<NamedLocation> i = locations.values().iterator(); i.hasNext();) {
             NamedLocation loc = i.next();
             if (CommandBook.server().getWorld(loc.getWorldName()) == null) {
                 i.remove();
                 loc.getLocation().setWorld(null);
-                getNestedList(unloadedLocs, loc.getWorldName()).add(loc);
+                getNestedList(unloadedLocations, loc.getWorldName()).add(loc);
             }
         }
     }
 
     public NamedLocation get(String id) {
-        return locs.get(id.toLowerCase());
+        return locations.get(id.toLowerCase());
     }
 
     public boolean remove(String id) {
-        return locs.remove(id.toLowerCase()) != null;
+        return locations.remove(id.toLowerCase()) != null;
     }
 
     public List<NamedLocation> getLocations() {
-        return new ArrayList<NamedLocation>(locs.values());
+        return new ArrayList<NamedLocation>(locations.values());
     }
 
     public NamedLocation create(String id, Location loc, Player player) {
         id = id.trim();
         NamedLocation warp = new NamedLocation(id, loc);
-        locs.put(id.toLowerCase(), warp);
+        locations.put(id.toLowerCase(), warp);
         if (player != null) {
             warp.setCreatorName(player.getName());
         } else {
