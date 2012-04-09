@@ -25,11 +25,11 @@ import org.bukkit.entity.Player;
 import com.sk89q.commandbook.CommandBook;
 
 public class TeleportPlayerIterator extends PlayerIteratorAction {
-    
+
     protected final Location loc;
     protected Location oldLoc;
     protected final boolean silent;
-    
+
     public TeleportPlayerIterator(CommandSender sender, Location loc) {
         this(sender, loc, false);
     }
@@ -39,18 +39,18 @@ public class TeleportPlayerIterator extends PlayerIteratorAction {
         this.loc = loc;
         this.silent = silent;
     }
-    
+
     @Override
     public void perform(Player player) {
         oldLoc = player.getLocation();
         player.teleport(loc);
     }
-    
+
     @Override
     public void onCaller(Player player) {
         player.sendMessage(ChatColor.YELLOW + "Teleported.");
     }
-    
+
     @Override
     public void onVictim(CommandSender sender, Player player) {
         if (silent)
@@ -58,14 +58,14 @@ public class TeleportPlayerIterator extends PlayerIteratorAction {
 
         if (oldLoc.getWorld().equals(loc.getWorld())) {
             player.sendMessage(ChatColor.YELLOW + "You've been teleported by "
-                    + PlayerUtil.toName(sender) + ".");
+                    + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + ".");
         } else {
             player.sendMessage(ChatColor.YELLOW + "You've been teleported by "
-                    + PlayerUtil.toName(sender) + " to world '"
+                    + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + " to world '"
                     + loc.getWorld().getName() + "'.");
         }
     }
-    
+
     @Override
     public void onInformMany(CommandSender sender, int affected) {
         sender.sendMessage(ChatColor.YELLOW.toString()

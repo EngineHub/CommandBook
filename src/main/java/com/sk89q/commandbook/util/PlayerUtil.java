@@ -272,26 +272,17 @@ public class PlayerUtil {
     }
 
     /**
-     * Gets the name of a command sender. This play be a display name.
+     * Gets the name of a command sender. This may be a display name.
      *
      * @param sender
      * @return
      */
     public static String toName(CommandSender sender) {
-        if (sender instanceof Player) {
-            String name = CommandBook.inst().useDisplayNames
-                    ? ((Player) sender).getDisplayName()
-                    : (sender).getName();
-            return ChatColor.stripColor(name);
-        } else if (sender instanceof ConsoleCommandSender) {
-            return "*Console*";
-        } else {
-            return sender.getName();
-        }
+        return ChatColor.stripColor(toColoredName(sender, null));
     }
 
     /**
-     * Gets the name of a command sender. This play be a display name.
+     * Gets the name of a command sender. This may be a display name.
      *
      * @param sender
      * @param endColor

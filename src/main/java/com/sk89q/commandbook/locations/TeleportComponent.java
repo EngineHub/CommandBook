@@ -124,7 +124,7 @@ public class TeleportComponent extends BukkitComponent implements Listener {
             sessions.getSession(UserSession.class, target).addBringable(player);
 
             sender.sendMessage(ChatColor.YELLOW.toString() + "Teleport request sent.");
-            target.sendMessage(ChatColor.AQUA + "**TELEPORT** " + PlayerUtil.toName(sender)
+            target.sendMessage(ChatColor.AQUA + "**TELEPORT** " + PlayerUtil.toColoredName(sender, ChatColor.AQUA)
                     + " requests a teleport! Use /bring <name> to accept.");
         }
 
@@ -137,7 +137,7 @@ public class TeleportComponent extends BukkitComponent implements Listener {
                 if (sessions.getSession(UserSession.class, player).isBringable(target)) {
                     sender.sendMessage(ChatColor.YELLOW + "Player teleported.");
                     target.sendMessage(ChatColor.YELLOW + "Your teleport request to "
-                            + PlayerUtil.toName(sender) + " was accepted.");
+                            + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + " was accepted.");
                     target.teleport(player);
                 } else {
                     throw new CommandException("That person didn't request a " +

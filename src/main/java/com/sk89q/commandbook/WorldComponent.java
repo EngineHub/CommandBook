@@ -73,7 +73,7 @@ public class WorldComponent extends BukkitComponent {
 
                 if (CommandBook.inst().broadcastChanges) {
                     CommandBook.server().broadcastMessage(ChatColor.YELLOW
-                            + PlayerUtil.toName(sender) + " has started on a storm on '"
+                            + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + " has started on a storm on '"
                             + world.getName() + "'.");
                 }
 
@@ -97,7 +97,7 @@ public class WorldComponent extends BukkitComponent {
 
                 if (CommandBook.inst().broadcastChanges) {
                     CommandBook.server().broadcastMessage(ChatColor.YELLOW
-                            + PlayerUtil.toName(sender) + " has stopped a storm on '"
+                            + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + " has stopped a storm on '"
                             + world.getName() + "'.");
                 }
 

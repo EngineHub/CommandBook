@@ -261,7 +261,7 @@ public class InfoComponent extends BukkitComponent {
             if (player.equals(sender)) {
                 sender.sendMessage(ChatColor.YELLOW + "You are in the " + biomeName + " biome.");
             } else {
-                sender.sendMessage(ChatColor.YELLOW + PlayerUtil.toName(player) + " is in the " + biomeName + " biome.");
+                sender.sendMessage(ChatColor.YELLOW + PlayerUtil.toColoredName(player, ChatColor.YELLOW) + " is in the " + biomeName + " biome.");
             }
 
         }

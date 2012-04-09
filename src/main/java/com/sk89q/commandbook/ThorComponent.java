@@ -50,11 +50,11 @@ import java.util.Set;
 public class ThorComponent extends BukkitComponent implements Listener {
 
     @InjectComponent private SessionComponent sessions;
-    
+
     private LocalConfiguration config;
 
     private static final Random random = new Random();
-    
+
     @Override
     public void enable() {
         this.config = configure(new LocalConfiguration());
@@ -92,7 +92,7 @@ public class ThorComponent extends BukkitComponent implements Listener {
             }
         }
     }
-    
+
     public class Commands {
         @Command(aliases = {"shock"}, usage = "[target]", desc = "Shock a player", flags = "ksa", min = 0, max = 1)
         @CommandPermissions({"commandbook.shock"})
@@ -151,17 +151,17 @@ public class ThorComponent extends BukkitComponent implements Listener {
                         included = true;
                     } else {
                         player.sendMessage(ChatColor.YELLOW + "You've been shocked by "
-                                + PlayerUtil.toName(sender) + ".");
+                                + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + ".");
 
                     }
                 } else {
                     if (count < 6) {
                         CommandBook.server().broadcastMessage(
-                                ChatColor.YELLOW + PlayerUtil.toName(sender)
-                                        + " shocked " + PlayerUtil.toName(player));
+                                ChatColor.YELLOW + PlayerUtil.toColoredName(sender, ChatColor.YELLOW)
+                                        + " shocked " + PlayerUtil.toColoredName(player, ChatColor.YELLOW));
                     } else if (count == 6) {
                         CommandBook.server().broadcastMessage(
-                                ChatColor.YELLOW + PlayerUtil.toName(sender)
+                                ChatColor.YELLOW + PlayerUtil.toColoredName(sender, ChatColor.YELLOW)
                                         + " shocked more people...");
                     }
                 }
@@ -208,7 +208,7 @@ public class ThorComponent extends BukkitComponent implements Listener {
                     included = true;
                 } else {
                     player.sendMessage(ChatColor.YELLOW + "You have been granted the might power of Thor's hammer by "
-                            + PlayerUtil.toName(sender) + ".");
+                            + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + ".");
 
                 }
             }
@@ -253,7 +253,7 @@ public class ThorComponent extends BukkitComponent implements Listener {
                     included = true;
                 } else {
                     player.sendMessage(ChatColor.YELLOW + "Thor's hammer has been revoked from you by "
-                            + PlayerUtil.toName(sender) + ".");
+                            + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + ".");
 
                 }
             }

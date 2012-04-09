@@ -315,7 +315,7 @@ public class TimeComponent extends BukkitComponent implements Listener {
 
             if (CommandBook.inst().broadcastChanges) {
                 CommandBook.server().broadcastMessage(ChatColor.YELLOW
-                        + PlayerUtil.toName(sender) + " " + verb + " the time of '"
+                        + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + " " + verb + " the time of '"
                         + world.getName() + "' to "
                         + CommandBookUtil.getTimeString(world.getTime()) + ".");
             } else {

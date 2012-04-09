@@ -135,7 +135,7 @@ public class SpawnLocationsComponent extends BukkitComponent implements Listener
                 @Override
                 public void onVictim(CommandSender sender, Player player) {
                     player.sendMessage(ChatColor.YELLOW + "Teleported to spawn by "
-                            + PlayerUtil.toName(sender) + ".");
+                            + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + ".");
                 }
 
                 @Override

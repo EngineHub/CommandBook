@@ -74,21 +74,21 @@ public class MessagingComponent extends BukkitComponent implements Listener {
                 PlayerUtil.matchPlayerOrConsole(sender, target);
         String status = sessions.getSession(receiver).getIdleStatus();
         if (status != null) {
-            sender.sendMessage(ChatColor.GRAY + PlayerUtil.toName(receiver) + " is afk. "
+            sender.sendMessage(ChatColor.GRAY + PlayerUtil.toColoredName(receiver, ChatColor.YELLOW) + " is afk. "
                     + "They might not see your message."
                     + (status.trim().length() == 0 ? "" : " (" + status + ")"));
         }
 
         receiver.sendMessage(ChatColor.GRAY + "(From "
-                + PlayerUtil.toName(sender) + "): "
+                + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + "): "
                 + ChatColor.WHITE + message);
 
         sender.sendMessage(ChatColor.GRAY + "(To "
-                + PlayerUtil.toName(receiver) + "): "
+                + PlayerUtil.toColoredName(receiver, ChatColor.YELLOW) + "): "
                 + ChatColor.WHITE + message);
 
-        CommandBook.logger().info("(PM) " + PlayerUtil.toName(sender) + " -> "
-                + PlayerUtil.toName(receiver) + ": " + message);
+        CommandBook.logger().info("(PM) " + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + " -> "
+                + PlayerUtil.toColoredName(receiver, ChatColor.YELLOW) + ": " + message);
 
         sessions.getSession(sender).setLastRecipient(receiver);
 
@@ -136,7 +136,7 @@ public class MessagingComponent extends BukkitComponent implements Listener {
                 return;
             }
 
-            String name = PlayerUtil.toName(sender);
+            String name = PlayerUtil.toColoredName(sender, ChatColor.YELLOW);
             String msg = args.getJoinedStrings(0);
 
             CommandBook.callEvent(
@@ -201,21 +201,21 @@ public class MessagingComponent extends BukkitComponent implements Listener {
 
             if (receiver instanceof Player && sessions.getSession(receiver).getIdleStatus() != null) {
                 String status = sessions.getSession(receiver).getIdleStatus();
-                sender.sendMessage(ChatColor.GRAY + PlayerUtil.toName(receiver) + " is afk. "
+                sender.sendMessage(ChatColor.GRAY + PlayerUtil.toColoredName(receiver, ChatColor.YELLOW) + " is afk. "
                         + "They might not see your message."
                         + (status.isEmpty() ? "" : " (" + status + ")"));
             }
 
             receiver.sendMessage(ChatColor.GRAY + "(From "
-                    + PlayerUtil.toName(sender) + "): "
+                    + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + "): "
                     + ChatColor.WHITE + message);
 
             sender.sendMessage(ChatColor.GRAY + "(To "
-                    + PlayerUtil.toName(receiver) + "): "
+                    + PlayerUtil.toColoredName(receiver, ChatColor.YELLOW) + "): "
                     + ChatColor.WHITE + message);
 
-            CommandBook.logger().info("(PM) " + PlayerUtil.toName(sender) + " -> "
-                    + PlayerUtil.toName(receiver) + ": " + message);
+            CommandBook.logger().info("(PM) " + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + " -> "
+                    + PlayerUtil.toColoredName(receiver, ChatColor.YELLOW) + ": " + message);
 
             // If the receiver hasn't had any player talk to them yet or hasn't
             // send a message, then we add it to the receiver's last message target
@@ -263,10 +263,10 @@ public class MessagingComponent extends BukkitComponent implements Listener {
 
                 if (player != sender) {
                     player.sendMessage(ChatColor.YELLOW + "You've been muted by "
-                            + PlayerUtil.toName(sender));
+                            + PlayerUtil.toColoredName(sender, ChatColor.YELLOW));
                 }
                 sender.sendMessage(ChatColor.YELLOW + "You've muted "
-                        + PlayerUtil.toName(player));
+                        + PlayerUtil.toColoredName(player, ChatColor.YELLOW));
             } else {
                 throw new CommandException("Player " + PlayerUtil.toName(player) + " is already muted!");
             }
@@ -280,10 +280,10 @@ public class MessagingComponent extends BukkitComponent implements Listener {
             if (sessions.getAdminSession(player).setMute(false)) {
                 if (player != sender) {
                     player.sendMessage(ChatColor.YELLOW + "You've been unmuted by "
-                        + PlayerUtil.toName(sender));
+                        + PlayerUtil.toColoredName(sender, ChatColor.YELLOW));
                 }
                 sender.sendMessage(ChatColor.YELLOW + "You've unmuted "
-                        + PlayerUtil.toName(player));
+                        + PlayerUtil.toColoredName(player, ChatColor.YELLOW));
             } else {
                 throw new CommandException("Player " + PlayerUtil.toName(player) + " was not muted!");
             }

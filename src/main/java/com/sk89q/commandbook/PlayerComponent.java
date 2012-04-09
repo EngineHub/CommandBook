@@ -120,24 +120,24 @@ public class PlayerComponent extends BukkitComponent {
             sender.sendMessage(ChatColor.YELLOW + "Player " + (CommandBook.inst().useDisplayNames ? player.getDisplayName() : player.getName())
                     + ChatColor.YELLOW + message + ".");
         }
-        @Command(aliases = {"heal"}, 
+        @Command(aliases = {"heal"},
         		usage = "[player]", desc = "Heal a player",
         		flags = "s", min = 0, max = 1)
         @CommandPermissions({"commandbook.heal", "commandbook.heal.other"})
         public void heal(CommandContext args,CommandSender sender) throws CommandException {
-            
+
             Iterable<Player> targets = null;
             boolean included = false;
-            
+
             // Detect arguments based on the number of arguments provided
             if (args.argsLength() == 0) {
                 targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
-                
-            } else if (args.argsLength() == 1) {            
+
+            } else if (args.argsLength() == 1) {
                 targets = PlayerUtil.matchPlayers(sender, args.getString(0));
-                
+
             }
-            
+
             for (Player player : targets) {
                 if (player != sender) {
                     // Check permissions!
@@ -150,40 +150,40 @@ public class PlayerComponent extends BukkitComponent {
             for (Player player : targets) {
                 player.setHealth(20);
                 player.setFoodLevel(20);
-                
+
                 // Tell the user
                 if (player.equals(sender)) {
                     player.sendMessage(ChatColor.YELLOW + "Healed!");
-                    
+
                     // Keep track of this
                     included = true;
                 } else {
                     player.sendMessage(ChatColor.YELLOW + "Healed by "
-                            + PlayerUtil.toName(sender) + ".");
-                    
+                            + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + ".");
+
                 }
             }
-            
+
             // The player didn't receive any items, then we need to send the
             // user a message so s/he know that something is indeed working
             if (!included && args.hasFlag('s')) {
                 sender.sendMessage(ChatColor.YELLOW.toString() + "Players healed.");
             }
         }
-        @Command(aliases = {"slay"}, 
-        		usage = "[player]", desc = "Slay a player", 
+        @Command(aliases = {"slay"},
+        		usage = "[player]", desc = "Slay a player",
         		flags = "s", min = 0, max = 1)
         @CommandPermissions({"commandbook.slay"})
-        
+
         public void slay(CommandContext args, CommandSender sender) throws CommandException {
-            
+
             Iterable<Player> targets = null;
             boolean included = false;
-            
+
             // Detect arguments based on the number of arguments provided
             if (args.argsLength() == 0) {
                 targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
-            } else if (args.argsLength() == 1) {            
+            } else if (args.argsLength() == 1) {
                 targets = PlayerUtil.matchPlayers(sender, args.getString(0));
             }
 
@@ -198,40 +198,40 @@ public class PlayerComponent extends BukkitComponent {
 
             for (Player player : targets) {
                 player.setHealth(0);
-                
+
                 // Tell the user
                 if (player.equals(sender)) {
                     player.sendMessage(ChatColor.YELLOW + "Slain!");
-                    
+
                     // Keep track of this
                     included = true;
                 } else {
                     player.sendMessage(ChatColor.YELLOW + "Slain by "
-                            + PlayerUtil.toName(sender) + ".");
-                    
+                            + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + ".");
+
                 }
             }
-            
+
             // The player didn't receive any items, then we need to send the
             // user a message so s/he know that something is indeed working
             if (!included && args.hasFlag('s')) {
                 sender.sendMessage(ChatColor.YELLOW.toString() + "Players slain.");
             }
-        }   
+        }
         @Command(aliases = {"locate"}, usage = "[player]", desc = "Locate a player", max = 1)
         @CommandPermissions({"commandbook.locate"})
         public void locate(CommandContext args, CommandSender sender) throws CommandException {
-            
+
             Player player = PlayerUtil.checkPlayer(sender);
-            
+
             if (args.argsLength() == 0) {
                 player.setCompassTarget(player.getWorld().getSpawnLocation());
-                
+
                 sender.sendMessage(ChatColor.YELLOW.toString() + "Compass reset to spawn.");
             } else {
                 Player target = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
                 player.setCompassTarget(target.getLocation());
-                
+
                 sender.sendMessage(ChatColor.YELLOW.toString() + "Compass repointed.");
             }
         }

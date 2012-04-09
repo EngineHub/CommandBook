@@ -39,7 +39,7 @@ public class KitsComponent extends BukkitComponent {
     @Override
     public void enable() {
         CommandBook.inst().createDefaultConfiguration("kits.txt");
-        
+
         // Setup kits
         kits = new FlatFileKitsManager(new File(CommandBook.inst().getDataFolder(), "kits.txt"));
         kits.load();
@@ -49,7 +49,7 @@ public class KitsComponent extends BukkitComponent {
                 GarbageCollector.CHECK_FREQUENCY, GarbageCollector.CHECK_FREQUENCY);
         registerCommands(Commands.class);
     }
-    
+
     @Override
     public void reload() {
         super.reload();
@@ -147,7 +147,7 @@ public class KitsComponent extends BukkitComponent {
                         if (success) {
                             player.sendMessage(ChatColor.YELLOW + "You've been given " +
                                     "the '" + id + "' kit by "
-                                    + PlayerUtil.toName(sender) + ".");
+                                    + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + ".");
                         } else {
                             player.sendMessage(ChatColor.RED + "A kit could not be given to you because it has been too soon.");
                         }

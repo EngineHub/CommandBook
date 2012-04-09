@@ -244,7 +244,7 @@ public class GodComponent extends BukkitComponent implements Listener {
                 } else {
                     if (!args.hasFlag('s'))
                     player.sendMessage(ChatColor.YELLOW + "God enabled by "
-                            + PlayerUtil.toName(sender) + ".");
+                            + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + ".");
 
                 }
             }
@@ -301,7 +301,7 @@ public class GodComponent extends BukkitComponent implements Listener {
                     included = true;
                 } else {
                     player.sendMessage(ChatColor.YELLOW + "God disabled by "
-                            + PlayerUtil.toName(sender) + ".");
+                            + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + ".");
 
                 }
             }

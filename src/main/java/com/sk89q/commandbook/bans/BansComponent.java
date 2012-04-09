@@ -150,7 +150,7 @@ public class BansComponent extends BukkitComponent implements Listener {
                 //Broadcast the Message
                 if (config.broadcastKicks && !args.hasFlag('s')) {
                     CommandBook.server().broadcastMessage(ChatColor.YELLOW
-                            + PlayerUtil.toName(sender) + " has kicked " + broadcastPlayers
+                            + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + " has kicked " + broadcastPlayers
                             + " - " + message);
                 }
             }
@@ -208,7 +208,7 @@ public class BansComponent extends BukkitComponent implements Listener {
             //Broadcast the Message
             if (config.broadcastBans && !args.hasFlag('s')) {
                 CommandBook.server().broadcastMessage(ChatColor.YELLOW
-                        + PlayerUtil.toName(sender) + " has banned " + banName
+                        + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + " has banned " + banName
                         + " - " + message);
             }
 

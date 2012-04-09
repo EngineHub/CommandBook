@@ -136,7 +136,7 @@ public class FunComponent extends BukkitComponent {
         public void pong(CommandContext args, CommandSender sender) throws CommandException {
 
             sender.sendMessage(ChatColor.YELLOW +
-                    "I hear " + PlayerUtil.toName(sender) + " likes cute Asian boys.");
+                    "I hear " + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + " likes cute Asian boys.");
         }
 
         @Command(aliases = {"spawnmob"}, usage = "<mob>[|rider] [count] [location]", desc = "Spawn a mob",
@@ -254,17 +254,17 @@ public class FunComponent extends BukkitComponent {
                         included = true;
                     } else {
                         player.sendMessage(ChatColor.YELLOW + "You've been slapped by "
-                                + PlayerUtil.toName(sender) + ".");
+                                + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + ".");
 
                     }
                 } else {
                     if (count < 6) {
                         CommandBook.server().broadcastMessage(
-                                ChatColor.YELLOW + PlayerUtil.toName(sender)
-                                        + " slapped " + PlayerUtil.toName(player));
+                                ChatColor.YELLOW + PlayerUtil.toColoredName(sender, ChatColor.YELLOW)
+                                        + " slapped " + PlayerUtil.toColoredName(player, ChatColor.YELLOW));
                     } else if (count == 6) {
                         CommandBook.server().broadcastMessage(
-                                ChatColor.YELLOW + PlayerUtil.toName(sender)
+                                ChatColor.YELLOW + PlayerUtil.toColoredName(sender, ChatColor.YELLOW)
                                         + " slapped more people...");
                     }
                 }
@@ -315,17 +315,18 @@ public class FunComponent extends BukkitComponent {
                         included = true;
                     } else {
                         player.sendMessage(ChatColor.YELLOW + "You've been rocketed by "
-                                + PlayerUtil.toName(sender) + ".");
+                                + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + ".");
 
                     }
                 } else {
+                    ++count;
                     if (count < 6) {
                         CommandBook.server().broadcastMessage(
-                                ChatColor.YELLOW + PlayerUtil.toName(sender)
-                                        + " rocketed " + PlayerUtil.toName(player));
+                                ChatColor.YELLOW + PlayerUtil.toColoredName(sender, ChatColor.YELLOW)
+                                        + " rocketed " + PlayerUtil.toColoredName(player, ChatColor.YELLOW));
                     } else if (count == 6) {
                         CommandBook.server().broadcastMessage(
-                                ChatColor.YELLOW + PlayerUtil.toName(sender)
+                                ChatColor.YELLOW + PlayerUtil.toColoredName(sender, ChatColor.YELLOW)
                                         + " rocketed more people...");
                     }
                 }
@@ -378,18 +379,18 @@ public class FunComponent extends BukkitComponent {
                         included = true;
                     } else {
                         player.sendMessage(ChatColor.YELLOW + "BARRAGE attack from "
-                                + PlayerUtil.toName(sender) + ".");
+                                + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + ".");
 
                     }
                 } else {
                     if (count < 6) {
                         CommandBook.server().broadcastMessage(
-                                ChatColor.YELLOW + PlayerUtil.toName(sender)
-                                        + " used BARRAGE on " + PlayerUtil.toName(player));
+                                ChatColor.YELLOW + PlayerUtil.toColoredName(sender, ChatColor.YELLOW)
+                                        + " used BARRAGE on " + PlayerUtil.toColoredName(player, ChatColor.YELLOW));
                     } else if (count == 6) {
                         CommandBook.server().broadcastMessage(
-                                ChatColor.YELLOW + PlayerUtil.toName(sender)
-                                        + " used it more people...");
+                                ChatColor.YELLOW + PlayerUtil.toColoredName(sender, ChatColor.YELLOW)
+                                        + " used it on more people...");
                     }
                 }
             }
@@ -440,18 +441,18 @@ public class FunComponent extends BukkitComponent {
                         included = true;
                     } else {
                         player.sendMessage(ChatColor.YELLOW + "Fireball attack from "
-                                + PlayerUtil.toName(sender) + ".");
+                                + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + ".");
 
                     }
                 } else {
                     if (count < 6) {
                         CommandBook.server().broadcastMessage(
-                                ChatColor.YELLOW + PlayerUtil.toName(sender)
-                                        + " used Fireball attack on " + PlayerUtil.toName(player));
+                                ChatColor.YELLOW + PlayerUtil.toColoredName(sender, ChatColor.YELLOW)
+                                        + " used Fireball attack on " + PlayerUtil.toColoredName(player, ChatColor.YELLOW));
                     } else if (count == 6) {
                         CommandBook.server().broadcastMessage(
-                                ChatColor.YELLOW + PlayerUtil.toName(sender)
-                                        + " used it more people...");
+                                ChatColor.YELLOW + PlayerUtil.toColoredName(sender, ChatColor.YELLOW)
+                                        + " used it on more people...");
                     }
                 }
             }
@@ -504,17 +505,17 @@ public class FunComponent extends BukkitComponent {
                         included = true;
                     } else {
                         player.sendMessage(ChatColor.YELLOW + "Fireball attack from "
-                                + PlayerUtil.toName(sender) + ".");
+                                + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + ".");
 
                     }
                 } else {
                     if (count < 6) {
                     	CommandBook.server().broadcastMessage(
-                                ChatColor.YELLOW + PlayerUtil.toName(sender)
-                                + " used Fireball attack on " + PlayerUtil.toName(player));
+                                ChatColor.YELLOW + PlayerUtil.toColoredName(sender, ChatColor.YELLOW)
+                                + " used Fireball attack on " + PlayerUtil.toColoredName(player, ChatColor.YELLOW));
                     } else if (count == 6) {
                     	CommandBook.server().broadcastMessage(
-                                ChatColor.YELLOW + PlayerUtil.toName(sender)
+                                ChatColor.YELLOW + PlayerUtil.toColoredName(sender, ChatColor.YELLOW)
                                 + " used it more people...");
                     }
                 }

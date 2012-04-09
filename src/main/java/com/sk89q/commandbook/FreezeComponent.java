@@ -136,14 +136,14 @@ public class FreezeComponent extends BukkitComponent implements Listener, Runnab
 
             if (!freezePlayer(player)) {
                 player.sendMessage(ChatColor.YELLOW + "You've been frozen by "
-                        + PlayerUtil.toName(sender));
+                        + PlayerUtil.toColoredName(sender, ChatColor.YELLOW));
                 sender.sendMessage(ChatColor.YELLOW + "You've frozen "
-                        + PlayerUtil.toName(player));
+                        + PlayerUtil.toColoredName(player, ChatColor.YELLOW));
             } else {
                 player.sendMessage(ChatColor.YELLOW + "Your freeze location has been updated by "
-                        + PlayerUtil.toName(sender));
+                        + PlayerUtil.toColoredName(sender, ChatColor.YELLOW));
                 sender.sendMessage(ChatColor.YELLOW + "You have updated the freeze location of "
-                        + PlayerUtil.toName(player));
+                        + PlayerUtil.toColoredName(player, ChatColor.YELLOW));
             }
         }
 
@@ -155,9 +155,9 @@ public class FreezeComponent extends BukkitComponent implements Listener, Runnab
             if (unfreezePlayer(player)) {
 
                 player.sendMessage(ChatColor.YELLOW + "You've been unfrozen by "
-                        + PlayerUtil.toName(sender));
+                        + PlayerUtil.toColoredName(sender, ChatColor.YELLOW));
                 sender.sendMessage(ChatColor.YELLOW + "You've unfrozen "
-                        + PlayerUtil.toName(player));
+                        + PlayerUtil.toColoredName(player, ChatColor.YELLOW));
             } else {
                 throw new CommandException(PlayerUtil.toName(player) + " was not frozen");
             }

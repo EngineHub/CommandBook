@@ -255,7 +255,7 @@ public class InventoryComponent extends BukkitComponent {
                 } else {
                     player.sendMessage(ChatColor.YELLOW
                             + "Your inventory has been cleared by "
-                            + PlayerUtil.toName(sender));
+                            + PlayerUtil.toColoredName(sender, ChatColor.YELLOW));
 
                 }
             }
@@ -323,7 +323,7 @@ public class InventoryComponent extends BukkitComponent {
                 } else {
                     player.sendMessage(ChatColor.YELLOW
                             + "Your item(s) has been expanded in stack size by "
-                            + PlayerUtil.toName(sender));
+                            + PlayerUtil.toColoredName(sender, ChatColor.YELLOW));
 
                 }
             }

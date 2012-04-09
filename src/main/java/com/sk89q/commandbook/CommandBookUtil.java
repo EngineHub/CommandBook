@@ -283,7 +283,7 @@ public class CommandBookUtil {
                 included = true;
             } else {
                 player.sendMessage(ChatColor.YELLOW + "Given from "
-                        + PlayerUtil.toName(sender) + ": "
+                        + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + ": "
                         + amtText + " "
                         + ItemUtil.toItemName(item.getTypeId()) + ".");
 
@@ -322,7 +322,7 @@ public class CommandBookUtil {
             target.getInventory().removeItem(item);
 
             target.sendMessage(ChatColor.YELLOW + "Taken from "
-                            + PlayerUtil.toName(sender) + ": "
+                            + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + ": "
                             + amt + " "
                             + ItemUtil.toItemName(item.getTypeId()) + ".");
 
