@@ -1,4 +1,5 @@
 2.1:
+ - Correctly use colored names everywhere when usedisplaynames is enabled in the configuration
  - Made the god component use the "god" entity metadata tag. This allows other plugins
     to more easily hook into CommandBook's godmode implementation.
  - Made most session data persist. Not all session data currently persists however.
