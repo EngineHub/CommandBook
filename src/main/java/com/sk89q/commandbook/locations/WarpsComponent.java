@@ -50,7 +50,6 @@ public class WarpsComponent extends LocationsComponent {
         @Command(aliases = {"warp"},
                 usage = "[world] [target] <warp>", desc = "Teleport to a warp",
                 flags = "s", min = 1, max = 3)
-        @CommandPermissions({"commandbook.warp.teleport"})
         public void warp(CommandContext args, CommandSender sender) throws CommandException {
             Iterable<Player> targets = null;
             NamedLocation warp = null;
@@ -84,6 +83,7 @@ public class WarpsComponent extends LocationsComponent {
             }
 
             if (warp != null) {
+                CommandBook.inst().checkPermission(sender, "commandbook.warp.teleport." + warp.getName());
                 loc = warp.getLocation();
             } else {
                 throw new CommandException("A warp by the given name does not exist.");
