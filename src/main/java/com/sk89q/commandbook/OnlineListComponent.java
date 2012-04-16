@@ -73,6 +73,7 @@ public class OnlineListComponent extends BukkitComponent implements Listener {
     public void sendOnlineList(Player[] online, CommandSender sender) {
 
         StringBuilder out = new StringBuilder();
+        int onlineCount = online.length;
 
         // This applies mostly to the console, so there might be 0 players
         // online if that's the case!
@@ -82,7 +83,14 @@ public class OnlineListComponent extends BukkitComponent implements Listener {
         }
 
         out.append(ChatColor.GRAY + "Online (");
-        out.append(online.length);
+        for (Player player : online) {
+            if (sender instanceof Player) {
+                if (!((Player) sender).canSee(player)) {
+                    onlineCount--;
+                }
+            }
+        }
+        out.append(onlineCount);
         if (config.playersListMaxPlayers) {
             out.append("/");
             out.append(CommandBook.server().getMaxPlayers());
@@ -94,6 +102,11 @@ public class OnlineListComponent extends BukkitComponent implements Listener {
             Map<String, List<Player>> groups = new HashMap<String, List<Player>>();
 
             for (Player player : online) {
+                if (sender instanceof Player) {
+                    if (!((Player) sender).canSee(player)) {
+                        continue;
+                    }
+                }
                 String[] playerGroups = CommandBook.inst().getPermissionsResolver().getGroups(
                         player.getName());
                 String group = playerGroups.length > 0 ? playerGroups[0] : "Default";
@@ -135,6 +148,12 @@ public class OnlineListComponent extends BukkitComponent implements Listener {
             boolean first = true;
 
             for (Player player : online) {
+                if (sender instanceof Player) {
+                    if (!((Player) sender).canSee(player)) {
+                        continue;
+                    }
+                }
+
                 if (!first) {
                     out.append(", ");
                 }
