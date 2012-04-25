@@ -150,6 +150,8 @@ public class PlayerComponent extends BukkitComponent {
             for (Player player : targets) {
                 player.setHealth(20);
                 player.setFoodLevel(20);
+                player.setSaturation(5);
+                player.setExhaustion(0);
 
                 // Tell the user
                 if (player.equals(sender)) {
@@ -157,7 +159,7 @@ public class PlayerComponent extends BukkitComponent {
 
                     // Keep track of this
                     included = true;
-                } else {
+                } else {p
                     player.sendMessage(ChatColor.YELLOW + "Healed by "
                             + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + ".");
 
