@@ -150,8 +150,8 @@ public class PlayerComponent extends BukkitComponent {
             for (Player player : targets) {
                 player.setHealth(20);
                 player.setFoodLevel(20);
-                player.setSaturation(5.0);
-                player.setExhaustion(0.0);
+                player.setSaturation(5);
+                player.setExhaustion(0);
 
                 // Tell the user
                 if (player.equals(sender)) {
