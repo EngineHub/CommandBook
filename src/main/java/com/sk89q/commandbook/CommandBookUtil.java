@@ -245,6 +245,7 @@ public class CommandBookUtil {
             // Check to see if the player can give stacks
             CommandBook.inst().checkPermission(sender, "commandbook.give.stacks");
         }
+        if(amt > 2240) amt = 2240;
 
         // Get a nice amount name
         String amtText = amt == -1 ? "an infinite stack of" : String.valueOf(amt);
