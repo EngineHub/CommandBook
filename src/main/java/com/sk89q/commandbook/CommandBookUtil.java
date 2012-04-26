@@ -18,38 +18,28 @@
 
 package com.sk89q.commandbook;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import com.sk89q.commandbook.util.ItemUtil;
 import com.sk89q.commandbook.util.PlayerUtil;
+import com.sk89q.minecraft.util.commands.CommandException;
+import com.sk89q.worldedit.blocks.BlockType;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Arrow;
-import org.bukkit.entity.CreatureType;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
-import com.sk89q.minecraft.util.commands.CommandException;
-import com.sk89q.worldedit.blocks.BlockType;
 
-import static com.sk89q.commandbook.util.PlayerUtil.toColoredName;
-import static com.sk89q.commandbook.util.PlayerUtil.toName;
-import static com.sk89q.commandbook.util.PlayerUtil.toUniqueName;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static com.sk89q.commandbook.util.PlayerUtil.*;
 
 /**
  * Utility methods for CommandBook, borrowed from Tetsuuuu (the plugin
@@ -245,7 +235,8 @@ public class CommandBookUtil {
             // Check to see if the player can give stacks
             CommandBook.inst().checkPermission(sender, "commandbook.give.stacks");
         }
-        if(amt > 2240) amt = 2240;
+
+        if(amt > 2240 && !drop) amt = 2240;
 
         // Get a nice amount name
         String amtText = amt == -1 ? "an infinite stack of" : String.valueOf(amt);

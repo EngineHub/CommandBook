@@ -19,16 +19,16 @@
 package com.sk89q.commandbook;
 
 import com.sk89q.commandbook.commands.PaginatedResult;
-import com.zachsthings.libcomponents.bukkit.BukkitComponent;
-import com.zachsthings.libcomponents.ComponentInformation;
-import com.zachsthings.libcomponents.config.ConfigurationBase;
-import com.zachsthings.libcomponents.config.Setting;
 import com.sk89q.commandbook.util.PlayerUtil;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.worldedit.blocks.ItemType;
+import com.zachsthings.libcomponents.ComponentInformation;
+import com.zachsthings.libcomponents.bukkit.BukkitComponent;
+import com.zachsthings.libcomponents.config.ConfigurationBase;
+import com.zachsthings.libcomponents.config.Setting;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
@@ -37,12 +37,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
 
-import static com.sk89q.commandbook.util.ItemUtil.*;
 import static com.sk89q.commandbook.CommandBookUtil.giveItem;
 import static com.sk89q.commandbook.CommandBookUtil.takeItem;
 
@@ -448,7 +446,7 @@ public class InventoryComponent extends BukkitComponent {
             new PaginatedResult<Enchantment>("Name - ID - Max Level") {
                 @Override
                 public String format(Enchantment entry) {
-                    return entry.getName() + " - " + entry.getId() +  " - " + entry.getMaxLevel();
+                    return entry.getName() + " - " + entry.getId() + " - " + entry.getMaxLevel();
                 }
             }.display(sender, Arrays.asList(Enchantment.values()), args.getFlagInteger('p', 1));
         }

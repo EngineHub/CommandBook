@@ -20,11 +20,11 @@ package com.sk89q.commandbook.locations;
 
 import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.commands.PaginatedResult;
-import com.zachsthings.libcomponents.ComponentInformation;
 import com.sk89q.commandbook.util.LocationUtil;
 import com.sk89q.commandbook.util.PlayerUtil;
 import com.sk89q.commandbook.util.TeleportPlayerIterator;
 import com.sk89q.minecraft.util.commands.*;
+import com.zachsthings.libcomponents.ComponentInformation;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;

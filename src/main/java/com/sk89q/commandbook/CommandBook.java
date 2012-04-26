@@ -19,15 +19,18 @@
 
 package com.sk89q.commandbook;
 
-import java.io.*;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import com.sk89q.bukkit.util.CommandsManagerRegistration;
+import com.sk89q.commandbook.commands.CommandBookCommands;
 import com.sk89q.commandbook.config.LegacyCommandBookConfigurationMigrator;
-import com.zachsthings.libcomponents.*;
+import com.sk89q.commandbook.session.SessionComponent;
+import com.sk89q.minecraft.util.commands.*;
+import com.sk89q.util.yaml.YAMLFormat;
+import com.sk89q.util.yaml.YAMLProcessor;
+import com.sk89q.worldedit.blocks.ItemType;
+import com.zachsthings.libcomponents.InjectComponent;
+import com.zachsthings.libcomponents.InjectComponentAnnotationHandler;
 import com.zachsthings.libcomponents.bukkit.BasePlugin;
+import com.zachsthings.libcomponents.bukkit.DefaultsFileYAMLProcessor;
 import com.zachsthings.libcomponents.bukkit.YAMLNodeConfigurationNode;
 import com.zachsthings.libcomponents.bukkit.YAMLProcessorConfigurationFile;
 import com.zachsthings.libcomponents.config.ConfigurationFile;
@@ -35,21 +38,22 @@ import com.zachsthings.libcomponents.loader.ClassLoaderComponentLoader;
 import com.zachsthings.libcomponents.loader.ConfigListedComponentLoader;
 import com.zachsthings.libcomponents.loader.JarFilesComponentLoader;
 import com.zachsthings.libcomponents.loader.StaticComponentLoader;
-import com.zachsthings.libcomponents.bukkit.DefaultsFileYAMLProcessor;
-import com.sk89q.commandbook.session.SessionComponent;
-import com.sk89q.util.yaml.YAMLFormat;
-import com.sk89q.util.yaml.YAMLProcessor;
-import org.bukkit.*;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
-import com.sk89q.commandbook.commands.*;
-import com.sk89q.minecraft.util.commands.*;
-import com.sk89q.worldedit.blocks.ItemType;
 import org.yaml.snakeyaml.error.YAMLException;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static com.sk89q.commandbook.util.ItemUtil.matchItemData;
 

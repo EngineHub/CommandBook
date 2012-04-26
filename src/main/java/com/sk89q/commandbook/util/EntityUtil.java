@@ -20,7 +20,6 @@ package com.sk89q.commandbook.util;
 
 import com.sk89q.minecraft.util.commands.CommandException;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.CreatureType;
 import org.bukkit.entity.EntityType;
 
 public class EntityUtil {

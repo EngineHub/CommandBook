@@ -18,9 +18,10 @@
 
 package com.sk89q.commandbook.bans;
 
-import java.net.InetAddress;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import java.net.InetAddress;
 
 /**
  * Interface for a ban database.

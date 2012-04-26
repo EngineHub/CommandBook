@@ -18,22 +18,22 @@
 
 package com.sk89q.commandbook.bans;
 
+import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.CommandBookUtil;
 import com.sk89q.commandbook.InfoComponent;
-import com.zachsthings.libcomponents.bukkit.BukkitComponent;
-import com.sk89q.commandbook.CommandBook;
-import com.zachsthings.libcomponents.ComponentInformation;
-import com.zachsthings.libcomponents.config.ConfigurationBase;
-import com.zachsthings.libcomponents.config.Setting;
 import com.sk89q.commandbook.util.PlayerUtil;
 import com.sk89q.minecraft.util.commands.*;
+import com.zachsthings.libcomponents.ComponentInformation;
+import com.zachsthings.libcomponents.bukkit.BukkitComponent;
+import com.zachsthings.libcomponents.config.ConfigurationBase;
+import com.zachsthings.libcomponents.config.Setting;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
-import org.bukkit.event.EventHandler;
 
 import java.io.File;
 import java.text.SimpleDateFormat;

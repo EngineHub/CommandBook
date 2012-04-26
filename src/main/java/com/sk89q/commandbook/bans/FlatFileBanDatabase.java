@@ -18,31 +18,21 @@
 
 package com.sk89q.commandbook.bans;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-import java.net.InetAddress;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.logging.FileHandler;
-import java.util.logging.Formatter;
-import java.util.logging.Handler;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
+import com.sk89q.commandbook.CommandBook;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import com.sk89q.commandbook.CommandBook;
-import static com.sk89q.commandbook.util.PlayerUtil.toUniqueName;
+
+import java.io.*;
+import java.net.InetAddress;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.logging.*;
 
 import static com.sk89q.commandbook.CommandBook.logger;
+import static com.sk89q.commandbook.util.PlayerUtil.toUniqueName;
 
 /**
  * Flat file ban database.
@@ -149,12 +139,12 @@ public class FlatFileBanDatabase implements BanDatabase {
                             new Ban(line.toLowerCase().trim(), null, null, System.currentTimeMillis(), 0L));
                 }
             }
-        } catch (FileNotFoundException e) {
+        } catch (FileNotFoundException ignored) {
         } finally {
             if (input != null) {
                 try {
                     input.close();
-                } catch (IOException e) {
+                } catch (IOException ignored) {
                 }
             }
         }

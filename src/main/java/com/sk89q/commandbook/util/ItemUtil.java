@@ -60,7 +60,7 @@ public class ItemUtil {
         try {
             // First let's try the filter as if it was a number
             return Integer.parseInt(filter);
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException ignored) {
         }
 
         // So the value isn't a number, but it may be an alias!
@@ -127,7 +127,7 @@ public class ItemUtil {
             if (match != null) {
                 return match;
             }
-        } catch (IllegalArgumentException e) {}
+        } catch (IllegalArgumentException ignored) {}
         throw new CommandException("Unknown dye color name of '" + filter + "'.");
     }
 }

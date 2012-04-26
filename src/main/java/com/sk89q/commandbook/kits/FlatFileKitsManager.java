@@ -18,20 +18,14 @@
 
 package com.sk89q.commandbook.kits;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
+import com.sk89q.commandbook.CommandBook;
+import org.bukkit.inventory.ItemStack;
+
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import com.sk89q.commandbook.CommandBook;
-import org.bukkit.inventory.ItemStack;
 
 import static com.sk89q.commandbook.CommandBook.logger;
 

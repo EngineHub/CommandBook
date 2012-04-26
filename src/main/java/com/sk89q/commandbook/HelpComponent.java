@@ -2,25 +2,26 @@ package com.sk89q.commandbook;
 
 import com.sk89q.bukkit.util.DynamicPluginCommand;
 import com.sk89q.commandbook.commands.PaginatedResult;
-import com.zachsthings.libcomponents.bukkit.BukkitComponent;
-import com.zachsthings.libcomponents.ComponentInformation;
-import com.zachsthings.libcomponents.config.ConfigurationBase;
-import com.zachsthings.libcomponents.config.Setting;
-import com.sk89q.minecraft.util.commands.*;
 import com.sk89q.minecraft.util.commands.Command;
+import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
+import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.util.ReflectionUtil;
 import com.sk89q.util.yaml.YAMLFormat;
 import com.sk89q.util.yaml.YAMLProcessor;
+import com.zachsthings.libcomponents.ComponentInformation;
+import com.zachsthings.libcomponents.bukkit.BukkitComponent;
+import com.zachsthings.libcomponents.config.ConfigurationBase;
+import com.zachsthings.libcomponents.config.Setting;
 import org.bukkit.ChatColor;
-import org.bukkit.command.*;
+import org.bukkit.command.CommandMap;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.PluginCommand;
+import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.command.defaults.VanillaCommand;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.*;
 
 import static com.sk89q.commandbook.CommandBookUtil.replaceColorMacros;
@@ -42,7 +43,7 @@ public class HelpComponent extends BukkitComponent {
             helpFile.getParentFile().mkdirs();
         if (!helpFile.exists() || !helpFile.isFile()) try {
             helpFile.createNewFile();
-        } catch (IOException e) {}
+        } catch (IOException ignored) {}
         help = new YAMLProcessor(helpFile, true, YAMLFormat.EXTENDED);
         reloadMessages();
         registerCommands(HelpCommands.class);

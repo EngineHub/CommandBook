@@ -32,23 +32,16 @@ import com.zachsthings.libcomponents.InjectComponent;
 import com.zachsthings.libcomponents.bukkit.BukkitComponent;
 import com.zachsthings.libcomponents.config.ConfigurationBase;
 import com.zachsthings.libcomponents.config.Setting;
-import com.zachsthings.libcomponents.config.typeconversions.TypeConversion;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.event.server.ServerCommandEvent;
 
-import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 import static com.sk89q.commandbook.CommandBookUtil.getNestedMap;
 
@@ -272,7 +265,7 @@ public class CooldownsComponent extends BukkitComponent implements Listener, Run
         public static final long MAX_AGE = TimeUnit.MINUTES.toMillis(30);
 
         public final Map<String, WarmupInfo> warmupCommands = new ConcurrentHashMap<String, WarmupInfo>();
-        @Setting("cooldown-commands") public Map<String, Integer> cooldownCommands = new ConcurrentHashMap<String, Integer>();
+        @Setting("cooldown-commands") public final Map<String, Integer> cooldownCommands = new ConcurrentHashMap<String, Integer>();
 
         protected CooldownState() {
             super(MAX_AGE);
