@@ -18,9 +18,9 @@
 
 package com.sk89q.commandbook;
 
-import com.zachsthings.libcomponents.bukkit.BukkitComponent;
-import com.zachsthings.libcomponents.ComponentInformation;
 import com.sk89q.minecraft.util.commands.*;
+import com.zachsthings.libcomponents.ComponentInformation;
+import com.zachsthings.libcomponents.bukkit.BukkitComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;

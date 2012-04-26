@@ -18,16 +18,16 @@
 
 package com.sk89q.commandbook.session;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
+import com.sk89q.minecraft.util.commands.CommandException;
 import com.zachsthings.libcomponents.config.Setting;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import com.sk89q.minecraft.util.commands.CommandException;
+
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class UserSession extends PersistentSession {
 

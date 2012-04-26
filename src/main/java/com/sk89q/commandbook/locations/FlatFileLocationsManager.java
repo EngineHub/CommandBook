@@ -18,31 +18,18 @@
 
 package com.sk89q.commandbook.locations;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import au.com.bytecode.opencsv.CSVReader;
+import au.com.bytecode.opencsv.CSVWriter;
 import com.sk89q.commandbook.CommandBook;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import au.com.bytecode.opencsv.CSVReader;
-import au.com.bytecode.opencsv.CSVWriter;
 
-import static com.sk89q.commandbook.CommandBookUtil.getNestedList;
+import java.io.*;
+import java.util.*;
+
 import static com.sk89q.commandbook.CommandBook.logger;
+import static com.sk89q.commandbook.CommandBookUtil.getNestedList;
 
 public class FlatFileLocationsManager implements LocationManager<NamedLocation> {
 

@@ -18,13 +18,10 @@
 
 package com.sk89q.commandbook.kits;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.NoSuchElementException;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.*;
 
 /**
  * Specifies the kit.

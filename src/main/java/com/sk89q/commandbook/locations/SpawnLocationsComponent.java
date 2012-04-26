@@ -19,10 +19,6 @@
 package com.sk89q.commandbook.locations;
 
 import com.sk89q.commandbook.CommandBook;
-import com.zachsthings.libcomponents.bukkit.BukkitComponent;
-import com.zachsthings.libcomponents.ComponentInformation;
-import com.zachsthings.libcomponents.config.ConfigurationBase;
-import com.zachsthings.libcomponents.config.Setting;
 import com.sk89q.commandbook.util.LocationUtil;
 import com.sk89q.commandbook.util.PlayerIteratorAction;
 import com.sk89q.commandbook.util.PlayerUtil;
@@ -30,6 +26,10 @@ import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
+import com.zachsthings.libcomponents.ComponentInformation;
+import com.zachsthings.libcomponents.bukkit.BukkitComponent;
+import com.zachsthings.libcomponents.config.ConfigurationBase;
+import com.zachsthings.libcomponents.config.Setting;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;

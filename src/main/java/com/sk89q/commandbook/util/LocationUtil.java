@@ -30,9 +30,7 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
-import static com.sk89q.commandbook.util.PlayerUtil.checkPlayer;
-import static com.sk89q.commandbook.util.PlayerUtil.matchPlayerNames;
-import static com.sk89q.commandbook.util.PlayerUtil.matchPlayers;
+import static com.sk89q.commandbook.util.PlayerUtil.*;
 
 public class LocationUtil {
     // No instantiation here...

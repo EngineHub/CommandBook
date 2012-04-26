@@ -18,13 +18,14 @@
 
 package com.sk89q.commandbook.locations;
 
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.entity.Player;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.entity.Player;
 
 import static com.sk89q.commandbook.CommandBook.logger;
 

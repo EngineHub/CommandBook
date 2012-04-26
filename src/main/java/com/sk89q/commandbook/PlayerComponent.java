@@ -18,20 +18,17 @@
 
 package com.sk89q.commandbook;
 
-import com.zachsthings.libcomponents.bukkit.BukkitComponent;
-import com.zachsthings.libcomponents.ComponentInformation;
 import com.sk89q.commandbook.util.PlayerUtil;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
-import com.sk89q.worldedit.blocks.ItemType;
-
+import com.zachsthings.libcomponents.ComponentInformation;
+import com.zachsthings.libcomponents.bukkit.BukkitComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 @ComponentInformation(friendlyName = "Player Commands", desc = "Various player-related commands.")
 public class PlayerComponent extends BukkitComponent {
@@ -91,7 +88,7 @@ public class PlayerComponent extends BukkitComponent {
                     } catch (IllegalArgumentException e) {
                         try {
                             mode = GameMode.getByValue(Integer.parseInt(modeString));
-                        } catch (NumberFormatException ex) {}
+                        } catch (NumberFormatException ignored) {}
                     }
                     if (mode == null) {
                         throw new CommandException("Unrecognized gamemode: " + modeString + ".");
@@ -150,8 +147,6 @@ public class PlayerComponent extends BukkitComponent {
             for (Player player : targets) {
                 player.setHealth(20);
                 player.setFoodLevel(20);
-                player.setSaturation(5);
-                player.setExhaustion(0);
 
                 // Tell the user
                 if (player.equals(sender)) {

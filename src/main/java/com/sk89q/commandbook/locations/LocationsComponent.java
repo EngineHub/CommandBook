@@ -20,13 +20,13 @@ package com.sk89q.commandbook.locations;
 
 import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.commands.PaginatedResult;
-import com.zachsthings.libcomponents.bukkit.BukkitComponent;
-import com.zachsthings.libcomponents.config.ConfigurationBase;
-import com.zachsthings.libcomponents.config.Setting;
 import com.sk89q.commandbook.util.LocationUtil;
 import com.sk89q.commandbook.util.PlayerUtil;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
+import com.zachsthings.libcomponents.bukkit.BukkitComponent;
+import com.zachsthings.libcomponents.config.ConfigurationBase;
+import com.zachsthings.libcomponents.config.Setting;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -86,7 +86,7 @@ public abstract class LocationsComponent extends BukkitComponent {
             throw new CommandException("No " + name.toLowerCase() + " found for " + name + " in world " + world.getName());
         }
         if (!loc.getCreatorName().equals(sender.getName())) {
-            CommandBook.inst().checkPermission(sender, "commandbook." + this.name.toLowerCase() + ".remove.other");
+            CommandBook.inst().checkPermission(sender, "commandbook." + name.toLowerCase() + ".remove.other");
         }
 
         getManager().remove(world, name);

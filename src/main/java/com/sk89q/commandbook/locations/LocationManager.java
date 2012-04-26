@@ -18,12 +18,12 @@
 
 package com.sk89q.commandbook.locations;
 
-import java.io.IOException;
-import java.util.List;
-
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+
+import java.io.IOException;
+import java.util.List;
 
 public interface LocationManager<T> {
 

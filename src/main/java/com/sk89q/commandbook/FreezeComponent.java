@@ -19,19 +19,18 @@
 package com.sk89q.commandbook;
 
 import com.sk89q.commandbook.session.PersistentSession;
-import com.zachsthings.libcomponents.Depend;
-import com.zachsthings.libcomponents.config.Setting;
-import org.bukkit.Location;
-import com.zachsthings.libcomponents.bukkit.BukkitComponent;
-import com.zachsthings.libcomponents.ComponentInformation;
-import com.zachsthings.libcomponents.InjectComponent;
 import com.sk89q.commandbook.session.SessionComponent;
 import com.sk89q.commandbook.util.PlayerUtil;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
+import com.zachsthings.libcomponents.ComponentInformation;
+import com.zachsthings.libcomponents.Depend;
+import com.zachsthings.libcomponents.InjectComponent;
+import com.zachsthings.libcomponents.bukkit.BukkitComponent;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
