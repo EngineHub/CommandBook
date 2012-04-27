@@ -19,14 +19,14 @@
 package com.sk89q.commandbook;
 
 import com.sk89q.commandbook.commands.PaginatedResult;
-import com.zachsthings.libcomponents.bukkit.BukkitComponent;
-import com.zachsthings.libcomponents.ComponentInformation;
 import com.sk89q.commandbook.util.LocationUtil;
 import com.sk89q.commandbook.util.PlayerUtil;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
+import com.zachsthings.libcomponents.ComponentInformation;
+import com.zachsthings.libcomponents.bukkit.BukkitComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -70,7 +70,7 @@ public class InfoComponent extends BukkitComponent {
 
         public void addWhoisInformation(String key, Object value) {
             if (value == null) {
-                addWhoisInformation(key, (String)null);
+                addWhoisInformation(key, null);
             } else {
                 addWhoisInformation(key, String.valueOf(value));
             }

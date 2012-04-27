@@ -1,21 +1,18 @@
 package com.sk89q.commandbook.bans;
 
-import java.io.*;
-import java.net.InetAddress;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.logging.FileHandler;
-import java.util.logging.Formatter;
-import java.util.logging.Handler;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
-
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
 import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.util.PlayerUtil;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import java.io.*;
+import java.net.InetAddress;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.logging.*;
+import java.util.logging.Formatter;
 
 import static com.sk89q.commandbook.CommandBook.logger;
 
@@ -104,7 +101,7 @@ public class CSVBanDatabase implements BanDatabase {
                 }
             }
             logger().info(bans.size() + " banned name(s) loaded.");
-        } catch (FileNotFoundException e) {
+        } catch (FileNotFoundException ignored) {
         } catch (IOException e) {
             nameBan = new HashMap<String, Ban>();
             ipBan = new HashMap<String, Ban>();
@@ -115,7 +112,7 @@ public class CSVBanDatabase implements BanDatabase {
             if (input != null) {
                 try {
                     input.close();
-                } catch (IOException e) {
+                } catch (IOException ignored) {
                 }
             }
         }
@@ -151,7 +148,7 @@ public class CSVBanDatabase implements BanDatabase {
             if (output != null) {
                 try {
                     output.close();
-                } catch (IOException e) {
+                } catch (IOException ignored) {
                 }
             }
         }

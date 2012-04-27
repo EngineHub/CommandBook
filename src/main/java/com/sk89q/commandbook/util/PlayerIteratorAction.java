@@ -18,7 +18,6 @@
 
 package com.sk89q.commandbook.util;
 
-import com.sk89q.commandbook.CommandBook;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
