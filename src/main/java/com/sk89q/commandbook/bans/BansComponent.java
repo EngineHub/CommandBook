@@ -99,7 +99,8 @@ public class BansComponent extends BukkitComponent implements Listener {
         final Player player = event.getPlayer();
 
         try {
-            if (!CommandBook.inst().hasPermission(player, "commandbook.bans.exempt")) {
+            if (!(CommandBook.inst().hasPermission(player, "commandbook.bans.exempt")
+                    && CommandBook.inst().hasPermission(player, "commandbook.bans.exempt.override"))) {
                 if (getBanDatabase().isBannedName(player.getName())) {
                     event.disallow(PlayerLoginEvent.Result.KICK_BANNED,
                             getBanDatabase().getBannedNameMessage(player.getName()));
