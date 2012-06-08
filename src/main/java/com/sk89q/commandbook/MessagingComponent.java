@@ -38,6 +38,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChatEvent;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
 import static com.sk89q.commandbook.CommandBookUtil.replaceColorMacros;
 
@@ -118,7 +119,11 @@ public class MessagingComponent extends BukkitComponent implements Listener {
                         return;
                     }
 
-                    messagePlayer(event.getPlayer(), name, message.substring(spaceIndex + 1));
+                    PlayerCommandPreprocessEvent commandPreprocessEvent = new
+                            PlayerCommandPreprocessEvent(event.getPlayer(), message);
+                    CommandBook.server().getPluginManager().callEvent(commandPreprocessEvent);
+                    if (!event.isCancelled()) messagePlayer(commandPreprocessEvent.getPlayer(),
+                            name, commandPreprocessEvent.getMessage().substring(spaceIndex + 1));
                 } catch (CommandException e) {
                     event.getPlayer().sendMessage(ChatColor.RED + e.getMessage());
                 }
