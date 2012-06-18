@@ -32,6 +32,8 @@ import com.zachsthings.libcomponents.ComponentInformation;
 import com.zachsthings.libcomponents.Depend;
 import com.zachsthings.libcomponents.InjectComponent;
 import com.zachsthings.libcomponents.bukkit.BukkitComponent;
+import com.zachsthings.libcomponents.config.ConfigurationBase;
+import com.zachsthings.libcomponents.config.Setting;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
@@ -46,11 +48,29 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 public class TeleportComponent extends BukkitComponent implements Listener {
 
     @InjectComponent private SessionComponent sessions;
+    private LocalConfiguration config;
 
     @Override
     public void enable() {
         CommandBook.registerEvents(this);
         registerCommands(Commands.class);
+        config = configure(new LocalConfiguration());
+    }
+
+    @Override
+    public void reload() {
+        configure(config);
+    }
+
+    private static class LocalConfiguration extends ConfigurationBase {
+        @Setting("call-message.sender") public String callMessageSender = "Teleport request sent.";
+        @Setting("call-message.target") public String callMessageTarget =
+                "**TELEPORT** %s requests a teleport! Use /bring <name> to accept.";
+        @Setting("bring-message.sender") public String bringMessageSender = "Player teleported.";
+        @Setting("bring-message.target") public String bringMessageTarget =
+                "Your teleport request to %s was accepted.";
+        @Setting("bring-message.no-perm") public String bringMessageNoPerm = "That person didn't request a " +
+                "teleport (recently) and you don't have permission to teleport anyone.";
     }
 
     // -- Event handlers
@@ -123,9 +143,9 @@ public class TeleportComponent extends BukkitComponent implements Listener {
             sessions.getSession(UserSession.class, player).checkLastTeleportRequest(target);
             sessions.getSession(UserSession.class, target).addBringable(player);
 
-            sender.sendMessage(ChatColor.YELLOW.toString() + "Teleport request sent.");
-            target.sendMessage(ChatColor.AQUA + "**TELEPORT** " + PlayerUtil.toColoredName(sender, ChatColor.AQUA)
-                    + " requests a teleport! Use /bring <name> to accept.");
+            sender.sendMessage(ChatColor.YELLOW.toString() + config.callMessageSender);
+            target.sendMessage(ChatColor.AQUA + String.format(config.callMessageTarget,
+                    PlayerUtil.toColoredName(sender, ChatColor.AQUA)));
         }
 
         @Command(aliases = {"bring", "tphere", "summon", "s"}, usage = "<target>", desc = "Bring a player to you", min = 1, max = 1)
@@ -135,14 +155,12 @@ public class TeleportComponent extends BukkitComponent implements Listener {
                 Player target = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
 
                 if (sessions.getSession(UserSession.class, player).isBringable(target)) {
-                    sender.sendMessage(ChatColor.YELLOW + "Player teleported.");
-                    target.sendMessage(ChatColor.YELLOW + "Your teleport request to "
-                            + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + " was accepted.");
+                    sender.sendMessage(ChatColor.YELLOW + config.bringMessageSender);
+                    target.sendMessage(ChatColor.YELLOW +
+                            String.format(config.bringMessageTarget, PlayerUtil.toColoredName(sender, ChatColor.YELLOW)));
                     target.teleport(player);
                 } else {
-                    throw new CommandException("That person didn't request a " +
-                            "teleport (recently) and you don't have " +
-                            "permission to teleport anyone.");
+                    throw new CommandException(config.bringMessageNoPerm);
                 }
 
                 return;
