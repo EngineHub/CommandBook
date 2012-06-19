@@ -20,6 +20,7 @@ package com.sk89q.commandbook.locations;
 
 import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.session.SessionComponent;
+import com.sk89q.commandbook.session.SessionFactory;
 import com.sk89q.commandbook.session.UserSession;
 import com.sk89q.commandbook.util.LocationUtil;
 import com.sk89q.commandbook.util.PlayerUtil;
@@ -55,6 +56,12 @@ public class TeleportComponent extends BukkitComponent implements Listener {
         CommandBook.registerEvents(this);
         registerCommands(Commands.class);
         config = configure(new LocalConfiguration());
+        sessions.registerSessionFactory(TeleportSession.class, new SessionFactory<TeleportSession>() {
+            @Override
+            public TeleportSession createSession(CommandSender user) {
+                return new TeleportSession(TeleportComponent.this);
+            }
+        });
     }
 
     @Override
@@ -62,10 +69,15 @@ public class TeleportComponent extends BukkitComponent implements Listener {
         configure(config);
     }
 
-    private static class LocalConfiguration extends ConfigurationBase {
+    public LocalConfiguration getConfig() {
+        return config;
+    }
+
+    public static class LocalConfiguration extends ConfigurationBase {
         @Setting("call-message.sender") public String callMessageSender = "Teleport request sent.";
         @Setting("call-message.target") public String callMessageTarget =
                 "**TELEPORT** %s requests a teleport! Use /bring <name> to accept.";
+        @Setting("call-message.too-soon") public String callMessageTooSoon = "Wait a bit before asking again.";
         @Setting("bring-message.sender") public String bringMessageSender = "Player teleported.";
         @Setting("bring-message.target") public String bringMessageTarget =
                 "Your teleport request to %s was accepted.";
@@ -77,7 +89,7 @@ public class TeleportComponent extends BukkitComponent implements Listener {
 
     @EventHandler
     public void onRespawn(PlayerRespawnEvent event) {
-        sessions.getSession(UserSession.class, event.getPlayer()).rememberLocation(event.getPlayer());
+        sessions.getSession(TeleportSession.class, event.getPlayer()).rememberLocation(event.getPlayer());
     }
 
     @EventHandler
@@ -88,11 +100,11 @@ public class TeleportComponent extends BukkitComponent implements Listener {
         if (event.isCancelled()) {
             return;
         }
-        if (loc == sessions.getSession(UserSession.class, player).getIgnoreLocation()) {
-            sessions.getSession(UserSession.class, player).setIgnoreLocation(null);
+        if (loc == sessions.getSession(TeleportSession.class, player).getIgnoreLocation()) {
+            sessions.getSession(TeleportSession.class, player).setIgnoreLocation(null);
             return;
         }
-        sessions.getSession(UserSession.class, player).rememberLocation(event.getPlayer());
+        sessions.getSession(TeleportSession.class, player).rememberLocation(event.getPlayer());
     }
 
     public class Commands {
@@ -140,8 +152,8 @@ public class TeleportComponent extends BukkitComponent implements Listener {
 
             CommandBook.inst().checkPermission(sender, target.getWorld(), "commandbook.call");
 
-            sessions.getSession(UserSession.class, player).checkLastTeleportRequest(target);
-            sessions.getSession(UserSession.class, target).addBringable(player);
+            sessions.getSession(TeleportSession.class, player).checkLastTeleportRequest(target);
+            sessions.getSession(TeleportSession.class, target).addBringable(player);
 
             sender.sendMessage(ChatColor.YELLOW.toString() + config.callMessageSender);
             target.sendMessage(ChatColor.AQUA + String.format(config.callMessageTarget,
@@ -154,7 +166,7 @@ public class TeleportComponent extends BukkitComponent implements Listener {
             if (!CommandBook.inst().hasPermission(sender, "commandbook.teleport.other")) {
                 Player target = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
 
-                if (sessions.getSession(UserSession.class, player).isBringable(target)) {
+                if (sessions.getSession(TeleportSession.class, player).isBringable(target)) {
                     sender.sendMessage(ChatColor.YELLOW + config.bringMessageSender);
                     target.sendMessage(ChatColor.YELLOW +
                             String.format(config.bringMessageTarget, PlayerUtil.toColoredName(sender, ChatColor.YELLOW)));
@@ -218,10 +230,10 @@ public class TeleportComponent extends BukkitComponent implements Listener {
             } else {
                 player = PlayerUtil.checkPlayer(sender);
             }
-            Location lastLoc = sessions.getSession(UserSession.class, player).popLastLocation();
+            Location lastLoc = sessions.getSession(TeleportSession.class, player).popLastLocation();
 
             if (lastLoc != null) {
-                sessions.getSession(UserSession.class, player).setIgnoreLocation(lastLoc);
+                sessions.getSession(TeleportSession.class, player).setIgnoreLocation(lastLoc);
                 player.teleport(lastLoc);
                 sender.sendMessage(ChatColor.YELLOW + "You've been returned.");
             } else {
