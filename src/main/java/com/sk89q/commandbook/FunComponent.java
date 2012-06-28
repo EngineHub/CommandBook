@@ -48,7 +48,7 @@ public class FunComponent extends BukkitComponent {
 
     public LivingEntity spawn(Location loc, EntityType type, String specialType,
                                CommandContext args, CommandSender sender) throws CommandException {
-        LivingEntity creature = loc.getWorld().spawnCreature(loc, type);
+        LivingEntity creature = loc.getWorld().spawnEntity(loc, type);
         if (args.hasFlag('d')) {
             creature.setHealth(1);
         }
