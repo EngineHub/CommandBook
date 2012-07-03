@@ -39,8 +39,8 @@ public class PlayerComponent extends BukkitComponent {
 
     public class Commands {
         @Command(aliases = {"gamemode", "gm"},
-                usage = "[player] [gamemode]", desc = "Change a player's gamemode",
-                flags = "c", min = 0, max = 2)
+            usage = "[player] [gamemode]", desc = "Change a player's gamemode",
+            flags = "c", min = 0, max = 2)
         @CommandPermissions({"commandbook.gamemode"})
         public void gamemode(CommandContext args, CommandSender sender) throws CommandException {
 
@@ -118,8 +118,8 @@ public class PlayerComponent extends BukkitComponent {
                     + ChatColor.YELLOW + message + ".");
         }
         @Command(aliases = {"heal"},
-                usage = "[player]", desc = "Heal a player",
-                flags = "s", min = 0, max = 1)
+            usage = "[player]", desc = "Heal a player",
+            flags = "s", min = 0, max = 1)
         @CommandPermissions({"commandbook.heal", "commandbook.heal.other"})
         public void heal(CommandContext args,CommandSender sender) throws CommandException {
 
@@ -170,8 +170,8 @@ public class PlayerComponent extends BukkitComponent {
             }
         }
         @Command(aliases = {"slay"},
-                usage = "[player]", desc = "Slay a player",
-                flags = "s", min = 0, max = 1)
+            usage = "[player]", desc = "Slay a player",
+            flags = "s", min = 0, max = 1)
         @CommandPermissions({"commandbook.slay"})
 
         public void slay(CommandContext args, CommandSender sender) throws CommandException {
@@ -231,7 +231,7 @@ public class PlayerComponent extends BukkitComponent {
                 Player target = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
                 player.setCompassTarget(target.getLocation());
 
-                sender.sendMessage(ChatColor.YELLOW.toString() + "Compass repointed.");
+                sender.sendMessage(ChatColor.YELLOW.toString() + "Compass target changed.");
             }
         }
     }
