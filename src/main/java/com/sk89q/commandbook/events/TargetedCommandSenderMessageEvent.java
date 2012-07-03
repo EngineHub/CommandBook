@@ -18,18 +18,35 @@
 
 package com.sk89q.commandbook.events;
 
+import org.bukkit.command.CommandSender;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public class SharedMessageEvent extends Event implements Cancellable {
+public class TargetedCommandSenderMessageEvent extends Event implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
     private boolean cancelled = false;
+    private final CommandSender sender;
+    private CommandSender target;
     private String message;
 
-    public SharedMessageEvent(String message) {
+    public TargetedCommandSenderMessageEvent(CommandSender sender, CommandSender target, String message) {
+        this.sender = sender;
+        this.target = target;
         this.message = message;
+    }
+
+    public CommandSender getSender() {
+        return sender;
+    }
+
+    public CommandSender getTarget() {
+        return target;
+    }
+
+    public void setTarget(CommandSender target) {
+        this.target = target;
     }
 
     public String getMessage() {
