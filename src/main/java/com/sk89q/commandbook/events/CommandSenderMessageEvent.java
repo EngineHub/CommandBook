@@ -19,13 +19,16 @@
 package com.sk89q.commandbook.events;
 
 import org.bukkit.command.CommandSender;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public class CommandSenderMessageEvent extends Event {
+public class CommandSenderMessageEvent extends Event implements Cancellable {
 
+    private static final HandlerList handlers = new HandlerList();
+    private boolean cancelled = false;
     private final CommandSender sender;
-    private final String message;
+    private String message;
 
     public CommandSenderMessageEvent(CommandSender sender, String message) {
         this.sender = sender;
@@ -40,7 +43,9 @@ public class CommandSenderMessageEvent extends Event {
         return message;
     }
 
-    private static final HandlerList handlers = new HandlerList();
+    public void setMessage(String message) {
+        this.message = message;
+    }
 
     public HandlerList getHandlers() {
         return handlers;
@@ -48,5 +53,15 @@ public class CommandSenderMessageEvent extends Event {
 
     public static HandlerList getHandlerList() {
         return handlers;
+    }
+
+    @Override
+    public boolean isCancelled() {
+        return cancelled;
+    }
+
+    @Override
+    public void setCancelled(boolean cancelled) {
+        this.cancelled = cancelled;
     }
 }

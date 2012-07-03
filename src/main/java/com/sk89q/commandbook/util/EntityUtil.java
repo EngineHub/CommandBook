@@ -36,14 +36,16 @@ public class EntityUtil {
                                           String filter, boolean requireSpawnable) throws CommandException {
 
         for (EntityType type : EntityType.values()) {
-            if (type.name().replace("_", "").equalsIgnoreCase(filter.replace("_", ""))
-                    || (type.getName() != null && type.getName().equalsIgnoreCase(filter)) && (type.isSpawnable() || !requireSpawnable)) {
+            if ((type.name().replace("_", "").equalsIgnoreCase(filter.replace("_", ""))
+                    || (type.getName() != null && type.getName().equalsIgnoreCase(filter)) && (type.isSpawnable()
+                    || !requireSpawnable)) && type.isAlive()) {
                 return type;
             }
         }
 
         for (EntityType testType : EntityType.values()) {
-            if (testType.getName() != null && testType.getName().toLowerCase().startsWith(filter.toLowerCase()) && (testType.isSpawnable() || !requireSpawnable)) {
+            if ((testType.getName() != null && testType.getName().toLowerCase().startsWith(filter.toLowerCase())
+                    && (testType.isSpawnable() || !requireSpawnable)) && testType.isAlive()) {
                 return testType;
             }
         }
@@ -62,7 +64,7 @@ public class EntityUtil {
     public static String getEntityTypeNameList(boolean requireSpawnable) {
         StringBuilder str = new StringBuilder();
         for (EntityType type : EntityType.values()) {
-            if (!requireSpawnable || type.isSpawnable()) {
+            if ((!requireSpawnable || type.isSpawnable()) && type.isAlive()) {
                 if (str.length() > 0) {
                     str.append(", ");
                 }
