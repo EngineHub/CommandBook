@@ -20,6 +20,7 @@ package com.sk89q.commandbook;
 
 import com.sk89q.commandbook.events.CommandSenderMessageEvent;
 import com.sk89q.commandbook.events.SharedMessageEvent;
+import com.sk89q.commandbook.events.TargetedCommandSenderMessageEvent;
 import com.sk89q.commandbook.session.SessionComponent;
 import com.sk89q.commandbook.util.PlayerUtil;
 import com.sk89q.minecraft.util.commands.Command;
@@ -79,16 +80,21 @@ public class MessagingComponent extends BukkitComponent implements Listener {
                     + (status.trim().length() == 0 ? "" : " (" + status + ")"));
         }
 
-        receiver.sendMessage(ChatColor.GRAY + "(From "
-                + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + "): "
-                + ChatColor.WHITE + message);
+        TargetedCommandSenderMessageEvent event = new TargetedCommandSenderMessageEvent(sender, receiver, message);
+        CommandBook.callEvent(event);
 
-        sender.sendMessage(ChatColor.GRAY + "(To "
-                + PlayerUtil.toColoredName(receiver, ChatColor.YELLOW) + "): "
-                + ChatColor.WHITE + message);
+        if (!event.isCancelled()) {
+            event.getTarget().sendMessage(ChatColor.GRAY + "(From "
+                    + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + "): "
+                    + ChatColor.WHITE + event.getMessage());
 
-        CommandBook.logger().info("(PM) " + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + " -> "
-                + PlayerUtil.toColoredName(receiver, ChatColor.YELLOW) + ": " + message);
+            sender.sendMessage(ChatColor.GRAY + "(To "
+                    + PlayerUtil.toColoredName(event.getTarget(), ChatColor.YELLOW) + "): "
+                    + ChatColor.WHITE + event.getMessage());
+
+            CommandBook.logger().info("(PM) " + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + " -> "
+                    + PlayerUtil.toColoredName(event.getTarget(), ChatColor.YELLOW) + ": " + event.getMessage());
+        }
 
         sessions.getSession(sender).setLastRecipient(receiver);
 
@@ -139,10 +145,12 @@ public class MessagingComponent extends BukkitComponent implements Listener {
             String name = PlayerUtil.toColoredName(sender, ChatColor.YELLOW);
             String msg = args.getJoinedStrings(0);
 
-            CommandBook.callEvent(
-                    new SharedMessageEvent(name + " " + msg));
+            SharedMessageEvent event = new SharedMessageEvent(name + " " + msg);
+            CommandBook.callEvent(event);
 
-            CommandBook.server().broadcastMessage("* " + name + " " + msg);
+            if (!event.isCancelled()) {
+                CommandBook.server().broadcastMessage("* " + event.getMessage());
+            }
         }
 
         @Command(aliases = {"say"}, usage = "<message...>", desc = "Send a message", min = 1, max = -1)
@@ -156,23 +164,19 @@ public class MessagingComponent extends BukkitComponent implements Listener {
             String msg = args.getJoinedStrings(0);
 
             if (sender instanceof Player) {
-                if (CommandBook.callEvent(
-                        new PlayerChatEvent((Player) sender, msg)).isCancelled()) {
-                    return;
+                PlayerChatEvent event = new PlayerChatEvent((Player) sender, msg);
+                if (!CommandBook.callEvent(event).isCancelled()) {
+                    CommandBook.server().broadcastMessage(
+                            "<" + PlayerUtil.toColoredName(sender, ChatColor.WHITE)
+                                    + "> " + event.getMessage());
                 }
-            }
-
-            CommandBook.callEvent(
-                    new CommandSenderMessageEvent(sender, msg));
-
-            if (sender instanceof Player) {
-                CommandBook.server().broadcastMessage(
-                        "<" + PlayerUtil.toColoredName(sender, ChatColor.WHITE)
-                                + "> " + args.getJoinedStrings(0));
             } else {
-                CommandBook.server().broadcastMessage(
-                        replaceColorMacros(config.consoleSayFormat).replace(
-                                "%s", args.getJoinedStrings(0)));
+                CommandSenderMessageEvent event = new CommandSenderMessageEvent(sender, msg);
+                if (!CommandBook.callEvent(event).isCancelled()) {
+                    CommandBook.server().broadcastMessage(
+                            replaceColorMacros(config.consoleSayFormat).replace(
+                                    "%s", event.getMessage()));
+                }
             }
         }
 
