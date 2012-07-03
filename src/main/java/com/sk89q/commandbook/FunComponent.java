@@ -18,8 +18,6 @@
 
 package com.sk89q.commandbook;
 
-import com.zachsthings.libcomponents.bukkit.BukkitComponent;
-import com.zachsthings.libcomponents.ComponentInformation;
 import com.sk89q.commandbook.util.ItemUtil;
 import com.sk89q.commandbook.util.LocationUtil;
 import com.sk89q.commandbook.util.PlayerUtil;
@@ -27,6 +25,8 @@ import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
+import com.zachsthings.libcomponents.ComponentInformation;
+import com.zachsthings.libcomponents.bukkit.BukkitComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
@@ -34,8 +34,9 @@ import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
-import static com.sk89q.commandbook.util.EntityUtil.matchCreatureType;
 import java.util.Random;
+
+import static com.sk89q.commandbook.util.EntityUtil.matchCreatureType;
 
 @ComponentInformation(friendlyName = "Fun", desc = "Provides some fun commands to toy with users. (/rocket and /pong are two fun ones)")
 public class FunComponent extends BukkitComponent {
@@ -48,7 +49,9 @@ public class FunComponent extends BukkitComponent {
 
     public LivingEntity spawn(Location loc, EntityType type, String specialType,
                                CommandContext args, CommandSender sender) throws CommandException {
-        LivingEntity creature = loc.getWorld().spawnCreature(loc, type);
+        if (!type.isAlive()) return null;
+
+        LivingEntity creature = (LivingEntity) loc.getWorld().spawnEntity(loc, type);
         if (args.hasFlag('d')) {
             creature.setHealth(1);
         }
@@ -189,9 +192,9 @@ public class FunComponent extends BukkitComponent {
             }
 
             for (int i = 0; i < count; i++) {
-                LivingEntity ridee = spawn(loc, type, specialType, args, sender);
+                Entity ridee = spawn(loc, type, specialType, args, sender);
                 if (hasRider) {
-                    LivingEntity rider = spawn(loc, riderType, riderSpecialType, args, sender);
+                    Entity rider = spawn(loc, riderType, riderSpecialType, args, sender);
                     ridee.setPassenger(rider);
                 }
             }
