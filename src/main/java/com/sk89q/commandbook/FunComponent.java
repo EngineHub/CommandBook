@@ -192,9 +192,9 @@ public class FunComponent extends BukkitComponent {
             }
 
             for (int i = 0; i < count; i++) {
-                Entity ridee = spawn(loc, type, specialType, args, sender);
+                LivingEntity ridee = spawn(loc, type, specialType, args, sender);
                 if (hasRider) {
-                    Entity rider = spawn(loc, riderType, riderSpecialType, args, sender);
+                    LivingEntity rider = spawn(loc, riderType, riderSpecialType, args, sender);
                     ridee.setPassenger(rider);
                 }
             }

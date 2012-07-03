@@ -118,8 +118,8 @@ public class PlayerComponent extends BukkitComponent {
                     + ChatColor.YELLOW + message + ".");
         }
         @Command(aliases = {"heal"},
-        		usage = "[player]", desc = "Heal a player",
-        		flags = "s", min = 0, max = 1)
+                usage = "[player]", desc = "Heal a player",
+                flags = "s", min = 0, max = 1)
         @CommandPermissions({"commandbook.heal", "commandbook.heal.other"})
         public void heal(CommandContext args,CommandSender sender) throws CommandException {
 
@@ -147,6 +147,8 @@ public class PlayerComponent extends BukkitComponent {
             for (Player player : targets) {
                 player.setHealth(20);
                 player.setFoodLevel(20);
+                player.setSaturation(5);
+                player.setExhaustion(0);
 
                 // Tell the user
                 if (player.equals(sender)) {
@@ -168,8 +170,8 @@ public class PlayerComponent extends BukkitComponent {
             }
         }
         @Command(aliases = {"slay"},
-        		usage = "[player]", desc = "Slay a player",
-        		flags = "s", min = 0, max = 1)
+                usage = "[player]", desc = "Slay a player",
+                flags = "s", min = 0, max = 1)
         @CommandPermissions({"commandbook.slay"})
 
         public void slay(CommandContext args, CommandSender sender) throws CommandException {
