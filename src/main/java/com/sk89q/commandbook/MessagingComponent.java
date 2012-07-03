@@ -164,21 +164,15 @@ public class MessagingComponent extends BukkitComponent implements Listener {
             String msg = args.getJoinedStrings(0);
 
             if (sender instanceof Player) {
-                if (CommandBook.callEvent(
-                        new PlayerChatEvent((Player) sender, msg)).isCancelled()) {
-                    return;
-                }
-            }
-
-            CommandSenderMessageEvent event = new CommandSenderMessageEvent(sender, msg);
-            CommandBook.callEvent(event);
-
-            if (!event.isCancelled()) {
-                if (sender instanceof Player) {
+                PlayerChatEvent event = new PlayerChatEvent((Player) sender, msg);
+                if (!CommandBook.callEvent(event).isCancelled()) {
                     CommandBook.server().broadcastMessage(
                             "<" + PlayerUtil.toColoredName(sender, ChatColor.WHITE)
                                     + "> " + event.getMessage());
-                } else {
+                }
+            } else {
+                CommandSenderMessageEvent event = new CommandSenderMessageEvent(sender, msg);
+                if (!CommandBook.callEvent(event).isCancelled()) {
                     CommandBook.server().broadcastMessage(
                             replaceColorMacros(config.consoleSayFormat).replace(
                                     "%s", event.getMessage()));
