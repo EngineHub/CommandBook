@@ -89,7 +89,6 @@ public class WarpsComponent extends LocationsComponent {
                 throw new CommandException("A warp by the given name does not exist.");
             }
 
-            loc.setY(loc.getY() + 0.5);
             (new TeleportPlayerIterator(sender, loc, args.hasFlag('s'))).iterate(targets);
         }
 
