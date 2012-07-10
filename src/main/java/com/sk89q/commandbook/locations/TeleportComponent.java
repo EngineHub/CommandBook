@@ -234,6 +234,7 @@ public class TeleportComponent extends BukkitComponent implements Listener {
 
             if (lastLoc != null) {
                 sessions.getSession(TeleportSession.class, player).setIgnoreLocation(lastLoc);
+                lastLoc.getChunk().load(true);
                 player.teleport(lastLoc);
                 sender.sendMessage(ChatColor.YELLOW + "You've been returned.");
             } else {

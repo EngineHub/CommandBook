@@ -66,6 +66,7 @@ public class NamedLocation {
     }
     
     public void teleport(Player player) {
+        loc.getChunk().load(true);
         player.teleport(loc);
     }
     

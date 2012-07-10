@@ -42,6 +42,7 @@ public class TeleportPlayerIterator extends PlayerIteratorAction {
     @Override
     public void perform(Player player) {
         oldLoc = player.getLocation();
+        loc.getChunk().load(true);
         player.teleport(loc);
     }
 
