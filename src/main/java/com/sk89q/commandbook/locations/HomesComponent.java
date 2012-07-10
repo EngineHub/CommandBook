@@ -98,6 +98,7 @@ public class HomesComponent extends LocationsComponent {
                 throw new CommandException("A home for the given player does not exist.");
             }
 
+            loc.setY(loc.getY() + 0.5);
             (new TeleportPlayerIterator(sender, loc)).iterate(targets);
         }
 

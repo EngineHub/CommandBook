@@ -128,6 +128,7 @@ public class TeleportComponent extends BukkitComponent implements Listener {
             } else {
                 targets = PlayerUtil.matchPlayers(sender, args.getString(0));
                 loc = LocationUtil.matchLocation(sender, args.getString(1));
+                loc.setY(loc.getY() + 0.5);
 
                 // Check permissions!
                 for (Player target : targets) {
@@ -180,6 +181,7 @@ public class TeleportComponent extends BukkitComponent implements Listener {
 
             Iterable<Player> targets = PlayerUtil.matchPlayers(sender, args.getString(0));
             Location loc = player.getLocation();
+            loc.setY(loc.getY() + 0.5);
 
             (new TeleportPlayerIterator(sender, loc) {
                 @Override
@@ -203,6 +205,7 @@ public class TeleportComponent extends BukkitComponent implements Listener {
         public void put(CommandContext args, CommandSender sender) throws CommandException {
             Iterable<Player> targets = PlayerUtil.matchPlayers(sender, args.getString(0));
             Location loc = LocationUtil.matchLocation(sender, "#target");
+            loc.setY(loc.getY() + 0.5);
 
             (new TeleportPlayerIterator(sender, loc) {
                 @Override
@@ -234,6 +237,7 @@ public class TeleportComponent extends BukkitComponent implements Listener {
 
             if (lastLoc != null) {
                 sessions.getSession(TeleportSession.class, player).setIgnoreLocation(lastLoc);
+                lastLoc.setY(lastLoc.getY() + 0.5);
                 player.teleport(lastLoc);
                 sender.sendMessage(ChatColor.YELLOW + "You've been returned.");
             } else {
