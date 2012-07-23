@@ -83,7 +83,11 @@ public class WarpsComponent extends LocationsComponent {
             }
 
             if (warp != null) {
-                CommandBook.inst().checkPermission(sender, "commandbook.warp.teleport.warp." + warp.getName());
+                try {
+                    CommandBook.inst().checkPermission(sender, "commandbook.warp.teleport");
+                } catch (CommandPermissionsException e) {
+                    CommandBook.inst().checkPermission(sender, "commandbook.warp.warp." + warp.getName());
+                }
                 loc = warp.getLocation();
             } else {
                 throw new CommandException("A warp by the given name does not exist.");
