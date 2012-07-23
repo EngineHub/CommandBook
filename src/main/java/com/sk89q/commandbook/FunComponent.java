@@ -48,7 +48,13 @@ public class FunComponent extends BukkitComponent {
 
     public LivingEntity spawn(Location loc, EntityType type, String specialType,
                                CommandContext args, CommandSender sender) throws CommandException {
-        LivingEntity creature = loc.getWorld().spawnCreature(loc, type);
+        Entity spawned = loc.getWorld().spawn(loc, type.getEntityClass());
+        if (!(spawned instanceof LivingEntity)) {
+            spawned.remove();
+            throw new CommandException("Not a creature!");
+        }
+        LivingEntity creature = (LivingEntity) spawned;
+        
         if (args.hasFlag('d')) {
             creature.setHealth(1);
         }
@@ -61,6 +67,7 @@ public class FunComponent extends BukkitComponent {
         if (args.hasFlag('b') && creature instanceof Animals) {
             ((Animals) creature).setBaby();
         }
+        
         if (!specialType.equals("")) {
             if (creature instanceof Wolf) {
                 if (specialType.matches("angry")) {
