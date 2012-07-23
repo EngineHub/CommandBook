@@ -35,8 +35,30 @@ public class EntityUtil {
      */
     public static EntityType matchCreatureType(CommandSender sender,
             String filter, boolean requireSpawnable) throws CommandException {
+        
+        EntityType partialMatch = null;
 
         for (EntityType type : EntityType.values()) {
+            Class<?> clazz = type.getEntityClass();
+            if (clazz == null) continue;
+            if (!LivingEntity.class.isAssignableFrom(clazz)) continue;
+            if (requireSpawnable && !type.isSpawnable()) continue;
+            
+            if (type.name().replace("_", "")
+                    .equalsIgnoreCase(filter.replace("_", ""))) {
+                return type;
+            }
+            
+            if (type.getName() != null) {
+                if (type.getName().equalsIgnoreCase(filter)) {
+                    return type;
+                }
+                
+                if (type.getName().toLowerCase().startsWith(filter.toLowerCase())) {
+                    partialMatch = type;
+                }
+            }
+            
             if (type.name().replace("_", "")
                     .equalsIgnoreCase(filter.replace("_", ""))
                     || (type.getName() != null && type.getName()
@@ -45,14 +67,9 @@ public class EntityUtil {
                 return type;
             }
         }
-
-        for (EntityType testType : EntityType.values()) {
-            if (testType.getName() != null
-                    && testType.getName().toLowerCase()
-                            .startsWith(filter.toLowerCase())
-                    && (testType.isSpawnable() || !requireSpawnable)) {
-                return testType;
-            }
+        
+        if (partialMatch != null) {
+            return partialMatch;
         }
 
         throw new CommandException("Unknown mob specified! You can "
