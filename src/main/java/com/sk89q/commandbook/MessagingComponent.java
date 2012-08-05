@@ -20,7 +20,9 @@ package com.sk89q.commandbook;
 
 import com.sk89q.commandbook.events.CommandSenderMessageEvent;
 import com.sk89q.commandbook.events.SharedMessageEvent;
+import com.sk89q.commandbook.session.AdministrativeSession;
 import com.sk89q.commandbook.session.SessionComponent;
+import com.sk89q.commandbook.session.UserSession;
 import com.sk89q.commandbook.util.PlayerUtil;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
@@ -37,7 +39,10 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerChatEvent;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
+
+import java.util.Arrays;
+import java.util.HashSet;
 
 import static com.sk89q.commandbook.CommandBookUtil.replaceColorMacros;
 
@@ -72,7 +77,8 @@ public class MessagingComponent extends BukkitComponent implements Listener {
     public void messagePlayer(CommandSender sender, String target, String message) throws CommandException {
         CommandSender receiver =
                 PlayerUtil.matchPlayerOrConsole(sender, target);
-        String status = sessions.getSession(receiver).getIdleStatus();
+        UserSession receiverSession = sessions.getSession(UserSession.class, receiver);
+        String status = receiverSession.getIdleStatus();
         if (status != null) {
             sender.sendMessage(ChatColor.GRAY + PlayerUtil.toColoredName(receiver, ChatColor.YELLOW) + " is afk. "
                     + "They might not see your message."
@@ -90,12 +96,12 @@ public class MessagingComponent extends BukkitComponent implements Listener {
         CommandBook.logger().info("(PM) " + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + " -> "
                 + PlayerUtil.toColoredName(receiver, ChatColor.YELLOW) + ": " + message);
 
-        sessions.getSession(sender).setLastRecipient(receiver);
+        sessions.getSession(UserSession.class, sender).setLastRecipient(receiver);
 
         // If the receiver hasn't had any player talk to them yet or hasn't
         // send a message, then we add it to the receiver's last message target
         // so s/he can /reply easily
-        sessions.getSession(receiver).setNewLastRecipient(sender);
+        receiverSession.setNewLastRecipient(sender);
     }
 
     /**
@@ -104,8 +110,8 @@ public class MessagingComponent extends BukkitComponent implements Listener {
      * @param event Relevant event details
      */
     @EventHandler
-    public void onChat(PlayerChatEvent event) {
-        if (sessions.getAdminSession(event.getPlayer()).isMute()) {
+    public void onChat(AsyncPlayerChatEvent event) {
+        if (sessions.getSession(AdministrativeSession.class, event.getPlayer()).isMute()) {
             event.getPlayer().sendMessage(ChatColor.RED + "You are muted.");
             event.setCancelled(true);
         } else if (event.getMessage().startsWith("@") && config.twitterStyle) {
@@ -131,7 +137,7 @@ public class MessagingComponent extends BukkitComponent implements Listener {
         @Command(aliases = {"me"}, usage = "<message...>", desc = "Send an action message", min = 1, max = -1)
         @CommandPermissions({"commandbook.say.me"})
         public void me(CommandContext args, CommandSender sender) throws CommandException {
-            if (sender instanceof Player && sessions.getAdminSession((Player) sender).isMute()) {
+            if (sender instanceof Player && sessions.getSession(AdministrativeSession.class, sender).isMute()) {
                 sender.sendMessage(ChatColor.RED + "You are muted.");
                 return;
             }
@@ -157,7 +163,8 @@ public class MessagingComponent extends BukkitComponent implements Listener {
 
             if (sender instanceof Player) {
                 if (CommandBook.callEvent(
-                        new PlayerChatEvent((Player) sender, msg)).isCancelled()) {
+                        new AsyncPlayerChatEvent(false, (Player) sender, msg,
+                                new HashSet<Player>(Arrays.asList(CommandBook.server().getOnlinePlayers())))).isCancelled()) {
                     return;
                 }
             }
