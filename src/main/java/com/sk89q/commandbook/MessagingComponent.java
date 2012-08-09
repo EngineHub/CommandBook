@@ -73,18 +73,32 @@ public class MessagingComponent extends BukkitComponent implements Listener {
         @Setting("console-say-format") public String consoleSayFormat = "<`r*Console`w> %s";
         @Setting("broadcast-format") public String broadcastFormat = "`r[Broadcast] %s";
         @Setting("pm-color") private String pmColorString = "GRAY";
-        public ChatColor pmColor = ChatColor.GRAY;
+        @Setting("pm-text-color") private String pmTextColorString = "RESET";
+        public ChatColor pmColor = ChatColor.GRAY; // Color for PM label
+        public ChatColor pmTextColor = ChatColor.RESET; // Color for text of PM
         @Setting("twitter-style") public boolean twitterStyle = true;
 
         @Override
         public void load(ConfigurationNode node) {
             super.load(node);
+            boolean error = false;
             try {
                 pmColor = ChatColor.valueOf(pmColorString);
             } catch (IllegalArgumentException e) {
                 CommandBook.logger().warning("Unknown PM Color  '" + pmColorString + "'! Resetting to GRAY");
                 pmColor = ChatColor.GRAY;
                 pmColorString = "GRAY";
+                error = true;
+            }
+            try {
+                pmTextColor = ChatColor.valueOf(pmTextColorString);
+            } catch (IllegalArgumentException e) {
+                CommandBook.logger().warning("Unknown PM Color  '" + pmTextColorString + "'! Resetting to GRAY");
+                pmTextColor = ChatColor.GRAY;
+                pmTextColorString = "GRAY";
+                error = true;
+            }
+            if (error) {
                 save(node);
             }
         }
@@ -96,18 +110,18 @@ public class MessagingComponent extends BukkitComponent implements Listener {
         UserSession receiverSession = sessions.getSession(UserSession.class, receiver);
         String status = receiverSession.getIdleStatus();
         if (status != null) {
-            sender.sendMessage(config.pmColor + PlayerUtil.toColoredName(receiver, ChatColor.YELLOW) + " is afk. "
+            sender.sendMessage(config.pmColor + PlayerUtil.toColoredName(receiver, config.pmColor) + " is afk. "
                     + "They might not see your message."
                     + (status.trim().length() == 0 ? "" : " (" + status + ")"));
         }
 
         receiver.sendMessage(config.pmColor + "(From "
                 + PlayerUtil.toColoredName(sender, config.pmColor) + "): "
-                + ChatColor.RESET + message);
+                + config.pmTextColor + message);
 
         sender.sendMessage(config.pmColor + "(To "
                 + PlayerUtil.toColoredName(receiver, config.pmColor) + "): "
-                + ChatColor.RESET + message);
+                + config.pmTextColor + message);
 
         CommandBook.logger().info("(PM) " + PlayerUtil.toColoredName(sender, ChatColor.RESET) + " -> "
                 + PlayerUtil.toColoredName(receiver, ChatColor.RESET) + ": " + message);
@@ -231,11 +245,11 @@ public class MessagingComponent extends BukkitComponent implements Listener {
 
             receiver.sendMessage(config.pmColor + "(From "
                     + PlayerUtil.toColoredName(sender, config.pmColor) + "): "
-                    + ChatColor.RESET + message);
+                    + config.pmTextColor + message);
 
             sender.sendMessage(config.pmColor + "(To "
                     + PlayerUtil.toColoredName(receiver, config.pmColor) + "): "
-                    + ChatColor.RESET + message);
+                    + config.pmTextColor + message);
 
             CommandBook.logger().info("(PM) " + PlayerUtil.toColoredName(sender, ChatColor.RESET) + " -> "
                     + PlayerUtil.toColoredName(receiver, ChatColor.RESET) + ": " + message);
