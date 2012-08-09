@@ -25,11 +25,13 @@ import com.zachsthings.libcomponents.ComponentInformation;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.logging.Level;
 
 public class CommandBookCommands {
-    
+
     public static class CommandBookParentCommand {
         @Command(aliases = {"cmdbook"}, desc = "CommandBook commands",
                 flags = "d", min = 1, max = 3)
@@ -37,19 +39,26 @@ public class CommandBookCommands {
         public static void cmdBook() {
         }
     }
-    
+
     @Command(aliases = {"version"}, usage = "", desc = "CommandBook version information", min = 0, max = 0)
     public static void version(CommandContext args, CommandSender sender) throws CommandException {
         sender.sendMessage(ChatColor.YELLOW + "CommandBook " + CommandBook.inst().getDescription().getVersion());
         sender.sendMessage(ChatColor.YELLOW + "http://www.sk89q.com");
     }
-    
+
     @Command(aliases = {"reload"}, usage = "", desc = "Reload CommandBook's settings", min = 0, max = 0)
     @CommandPermissions({"commandbook.reload"})
     public static void reload(CommandContext args, CommandSender sender) throws CommandException {
-        CommandBook.inst().populateConfiguration();
+        try {
+            CommandBook.inst().getGlobalConfiguration().load();
+        } catch (IOException e) {
+            sender.sendMessage(ChatColor.RED + "Error reolading configuration: " + e.getMessage());
+            sender.sendMessage(ChatColor.RED + "See console for details!");
+            CommandBook.logger().log(Level.WARNING, "Error reloading configuration: " + e, e);
+        }
+        CommandBook.inst().loadConfiguration();
         CommandBook.inst().getComponentManager().reloadComponents();
-        
+
         sender.sendMessage(ChatColor.YELLOW + "CommandBook's configuration has been reloaded.");
     }
 
@@ -60,7 +69,7 @@ public class CommandBookCommands {
 
         sender.sendMessage(ChatColor.YELLOW + "CommandBook's configuration has been reloaded.");
     }
-    
+
     @Command(aliases = {"help", "doc"}, usage = "<component>", desc = "Get documentation for a component",
             flags = "p:", min = 0, max = 1)
     @CommandPermissions("commandbook.component.help")
@@ -72,7 +81,7 @@ public class CommandBookCommands {
                     return entry.getInformation().friendlyName() + " - " + entry.getInformation().desc();
                 }
             }.display(sender, CommandBook.inst().getComponentManager().getComponents(), args.getFlagInteger('p', 1));
-            
+
         } else {
             final String componentName = args.getString(0).replaceAll(" ", "-").toLowerCase();
             AbstractComponent component = CommandBook.inst().getComponentManager().getComponent(componentName);
@@ -82,7 +91,7 @@ public class CommandBookCommands {
             final ComponentInformation info = component.getInformation();
             sender.sendMessage(ChatColor.YELLOW + info.friendlyName() + " - " + info.desc());
             if (info.authors().length > 0 && info.authors()[0].length() > 0) {
-                sender.sendMessage(ChatColor.YELLOW + "Authors: " + 
+                sender.sendMessage(ChatColor.YELLOW + "Authors: " +
                         Arrays.toString(info.authors()).replaceAll("[(.*)]", "$1"));
             }
             Map<String, String> commands = component.getCommands();
@@ -97,7 +106,7 @@ public class CommandBookCommands {
                 sender.sendMessage(ChatColor.YELLOW + "No commands");
             }
         }
-        
+
     }
-    
+
 }

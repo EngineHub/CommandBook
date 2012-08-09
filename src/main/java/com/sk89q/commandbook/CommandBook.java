@@ -206,7 +206,8 @@ public final class CommandBook extends BasePlugin {
     /**
      * Loads the configuration.
      */
-    public YAMLProcessor populateConfiguration() {
+    @Override
+    public YAMLProcessor createConfiguration() {
         final File configFile = new File(getDataFolder(), "config.yml");
         YAMLProcessor config = new YAMLProcessor(configFile, true, YAMLFormat.EXTENDED);
         YAMLProcessor comments = new DefaultsFileYAMLProcessor("config-comments.yml", false);
@@ -233,6 +234,12 @@ public final class CommandBook extends BasePlugin {
             logger().severe("Error migrating CommandBook configuration: " + result);
         }
 
+        return config;
+    }
+
+
+    @Override
+    public void populateConfiguration(YAMLProcessor config) {
         loadItemList(config);
 
         useDisplayNames = config.getBoolean("use-display-names", true);
@@ -246,8 +253,6 @@ public final class CommandBook extends BasePlugin {
                     "Some features have been disabled to be compatible with " +
                     "poorly written server wrappers.");
         }
-
-        return config;
     }
 
     /**
