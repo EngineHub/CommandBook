@@ -1,39 +1,30 @@
-<!--
-  Maven build file for CommandBook
-  Copyright (c) 2011 sk89q <http://www.sk89q.com>
-  CommandBook is available under the GNU General Public License v3
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.sk89q</groupId>
   <artifactId>commandbook</artifactId>
   <version>2.2-SNAPSHOT</version>
   <name>CommandBook</name>
   <description>CommandBook brings general commands to Bukkit</description>
-
+  <licenses>
+    <license>
+      <name>GNU General Public License 2.0</name>
+      <url>LICENSE.txt</url>
+      <distribution>repo</distribution>
+      <comments>License on all contributions</comments>
+    </license>
+  </licenses>
   <scm>
     <connection>scm:git:git://github.com/sk89q/commandbook.git</connection>
     <url>https://github.com/sk89q/commandbook</url>
+    <tag>master</tag>
     <developerConnection>scm:git:git@github.com:sk89q/commandbook.git</developerConnection>
   </scm>
-
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
   <repositories>
-    <repository>
-      <id>zml-repo</id>
-      <url>http://files.zachsthings.com/repo</url>
-    </repository>
-    <repository>
-      <id>sk89q-mvn2</id>
-      <url>http://mvn2.sk89q.com/repo</url>
-    </repository>
-    <repository>
-      <id>bukkit-repo</id>
-      <url>http://repo.bukkit.org/content/groups/public/</url>
-    </repository>
-  </repositories>
-
   <dependencies>
-    <!-- Required component -->
     <dependency>
       <groupId>com.sk89q</groupId>
       <artifactId>worldedit</artifactId>
@@ -45,7 +36,6 @@
         </exclusion>
       </exclusions>
     </dependency>
-
     <dependency>
         <groupId>com.zachsthings.libcomponents</groupId>
         <artifactId>libcomponents-bukkit</artifactId>
@@ -65,7 +55,6 @@
       <artifactId>opencsv</artifactId>
       <version>2.0</version>
     </dependency>
-
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -73,9 +62,22 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-
+  <distributionManagement>
+    <site>
+      <id>sk89q-docs-upload</id>
+      <url>ftp://sk89q-maven-deploy/commandbook/</url>
+    </site>
+  </distributionManagement>
   <build>
     <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
+    
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+         <artifactId>wagon-ftp</artifactId>
+         <version>1.0-beta-6</version>
+      </extension>
+    </extensions>
 
     <!-- Resources -->
     <resources>
@@ -174,6 +176,35 @@
           <preparationGoals>assembly:assembly</preparationGoals>
           <goals>assembly:assembly</goals>
           <tagNameFormat>@{project.version}</tagNameFormat>
+        </configuration>
+      </plugin>
+      
+      <!-- Site generation -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-site-plugin</artifactId>
+        <version>3.1</version>
+        <configuration>
+          <reportPlugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-project-info-reports-plugin</artifactId>
+            <version>2.5</version>
+            <reportSets>
+              <reportSet>
+                <reports>
+                  <report>license</report>
+                  <report>index</report>
+                </reports>
+              </reportSet>
+            </reportSets>
+          </plugin>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-javadoc-plugin</artifactId>
+              <version>2.8.1</version>
+            </plugin>
+          </reportPlugins>
         </configuration>
       </plugin>
     </plugins>
