@@ -41,25 +41,19 @@
     <dependency>
       <groupId>com.sk89q</groupId>
       <artifactId>worldedit</artifactId>
-      <version>5.3</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.spout</groupId>
-          <artifactId>spoutapi</artifactId>
-        </exclusion>
-      </exclusions>
+      <version>5.4.2</version>
     </dependency>
     <dependency>
-        <groupId>com.zachsthings.libcomponents</groupId>
-        <artifactId>libcomponents-bukkit</artifactId>
-        <version>1.2-SNAPSHOT</version>
+      <groupId>com.zachsthings.libcomponents</groupId>
+      <artifactId>libcomponents-bukkit</artifactId>
+      <version>1.2-SNAPSHOT</version>
     </dependency>
 
     <!-- Bukkit -->
     <dependency>
       <groupId>org.bukkit</groupId>
       <artifactId>bukkit</artifactId>
-      <version>1.3.1-R0.1-SNAPSHOT</version>
+      <version>1.3.1-R2.0</version>
     </dependency>
 
     <!-- Other dependencies -->
