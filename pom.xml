@@ -47,6 +47,12 @@
       <groupId>com.zachsthings.libcomponents</groupId>
       <artifactId>libcomponents-bukkit</artifactId>
       <version>1.2-SNAPSHOT</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.spout</groupId>
+          <artifactId>spoutapi</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <!-- Bukkit -->
