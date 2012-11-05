@@ -43,7 +43,7 @@ public class HomesComponent extends LocationsComponent {
     }
 
     public class Commands {
-        @Command(aliases = {"home"}, usage = "[world] [target] [owner]", desc = "Teleport to a home", min = 0, max = 3)
+        @Command(aliases = {"home"}, usage = "[world] [target] [owner] [home]", desc = "Teleport to a home", min = 0, max = 4)
         @CommandPermissions({"commandbook.home.teleport"})
         public void home(CommandContext args, CommandSender sender) throws CommandException {
             Iterable<Player> targets = null;
@@ -58,8 +58,16 @@ public class HomesComponent extends LocationsComponent {
             } else if (args.argsLength() == 1) {
                 Player player = PlayerUtil.checkPlayer(sender);
                 targets = PlayerUtil.matchPlayers(player);
-                home = getManager().get(player.getWorld(), args.getString(0));
+                try {
+                    home = getManager().get(player.getWorld(), PlayerUtil.matchPlayerExactly(player, args.getString(0)).getName());
+                } catch (CommandException e) {
+                    home = getManager().get(player.getWorld(), player.getName() + "@" + args.getString(0));
+                }
             } else if (args.argsLength() == 2) {
+                Player player = PlayerUtil.checkPlayer(sender);
+                targets = PlayerUtil.matchPlayers(player);
+                home = getManager().get(player.getWorld(), PlayerUtil.matchPlayerExactly(player, args.getString(0)).getName() + "@" + args.getString(1));
+            } else if (args.argsLength() == 3) {
                 targets = PlayerUtil.matchPlayers(sender, args.getString(0));
                 if (getManager().isPerWorld()) {
                     Player player = PlayerUtil.checkPlayer(sender);
@@ -75,10 +83,14 @@ public class HomesComponent extends LocationsComponent {
                         break;
                     }
                 }
-            } else if (args.argsLength() == 3) {
-                targets = PlayerUtil.matchPlayers(sender, args.getString(1));
-                home = getManager().get(
-                        LocationUtil.matchWorld(sender, args.getString(0)), args.getString(2));
+            } else if (args.argsLength() == 4) {
+                targets = PlayerUtil.matchPlayers(sender, args.getString(0));
+                if (getManager().isPerWorld()) {
+                    Player player = PlayerUtil.checkPlayer(sender);
+                    home = getManager().get(player.getWorld(), args.getString(1) + "@" + args.getString(3));
+                } else {
+                    home = getManager().get(null, args.getString(1) + "@" + args.getString(3));
+                }
 
                 // Check permissions!
                 for (Player target : targets) {
@@ -101,7 +113,7 @@ public class HomesComponent extends LocationsComponent {
             (new TeleportPlayerIterator(sender, loc)).iterate(targets);
         }
 
-        @Command(aliases = {"sethome"}, usage = "[owner] [location]", desc = "Set a home", min = 0, max = 2)
+        @Command(aliases = {"sethome"}, usage = "[owner] [location]", desc = "Set a home", min = 0, max = 3)
         @CommandPermissions({"commandbook.home.set"})
         public void setHome(CommandContext args, CommandSender sender) throws CommandException {
             String homeName;
@@ -114,7 +126,11 @@ public class HomesComponent extends LocationsComponent {
                 homeName = player.getName();
                 loc = player.getLocation();
             } else if (args.argsLength() == 1) {
-                homeName = args.getString(0);
+                try {
+                	homeName = PlayerUtil.matchPlayerExactly(sender, args.getString(0)).getName();
+                } catch (CommandException e) {
+                    homeName = sender.getName() + "@" + args.getString(0);
+                }
                 player = PlayerUtil.checkPlayer(sender);
                 loc = player.getLocation();
 
@@ -122,8 +138,20 @@ public class HomesComponent extends LocationsComponent {
                 if (!homeName.equals(sender.getName())) {
                     CommandBook.inst().checkPermission(sender, "commandbook.home.set.other");
                 }
-            } else {
+            } else if (args.argsLength() == 2) {
                 homeName = args.getString(1);
+                loc = LocationUtil.matchLocation(sender, args.getString(0));
+
+                // Check permissions!
+                if (!homeName.equals(sender.getName())) {
+                    CommandBook.inst().checkPermission(sender, "commandbook.home.set.other");
+                }
+            } else {
+                try {
+                	homeName = PlayerUtil.matchPlayerExactly(sender, args.getString(1)).getName();
+                } catch (CommandException e) {
+                    homeName = sender.getName() + "@" + args.getString(1);
+                }
                 loc = LocationUtil.matchLocation(sender, args.getString(0));
 
                 // Check permissions!
