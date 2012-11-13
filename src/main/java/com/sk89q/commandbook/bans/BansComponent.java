@@ -24,6 +24,7 @@ import com.sk89q.commandbook.InfoComponent;
 import com.sk89q.commandbook.util.PlayerUtil;
 import com.sk89q.minecraft.util.commands.*;
 import com.zachsthings.libcomponents.ComponentInformation;
+import com.zachsthings.libcomponents.bukkit.BasePlugin;
 import com.zachsthings.libcomponents.bukkit.BukkitComponent;
 import com.zachsthings.libcomponents.config.ConfigurationBase;
 import com.zachsthings.libcomponents.config.Setting;
@@ -141,7 +142,7 @@ public class BansComponent extends BukkitComponent implements Listener {
                     continue;
                 }
                 player.kickPlayer(message);
-                broadcastPlayers += player.getName() + " ";
+                broadcastPlayers += PlayerUtil.toColoredName(player, ChatColor.YELLOW) + " ";
                 getBanDatabase().logKick(player, sender, message);
             }
 
@@ -149,7 +150,7 @@ public class BansComponent extends BukkitComponent implements Listener {
                 sender.sendMessage(ChatColor.YELLOW + "Player(s) kicked.");
                 //Broadcast the Message
                 if (config.broadcastKicks && !args.hasFlag('s')) {
-                    CommandBook.server().broadcastMessage(ChatColor.YELLOW
+                    BasePlugin.server().broadcastMessage(ChatColor.YELLOW
                             + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + " has kicked " + broadcastPlayers
                             + " - " + message);
                 }
@@ -207,7 +208,7 @@ public class BansComponent extends BukkitComponent implements Listener {
 
             //Broadcast the Message
             if (config.broadcastBans && !args.hasFlag('s')) {
-                CommandBook.server().broadcastMessage(ChatColor.YELLOW
+                BasePlugin.server().broadcastMessage(ChatColor.YELLOW
                         + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + " has banned " + banName
                         + " - " + message);
             }
