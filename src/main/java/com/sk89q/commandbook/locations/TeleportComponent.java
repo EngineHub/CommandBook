@@ -19,9 +19,10 @@
 package com.sk89q.commandbook.locations;
 
 import com.sk89q.commandbook.CommandBook;
+import com.sk89q.commandbook.CommandBookUtil;
 import com.sk89q.commandbook.session.SessionComponent;
 import com.sk89q.commandbook.session.SessionFactory;
-import com.sk89q.commandbook.session.UserSession;
+import com.sk89q.commandbook.util.LegacyBukkitCompat;
 import com.sk89q.commandbook.util.LocationUtil;
 import com.sk89q.commandbook.util.PlayerUtil;
 import com.sk89q.commandbook.util.TeleportPlayerIterator;
@@ -32,11 +33,13 @@ import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.zachsthings.libcomponents.ComponentInformation;
 import com.zachsthings.libcomponents.Depend;
 import com.zachsthings.libcomponents.InjectComponent;
+import com.zachsthings.libcomponents.bukkit.BasePlugin;
 import com.zachsthings.libcomponents.bukkit.BukkitComponent;
 import com.zachsthings.libcomponents.config.ConfigurationBase;
 import com.zachsthings.libcomponents.config.Setting;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -111,7 +114,7 @@ public class TeleportComponent extends BukkitComponent implements Listener {
 
         @Command(aliases = {"teleport", "tp"}, usage = "[target] <destination>",
                 desc = "Teleport to a location",
-                flags = "s", min = 1, max = 2)
+                flags = "s", min = 1, max = 4)
         @CommandPermissions({"commandbook.teleport"})
         public void teleport(CommandContext args, CommandSender sender) throws CommandException {
 
@@ -124,6 +127,33 @@ public class TeleportComponent extends BukkitComponent implements Listener {
                 loc = LocationUtil.matchLocation(sender, args.getString(0));
                 if (sender instanceof Player) {
                     CommandBook.inst().checkPermission(sender, loc.getWorld(), "commandbook.teleport");
+                }
+            // Compatibility with vanilla
+            } else if (args.argsLength() == 4 || args.argsLength() == 3) {
+                targets = PlayerUtil.matchPlayers(sender, args.getString(0));
+
+                World world;
+
+                try {
+                    world = LegacyBukkitCompat.extractWorld(sender);
+                } catch (Throwable t) {
+                    if (sender instanceof Player) {
+                        world = ((Player) sender).getWorld();
+                    } else {
+                        world = BasePlugin.server().getWorlds().get(0);
+                    }
+                }
+
+                if (args.argsLength() == 3) {
+                    int x = args.getInteger(1);
+                    int z = args.getInteger(2);
+                    int y = world.getHighestBlockYAt(x, z);
+                    loc = CommandBookUtil.findFreePosition(new Location(world, x, y, z));
+                } else {
+                    int x = args.getInteger(1);
+                    int y = args.getInteger(2);
+                    int z = args.getInteger(3);
+                    loc = new Location(world, x, y, z);
                 }
             } else {
                 targets = PlayerUtil.matchPlayers(sender, args.getString(0));
