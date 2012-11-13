@@ -31,6 +31,7 @@ import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.zachsthings.libcomponents.ComponentInformation;
 import com.zachsthings.libcomponents.Depend;
 import com.zachsthings.libcomponents.InjectComponent;
+import com.zachsthings.libcomponents.bukkit.BasePlugin;
 import com.zachsthings.libcomponents.bukkit.BukkitComponent;
 import com.zachsthings.libcomponents.config.ConfigurationBase;
 import com.zachsthings.libcomponents.config.ConfigurationNode;
@@ -175,10 +176,10 @@ public class MessagingComponent extends BukkitComponent implements Listener {
             String name = PlayerUtil.toColoredName(sender, ChatColor.YELLOW);
             String msg = args.getJoinedStrings(0);
 
-            CommandBook.callEvent(
+            BasePlugin.callEvent(
                     new SharedMessageEvent(name + " " + msg));
 
-            CommandBook.server().broadcastMessage("* " + name + " " + msg);
+            BasePlugin.server().broadcastMessage("* " + name + " " + msg);
         }
 
         @Command(aliases = {"say"}, usage = "<message...>", desc = "Send a message", min = 1, max = -1)
@@ -192,22 +193,22 @@ public class MessagingComponent extends BukkitComponent implements Listener {
             String msg = args.getJoinedStrings(0);
 
             if (sender instanceof Player) {
-                if (CommandBook.callEvent(
+                if (BasePlugin.callEvent(
                         new AsyncPlayerChatEvent(false, (Player) sender, msg,
-                                new HashSet<Player>(Arrays.asList(CommandBook.server().getOnlinePlayers())))).isCancelled()) {
+                                new HashSet<Player>(Arrays.asList(BasePlugin.server().getOnlinePlayers())))).isCancelled()) {
                     return;
                 }
             }
 
-            CommandBook.callEvent(
+            BasePlugin.callEvent(
                     new CommandSenderMessageEvent(sender, msg));
 
             if (sender instanceof Player) {
-                CommandBook.server().broadcastMessage(
+                BasePlugin.server().broadcastMessage(
                         "<" + PlayerUtil.toColoredName(sender, ChatColor.RESET)
                                 + "> " + args.getJoinedStrings(0));
             } else {
-                CommandBook.server().broadcastMessage(
+                BasePlugin.server().broadcastMessage(
                         replaceColorMacros(config.consoleSayFormat).replace(
                                 "%s", args.getJoinedStrings(0)));
             }
@@ -268,20 +269,27 @@ public class MessagingComponent extends BukkitComponent implements Listener {
 
             Player player = PlayerUtil.checkPlayer(sender);
 
-            if (sessions.getSession(player).getIdleStatus() == null) {
-                String status = "";
-                if (args.argsLength() > 0) {
-                    status = args.getJoinedStrings(0);
-                    sessions.getSession(player).setIdleStatus(status);
-                }
-
-                player.sendMessage(ChatColor.YELLOW
-                        + (status.isEmpty() ? "Set as away" : "Set away status to \"" + status + "\"")
-                        + ". To return, type /afk again.");
-            } else {
-                player.sendMessage(ChatColor.YELLOW + "You are no longer away.");
-                sessions.getSession(player).setIdleStatus(null);
+            String status = "";
+            if (args.argsLength() > 0) {
+                status = args.getJoinedStrings(0);
+                sessions.getSession(player).setIdleStatus(status);
             }
+
+            player.sendMessage(ChatColor.YELLOW
+                    + (status.isEmpty() ? "Set as away" : "Set away status to \"" + status + "\"")
+                    + ". To return, type /back.");
+        }
+
+        @Command(aliases = {"back", "unafk", "unaway"},
+                usage = "", desc = "Set yourself as back",
+                flags = "", min = 0, max = -1)
+        @CommandPermissions({"commandbook.away"})
+        public void back(CommandContext args, CommandSender sender) throws CommandException {
+
+            Player player = PlayerUtil.checkPlayer(sender);
+
+            player.sendMessage(ChatColor.YELLOW + "You are no longer away.");
+            sessions.getSession(player).setIdleStatus(null);
         }
 
         @Command(aliases = {"mute"}, usage = "<target>", desc = "Mute a player", flags = "o", min = 1, max = 1)
@@ -329,7 +337,7 @@ public class MessagingComponent extends BukkitComponent implements Listener {
         @Command(aliases = {"broadcast"}, usage = "<message...>", desc = "Broadcast a message", min = 1, max = -1)
         @CommandPermissions({"commandbook.broadcast"})
         public void broadcast(CommandContext args, CommandSender sender) throws CommandException {
-            CommandBook.server().broadcastMessage(
+            BasePlugin.server().broadcastMessage(
                     replaceColorMacros(config.broadcastFormat).replace(
                             "%s", args.getJoinedStrings(0)));
         }
