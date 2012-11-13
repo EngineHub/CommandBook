@@ -87,6 +87,10 @@ public class SpawnLocationsComponent extends BukkitComponent implements Listener
         if (event.isCancelled()) {
             return;
         }
+        // Work around someone's bug
+        if (loc == null || loc.getWorld() == null) {
+            return;
+        }
         if (loc.equals(loc.getWorld().getSpawnLocation())) {
             event.setTo(spawns.getWorldSpawn(loc.getWorld()));
         }
