@@ -18,6 +18,7 @@
 
 package com.sk89q.commandbook;
 
+import com.zachsthings.libcomponents.bukkit.BasePlugin;
 import com.zachsthings.libcomponents.bukkit.BukkitComponent;
 import com.zachsthings.libcomponents.ComponentInformation;
 import com.sk89q.commandbook.util.ItemUtil;
@@ -54,7 +55,7 @@ public class FunComponent extends BukkitComponent {
             throw new CommandException("Not a creature!");
         }
         LivingEntity creature = (LivingEntity) spawned;
-        
+
         if (args.hasFlag('d')) {
             creature.setHealth(1);
         }
@@ -67,7 +68,7 @@ public class FunComponent extends BukkitComponent {
         if (args.hasFlag('b') && creature instanceof Animals) {
             ((Animals) creature).setBaby();
         }
-        
+
         if (!specialType.equals("")) {
             if (creature instanceof Wolf) {
                 if (specialType.matches("angry")) {
@@ -266,11 +267,11 @@ public class FunComponent extends BukkitComponent {
                     }
                 } else {
                     if (count < 6) {
-                        CommandBook.server().broadcastMessage(
+                        BasePlugin.server().broadcastMessage(
                                 ChatColor.YELLOW + PlayerUtil.toColoredName(sender, ChatColor.YELLOW)
                                         + " slapped " + PlayerUtil.toColoredName(player, ChatColor.YELLOW));
                     } else if (count == 6) {
-                        CommandBook.server().broadcastMessage(
+                        BasePlugin.server().broadcastMessage(
                                 ChatColor.YELLOW + PlayerUtil.toColoredName(sender, ChatColor.YELLOW)
                                         + " slapped more people...");
                     }
@@ -308,9 +309,9 @@ public class FunComponent extends BukkitComponent {
 
             for (Player player : targets) {
                 if (args.hasFlag('h')) {
-                    player.setVelocity(new Vector(0, 50, 0));
+                    player.setVelocity(new Vector(0, 4, 0));
                 } else {
-                    player.setVelocity(new Vector(0, 20, 0));
+                    player.setVelocity(new Vector(0, 2, 0));
                 }
 
                 if (args.hasFlag('s')) {
@@ -328,11 +329,11 @@ public class FunComponent extends BukkitComponent {
                 } else {
                     ++count;
                     if (count < 6) {
-                        CommandBook.server().broadcastMessage(
+                        BasePlugin.server().broadcastMessage(
                                 ChatColor.YELLOW + PlayerUtil.toColoredName(sender, ChatColor.YELLOW)
                                         + " rocketed " + PlayerUtil.toColoredName(player, ChatColor.YELLOW));
                     } else if (count == 6) {
-                        CommandBook.server().broadcastMessage(
+                        BasePlugin.server().broadcastMessage(
                                 ChatColor.YELLOW + PlayerUtil.toColoredName(sender, ChatColor.YELLOW)
                                         + " rocketed more people...");
                     }
@@ -391,11 +392,11 @@ public class FunComponent extends BukkitComponent {
                     }
                 } else {
                     if (count < 6) {
-                        CommandBook.server().broadcastMessage(
+                        BasePlugin.server().broadcastMessage(
                                 ChatColor.YELLOW + PlayerUtil.toColoredName(sender, ChatColor.YELLOW)
                                         + " used BARRAGE on " + PlayerUtil.toColoredName(player, ChatColor.YELLOW));
                     } else if (count == 6) {
-                        CommandBook.server().broadcastMessage(
+                        BasePlugin.server().broadcastMessage(
                                 ChatColor.YELLOW + PlayerUtil.toColoredName(sender, ChatColor.YELLOW)
                                         + " used it on more people...");
                     }
@@ -453,11 +454,11 @@ public class FunComponent extends BukkitComponent {
                     }
                 } else {
                     if (count < 6) {
-                        CommandBook.server().broadcastMessage(
+                        BasePlugin.server().broadcastMessage(
                                 ChatColor.YELLOW + PlayerUtil.toColoredName(sender, ChatColor.YELLOW)
                                         + " used Fireball attack on " + PlayerUtil.toColoredName(player, ChatColor.YELLOW));
                     } else if (count == 6) {
-                        CommandBook.server().broadcastMessage(
+                        BasePlugin.server().broadcastMessage(
                                 ChatColor.YELLOW + PlayerUtil.toColoredName(sender, ChatColor.YELLOW)
                                         + " used it on more people...");
                     }
@@ -517,11 +518,11 @@ public class FunComponent extends BukkitComponent {
                     }
                 } else {
                     if (count < 6) {
-                    	CommandBook.server().broadcastMessage(
+                    	BasePlugin.server().broadcastMessage(
                                 ChatColor.YELLOW + PlayerUtil.toColoredName(sender, ChatColor.YELLOW)
                                 + " used Fireball attack on " + PlayerUtil.toColoredName(player, ChatColor.YELLOW));
                     } else if (count == 6) {
-                    	CommandBook.server().broadcastMessage(
+                    	BasePlugin.server().broadcastMessage(
                                 ChatColor.YELLOW + PlayerUtil.toColoredName(sender, ChatColor.YELLOW)
                                 + " used it more people...");
                     }
