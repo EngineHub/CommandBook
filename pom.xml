@@ -170,6 +170,15 @@
         <configuration>
           <descriptor>${basedir}/src/main/assembly/default.xml</descriptor>
         </configuration>
+        <executions>
+          <execution>
+            <id>release</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
 
       <plugin>
