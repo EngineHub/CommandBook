@@ -1,3 +1,28 @@
+2.2:
+- Added /enchantments command to list enchantments.
+- Made /call-related messages configurable.
+- Made /afk support no parameters. Use /back to return now.
+- Made the body of PMs colorable.
+- Made warps check commandbook.warp.teleport.<warpname> for permissions.
+- Fixed support for /tp @p x y z with command blocks.
+- Fixed the lack of support for setting non-animal creatures as babies (when supported).
+    Note that Bukkit does not yet support baby zombies.
+- Fixed /rocket no longer properly rocketing players.
+- Fixed /kick not using display names for the entire message.
+- Fixed /spawnmob to only list proper mobs.
+- Fixed issues with AsyncChat.
+- Fixed configuration reloading not working.
+- Fixed issues with teleporting for some people, where players appeared in the ground
+    or worse.
+- Fixed the online list showing vanished players.
+- Fixed issue with remove permission for the locations-related portions using the
+    wrong name of the location.
+- Fixed /heal not setting food levels.
+- Clamped number of items 2,240 if items are being dropped with /item or /give.
+
+Thank you to morganm, TexasGamer, authorblues, DarkArc, and run942 for their
+contributions to this release.
+
 2.1:
  - Correctly use colored names everywhere when usedisplaynames is enabled in the configuration
  - Made the god component use the "god" entity metadata tag. This allows other plugins
