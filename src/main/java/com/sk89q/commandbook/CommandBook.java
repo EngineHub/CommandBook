@@ -73,6 +73,7 @@ public final class CommandBook extends BasePlugin {
     public boolean useDisplayNames;
     public boolean lookupWithDisplayNames;
     public boolean crappyWrapperCompat;
+    public String consoleName;
 
 
     public CommandBook() {
@@ -245,6 +246,7 @@ public final class CommandBook extends BasePlugin {
         useDisplayNames = config.getBoolean("use-display-names", true);
         lookupWithDisplayNames = config.getBoolean("lookup-with-display-names", true);
         broadcastChanges = config.getBoolean("broadcast-changes", true);
+        consoleName = config.getString("console-broadcast-name", "*Console*");
 
         crappyWrapperCompat = config.getBoolean("crappy-wrapper-compat", true);
 
