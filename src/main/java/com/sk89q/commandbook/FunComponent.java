@@ -141,6 +141,7 @@ public class FunComponent extends BukkitComponent {
         @Command(aliases = {"pong"},
                 usage = "", desc = "A dummy command",
                 flags = "", min = 0, max = 0)
+        @CommandPermissions({"commandbook.pong"})
         public void pong(CommandContext args, CommandSender sender) throws CommandException {
 
             sender.sendMessage(ChatColor.YELLOW +
