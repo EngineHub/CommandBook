@@ -18,8 +18,17 @@
 
 package com.sk89q.commandbook.locations;
 
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
+
 import com.sk89q.commandbook.CommandBook;
-import com.sk89q.commandbook.CommandBookUtil;
 import com.sk89q.commandbook.session.SessionComponent;
 import com.sk89q.commandbook.session.SessionFactory;
 import com.sk89q.commandbook.util.LegacyBukkitCompat;
@@ -37,15 +46,6 @@ import com.zachsthings.libcomponents.bukkit.BasePlugin;
 import com.zachsthings.libcomponents.bukkit.BukkitComponent;
 import com.zachsthings.libcomponents.config.ConfigurationBase;
 import com.zachsthings.libcomponents.config.Setting;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerRespawnEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
 
 @ComponentInformation(friendlyName = "Teleports", desc = "Teleport-related commands")
 @Depend(components = SessionComponent.class)
@@ -120,21 +120,75 @@ public class TeleportComponent extends BukkitComponent implements Listener {
 
             Iterable<Player> targets;
             final Location loc;
+            boolean[] relative = new boolean[]{false, false, false};
 
-            // Detect arguments based on the number of arguments provided
+            /*
+            1. /tp playerTarget x y z (4 args) - VANILLA
+
+            2. /tp x y z (3 args)
+            3. /tp playerTarget x z (3 args) - NOT SUPPORTED
+
+            4. /tp playerTarget x,y,z (2 args)
+            5. /tp playerTarget playerDest (2 args) - VANILLA
+            6. /tp x z (2 args) - NOT SUPPORTED
+
+            7. /tp x,y,z (1 arg)
+            8. /tp playerDest (1 arg) - VANILLA
+             */
+            // TODO: reduce code duplication, currently just trying to catch every case
             if (args.argsLength() == 1) {
+                loc = LocationUtil.matchLocation(sender, args.getString(0)); // matches both #7 and #8
+                // go to the center of the block if we're on the edge
+                if (loc.getX() == loc.getBlockX()) loc.add(0.5, 0, 0);
+                if (loc.getZ() == loc.getBlockZ()) loc.add(0, 0, 0.5);
                 targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
-                loc = LocationUtil.matchLocation(sender, args.getString(0));
-                if (sender instanceof Player) {
-                    CommandBook.inst().checkPermission(sender, loc.getWorld(), "commandbook.teleport");
-                }
-            // Compatibility with vanilla
-            } else if (args.argsLength() == 4 || args.argsLength() == 3) {
+                // check target location (CommandPermissions annotation only checks sender's location)
+                CommandBook.inst().checkPermission(PlayerUtil.checkPlayer(sender), loc.getWorld(), "commandbook.teleport");
+            } else if (args.argsLength() == 2) {
                 targets = PlayerUtil.matchPlayers(sender, args.getString(0));
+                loc = LocationUtil.matchLocation(sender, args.getString(1)); // matches both #4 and #5
+                if (loc.getX() == loc.getBlockX()) loc.add(0.5, 0, 0);
+                if (loc.getZ() == loc.getBlockZ()) loc.add(0, 0, 0.5);
 
+                // Check permissions!
+                CommandBook.inst().checkPermission(PlayerUtil.checkPlayer(sender), loc.getWorld(), "commandbook.teleport");
+                for (Player target : targets) {
+                    if (target != sender) { // if any of the targets is not the sender, we need to check .other
+                        CommandBook.inst().checkPermission(sender, "commandbook.teleport.other");
+                        if (sender instanceof Player) {
+                            CommandBook.inst().checkPermission(sender, loc.getWorld(), "commandbook.teleport.other");
+                        }
+                        break;
+                    }
+                }
+            } else if (args.argsLength() == 3) {
+                // matches #2 - can only be used by a player
+                targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
+                int x = args.getInteger(1);
+                int y = args.getInteger(2);
+                int z = args.getInteger(3);
+                loc = new Location((PlayerUtil.checkPlayer(sender)).getWorld(), x, y, z);
+                if (loc.getX() == loc.getBlockX()) loc.add(0.5, 0, 0);
+                if (loc.getZ() == loc.getBlockZ()) loc.add(0, 0, 0.5);
+                // check location permission
+                CommandBook.inst().checkPermission(PlayerUtil.checkPlayer(sender), loc.getWorld(), "commandbook.teleport");
+            } else if (args.argsLength() == 4) {
+                targets = PlayerUtil.matchPlayers(sender, args.getString(0)); // matches #1
+                // support relative location (~5 -> current coord + 5)
+                String xArg = args.getString(1);
+                String yArg = args.getString(2);
+                String zArg = args.getString(3);
+                if (xArg.startsWith("~")) relative[0] = true;
+                if (yArg.startsWith("~")) relative[1] = true;
+                if (zArg.startsWith("~")) relative[2] = true;
+                if (relative[0] || relative[1] || relative[2]) {
+                    CommandBook.inst().checkPermission(PlayerUtil.checkPlayer(sender), "commandbook.locations.coords.relative");
+                }
+                int x = Integer.valueOf(xArg.replace("~", ""));
+                int y = Integer.valueOf(yArg.replace("~", ""));
+                int z = Integer.valueOf(zArg.replace("~", ""));
                 World world;
-
-                try {
+                try { // for CommandBlock support
                     world = LegacyBukkitCompat.extractWorld(sender);
                 } catch (Throwable t) {
                     if (sender instanceof Player) {
@@ -143,25 +197,10 @@ public class TeleportComponent extends BukkitComponent implements Listener {
                         world = BasePlugin.server().getWorlds().get(0);
                     }
                 }
-
-                if (args.argsLength() == 3) {
-                    int x = args.getInteger(1);
-                    int z = args.getInteger(2);
-                    int y = world.getHighestBlockYAt(x, z);
-                    loc = CommandBookUtil.findFreePosition(new Location(world, x, y, z));
-                } else {
-                    int x = args.getInteger(1);
-                    int y = args.getInteger(2);
-                    int z = args.getInteger(3);
-                    loc = new Location(world, x, y, z);
-                }
-            } else {
-                targets = PlayerUtil.matchPlayers(sender, args.getString(0));
-                loc = LocationUtil.matchLocation(sender, args.getString(1));
-
-                // Check permissions!
+                loc = new Location(world, x, y, z);
+                CommandBook.inst().checkPermission(PlayerUtil.checkPlayer(sender), loc.getWorld(), "commandbook.teleport");
                 for (Player target : targets) {
-                    if (target != sender) {
+                    if (target != sender) { // if any of the targets is not the sender, we need to check .other
                         CommandBook.inst().checkPermission(sender, "commandbook.teleport.other");
                         if (sender instanceof Player) {
                             CommandBook.inst().checkPermission(sender, loc.getWorld(), "commandbook.teleport.other");
@@ -169,9 +208,11 @@ public class TeleportComponent extends BukkitComponent implements Listener {
                         break;
                     }
                 }
+            } else { // this can't actually happen unless someone constructs their own CommandContext
+                throw new CommandException("Invalid number of args.");
             }
 
-            (new TeleportPlayerIterator(sender, loc, args.hasFlag('s'))).iterate(targets);
+            (new TeleportPlayerIterator(sender, loc, args.hasFlag('s'), relative)).iterate(targets);
         }
 
         @Command(aliases = {"call"}, usage = "<target>", desc = "Request a teleport", min = 1, max = 1)

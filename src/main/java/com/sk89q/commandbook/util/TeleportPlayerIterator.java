@@ -28,22 +28,35 @@ public class TeleportPlayerIterator extends PlayerIteratorAction {
     protected final Location loc;
     protected Location oldLoc;
     protected final boolean silent;
+    protected final boolean[] relative;
 
     public TeleportPlayerIterator(CommandSender sender, Location loc) {
         this(sender, loc, false);
     }
 
     public TeleportPlayerIterator(CommandSender sender, Location loc, boolean silent) {
+        this(sender, loc, silent, new boolean[]{false, false, false});
+    }
+
+    public TeleportPlayerIterator(CommandSender sender, Location loc, boolean silent, boolean[] relative) {
         super(sender);
         this.loc = loc;
         this.silent = silent;
+        this.relative = relative;
     }
 
     @Override
     public void perform(Player player) {
         oldLoc = player.getLocation();
-        loc.getChunk().load(true);
-        player.teleport(loc);
+        Location newLoc = loc;
+        // for each coord, if it is relative, add the given location's coord
+        // to the old location's to form the new location's
+        if (relative[0]) newLoc.setX(oldLoc.getX() + loc.getX());
+        if (relative[1]) newLoc.setY(oldLoc.getY() + loc.getY());
+        if (relative[2]) newLoc.setZ(oldLoc.getZ() + loc.getZ());
+
+        newLoc.getChunk().load(true);
+        player.teleport(newLoc);
     }
 
     @Override

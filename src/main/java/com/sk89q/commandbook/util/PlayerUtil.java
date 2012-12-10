@@ -18,18 +18,19 @@
 
 package com.sk89q.commandbook.util;
 
-import com.sk89q.commandbook.CommandBook;
-import com.sk89q.minecraft.util.commands.CommandException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import com.sk89q.commandbook.CommandBook;
+import com.sk89q.minecraft.util.commands.CommandException;
 
 public class PlayerUtil {
     // DO NOT INSTANTIATE ME!!!!!
@@ -144,6 +145,7 @@ public class PlayerUtil {
         }
 
         if (filter.equals("*")) {
+            CommandBook.inst().checkPermission(source, "commandbook.targets.everyone");
             return checkPlayerMatch(Arrays.asList(CommandBook.server().getOnlinePlayers()));
         }
 
@@ -155,6 +157,7 @@ public class PlayerUtil {
                 List<Player> players = new ArrayList<Player>();
                 Player sourcePlayer = checkPlayer(source);
                 World sourceWorld = sourcePlayer.getWorld();
+                CommandBook.inst().checkPermission(source, "commandbook.targets.world." + sourceWorld.getName());
 
                 for (Player player : CommandBook.server().getOnlinePlayers()) {
                     if (player.getWorld().equals(sourceWorld)) {
@@ -166,6 +169,7 @@ public class PlayerUtil {
 
                 // Handle #near, which is for nearby players.
             } else if (filter.equalsIgnoreCase("#near")) {
+                CommandBook.inst().checkPermission(source, "commandbook.targets.near");
                 List<Player> players = new ArrayList<Player>();
                 Player sourcePlayer = checkPlayer(source);
                 World sourceWorld = sourcePlayer.getWorld();
