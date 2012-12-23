@@ -29,6 +29,7 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
 import com.sk89q.commandbook.CommandBook;
+import com.sk89q.commandbook.CommandBookUtil;
 import com.sk89q.commandbook.session.SessionComponent;
 import com.sk89q.commandbook.session.SessionFactory;
 import com.sk89q.commandbook.util.LegacyBukkitCompat;
@@ -77,13 +78,13 @@ public class TeleportComponent extends BukkitComponent implements Listener {
     }
 
     public static class LocalConfiguration extends ConfigurationBase {
-        @Setting("call-message.sender") public String callMessageSender = "Teleport request sent.";
+        @Setting("call-message.sender") public String callMessageSender = "`yTeleport request sent.";
         @Setting("call-message.target") public String callMessageTarget =
-                "**TELEPORT** %s requests a teleport! Use /bring <name> to accept.";
+                "`c**TELEPORT** %cname%`c requests a teleport! Use /bring <name> to accept.";
         @Setting("call-message.too-soon") public String callMessageTooSoon = "Wait a bit before asking again.";
-        @Setting("bring-message.sender") public String bringMessageSender = "Player teleported.";
+        @Setting("bring-message.sender") public String bringMessageSender = "`yPlayer teleported.";
         @Setting("bring-message.target") public String bringMessageTarget =
-                "Your teleport request to %s was accepted.";
+                "`yYour teleport request to %cname%`y was accepted.";
         @Setting("bring-message.no-perm") public String bringMessageNoPerm = "That person didn't request a " +
                 "teleport (recently) and you don't have permission to teleport anyone.";
     }
@@ -226,9 +227,16 @@ public class TeleportComponent extends BukkitComponent implements Listener {
             sessions.getSession(TeleportSession.class, player).checkLastTeleportRequest(target);
             sessions.getSession(TeleportSession.class, target).addBringable(player);
 
-            sender.sendMessage(ChatColor.YELLOW.toString() + config.callMessageSender);
-            target.sendMessage(ChatColor.AQUA + String.format(config.callMessageTarget,
-                    PlayerUtil.toColoredName(sender, ChatColor.AQUA)));
+            String senderMessage = CommandBookUtil.replaceColorMacros(
+                    CommandBookUtil.replaceMacros(sender, config.callMessageSender))
+                    .replaceAll("%ctarget%", PlayerUtil.toColoredName(target, null))
+                    .replaceAll("%target%", PlayerUtil.toName(target));
+            String targetMessage = CommandBookUtil.replaceColorMacros(
+                    CommandBookUtil.replaceMacros(sender, config.callMessageTarget))
+                    .replaceAll("%ctarget%", PlayerUtil.toColoredName(target, null))
+                    .replaceAll("%target%", PlayerUtil.toName(target));
+            sender.sendMessage(senderMessage);
+            target.sendMessage(targetMessage);
         }
 
         @Command(aliases = {"bring", "tphere", "summon", "s"}, usage = "<target>", desc = "Bring a player to you", min = 1, max = 1)
@@ -238,9 +246,16 @@ public class TeleportComponent extends BukkitComponent implements Listener {
                 Player target = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
 
                 if (sessions.getSession(TeleportSession.class, player).isBringable(target)) {
-                    sender.sendMessage(ChatColor.YELLOW + config.bringMessageSender);
-                    target.sendMessage(ChatColor.YELLOW +
-                            String.format(config.bringMessageTarget, PlayerUtil.toColoredName(sender, ChatColor.YELLOW)));
+                    String senderMessage = CommandBookUtil.replaceColorMacros(
+                            CommandBookUtil.replaceMacros(sender, config.bringMessageSender))
+                            .replaceAll("%ctarget%", PlayerUtil.toColoredName(target, null))
+                            .replaceAll("%target%", target.getName());
+                    String targetMessage = CommandBookUtil.replaceColorMacros(
+                            CommandBookUtil.replaceMacros(sender, config.bringMessageTarget))
+                            .replaceAll("%ctarget%", PlayerUtil.toColoredName(target, null))
+                            .replaceAll("%target%", target.getName());
+                    sender.sendMessage(senderMessage);
+                    target.sendMessage(targetMessage);
                     target.teleport(player);
                 } else {
                     throw new CommandException(config.bringMessageNoPerm);
