@@ -71,7 +71,10 @@ public class SessionComponent extends BukkitComponent implements Runnable, Liste
                 session.handleDisconnect();
                 session.save(new YAMLNodeConfigurationNode(getSessionConfiguration(player.getName(), session.getClass())));
             }
-            getUserConfiguration(player.getName()).save();
+            YAMLProcessor proc = getUserConfiguration(player.getName(), false);
+            if (proc != null) {
+                proc.save();
+            }
         }
     }
 
@@ -226,11 +229,15 @@ public class SessionComponent extends BukkitComponent implements Runnable, Liste
     }
 
     // Persistence-related methods
-    private YAMLProcessor getUserConfiguration(String player) {
+    private YAMLProcessor getUserConfiguration(String player, boolean create) {
         YAMLProcessor processor = sessionDataStores.get(player);
         if (processor == null) {
             File userFile = new File(sessionsDir, player + ".yml");
             if (!userFile.exists()) {
+                if (!create) {
+                    return null;
+                }
+
                 try {
                     userFile.createNewFile();
                 } catch (IOException e) {
@@ -249,7 +256,7 @@ public class SessionComponent extends BukkitComponent implements Runnable, Liste
     }
 
     private YAMLNode getSessionConfiguration(String player, Class<? extends PersistentSession> type) {
-        YAMLProcessor proc = getUserConfiguration(player);
+        YAMLProcessor proc = getUserConfiguration(player, true);
         String className = type.getCanonicalName().replaceAll("\\.", "/");
         YAMLNode sessionNode = proc.getNode(className);
         if (sessionNode == null) {
@@ -274,7 +281,10 @@ public class SessionComponent extends BukkitComponent implements Runnable, Liste
 
                     if (!sess.isRecent()) {
                         i2.remove();
-                        getUserConfiguration(sess.getSenderName()).removeProperty(sess.getClass().getCanonicalName().replaceAll("\\.", "/"));
+                        YAMLProcessor processor = getUserConfiguration(sess.getSenderName(), false);
+                        if (processor != null) {
+                            processor.removeProperty(sess.getClass().getCanonicalName().replaceAll("\\.", "/"));
+                        }
                     }
                 }
 
@@ -294,26 +304,28 @@ public class SessionComponent extends BukkitComponent implements Runnable, Liste
             session.handleReconnect(event.getPlayer());
         }
 
-        YAMLProcessor config = getUserConfiguration(event.getPlayer().getName());
-        List<String> keys = config.getKeys(null);
-        if (keys != null) {
-            for (String key : keys) {
-                Class<? extends PersistentSession> sessionType;
-                try {
-                    Class<?> clazz = Class.forName(key.replaceAll("/", "."));
-                    if (!PersistentSession.class.isAssignableFrom(clazz)) {
+        YAMLProcessor config = getUserConfiguration(event.getPlayer().getName(), false);
+        if (config != null) {
+            List<String> keys = config.getKeys(null);
+            if (keys != null) {
+                for (String key : keys) {
+                    Class<? extends PersistentSession> sessionType;
+                    try {
+                        Class<?> clazz = Class.forName(key.replaceAll("/", "."));
+                        if (!PersistentSession.class.isAssignableFrom(clazz)) {
+                            continue;
+                        }
+                        sessionType = clazz.asSubclass(PersistentSession.class);
+                    } catch (ClassNotFoundException e) {
                         continue;
                     }
-                    sessionType = clazz.asSubclass(PersistentSession.class);
-                } catch (ClassNotFoundException e) {
-                    continue;
-                }
-                YAMLNode node = config.getNode(key);
-                if (node != null) {
-                    PersistentSession session = getSession(sessionType, event.getPlayer());
-                    session.load(new YAMLNodeConfigurationNode(node));
-                }
+                    YAMLNode node = config.getNode(key);
+                    if (node != null) {
+                        PersistentSession session = getSession(sessionType, event.getPlayer());
+                        session.load(new YAMLNodeConfigurationNode(node));
+                    }
 
+                }
             }
         }
     }
@@ -329,7 +341,10 @@ public class SessionComponent extends BukkitComponent implements Runnable, Liste
             session.handleDisconnect();
             session.save(new YAMLNodeConfigurationNode(getSessionConfiguration(event.getPlayer().getName(), session.getClass())));
         }
-        getUserConfiguration(event.getPlayer().getName()).save();
+        YAMLProcessor proc = getUserConfiguration(event.getPlayer().getName(), false);
+        if (proc != null) {
+            proc.save();
+        }
     }
 
     public class Commands {
