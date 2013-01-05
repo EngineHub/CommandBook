@@ -56,6 +56,9 @@ public class TeleportPlayerIterator extends PlayerIteratorAction {
         if (relative[2]) newLoc.setZ(oldLoc.getZ() + loc.getZ());
 
         newLoc.getChunk().load(true);
+        if (player.getVehicle() != null) {
+            player.getVehicle().eject();
+        }
         player.teleport(newLoc);
     }
 
