@@ -18,6 +18,7 @@
 
 package com.sk89q.commandbook.session;
 
+import com.google.common.base.Preconditions;
 import com.sk89q.commandbook.CommandBook;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
@@ -322,6 +323,7 @@ public class SessionComponent extends BukkitComponent implements Runnable, Liste
                     YAMLNode node = config.getNode(key);
                     if (node != null) {
                         PersistentSession session = getSession(sessionType, event.getPlayer());
+                        Preconditions.checkNotNull(session, "Session " + sessionType + " does not have a valid factory!");
                         session.load(new YAMLNodeConfigurationNode(node));
                     }
 
