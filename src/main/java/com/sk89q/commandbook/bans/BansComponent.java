@@ -99,19 +99,15 @@ public class BansComponent extends BukkitComponent implements Listener {
     public void playerLogin(PlayerLoginEvent event) {
         final Player player = event.getPlayer();
 
-        try {
-            if (!CommandBook.inst().hasPermission(player, "commandbook.bans.exempt")) {
-                if (getBanDatabase().isBannedName(player.getName())) {
-                    event.disallow(PlayerLoginEvent.Result.KICK_BANNED,
-                            getBanDatabase().getBannedNameMessage(player.getName()));
-                } else if (getBanDatabase().isBannedAddress(
-                        player.getAddress().getAddress())) {
-                    event.disallow(PlayerLoginEvent.Result.KICK_BANNED, getBanDatabase().getBannedAddressMessage(
-                            player.getAddress().getAddress().getHostAddress()));
-                }
+        if (!CommandBook.inst().hasPermission(player, "commandbook.bans.exempt")) {
+            if (getBanDatabase().isBannedName(player.getName())) {
+                event.disallow(PlayerLoginEvent.Result.KICK_BANNED,
+                        getBanDatabase().getBannedNameMessage(player.getName()));
+            } else if (getBanDatabase().isBannedAddress(
+                    event.getAddress())) {
+                event.disallow(PlayerLoginEvent.Result.KICK_BANNED, getBanDatabase().getBannedAddressMessage(
+                        event.getAddress().getHostAddress()));
             }
-        } catch (NullPointerException e) {
-            // Bug in CraftBukkit
         }
     }
 
@@ -158,7 +154,7 @@ public class BansComponent extends BukkitComponent implements Listener {
         }
 
         @Command(aliases = {"ban"}, usage = "[-t end ] <target> [reason...]",
-                desc = "Ban a user", flags = "set:o", min = 1, max = -1)
+                desc = "Ban a user or IP address (with the -i flag)", flags = "set:o", min = 1, max = -1)
         @CommandPermissions({"commandbook.bans.ban"})
         public void ban(CommandContext args, CommandSender sender) throws CommandException {
             String banName;
@@ -169,7 +165,6 @@ public class BansComponent extends BukkitComponent implements Listener {
 
             final boolean hasExemptOverride = args.hasFlag('o')
                     && CommandBook.inst().hasPermission(sender, "commandbook.bans.exempt.override");
-
             // Check if it's a player in the server right now
             try {
                 Player player;
@@ -208,7 +203,7 @@ public class BansComponent extends BukkitComponent implements Listener {
 
             //Broadcast the Message
             if (config.broadcastBans && !args.hasFlag('s')) {
-                BasePlugin.server().broadcastMessage(ChatColor.YELLOW
+                CommandBook.server().broadcastMessage(ChatColor.YELLOW
                         + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + " has banned " + banName
                         + " - " + message);
             }
@@ -219,16 +214,17 @@ public class BansComponent extends BukkitComponent implements Listener {
                 sender.sendMessage(ChatColor.RED + "Bans database failed to save. See console.");
             }
         }
-        /*
-            @Command(aliases = {"banip"},
-                    usage = "<target> [reason...]", desc = "Ban an IP address",
+
+            @Command(aliases = {"banip", "ipban"},
+                    usage = "<target> [reason...]", desc = "Ban an IP address", flags = "st:",
                     min = 1, max = -1)
             @CommandPermissions({"commandbook.bans.ban.ip"})
-            public static void banIP(CommandContext args, CommandBookPlugin plugin,
+            public void banIP(CommandContext args,
                     CommandSender sender) throws CommandException {
 
                 String message = args.argsLength() >= 2 ? args.getJoinedStrings(1)
                         : "Banned!";
+                long endDate = args.hasFlag('t') ? CommandBookUtil.matchFutureDate(args.getFlag('t')) : 0L;
 
                 String addr = args.getString(0)
                             .replace("\r", "")
@@ -237,22 +233,22 @@ public class BansComponent extends BukkitComponent implements Listener {
                             .replace("\b", "");
 
                 // Need to kick + log
-                for (Player player : plugin.getServer().getOnlinePlayers()) {
+                for (Player player : CommandBook.server().getOnlinePlayers()) {
                     if (player.getAddress().getAddress().getHostAddress().equals(addr)) {
                         player.kickPlayer(message);
-                        plugin.getBanDatabase().logKick(player, sender, message);
+                        getBanDatabase().logKick(player, sender, message);
                     }
                 }
 
-                plugin.getBanDatabase().banAddress(addr, sender, message);
+                getBanDatabase().ban(null, addr, sender, message, endDate);
 
                 sender.sendMessage(ChatColor.YELLOW + addr + " banned.");
 
-                if (!plugin.getBanDatabase().save()) {
+                if (!getBanDatabase().save()) {
                     sender.sendMessage(ChatColor.RED + "Bans database failed to save. See console.");
                 }
             }
-        */
+
         @Command(aliases = {"unban"}, usage = "<target>", desc = "Unban a user", min = 1, max = -1)
         @CommandPermissions({"commandbook.bans.unban"})
         public void unban(CommandContext args, CommandSender sender) throws CommandException {
@@ -276,7 +272,7 @@ public class BansComponent extends BukkitComponent implements Listener {
             }
         }
 
-        @Command(aliases = {"unbanip"},
+        @Command(aliases = {"unbanip", "unipban"},
                 usage = "<target> [reason...]", desc = "Unban an IP address",
                 min = 1, max = -1)
         @CommandPermissions({"commandbook.bans.unban.ip"})
@@ -291,7 +287,7 @@ public class BansComponent extends BukkitComponent implements Listener {
             String message = args.argsLength() >= 2 ? args.getJoinedStrings(1)
                     : "Unbanned!";
 
-            if (!getBanDatabase().unban(null, addr, sender, message)) {
+            if (getBanDatabase().unban(null, addr, sender, message)) {
                 sender.sendMessage(ChatColor.YELLOW + addr + " unbanned.");
 
                 if (!getBanDatabase().save()) {
