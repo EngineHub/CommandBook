@@ -18,6 +18,11 @@
 
 package com.sk89q.commandbook;
 
+import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+
 import com.sk89q.commandbook.util.PlayerUtil;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
@@ -25,10 +30,6 @@ import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.zachsthings.libcomponents.ComponentInformation;
 import com.zachsthings.libcomponents.bukkit.BukkitComponent;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 @ComponentInformation(friendlyName = "Player Commands", desc = "Various player-related commands.")
 public class PlayerComponent extends BukkitComponent {
@@ -73,8 +74,15 @@ public class PlayerComponent extends BukkitComponent {
                         modeString = args.getString(0);
                         player = PlayerUtil.checkPlayer(sender);
                     } else { // 2 - first is player, second mode
-                        player = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
-                        modeString = args.getString(1);
+                        // HERP DERP VANILLA COMMAND BLOCKS
+                        try {
+                            modeString = String.valueOf(args.getInteger(0));
+                            player = PlayerUtil.matchSinglePlayer(sender, args.getString(1));
+                        } catch (NumberFormatException e) {
+                            // NOPE NOT VANILLA COMMAND BLOCKS
+                            player = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
+                            modeString = args.getString(1);
+                        }
                     }
 
                     if (player != sender) {
