@@ -181,6 +181,10 @@ public class SessionComponent extends BukkitComponent implements Runnable, Liste
             if (session == null) {
                 session = getSessionFactory(type).createSession(user);
                 if (session != null) {
+                    YAMLNode node = getSessionConfiguration(user.getName(), type, false);
+                    if (node != null) {
+                       session.load(new YAMLNodeConfigurationNode(node));
+                    }
                     session.handleReconnect(user);
                     userSessions.put(type, session);
                 }
@@ -257,10 +261,18 @@ public class SessionComponent extends BukkitComponent implements Runnable, Liste
     }
 
     private YAMLNode getSessionConfiguration(String player, Class<? extends PersistentSession> type) {
-        YAMLProcessor proc = getUserConfiguration(player, true);
+        return getSessionConfiguration(player, type, true);
+    }
+
+    private YAMLNode getSessionConfiguration(String player, Class<? extends PersistentSession> type, boolean create) {
+        YAMLProcessor proc = getUserConfiguration(player, create);
+        if (proc == null) {
+            return null;
+        }
+
         String className = type.getCanonicalName().replaceAll("\\.", "/");
         YAMLNode sessionNode = proc.getNode(className);
-        if (sessionNode == null) {
+        if (sessionNode == null && create) {
             sessionNode = proc.addNode(className);
         }
         return sessionNode;
@@ -303,32 +315,6 @@ public class SessionComponent extends BukkitComponent implements Runnable, Liste
         for (PersistentSession session : getSessions(event.getPlayer())) {
             session.load(new YAMLNodeConfigurationNode(getSessionConfiguration(event.getPlayer().getName(), session.getClass())));
             session.handleReconnect(event.getPlayer());
-        }
-
-        YAMLProcessor config = getUserConfiguration(event.getPlayer().getName(), false);
-        if (config != null) {
-            List<String> keys = config.getKeys(null);
-            if (keys != null) {
-                for (String key : keys) {
-                    Class<? extends PersistentSession> sessionType;
-                    try {
-                        Class<?> clazz = Class.forName(key.replaceAll("/", "."));
-                        if (!PersistentSession.class.isAssignableFrom(clazz)) {
-                            continue;
-                        }
-                        sessionType = clazz.asSubclass(PersistentSession.class);
-                    } catch (ClassNotFoundException e) {
-                        continue;
-                    }
-                    YAMLNode node = config.getNode(key);
-                    if (node != null) {
-                        PersistentSession session = getSession(sessionType, event.getPlayer());
-                        Preconditions.checkNotNull(session, "Session " + sessionType + " does not have a valid factory!");
-                        session.load(new YAMLNodeConfigurationNode(node));
-                    }
-
-                }
-            }
         }
     }
 
