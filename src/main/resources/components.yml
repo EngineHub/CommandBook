@@ -64,6 +64,9 @@ help:
 god:
     class: com.sk89q.commandbook.GodComponent
     default: true
+flight:
+    class: com.sk89q.commandbook.FlightComponent
+    default: true
 #cooldowns:
 #    class: com.sk89q.commandbook.CooldownsComponent
 #    default: false
