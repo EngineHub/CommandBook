@@ -536,6 +536,37 @@ public class FunComponent extends BukkitComponent {
                 sender.sendMessage(ChatColor.YELLOW.toString() + "Fireball attack sent.");
             }
         }
+        @Command(aliases = {"hat"},
+                usage = "", desc = "Places the block in hand on the player's head",
+                flags = "", min = 0, max = 1)
+        @CommandPermissions({"commandbook.hat"})
+        public void hat(CommandContext args, CommandSender sender) throws CommandException {
+            ItemStack item = null;
+            int amt = config.defaultItemStackSize;
+            Iterable<Player> targets = null;
 
+            // Check permissions!
+            for (Player player : targets) {
+                if (player != sender) {
+                    CommandBook.inst().checkPermission(sender, "commandbook.hat.other");
+                    break;
+                }
+            }
+            
+            Player player = (Player)sender;
+            
+            if (player.getItemInHand().getType() != Material.AIR) {
+                ItemStack itemHand = player.getItemInHand();
+                PlayerInventory inventory = player.getInventory();
+                ItemStack itemHead = inventory.getHelmet();
+                inventory.removeItem(new ItemStack[] { itemHand });
+                inventory.setHelmet(itemHand);
+                inventory.setItemInHand(itemHead);
+                player.sendMessage(ChatColor.YELLOW + "Item successfuly put on your head.");
+                return true;
+            }
+            player.sendMessage(ChatColor.YELLOW + "You must have something to put on your head!");
+            return true;
+        }
     }
 }
