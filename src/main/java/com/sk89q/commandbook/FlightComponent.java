@@ -1,5 +1,14 @@
 package com.sk89q.commandbook;
 
+import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerGameModeChangeEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+
 import com.sk89q.commandbook.session.PersistentSession;
 import com.sk89q.commandbook.session.SessionComponent;
 import com.sk89q.commandbook.util.PlayerUtil;
@@ -11,25 +20,24 @@ import com.sk89q.minecraft.util.commands.NestedCommand;
 import com.zachsthings.libcomponents.ComponentInformation;
 import com.zachsthings.libcomponents.InjectComponent;
 import com.zachsthings.libcomponents.bukkit.BukkitComponent;
+import com.zachsthings.libcomponents.config.ConfigurationBase;
 import com.zachsthings.libcomponents.config.Setting;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerGameModeChangeEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
 
 @ComponentInformation(friendlyName = "Flight", desc = "Allows players to fly and control flight speed")
 public class FlightComponent extends BukkitComponent implements Listener {
     private static final float DEFAULT_FLIGHT_SPEED = 0.1f, DEFAULT_WALK_SPEED = 0.2f;
     @InjectComponent private SessionComponent sessions;
+    private LocalConfiguration config;
 
     @Override
     public void enable() {
         CommandBook.registerEvents(this);
         registerCommands(Commands.class);
+        config = configure(new LocalConfiguration());
+    }
+
+    private static class LocalConfiguration extends ConfigurationBase {
+        @Setting("auto-enable") public boolean autoEnable = false;
     }
 
     public static class FlightSession extends PersistentSession {
@@ -161,7 +169,7 @@ public class FlightComponent extends BukkitComponent implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         FlightSession session = sessions.getSession(FlightSession.class, event.getPlayer());
-        if (CommandBook.inst().hasPermission(event.getPlayer(), "commandbook.flight.onjoin")) {
+        if (config.autoEnable && CommandBook.inst().hasPermission(event.getPlayer(), "commandbook.flight.onjoin")) {
             event.getPlayer().setAllowFlight(session.canFly = true);
         }
     }
