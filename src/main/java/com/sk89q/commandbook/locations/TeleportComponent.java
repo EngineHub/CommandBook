@@ -183,7 +183,7 @@ public class TeleportComponent extends BukkitComponent implements Listener {
                 if (yArg.startsWith("~")) relative[1] = true;
                 if (zArg.startsWith("~")) relative[2] = true;
                 if (relative[0] || relative[1] || relative[2]) {
-                    CommandBook.inst().checkPermission(PlayerUtil.checkPlayer(sender), "commandbook.locations.coords.relative");
+                    CommandBook.inst().checkPermission(sender, "commandbook.locations.coords.relative");
                 }
                 int x = Integer.valueOf(xArg.replace("~", ""));
                 int y = Integer.valueOf(yArg.replace("~", ""));
@@ -199,7 +199,7 @@ public class TeleportComponent extends BukkitComponent implements Listener {
                     }
                 }
                 loc = new Location(world, x, y, z);
-                CommandBook.inst().checkPermission(PlayerUtil.checkPlayer(sender), loc.getWorld(), "commandbook.teleport");
+                CommandBook.inst().checkPermission(sender, loc.getWorld(), "commandbook.teleport");
                 for (Player target : targets) {
                     if (target != sender) { // if any of the targets is not the sender, we need to check .other
                         CommandBook.inst().checkPermission(sender, "commandbook.teleport.other");
