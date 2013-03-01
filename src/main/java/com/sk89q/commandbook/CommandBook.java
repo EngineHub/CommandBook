@@ -111,7 +111,6 @@ public final class CommandBook extends BasePlugin {
 		final CommandsManagerRegistration cmdRegister = new CommandsManagerRegistration(this, commands);
         if (lowPriorityCommandRegistration) {
             getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
-                @Override
                 public void run() {
                     cmdRegister.register(CommandBookCommands.CommandBookParentCommand.class);
                 }

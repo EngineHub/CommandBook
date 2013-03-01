@@ -269,12 +269,10 @@ public class FlatFileBanDatabase implements BanDatabase {
         throw new UnsupportedOperationException("Importing to legacy ban storage provider not supported.");
     }
 
-    @Override
     public Ban getBannedName(String name) {
         return bannedNames.get(name);
     }
 
-    @Override
     public Ban getBannedAddress(String address) {
         return null;
     }

@@ -40,6 +40,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import static com.sk89q.commandbook.CommandBookUtil.giveItem;
 import static com.sk89q.commandbook.CommandBookUtil.takeItem;
@@ -66,6 +67,7 @@ public class InventoryComponent extends BukkitComponent {
         @Setting("allowed-items") public Set<Integer> allowedItems = Collections.emptySet();
         @Setting("disllowed-items") public Set<Integer> disallowedItems = Collections.emptySet();
         @Setting("default-item-stack-size") public int defaultItemStackSize = 1;
+        @Setting("stack-glitchy-items") public boolean stackGlitchyItems = false;
     }
 
     // -- Helper methods
@@ -413,8 +415,10 @@ public class InventoryComponent extends BukkitComponent {
                         // Same type?
                         // Blocks store their color in the damage value
                         if (item2.getTypeId() == item.getTypeId() &&
-                                ((!ItemType.usesDamageValue(item.getTypeId()) && ignoreDamaged)
-                                        || item.getDurability() == item2.getDurability()) &&
+                                ((ItemType.usesDamageValue(item.getTypeId()) && ignoreDamaged)
+                                        || !ItemType.usesDamageValue(item.getTypeId())) &&
+                                (ItemType.isGlitchyStack(item.getTypeId()) && config.stackGlitchyItems
+                                		|| !ItemType.isGlitchyStack(item.getTypeId())) && 
                                 item.getEnchantments().equals(item2.getEnchantments())) {
                             // This stack won't fit in the parent stack
                             if (item2.getAmount() > needed) {
