@@ -68,19 +68,28 @@ public class FunComponent extends BukkitComponent {
         if (args.hasFlag('b') && creature instanceof Ageable) {
             ((Ageable) creature).setBaby();
         }
+        if (args.hasFlag('t') && creature instanceof Tameable && sender instanceof AnimalTamer) {
+            ((Tameable) creature).setOwner((AnimalTamer) sender);
+        }
 
         if (!specialType.equals("")) {
             if (creature instanceof Wolf) {
-                if (specialType.matches("angry")) {
+                if (specialType.contains("angry")) {
                     ((Wolf) creature).setAngry(true);
-                    return creature;
-                } else if (specialType.matches("sit(ting)?")) {
-                    ((Wolf) creature).setSitting(true);
-                    return creature;
-                } else if (specialType.matches("tame(d)?") && sender instanceof Player) {
-                    ((Wolf) creature).setOwner(((Player) sender));
-                    return creature;
                 }
+                if (specialType.contains("sit(ting)?")) {
+                    ((Wolf) creature).setSitting(true);
+                }
+                return creature;
+            } else if (creature instanceof Ocelot) {
+                if (specialType.contains("black")) {
+                    ((Ocelot) creature).setCatType(Ocelot.Type.BLACK_CAT);
+                } else if (specialType.contains("red")) {
+                    ((Ocelot) creature).setCatType(Ocelot.Type.RED_CAT);
+                } else if (specialType.contains("siamese")) {
+                    ((Ocelot) creature).setCatType(Ocelot.Type.SIAMESE_CAT);
+                } // wild is default
+                return creature;
             } else if (creature instanceof Creeper
                     && specialType.matches("(power(ed)?|electric|lightning|shock(ed)?)")) {
                 ((Creeper) creature).setPowered(true);
@@ -99,6 +108,11 @@ public class FunComponent extends BukkitComponent {
             } else if (creature instanceof Slime) {
                 ((Slime) creature).setSize(Integer.parseInt(specialType));
                 return creature;
+            } else if (creature instanceof Skeleton) {
+                if (specialType.matches("wither")) {
+                    ((Skeleton) creature).setSkeletonType(Skeleton.SkeletonType.WITHER);
+                    return creature;
+                }
             } else if (creature instanceof PigZombie) {
                 if (specialType.matches("angry")) {
                     ((PigZombie) creature).setAngry(true);
@@ -149,7 +163,7 @@ public class FunComponent extends BukkitComponent {
         }
 
         @Command(aliases = {"spawnmob"}, usage = "<mob>[|rider] [count] [location]", desc = "Spawn a mob",
-                flags = "dirb", min = 1, max = 4)
+                flags = "dirbt", min = 1, max = 4)
         @CommandPermissions({"commandbook.spawnmob"})
         public void spawnMob(CommandContext args, CommandSender sender) throws CommandException {
             Location loc;
@@ -251,7 +265,7 @@ public class FunComponent extends BukkitComponent {
                 }
 
                 if (args.hasFlag('d')) {
-                    player.setHealth(player.getHealth() - 1);
+                    player.setHealth(Math.max(0, player.getHealth() - 1));
                 }
 
                 if (args.hasFlag('s')) {

@@ -415,7 +415,7 @@ public class InventoryComponent extends BukkitComponent {
                         if (item2.getTypeId() == item.getTypeId() &&
                                 ((!ItemType.usesDamageValue(item.getTypeId()) && ignoreDamaged)
                                         || item.getDurability() == item2.getDurability()) &&
-                                item.getEnchantments().equals(item2.getEnchantments())) {
+                                item.getItemMeta() == item2.getItemMeta()) {
                             // This stack won't fit in the parent stack
                             if (item2.getAmount() > needed) {
                                 item.setAmount(64);

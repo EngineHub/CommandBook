@@ -153,7 +153,7 @@ public class PlayerComponent extends BukkitComponent {
             }
 
             for (Player player : targets) {
-                player.setHealth(20);
+                player.setHealth(player.getMaxHealth());
                 player.setFoodLevel(20);
 
                 // Tell the user
