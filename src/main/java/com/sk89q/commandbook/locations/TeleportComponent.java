@@ -165,9 +165,9 @@ public class TeleportComponent extends BukkitComponent implements Listener {
             } else if (args.argsLength() == 3) {
                 // matches #2 - can only be used by a player
                 targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
-                int x = args.getInteger(1);
-                int y = args.getInteger(2);
-                int z = args.getInteger(3);
+                double x = args.getDouble(1);
+                double y = args.getDouble(2);
+                double z = args.getDouble(3);
                 loc = new Location((PlayerUtil.checkPlayer(sender)).getWorld(), x, y, z);
                 if (loc.getX() == loc.getBlockX()) loc.add(0.5, 0, 0);
                 if (loc.getZ() == loc.getBlockZ()) loc.add(0, 0, 0.5);
@@ -185,9 +185,9 @@ public class TeleportComponent extends BukkitComponent implements Listener {
                 if (relative[0] || relative[1] || relative[2]) {
                     CommandBook.inst().checkPermission(sender, "commandbook.locations.coords.relative");
                 }
-                int x = Integer.valueOf(xArg.replace("~", ""));
-                int y = Integer.valueOf(yArg.replace("~", ""));
-                int z = Integer.valueOf(zArg.replace("~", ""));
+                double x = Double.parseDouble(xArg.replace("~", ""));
+                double y = Double.parseDouble(yArg.replace("~", ""));
+                double z = Double.parseDouble(zArg.replace("~", ""));
                 World world;
                 try { // for CommandBlock support
                     world = LegacyBukkitCompat.extractWorld(sender);
