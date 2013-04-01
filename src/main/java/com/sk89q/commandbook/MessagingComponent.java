@@ -214,7 +214,7 @@ public class MessagingComponent extends BukkitComponent implements Listener {
             }
         }
 
-        @Command(aliases = {"msg", "message", "whisper", "pm", "tell"}, usage = "<target> <message...>", desc = "Private message a user", min = 2, max = -1)
+        @Command(aliases = {"msg", "message", "whisper", "pm", "tell", "w"}, usage = "<target> <message...>", desc = "Private message a user", min = 2, max = -1)
         @CommandPermissions({"commandbook.msg"})
         public void msg(CommandContext args, CommandSender sender) throws CommandException {
             // This will throw errors as needed
