@@ -42,7 +42,6 @@ public class PlayerComponent extends BukkitComponent {
         @Command(aliases = {"gamemode", "gm"},
                 usage = "[player] [gamemode]", desc = "Change a player's gamemode",
                 flags = "c", min = 0, max = 2)
-        @CommandPermissions({"commandbook.gamemode"})
         public void gamemode(CommandContext args, CommandSender sender) throws CommandException {
 
             Player player;
@@ -51,17 +50,11 @@ public class PlayerComponent extends BukkitComponent {
 
             if (args.argsLength() == 0) { // check self
                 // check current player
-                CommandBook.inst().checkPermission(sender, "commandbook.gamemode.check");
                 player = PlayerUtil.checkPlayer(sender);
                 mode = player.getGameMode();
             } else {
                 if (args.hasFlag('c')) { //check other player
                     player = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
-                    if (player != sender) {
-                        CommandBook.inst().checkPermission(sender, "commandbook.gamemode.check.other");
-                    } else {
-                        CommandBook.inst().checkPermission(sender, "commandbook.gamemode.check");
-                    }
                     mode = player.getGameMode();
                 } else {
                     change = true;
@@ -85,11 +78,9 @@ public class PlayerComponent extends BukkitComponent {
                         }
                     }
 
-                    if (player != sender) {
-                        CommandBook.inst().checkPermission(sender, "commandbook.gamemode.change.other");
-                    } else {
-                        CommandBook.inst().checkPermission(sender, "commandbook.gamemode.change");
-                    }
+                    CommandBook.inst().checkPermission(sender, "commandbook.gamemode."
+                            + (change ? "change" : "check")
+                            + (player != sender ? ".other" : ""));
 
                     try {
                         mode = GameMode.valueOf(modeString.toUpperCase());
@@ -125,6 +116,7 @@ public class PlayerComponent extends BukkitComponent {
             sender.sendMessage(ChatColor.YELLOW + "Player " + (CommandBook.inst().useDisplayNames ? player.getDisplayName() : player.getName())
                     + ChatColor.YELLOW + message + ".");
         }
+
         @Command(aliases = {"heal"},
         		usage = "[player]", desc = "Heal a player",
         		flags = "s", min = 0, max = 1)
