@@ -86,7 +86,7 @@ public abstract class LocationsComponent extends BukkitComponent {
             throw new CommandException("No " + name.toLowerCase() + " found for " + name + " in world " + world.getName());
         }
         if (!loc.getCreatorName().equals(sender.getName())) {
-            CommandBook.inst().checkPermission(sender, "commandbook." + name.toLowerCase() + ".remove.other");
+            CommandBook.inst().checkPermission(sender, "commandbook." + this.name.toLowerCase() + ".remove.other");
         }
 
         getManager().remove(world, name);
