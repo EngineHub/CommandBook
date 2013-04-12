@@ -88,7 +88,7 @@ public class TeleportSession extends PersistentSession {
 
         locationHistory.add(0, location);
         while (locationHistory.size() > LOCATION_HISTORY_SIZE) {
-            locationHistory.poll();
+            locationHistory.pollLast();
         }
     }
 
