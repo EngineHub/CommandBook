@@ -165,20 +165,22 @@ public class TeleportComponent extends BukkitComponent implements Listener {
             } else if (args.argsLength() == 3) {
                 // matches #2 - can only be used by a player
                 targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
-                double x = args.getDouble(1);
-                double y = args.getDouble(2);
-                double z = args.getDouble(3);
+                double x = args.getDouble(0);
+                double y = args.getDouble(1);
+                double z = args.getDouble(2);
                 loc = new Location((PlayerUtil.checkPlayer(sender)).getWorld(), x, y, z);
                 if (loc.getX() == loc.getBlockX()) loc.add(0.5, 0, 0);
                 if (loc.getZ() == loc.getBlockZ()) loc.add(0, 0, 0.5);
                 // check location permission
                 CommandBook.inst().checkPermission(sender, loc.getWorld(), "commandbook.teleport");
+                CommandBook.inst().checkPermission(sender, loc.getWorld(), "commandbook.locations.coords");
             } else if (args.argsLength() == 4) {
                 targets = PlayerUtil.matchPlayers(sender, args.getString(0)); // matches #1
                 // support relative location (~5 -> current coord + 5)
                 String xArg = args.getString(1);
                 String yArg = args.getString(2);
                 String zArg = args.getString(3);
+                CommandBook.inst().checkPermission(sender, "commandbook.locations.coords");
                 if (xArg.startsWith("~")) relative[0] = true;
                 if (yArg.startsWith("~")) relative[1] = true;
                 if (zArg.startsWith("~")) relative[2] = true;
