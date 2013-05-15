@@ -55,6 +55,11 @@ public class TeleportPlayerIterator extends PlayerIteratorAction {
         if (relative[1]) newLoc.setY(oldLoc.getY() + loc.getY());
         if (relative[2]) newLoc.setZ(oldLoc.getZ() + loc.getZ());
 
+        if (newLoc.getPitch() == 0.0 && newLoc.getYaw() == 0.0) {
+            newLoc.setPitch(oldLoc.getPitch());
+            newLoc.setYaw(oldLoc.getYaw());
+        }
+
         newLoc.getChunk().load(true);
         if (player.getVehicle() != null) {
             player.getVehicle().eject();
