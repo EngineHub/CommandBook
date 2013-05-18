@@ -187,10 +187,12 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
         }
         for (Iterator<NamedLocation> i = locations.values().iterator(); i.hasNext();) {
             NamedLocation loc = i.next();
-            if (CommandBook.server().getWorld(loc.getWorldName()) == null) {
-                i.remove();
-                loc.getLocation().setWorld(null);
-                getNestedList(unloadedLocations, loc.getWorldName()).add(loc);
+            if (loc.getWorldName() != null) {    
+                if (CommandBook.server().getWorld(loc.getWorldName()) == null) {
+                    i.remove();
+                    loc.getLocation().setWorld(null);
+                    getNestedList(unloadedLocations, loc.getWorldName()).add(loc);
+                }
             }
         }
     }
