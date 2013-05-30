@@ -28,10 +28,6 @@
       <url>http://maven.sk89q.com/repo/</url>
     </repository>
     <repository>
-      <id>zml-repo</id>
-      <url>http://files.zachsthings.com/repo</url>
-    </repository>
-    <repository>
       <id>bukkit-repo</id>
       <url>http://repo.bukkit.org/content/groups/public/</url>
     </repository>
@@ -40,12 +36,12 @@
     <dependency>
       <groupId>com.sk89q</groupId>
       <artifactId>worldedit</artifactId>
-      <version>5.5</version>
+      <version>5.5.6</version>
     </dependency>
     <dependency>
       <groupId>com.zachsthings.libcomponents</groupId>
       <artifactId>libcomponents-bukkit</artifactId>
-      <version>1.2-SNAPSHOT</version>
+      <version>1.2</version>
       <exclusions>
         <exclusion>
           <groupId>org.spout</groupId>
