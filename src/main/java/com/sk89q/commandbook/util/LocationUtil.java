@@ -143,13 +143,12 @@ public class LocationUtil {
 
             // Handle special hash tag groups
         } else if (filter.charAt(0) == '#') {
-            CommandBook.inst().checkPermission(source, "commandbook.spawn");
-
             String[] args = filter.split(":");
 
             // Handle #world, which matches player of the same world as the
             // calling source
             if (args[0].equalsIgnoreCase("#spawn")) {
+                CommandBook.inst().checkPermission(source, "commandbook.spawn");
                 if (args.length > 1) {
                     return matchWorld(source, args[1]).getSpawnLocation();
                 } else {
@@ -159,6 +158,7 @@ public class LocationUtil {
 
                 // Handle #target, which matches the player's target position
             } else if (args[0].equalsIgnoreCase("#target")) {
+                CommandBook.inst().checkPermission(source, "commandbook.locations.target");
                 Player player = checkPlayer(source);
                 Location playerLoc = player.getLocation();
                 Block targetBlock = player.getTargetBlock(null, 100);
