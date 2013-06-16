@@ -63,6 +63,7 @@ public class WorldComponent extends BukkitComponent {
                     || weatherStr.equalsIgnoreCase("snowy")
                     || weatherStr.equalsIgnoreCase("rain")
                     || weatherStr.equalsIgnoreCase("snow")
+                    || weatherStr.equalsIgnoreCase("storm")
                     || weatherStr.equalsIgnoreCase("on")) {
 
                 world.setStorm(true);
@@ -84,6 +85,7 @@ public class WorldComponent extends BukkitComponent {
 
             } else if (weatherStr.equalsIgnoreCase("clear")
                     || weatherStr.equalsIgnoreCase("sunny")
+                    || weatherStr.equalsIgnoreCase("sun")
                     || weatherStr.equalsIgnoreCase("snowy")
                     || weatherStr.equalsIgnoreCase("rain")
                     || weatherStr.equalsIgnoreCase("snow")
