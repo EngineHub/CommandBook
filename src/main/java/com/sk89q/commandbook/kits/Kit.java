@@ -83,8 +83,7 @@ public class Kit {
         }
 
         for (ItemStack item : items) {
-            player.getInventory().addItem(new ItemStack(item.getType(),
-                    item.getAmount(), item.getDurability()));
+            player.getInventory().addItem(item.clone());
         }
 
         return true;
