@@ -1,3 +1,26 @@
+2.3
+- Fixed missing support for enchantments in kits.
+- Added storm and sun commands as aliases.
+- Added node commandbook.locations.target for #target. (eg /tp #target, /put)
+- Fixed potential warning in MCPC+ dimension unloads.
+- Maintain pitch/yaw information for non-player teleports.
+- Fixed the return command.
+- Fixed warps/homes remove command checking wrong permission.
+- Overrided vanilla 'w' alias for tell command.
+- Condense and corrected /gamemode permissions checks.
+- Use decimals instead of whole numbers for teleport commands.
+- Refixed stack issue.
+- Fixed teleport command from commandblocks/console.
+- Added auto enable config setting to flight component.
+- Added a component to control flight and walking speed, as well as flight permission.
+- Added gamemode command vanilla support.
+- Re-enable IP bans - use the ipban command.
+- Don't teleport players in vehicles. Eject them first.
+- Updated sessions to only create files when a player actually has a session to persist.
+- Made call and bring messages actually configurable.
+- Fixed various issues with the /tp command.
+- Added commandbook.pong permissions to /pong command.
+
 2.2:
 - Added /enchantments command to list enchantments.
 - Made /call-related messages configurable.
