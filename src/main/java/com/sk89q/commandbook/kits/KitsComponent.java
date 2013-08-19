@@ -19,22 +19,33 @@
 package com.sk89q.commandbook.kits;
 
 import com.sk89q.commandbook.CommandBook;
+import com.sk89q.commandbook.session.PersistentSession;
+import com.sk89q.commandbook.session.SessionComponent;
 import com.sk89q.commandbook.util.PlayerUtil;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.zachsthings.libcomponents.ComponentInformation;
+import com.zachsthings.libcomponents.InjectComponent;
 import com.zachsthings.libcomponents.bukkit.BukkitComponent;
+import com.zachsthings.libcomponents.config.ConfigurationBase;
+import com.zachsthings.libcomponents.config.Setting;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 
 import java.io.File;
 import java.util.Map;
 
 @ComponentInformation(friendlyName = "Kits", desc = "Distributes kits to players on command (with cooldowns)")
-public class KitsComponent extends BukkitComponent {
+public class KitsComponent extends BukkitComponent implements Listener{
     private KitManager kits;
+    private LocalConfiguration config;
+    @InjectComponent private SessionComponent sessions;
 
     @Override
     public void enable() {
@@ -48,12 +59,44 @@ public class KitsComponent extends BukkitComponent {
                 CommandBook.inst(), new GarbageCollector(this),
                 GarbageCollector.CHECK_FREQUENCY, GarbageCollector.CHECK_FREQUENCY);
         registerCommands(Commands.class);
+        config = configure(new LocalConfiguration());
+        if(config.joinKit){
+        	CommandBook.registerEvents(this);
+        }
     }
 
     @Override
     public void reload() {
         super.reload();
         kits.load();
+        config = configure(config);
+    }
+
+    private static class LocalConfiguration extends ConfigurationBase {
+    	@Setting("join-kit") public boolean joinKit = true;
+    	@Setting("join-kit-name") public String joinKitName = "starter";
+    }
+
+    public static class KitSession extends PersistentSession {
+        private KitSession() {
+            super(-1);
+        }
+
+        @Setting("given-kit") private boolean givenKit = false;
+    }
+
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+        KitSession session = sessions.getSession(KitSession.class, player);
+        if(!session.givenKit){
+            Kit kit = getKitManager().getKit(config.joinKitName);
+
+            if (kit != null) {
+            	kit.distribute(player);
+            }
+            session.givenKit = !session.givenKit;
+        }
     }
 
     /**
