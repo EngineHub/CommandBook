@@ -37,7 +37,7 @@ import java.io.File;
 import java.util.Map;
 
 @ComponentInformation(friendlyName = "Kits", desc = "Distributes kits to players on command (with cooldowns)")
-public class KitsComponent extends BukkitComponent implements Listener{
+public class KitsComponent extends BukkitComponent implements Listener {
     private KitManager kits;
 
     @Override
@@ -64,10 +64,10 @@ public class KitsComponent extends BukkitComponent implements Listener{
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        if(!player.hasPlayedBefore()){
-            for(Object map : kits.getKits().keySet()){
+        if (!player.hasPlayedBefore()) {
+            for (Object map : kits.getKits().keySet()) {
             	Kit kit = kits.getKits().get(map);
-            	if(CommandBook.inst().hasPermission(player, "commandbook.kits.onfirstlogin."+map)){
+            	if (CommandBook.inst().hasPermission(player, "commandbook.kits.onfirstlogin."+map)) {
             		kit.distribute(player);
             	}
             }
