@@ -42,7 +42,7 @@ import java.io.File;
 import java.util.Map;
 
 @ComponentInformation(friendlyName = "Kits", desc = "Distributes kits to players on command (with cooldowns)")
-public class KitsComponent extends BukkitComponent implements Listener{
+public class KitsComponent extends BukkitComponent implements Listener {
     private KitManager kits;
     private LocalConfiguration config;
     @InjectComponent private SessionComponent sessions;
