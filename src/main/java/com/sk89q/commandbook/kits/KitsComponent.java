@@ -60,7 +60,7 @@ public class KitsComponent extends BukkitComponent implements Listener{
                 GarbageCollector.CHECK_FREQUENCY, GarbageCollector.CHECK_FREQUENCY);
         registerCommands(Commands.class);
         config = configure(new LocalConfiguration());
-        if(config.joinKit){
+        if (config.joinKit) {
         	CommandBook.registerEvents(this);
         }
     }
@@ -73,8 +73,8 @@ public class KitsComponent extends BukkitComponent implements Listener{
     }
 
     private static class LocalConfiguration extends ConfigurationBase {
-    	@Setting("join-kit") public boolean joinKit = true;
-    	@Setting("join-kit-name") public String joinKitName = "starter";
+    	@Setting("join-kit") public boolean joinKit = false;
+    	@Setting("join-kit-name") public String joinKitName = "";
     }
 
     public static class KitSession extends PersistentSession {
@@ -89,13 +89,13 @@ public class KitsComponent extends BukkitComponent implements Listener{
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         KitSession session = sessions.getSession(KitSession.class, player);
-        if(!session.givenKit){
+        if (!session.givenKit) {
             Kit kit = getKitManager().getKit(config.joinKitName);
 
             if (kit != null) {
             	kit.distribute(player);
             }
-            session.givenKit = !session.givenKit;
+            session.givenKit = true;
         }
     }
 
