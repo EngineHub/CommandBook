@@ -136,6 +136,11 @@ public class FunComponent extends BukkitComponent {
                 }
                 ((PigZombie) creature).setAnger(Integer.parseInt(specialType));
                 return creature;
+            } else if (creature instanceof Zombie) {
+                if (specialType.matches("villager")) {
+                    ((Zombie) creature).setVillager(true);
+                }
+                return creature;
             } else if (creature instanceof Enderman) {
                 ItemStack item = CommandBook.inst().getItem(specialType);
                 if (item == null) return creature;
