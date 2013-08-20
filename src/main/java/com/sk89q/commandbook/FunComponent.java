@@ -47,6 +47,19 @@ public class FunComponent extends BukkitComponent {
         registerCommands(Commands.class);
     }
 
+    private static <T extends Enum<T>> String valueList(Class<T> clazz) {
+        StringBuilder res = new StringBuilder();
+        boolean first = true;
+        for (Object e : clazz.getEnumConstants()) {
+            if (!first) {
+                res.append(", ");
+            }
+            res.append(e.toString());
+            first = false;
+        }
+        return res.toString();
+    }
+
     public LivingEntity spawn(Location loc, EntityType type, String specialType,
                                CommandContext args, CommandSender sender) throws CommandException {
         Entity spawned = loc.getWorld().spawn(loc, type.getEntityClass());
@@ -82,13 +95,16 @@ public class FunComponent extends BukkitComponent {
                 }
                 return creature;
             } else if (creature instanceof Ocelot) {
-                if (specialType.contains("black")) {
-                    ((Ocelot) creature).setCatType(Ocelot.Type.BLACK_CAT);
-                } else if (specialType.contains("red")) {
-                    ((Ocelot) creature).setCatType(Ocelot.Type.RED_CAT);
-                } else if (specialType.contains("siamese")) {
-                    ((Ocelot) creature).setCatType(Ocelot.Type.SIAMESE_CAT);
-                } // wild is default
+                Ocelot.Type catType;
+                try {
+                    catType = Ocelot.Type.valueOf(specialType.toUpperCase());
+                } catch (IllegalArgumentException e) {
+                    throw new CommandException("Unknown cat type '" + specialType + "'. Allowed values are: "
+                            + valueList(Ocelot.Type.class));
+                }
+                if (catType != null) {
+                    ((Ocelot) creature).setCatType(catType);
+                }
                 return creature;
             } else if (creature instanceof Creeper
                     && specialType.matches("(power(ed)?|electric|lightning|shock(ed)?)")) {
@@ -133,12 +149,67 @@ public class FunComponent extends BukkitComponent {
                 try {
                     profession = Villager.Profession.valueOf(specialType.toUpperCase());
                 } catch (IllegalArgumentException e) {
-                   throw new CommandException("Unknown profession '" + specialType + "'");
+                   throw new CommandException("Unknown profession '" + specialType + "'. Allowed values are: "
+                           + valueList(Villager.Profession.class));
                 }
 
                 if (profession != null) {
                     ((Villager) creature).setProfession(profession);
                 }
+                return creature;
+            } else if (creature instanceof Horse) {
+                Horse.Color color = null;
+                Horse.Style style = null;
+                Horse.Variant variant = null;
+                String[] horseTypes = specialType.split(","); // this might eff up if the user types dumb stuff
+                // horse:color OR horse:color,style OR horse:variant
+                // OR horse:color,style,variant which doesn't do much since color/style
+                // are not visible on non-horse variants
+                if (horseTypes.length == 1) {
+                    // need to test color or variant
+                    try {
+                        color = Horse.Color.valueOf(horseTypes[0].toUpperCase());
+                    } catch (IllegalArgumentException e) {
+                        // wasn't color
+                        try {
+                            variant = Horse.Variant.valueOf(horseTypes[0].toUpperCase());
+                        } catch (IllegalArgumentException e2) {
+                            // oops
+                            throw new CommandException("Unknown color or variant  '" + horseTypes[0] + "'. Allowed colors are: "
+                                    + valueList(Horse.Color.class) + ". Allowed variants are: "
+                                    + valueList(Horse.Variant.class));
+                        }
+                    }
+                } else if (horseTypes.length >= 2) {
+                    // color,style
+                    try {
+                        color = Horse.Color.valueOf(horseTypes[0].toUpperCase());
+                    } catch (IllegalArgumentException e) {
+                        throw new CommandException("Unknown color '" + horseTypes[0] + "'. Allowed colors are: "
+                                + valueList(Horse.Color.class));
+                    }
+                    try {
+                        style = Horse.Style.valueOf(horseTypes[1].toUpperCase());
+                    } catch (IllegalArgumentException e) {
+                        throw new CommandException("Unknown style '" + horseTypes[1] + "'. Allowed styles are: "
+                                + valueList(Horse.Style.class));
+                    }
+                    if (horseTypes.length >= 3) {
+                        // variant at end
+                        try {
+                            variant = Horse.Variant.valueOf(horseTypes[2].toUpperCase());
+                        } catch (IllegalArgumentException e) {
+                            throw new CommandException("Unknown variant '" + horseTypes[2] + "'. Allowed variants are: "
+                                    + valueList(Horse.Variant.class));
+                        }
+                    }
+                }
+                // ok we have some or none of the traits now, apply
+                Horse horse = (Horse) creature;
+                if (color != null) horse.setColor(color);
+                if (style != null) horse.setStyle(style);
+                if (variant != null) horse.setVariant(variant);
+                return horse;
             }
         }
         return creature;
