@@ -66,9 +66,8 @@ public class KitsComponent extends BukkitComponent implements Listener {
         Player player = event.getPlayer();
         if (!player.hasPlayedBefore()) {
              for (Entry<String, Kit> map : kits.getKits().entrySet()) {
-                Kit kit = kits.getKits().get(map);
                 if (CommandBook.inst().hasPermission(player, "commandbook.kits.onfirstlogin."+map)) {
-                    kit.distribute(player);
+                    map.getValue().distribute(player);
             	}
             }
         }
