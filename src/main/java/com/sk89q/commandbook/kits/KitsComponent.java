@@ -64,6 +64,7 @@ public class KitsComponent extends BukkitComponent implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
+
         if (!player.hasPlayedBefore()) {
              for (Entry<String, Kit> map : kits.getKits().entrySet()) {
                 if (CommandBook.inst().hasPermission(player, "commandbook.kits.onfirstlogin." + map)) {
