@@ -86,16 +86,12 @@ public class CommandBookUtil {
         // use mojang's symbols where we can, make new ones up when they are already used
         str = str.replace("`k", ChatColor.MAGIC.toString());
 
-        try {
-            str = str.replace("`l", ChatColor.BOLD.toString());
-            str = str.replace("`m", ChatColor.STRIKETHROUGH.toString());
-            str = str.replace("`n", ChatColor.UNDERLINE.toString());
-            str = str.replace("`o", ChatColor.ITALIC.toString());
+        str = str.replace("`l", ChatColor.BOLD.toString());
+        str = str.replace("`m", ChatColor.STRIKETHROUGH.toString());
+        str = str.replace("`n", ChatColor.UNDERLINE.toString());
+        str = str.replace("`o", ChatColor.ITALIC.toString());
 
-            str = str.replace("`x", ChatColor.RESET.toString());
-        } catch (NoSuchFieldError t) {
-            // Keep this until 1.2.4+ is used on most Bukkit servers
-        }
+        str = str.replace("`x", ChatColor.RESET.toString());
 
         return str;
     }
