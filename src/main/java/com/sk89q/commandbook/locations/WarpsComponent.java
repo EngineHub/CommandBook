@@ -109,6 +109,9 @@ public class WarpsComponent extends LocationsComponent {
                 loc = player.getLocation();
             } else {
                 loc = LocationUtil.matchLocation(sender, args.getString(1));
+                if (sender instanceof Player) {
+                    player = (Player) sender;
+                }
             }
             NamedLocation existing = getManager().get(loc.getWorld(), warpName);
             if (existing != null) {

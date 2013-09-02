@@ -35,16 +35,16 @@ public class RootLocationManager<T> {
     private Map<String, LocationManager<T>> managers;
     private final LocationManagerFactory<LocationManager<T>> factory;
     private final boolean perWorld;
-    
+
     public RootLocationManager(LocationManagerFactory<LocationManager<T>> factory, boolean perWorld) {
         this.factory = factory;
         this.perWorld = perWorld;
-        
+
         if (perWorld) {
             managers = new HashMap<String, LocationManager<T>>();
         } else {
             rootManager = factory.createManager();
-            
+
             try {
                 rootManager.load();
             } catch (IOException e) {
@@ -52,50 +52,50 @@ public class RootLocationManager<T> {
             }
         }
     }
-    
+
     private LocationManager<T> getManager(World world) {
-		if (!perWorld) {
-			return rootManager;
-		}
-		
+        if (!perWorld) {
+            return rootManager;
+        }
+
         LocationManager<T> manager = managers.get(world.getName());
-        
+
         if (manager != null) {
             return manager;
         }
-        
+
         manager = factory.createManager(world);
-		manager.castWorld(world);
-        
+        manager.castWorld(world);
+
         try {
             manager.load();
         } catch (IOException e) {
             logger().warning("Failed to load warps for world " + world.getName()
                     + ": " + e.getMessage());
         }
-        
+
         managers.put(world.getName(), manager);
         return manager;
     }
-    
+
     public T get(World world, String id) {
-		return getManager(world).get(id);
+        return getManager(world).get(id);
     }
 
-	public T create(String id, Location loc, Player player) {
-		LocationManager<T> manager = getManager(loc.getWorld());
-		T ret = manager.create(id, loc, player);
-		save(manager);
-		return ret;
-	}
+    public T create(String id, Location loc, Player player) {
+        LocationManager<T> manager = getManager(loc.getWorld());
+        T ret = manager.create(id, loc, player);
+        save(manager);
+        return ret;
+    }
 
-	public boolean remove(World world, String id) {
-		LocationManager<T> manager = getManager(world);
-		boolean ret = getManager(world).remove(id);
-		save(manager);
-		return ret;
-	}
-    
+    public boolean remove(World world, String id) {
+        LocationManager<T> manager = getManager(world);
+        boolean ret = getManager(world).remove(id);
+        save(manager);
+        return ret;
+    }
+
     private void save(LocationManager<T> manager) {
         try {
             manager.save();
@@ -105,14 +105,14 @@ public class RootLocationManager<T> {
     }
 
     public List<T> getLocations(World world) {
-		return getManager(world).getLocations();
+        return getManager(world).getLocations();
     }
-    
+
     public boolean isPerWorld() {
         return perWorld;
     }
-    
+
     public void updateWorlds(World world) {
-		getManager(world).updateWorlds();
+        getManager(world).updateWorlds();
     }
 }
