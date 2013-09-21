@@ -84,7 +84,7 @@ public class LocationUtil {
 
                 throw new CommandException("No skylands world found.");
                 // Handle getting a world from a player
-            } else if (filter.matches("^#player$")) {
+            } else if (filter.matches("^#player:[^ ]+$")) {
                 String parts[] = filter.split(":", 2);
 
                 // They didn't specify an argument for the player!
