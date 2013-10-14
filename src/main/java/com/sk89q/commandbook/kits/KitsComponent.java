@@ -70,7 +70,7 @@ public class KitsComponent extends BukkitComponent implements Listener {
             for (Entry<String, Kit> map : kits.getKits().entrySet()) {
                 if (CommandBook.inst().hasPermission(player, "commandbook.kits.onfirstlogin." + map.getKey())) {
                     map.getValue().distribute(player);
-            	}
+                }
             }
         }
     }
