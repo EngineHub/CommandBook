@@ -25,15 +25,20 @@ import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.zachsthings.libcomponents.ComponentInformation;
 import com.zachsthings.libcomponents.bukkit.BukkitComponent;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 
 import java.io.File;
 import java.util.Map;
+import java.util.Map.Entry;
 
 @ComponentInformation(friendlyName = "Kits", desc = "Distributes kits to players on command (with cooldowns)")
-public class KitsComponent extends BukkitComponent {
+public class KitsComponent extends BukkitComponent implements Listener {
     private KitManager kits;
 
     @Override
@@ -48,12 +53,26 @@ public class KitsComponent extends BukkitComponent {
                 CommandBook.inst(), new GarbageCollector(this),
                 GarbageCollector.CHECK_FREQUENCY, GarbageCollector.CHECK_FREQUENCY);
         registerCommands(Commands.class);
+        CommandBook.registerEvents(this);
     }
 
     @Override
     public void reload() {
         super.reload();
         kits.load();
+    }
+
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+
+        if (!player.hasPlayedBefore()) {
+            for (Entry<String, Kit> map : kits.getKits().entrySet()) {
+                if (CommandBook.inst().hasPermission(player, "commandbook.kits.onfirstlogin." + map.getKey())) {
+                    map.getValue().distribute(player);
+                }
+            }
+        }
     }
 
     /**
