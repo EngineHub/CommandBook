@@ -201,6 +201,8 @@ public class TeleportComponent extends BukkitComponent implements Listener {
                     }
                 }
                 loc = new Location(world, x, y, z);
+                if (loc.getX() == loc.getBlockX()) loc.add(0.5, 0, 0);
+                if (loc.getZ() == loc.getBlockZ()) loc.add(0, 0, 0.5);
                 CommandBook.inst().checkPermission(sender, loc.getWorld(), "commandbook.teleport");
                 for (Player target : targets) {
                     if (target != sender) { // if any of the targets is not the sender, we need to check .other
