@@ -49,23 +49,28 @@ public class FlightComponent extends BukkitComponent implements Listener {
     }
 
     public class Commands {
-        @Command(aliases = "fly", usage = "[player]", desc = "Toggle flight for a player", min = 0, max = 1)
-        @CommandPermissions("commandbook.flight.toggle")
+        @Command(aliases = "fly", usage = "[player]", desc = "Toggle flight for a player",
+                flags = "s", min = 0, max = 1)
         public void fly(CommandContext args, CommandSender sender) throws CommandException {
-            Player player;
-            if (args.argsLength() == 1) {
-                player = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
-            } else {
-                player = PlayerUtil.checkPlayer(sender);
+            Iterable<Player> targets = null;
+            boolean included = false;
+
+            targets = PlayerUtil.detectTargets(sender, args, "commandbook.flight.toggle");
+
+            for (Player player : targets) {
+                FlightSession session = sessions.getSession(FlightSession.class, player);
+                session.canFly = !session.canFly;
+                player.setAllowFlight(session.canFly);
+                if (!included && player.equals(sender)) {
+                    included = true;
+                }
+                if (!args.hasFlag('s')) {
+                    player.sendMessage(ChatColor.YELLOW + "You can " + (session.canFly ? "now" : "no longer") + " fly!");
+                }
             }
-            FlightSession session = sessions.getSession(FlightSession.class, player);
-
-            session.canFly = !session.canFly;
-            player.setAllowFlight(session.canFly);
-
-
-            player.sendMessage(ChatColor.YELLOW + "You can " + (session.canFly ? "now" : "no longer") + " fly!");
-
+            if (!included && !args.hasFlag('s')) {
+                sender.sendMessage(ChatColor.YELLOW + "Flight mode toggled for player(s).");
+            }
         }
 
         @Command(aliases = "speed", desc = "Set the speed of player movement")
@@ -73,28 +78,35 @@ public class FlightComponent extends BukkitComponent implements Listener {
         public void speed() {
         }
 
-        @Command(aliases = "reverse", desc = "Go in reverse!", usage = "[player]", min = 0, max = 1)
-        @CommandPermissions("commandbook.flight.reverse")
+        @Command(aliases = "reverse", desc = "Go in reverse!", usage = "[player]",
+                flags = "s", min = 0, max = 1)
         public void reverse(CommandContext args, CommandSender sender) throws CommandException {
-            Player player;
-            if (args.argsLength() > 0) {
-                player = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
-            } else {
-                player = PlayerUtil.checkPlayer(sender);
-            }
+            Iterable<Player> targets = null;
+            boolean included = false;
 
-            player.setFlySpeed(-player.getFlySpeed());
-            // player.setWalkSpeed(-player.getWalkSpeed()); // Gives weird video artifacts TODO: Bug DB about disabling viewport distortions when we change walk speed
-            player.sendMessage(ChatColor.YELLOW + "And now in reverse!");
-            if (sender != player) {
-                sender.sendMessage(ChatColor.YELLOW + player.getName() + " has been put in reverse!");
+            targets = PlayerUtil.detectTargets(sender, args, "commandbook.flight.reverse");
+
+            for (Player player : targets) {
+                player.setFlySpeed(-player.getFlySpeed());
+                // player.setWalkSpeed(-player.getWalkSpeed()); // Gives weird video artifacts TODO: Bug DB about disabling viewport distortions when we change walk speed
+                if (!sender.equals(player)) {
+                    sender.sendMessage(ChatColor.YELLOW + player.getName() + " has been put in reverse!");
+                }
+                if (!included && player.equals(sender)) {
+                    included = true;
+                }
+                if (!args.hasFlag('s')) {
+                    player.sendMessage(ChatColor.YELLOW + "And now in reverse!");
+                }
+            }
+            if (!included && !args.hasFlag('s')) {
+                sender.sendMessage(ChatColor.YELLOW + "Speed reversed for player(s).");
             }
         }
     }
 
     public class SpeedCommands {
         @Command(aliases = {"flight", "fly", "f"}, usage = "[player] [speed-multiplier]", desc = "Set the flying speed multiplier")
-        @CommandPermissions({"commandbook.flight.speed", "commandbook.speed.flight"})
         public void flightSpeed(CommandContext args, CommandSender sender) throws CommandException {
             Player player;
             float flightMultiplier = 1f;
@@ -111,6 +123,8 @@ public class FlightComponent extends BukkitComponent implements Listener {
             } else {
                 player = PlayerUtil.checkPlayer(sender);
             }
+            CommandBook.inst().checkPermission(sender, "commandbook.speed.flight"
+                    + (player.equals(sender) ? "" : ".other"));
             final float flightSpeed = DEFAULT_FLIGHT_SPEED * flightMultiplier; // Apply multiplier
 
             try {
@@ -130,7 +144,6 @@ public class FlightComponent extends BukkitComponent implements Listener {
         }
 
         @Command(aliases = {"walk", "walking", "w"}, usage = "[player] [speed-multiplier]", desc = "Set the walking speed multiplier")
-        @CommandPermissions({"commandbook.speed.walk"})
         public void walkSpeed(CommandContext args, CommandSender sender) throws CommandException {
             Player player;
             float walkMultiplier = 1f;
@@ -147,6 +160,8 @@ public class FlightComponent extends BukkitComponent implements Listener {
             } else {
                 player = PlayerUtil.checkPlayer(sender);
             }
+            CommandBook.inst().checkPermission(sender, "commandbook.speed.walk"
+                    + (player.equals(sender) ? "" : ".other"));
             final float walkSpeed = DEFAULT_WALK_SPEED * walkMultiplier; // Apply multiplier
 
             try {

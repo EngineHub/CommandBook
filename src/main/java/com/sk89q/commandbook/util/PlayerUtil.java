@@ -30,6 +30,7 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 import com.sk89q.commandbook.CommandBook;
+import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 
 public class PlayerUtil {
@@ -321,5 +322,26 @@ public class PlayerUtil {
         } else {
             return "*Console*";
         }
+    }
+
+    public static Iterable<Player> detectTargets(CommandSender sender, CommandContext args, String perm) throws CommandException {
+        Iterable<Player> targets = new ArrayList<Player>();
+        // Detect targets based on the number of arguments provided
+        if (args.argsLength() == 0) {
+            targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
+        } else {
+            targets = PlayerUtil.matchPlayers(sender, args.getString(0));
+        }
+        checkPlayerMatch((List<Player>) targets);
+        // Check permissions!
+        for (Player player : targets) {
+            if (player.equals(sender)) {
+                CommandBook.inst().checkPermission(sender, perm);
+            } else {
+                CommandBook.inst().checkPermission(sender, perm + ".other");
+                break;
+            }
+        }
+        return targets;
     }
 }
