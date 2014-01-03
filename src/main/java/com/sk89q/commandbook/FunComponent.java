@@ -30,6 +30,7 @@ import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
@@ -78,8 +79,12 @@ public class FunComponent extends BukkitComponent {
         if (args.hasFlag('r')) {
             creature.setVelocity(new Vector(0, 2, 0));
         }
-        if (args.hasFlag('b') && creature instanceof Ageable) {
-            ((Ageable) creature).setBaby();
+        if (args.hasFlag('b')) {
+            if (creature instanceof Ageable) {
+                ((Ageable) creature).setBaby();
+            } else if (creature instanceof Zombie) {
+                ((Zombie) creature).setBaby(true);
+            }
         }
         if (args.hasFlag('p')) {
             creature.setCanPickupItems(true);
@@ -95,6 +100,12 @@ public class FunComponent extends BukkitComponent {
             } else {
                 ((Tameable) creature).setTamed(true);
             }
+        }
+
+        if (creature instanceof Skeleton) {
+            creature.getEquipment().setItemInHand(new ItemStack(Material.BOW));
+        } else if (creature instanceof PigZombie) {
+            creature.getEquipment().setItemInHand(new ItemStack(Material.GOLD_SWORD));
         }
 
         String[] types = specialTypes.split(",");
@@ -210,7 +221,6 @@ public class FunComponent extends BukkitComponent {
                         throw new CommandException("Unknown color, style, or variant '" + specialType + "'.");
                     default:
                         break outerloop; // can't do anything with this animal, regardless of all the types given
-
                     }
                 }
         }
