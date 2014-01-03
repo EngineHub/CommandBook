@@ -143,25 +143,11 @@ public class TeleportComponent extends BukkitComponent implements Listener {
                 if (loc.getX() == loc.getBlockX()) loc.add(0.5, 0, 0);
                 if (loc.getZ() == loc.getBlockZ()) loc.add(0, 0, 0.5);
                 targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
-                // check target location (CommandPermissions annotation only checks sender's location)
-                CommandBook.inst().checkPermission(sender, loc.getWorld(), "commandbook.teleport");
             } else if (args.argsLength() == 2) {
                 targets = PlayerUtil.matchPlayers(sender, args.getString(0));
                 loc = LocationUtil.matchLocation(sender, args.getString(1)); // matches both #4 and #5
                 if (loc.getX() == loc.getBlockX()) loc.add(0.5, 0, 0);
                 if (loc.getZ() == loc.getBlockZ()) loc.add(0, 0, 0.5);
-
-                // Check permissions!
-                CommandBook.inst().checkPermission(sender, loc.getWorld(), "commandbook.teleport");
-                for (Player target : targets) {
-                    if (target != sender) { // if any of the targets is not the sender, we need to check .other
-                        CommandBook.inst().checkPermission(sender, "commandbook.teleport.other");
-                        if (sender instanceof Player) {
-                            CommandBook.inst().checkPermission(sender, loc.getWorld(), "commandbook.teleport.other");
-                        }
-                        break;
-                    }
-                }
             } else if (args.argsLength() == 3) {
                 // matches #2 - can only be used by a player
                 targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
@@ -172,7 +158,6 @@ public class TeleportComponent extends BukkitComponent implements Listener {
                 if (loc.getX() == loc.getBlockX()) loc.add(0.5, 0, 0);
                 if (loc.getZ() == loc.getBlockZ()) loc.add(0, 0, 0.5);
                 // check location permission
-                CommandBook.inst().checkPermission(sender, loc.getWorld(), "commandbook.teleport");
                 CommandBook.inst().checkPermission(sender, loc.getWorld(), "commandbook.locations.coords");
             } else if (args.argsLength() == 4) {
                 targets = PlayerUtil.matchPlayers(sender, args.getString(0)); // matches #1
@@ -203,18 +188,33 @@ public class TeleportComponent extends BukkitComponent implements Listener {
                 loc = new Location(world, x, y, z);
                 if (loc.getX() == loc.getBlockX()) loc.add(0.5, 0, 0);
                 if (loc.getZ() == loc.getBlockZ()) loc.add(0, 0, 0.5);
-                CommandBook.inst().checkPermission(sender, loc.getWorld(), "commandbook.teleport");
-                for (Player target : targets) {
-                    if (target != sender) { // if any of the targets is not the sender, we need to check .other
-                        CommandBook.inst().checkPermission(sender, "commandbook.teleport.other");
-                        if (sender instanceof Player) {
-                            CommandBook.inst().checkPermission(sender, loc.getWorld(), "commandbook.teleport.other");
-                        }
-                        break;
-                    }
-                }
+
             } else { // this can't actually happen unless someone constructs their own CommandContext
                 throw new CommandException("Invalid number of args.");
+            }
+
+            boolean hasTeleOtherCurrent = CommandBook.inst().hasPermission(sender, "commandbook.teleport.other");
+            boolean hasTeleOtherTo = CommandBook.inst().hasPermission(sender, loc.getWorld(), "commandbook.teleport.other");
+
+            for (Player target : targets) {
+                if (target != sender) {
+                    // If any of the targets is not the sender, we need to check .other
+                    // we must check for the from (target's world), current (sender's world),
+                    // and to (target location's world).
+                    if (!loc.getWorld().equals(target.getWorld())) {
+                        CommandBook.inst().checkPermission(sender, target.getWorld(), "commandbook.teleport.other");
+                    }
+
+                    // If either check has failed, check both to get the proper exception response
+                    if (!hasTeleOtherCurrent || !hasTeleOtherTo) {
+                        CommandBook.inst().checkPermission(sender, "commandbook.teleport.other");
+                        CommandBook.inst().checkPermission(sender, loc.getWorld(), "commandbook.teleport.other");
+                    }
+                } else {
+                    // If the target is the sender, just check the to (target location's world)
+                    // the current has already been checked
+                    CommandBook.inst().checkPermission(sender, loc.getWorld(), "commandbook.teleport");
+                }
             }
 
             (new TeleportPlayerIterator(sender, loc, args.hasFlag('s'), relative)).iterate(targets);
@@ -261,11 +261,10 @@ public class TeleportComponent extends BukkitComponent implements Listener {
                     sender.sendMessage(senderMessage);
                     target.sendMessage(targetMessage);
                     target.teleport(player);
+                    return;
                 } else {
                     throw new CommandException(config.bringMessageNoPerm);
                 }
-
-                return;
             }
 
             Iterable<Player> targets = PlayerUtil.matchPlayers(sender, args.getString(0));
