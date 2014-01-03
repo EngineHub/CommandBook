@@ -220,7 +220,7 @@ public class TeleportComponent extends BukkitComponent implements Listener {
             (new TeleportPlayerIterator(sender, loc, args.hasFlag('s'), relative)).iterate(targets);
         }
 
-        @Command(aliases = {"call"}, usage = "<target>", desc = "Request a teleport", min = 1, max = 1)
+        @Command(aliases = {"call", "tpa"}, usage = "<target>", desc = "Request a teleport", min = 1, max = 1)
         @CommandPermissions({"commandbook.call"})
         public void requestTeleport(CommandContext args, CommandSender sender) throws CommandException {
             Player player = PlayerUtil.checkPlayer(sender);
