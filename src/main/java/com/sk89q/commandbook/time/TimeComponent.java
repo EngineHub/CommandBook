@@ -180,7 +180,7 @@ public class TimeComponent extends BukkitComponent implements Listener {
     public class Commands {
         @Command(aliases = {"time"},
                 usage = "[world] <time|\"current\">", desc = "Get/change the world time",
-                flags = "l", min = 0, max = 2)
+                flags = "ls", min = 0, max = 2)
         public void time(CommandContext args, CommandSender sender) throws CommandException {
 
             World world;
@@ -199,6 +199,13 @@ public class TimeComponent extends BukkitComponent implements Listener {
             } else { // A world was specified!
                 world = LocationUtil.matchWorld(sender, args.getString(0));
                 timeStr = args.getString(1);
+            }
+
+            boolean broadcastChanges = CommandBook.inst().broadcastChanges;
+
+            if (broadcastChanges && args.hasFlag('s')) {
+                CommandBook.inst().checkPermission(sender, "commandbook.time.silent");
+                broadcastChanges = false;
             }
 
             // Let the player get the time
@@ -233,7 +240,7 @@ public class TimeComponent extends BukkitComponent implements Listener {
                 verb = "locked";
             }
 
-            if (CommandBook.inst().broadcastChanges) {
+            if (broadcastChanges) {
                 CommandBook.server().broadcastMessage(ChatColor.YELLOW
                         + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + " " + verb + " the time of '"
                         + world.getName() + "' to "
