@@ -23,7 +23,7 @@ kits:
     class: com.sk89q.commandbook.kits.KitsComponent
     default: true
 midi:
-    class: com.sk89q.jinglenote.JingleNoteComponent
+    class: com.sk89q.commandbook.JingleNoteComponent
     default: true
 time:
     class: com.sk89q.commandbook.time.TimeComponent

@@ -1,6 +1,19 @@
-// $Id$
 /*
- * Tetsuuuu plugin for SK's Minecraft Server Copyright (C) 2010 sk89q <http://www.sk89q.com> All rights reserved.
+ * CommandBook
+ * Copyright (C) 2011 sk89q <http://www.sk89q.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 package com.sk89q.jinglenote;
@@ -45,7 +58,6 @@ public class MidiJingleSequencer implements JingleSequencer {
         1, 1, 1, 1, 1, 2, 4, 3, // 128
     };
 
-
     private static final int[] percussion = {
         3, 3, 4, 4, 3, 2, 3, 2, //8 - Electric Snare
         2, 2, 2, 2, 2, 2, 2, 2, //16 - Hi Mid Tom
@@ -55,7 +67,6 @@ public class MidiJingleSequencer implements JingleSequencer {
         3, 3, 3, 3, 3, 3, 5, 5, //48 - Open Cuica
         3, 3,                   //50 - Open Triangle
     };
-
 
     protected final File midiFile;
     private Sequencer sequencer = null;
@@ -69,19 +80,23 @@ public class MidiJingleSequencer implements JingleSequencer {
             sequencer.open();
             Sequence seq = MidiSystem.getSequence(midiFile);
             sequencer.setSequence(seq);
-            if(loop)
+            if (loop) {
                 sequencer.setLoopCount(Sequencer.LOOP_CONTINUOUSLY);
+            }
         } catch (MidiUnavailableException e) {
-            if (sequencer != null && sequencer.isOpen())
+            if (sequencer != null && sequencer.isOpen()) {
                 sequencer.close();
+            }
             throw e;
         } catch (InvalidMidiDataException e) {
-            if (sequencer != null && sequencer.isOpen())
+            if (sequencer != null && sequencer.isOpen()) {
                 sequencer.close();
+            }
             throw e;
         } catch (IOException e) {
-            if (sequencer != null && sequencer.isOpen())
+            if (sequencer != null && sequencer.isOpen()) {
                 sequencer.close();
+            }
             throw e;
         }
     }
@@ -92,8 +107,9 @@ public class MidiJingleSequencer implements JingleSequencer {
         final Map<Integer, Integer> patches = new HashMap<Integer, Integer>();
 
         try {
-            if(sequencer.getSequence() == null)
+            if (sequencer.getSequence() == null) {
                 return;
+            }
             if (!sequencer.isOpen()) {
                 sequencer.open();
             }
@@ -101,15 +117,12 @@ public class MidiJingleSequencer implements JingleSequencer {
 
                 @Override
                 public void send(MidiMessage message, long timeStamp) {
-
                     if ((message.getStatus() & 0xF0) == ShortMessage.PROGRAM_CHANGE) {
-
                         ShortMessage msg = (ShortMessage) message;
                         int chan = msg.getChannel();
                         int patch = msg.getData1();
                         patches.put(chan, patch);
                     } else if ((message.getStatus() & 0xF0) == ShortMessage.NOTE_ON) {
-
                         ShortMessage msg = (ShortMessage) message;
                         int chan = msg.getChannel();
                         int n = msg.getData1();
@@ -124,7 +137,6 @@ public class MidiJingleSequencer implements JingleSequencer {
 
                 @Override
                 public void close() {
-
                 }
             });
 
@@ -133,7 +145,7 @@ public class MidiJingleSequencer implements JingleSequencer {
                     sequencer.start();
                 }
             }
-            catch(Exception ignored){}
+            catch(Exception ignored) {}
 
             while (sequencer.isRunning()) {
                 Thread.sleep(1000);
@@ -153,30 +165,33 @@ public class MidiJingleSequencer implements JingleSequencer {
 
     @Override
     public void stop() {
-
         if (sequencer != null && sequencer.isOpen()) {
             sequencer.close();
         }
     }
 
     protected static byte toMCNote(int n) {
-
-        if (n < 54) return (byte) ((n - 6) % (18 - 6));
-        else if (n > 78) return (byte) ((n - 6) % (18 - 6) + 12);
-        else return (byte) (n - 54);
+        if (n < 54) {
+            return (byte) ((n - 6) % (18 - 6));
+        } else if (n > 78) {
+            return (byte) ((n - 6) % (18 - 6) + 12);
+        } else {
+            return (byte) (n - 54);
+        }
     }
 
     protected static byte toMCInstrument(Integer patch) {
-
-        if (patch == null) return 0;
-
-        if (patch < 0 || patch >= instruments.length) return 0;
+        if (patch == null) {
+            return 0;
+        }
+        if (patch < 0 || patch >= instruments.length) {
+            return 0;
+        }
 
         return (byte) instruments[patch];
     }
 
     protected Instrument toMCSound(byte instrument) {
-
         switch (instrument) {
             case 1:
                 return Instrument.BASS_GUITAR;
@@ -196,9 +211,9 @@ public class MidiJingleSequencer implements JingleSequencer {
     }
 
     protected static byte toMCPercussion(Integer patch) {
-
-        if(patch == null)
+        if (patch == null) {
             return 0;
+        }
 
         int i = patch - 33;
         if (i < 0 || i >= percussion.length) {
@@ -210,7 +225,6 @@ public class MidiJingleSequencer implements JingleSequencer {
 
 
     public boolean isSongPlaying() {
-
         return sequencer.isRunning();
     }
 
