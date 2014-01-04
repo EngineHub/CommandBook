@@ -267,23 +267,20 @@ public class TeleportComponent extends BukkitComponent implements Listener {
                 }
             }
 
-            Iterable<Player> targets = PlayerUtil.matchPlayers(sender, args.getString(0));
             Location loc = player.getLocation();
 
-            (new TeleportPlayerIterator(sender, loc) {
-                @Override
-                public void perform(Player player) {
-                    if (sender instanceof Player) {
-                        if (!player.getWorld().getName().equals(((Player) sender).getWorld().getName())) {
-                            if (!CommandBook.inst().hasPermission(sender, player.getWorld(), "commandbook.teleport.other")) {
-                                return;
-                            }
-                        }
-                    }
-                    oldLoc = player.getLocation();
-                    player.teleport(loc);
+            CommandBook.inst().checkPermission(sender, "commandbook.teleport.other");
+
+            Iterable<Player> targets = PlayerUtil.matchPlayers(sender, args.getString(0));
+
+            for (Player target : targets) {
+                // We have already checked the from and current locations, we must now check the to if the world does not match
+                if (!loc.getWorld().equals(target.getWorld())) {
+                    CommandBook.inst().checkPermission(sender, target.getWorld(), "commandbook.teleport.other");
                 }
-            }).iterate(targets);
+            }
+
+            (new TeleportPlayerIterator(sender, loc)).iterate(targets);
         }
 
         @Command(aliases = {"put", "place"}, usage = "<target>",
