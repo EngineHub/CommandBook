@@ -104,9 +104,14 @@ public class TeleportComponent extends BukkitComponent implements Listener {
         if (event.isCancelled()) {
             return;
         }
-        if (loc == sessions.getSession(TeleportSession.class, player).getIgnoreLocation()) {
-            sessions.getSession(TeleportSession.class, player).setIgnoreLocation(null);
-            return;
+
+        Location ignored = sessions.getSession(TeleportSession.class, player).getIgnoreLocation();
+        if (ignored != null) {
+            if (ignored.getWorld().equals(loc.getWorld()) && ignored.distanceSquared(loc) <= 2) {
+                return;
+            } else {
+                sessions.getSession(TeleportSession.class, player).setIgnoreLocation(null);
+            }
         }
         sessions.getSession(TeleportSession.class, player).rememberLocation(event.getPlayer());
     }
