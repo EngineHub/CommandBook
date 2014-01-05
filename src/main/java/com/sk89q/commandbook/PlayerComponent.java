@@ -169,6 +169,65 @@ public class PlayerComponent extends BukkitComponent {
                 sender.sendMessage(ChatColor.YELLOW.toString() + "Players healed.");
             }
         }
+
+        @Command(aliases = {"extinguish"},
+                usage = "[player]", desc = "Put out a fire on a player",
+                flags = "s", min = 0, max = 1)
+        @CommandPermissions({"commandbook.extinguish", "commandbook.extinguish.other"})
+        public void extinguish(CommandContext args,CommandSender sender) throws CommandException {
+
+            Iterable<Player> targets;
+            boolean included = false;
+
+            // Detect arguments based on the number of arguments provided
+            if (args.argsLength() > 0) {
+                targets = PlayerUtil.matchPlayers(sender, args.getString(0));
+            } else {
+                targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
+            }
+
+            for (Player player : targets) {
+                if (player != sender) {
+                    // Check permissions!
+                    CommandBook.inst().checkPermission(sender, "commandbook.extinguish.other");
+                } else {
+                    CommandBook.inst().checkPermission(sender, "commandbook.extinguish");
+                }
+            }
+
+            for (Player player : targets) {
+
+                if (player.getFireTicks() < 1) {
+                    player.sendMessage(ChatColor.RED +
+                            PlayerUtil.toColoredName(player, ChatColor.RED)
+                            + " was not on fire!");
+                    continue;
+                }
+
+                player.setFireTicks(0);
+
+                // Tell the user
+                if (player.equals(sender)) {
+                    player.sendMessage(ChatColor.YELLOW + "Fire extinguished!");
+
+                    // Keep track of this
+                    included = true;
+                } else {
+                    if (!args.hasFlag('s')) {
+                        player.sendMessage(ChatColor.YELLOW + "Fire extinguished by "
+                                + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + ".");
+                    }
+
+                }
+            }
+
+            // The player didn't receive any items, then we need to send the
+            // user a message so s/he know that something is indeed working
+            if (!included) {
+                sender.sendMessage(ChatColor.YELLOW.toString() + "Fires extinguished.");
+            }
+        }
+
         @Command(aliases = {"slay"},
         		usage = "[player]", desc = "Slay a player",
         		flags = "s", min = 0, max = 1)
