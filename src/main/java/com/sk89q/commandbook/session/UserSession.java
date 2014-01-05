@@ -33,7 +33,6 @@ public class UserSession extends PersistentSession {
     @Setting("messaging.last-recipient") private String lastRecipient = null;
     @Setting("messaging.last-recipient-time") private long lastRecipientTime = 0;
     private boolean hasThor = false;
-    @Setting("idle-status") private String idleStatus = null;
     @Setting("confirm-command") private String commandToConfirm;
 
 
@@ -80,14 +79,6 @@ public class UserSession extends PersistentSession {
 
     public void setHasThor(boolean hasThor) {
         this.hasThor = hasThor;
-    }
-
-    public String getIdleStatus() {
-        return this.idleStatus;
-    }
-
-    public void setIdleStatus(String status) {
-        this.idleStatus = status;
     }
 
     public boolean checkOrQueueConfirmed(String command) {

@@ -10,6 +10,9 @@ warps:
 freeze:
     class: com.sk89q.commandbook.FreezeComponent
     default: false
+afk:
+    class: com.sk89q.commandbook.AFKComponent
+    default: true
 messaging:
     class: com.sk89q.commandbook.MessagingComponent
     default: true

@@ -109,8 +109,9 @@ public class MessagingComponent extends BukkitComponent implements Listener {
         CommandSender receiver =
                 PlayerUtil.matchPlayerOrConsole(sender, target);
         UserSession receiverSession = sessions.getSession(UserSession.class, receiver);
-        String status = receiverSession.getIdleStatus();
-        if (status != null) {
+        AFKComponent.AFKSession afkSession = sessions.getSession(AFKComponent.AFKSession.class, receiver);
+        if (afkSession.isAFK()) {
+            String status = afkSession.getIdleStatus();
             sender.sendMessage(config.pmColor + PlayerUtil.toColoredName(receiver, config.pmColor) + " is afk. "
                     + "They might not see your message."
                     + (status.trim().length() == 0 ? "" : " (" + status + ")"));
@@ -224,72 +225,12 @@ public class MessagingComponent extends BukkitComponent implements Listener {
         @Command(aliases = {"reply", "r"}, usage = "<message...>", desc = "Reply to last user", min = 1, max = -1)
         @CommandPermissions({"commandbook.msg"})
         public void reply(CommandContext args, CommandSender sender) throws CommandException {
-            String message = args.getJoinedStrings(0);
-            CommandSender receiver;
-
             String lastRecipient = sessions.getSession(UserSession.class, sender).getLastRecipient();
-
-            if (lastRecipient != null) {
-                // This will throw errors as needed
-                receiver = PlayerUtil.matchPlayerOrConsole(sender, lastRecipient);
-            } else {
-                sender.sendMessage(ChatColor.RED + "You haven't messaged anyone.");
-                return;
+            if (lastRecipient == null) {
+                throw new CommandException("You haven't messaged anyone.");
             }
 
-            if (receiver instanceof Player && sessions.getSession(UserSession.class, receiver).getIdleStatus() != null) {
-                String status = sessions.getSession(UserSession.class, receiver).getIdleStatus();
-                sender.sendMessage(config.pmColor + PlayerUtil.toColoredName(receiver, config.pmColor) + " is afk. "
-                        + "They might not see your message."
-                        + (status.isEmpty() ? "" : " (" + status + ")"));
-            }
-
-            receiver.sendMessage(config.pmColor + "(From "
-                    + PlayerUtil.toColoredName(sender, config.pmColor) + "): "
-                    + config.pmTextColor + message);
-
-            sender.sendMessage(config.pmColor + "(To "
-                    + PlayerUtil.toColoredName(receiver, config.pmColor) + "): "
-                    + config.pmTextColor + message);
-
-            CommandBook.logger().info("(PM) " + PlayerUtil.toColoredName(sender, ChatColor.RESET) + " -> "
-                    + PlayerUtil.toColoredName(receiver, ChatColor.RESET) + ": " + message);
-
-            // If the receiver hasn't had any player talk to them yet or hasn't
-            // send a message, then we add it to the receiver's last message target
-            // so s/he can /reply easily
-            sessions.getSession(UserSession.class, receiver).setNewLastRecipient(sender);
-        }
-
-        @Command(aliases = {"afk", "away"},
-                usage = "", desc = "Set yourself as away",
-                flags = "", min = 0, max = -1)
-        @CommandPermissions({"commandbook.away"})
-        public void afk(CommandContext args, CommandSender sender) throws CommandException {
-
-            Player player = PlayerUtil.checkPlayer(sender);
-
-            String status = "";
-            if (args.argsLength() > 0) {
-                status = args.getJoinedStrings(0);
-                sessions.getSession(UserSession.class, player).setIdleStatus(status);
-            }
-
-            player.sendMessage(ChatColor.YELLOW
-                    + (status.isEmpty() ? "Set as away" : "Set away status to \"" + status + "\"")
-                    + ". To return, type /back.");
-        }
-
-        @Command(aliases = {"back", "unafk", "unaway"},
-                usage = "", desc = "Set yourself as back",
-                flags = "", min = 0, max = -1)
-        @CommandPermissions({"commandbook.away"})
-        public void back(CommandContext args, CommandSender sender) throws CommandException {
-
-            Player player = PlayerUtil.checkPlayer(sender);
-
-            player.sendMessage(ChatColor.YELLOW + "You are no longer away.");
-            sessions.getSession(UserSession.class, player).setIdleStatus(null);
+            messagePlayer(sender, lastRecipient, args.getJoinedStrings(0));
         }
 
         @Command(aliases = {"mute"}, usage = "<target>", desc = "Mute a player", flags = "o", min = 1, max = 1)

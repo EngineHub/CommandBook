@@ -254,4 +254,15 @@ public class LocationUtil {
                 location.getBlockZ() + "@" + 
                 location.getWorld().getName();
     }
+
+    /**
+     * Get the 2D distance between two points a and b.
+     *
+     * @param a first location
+     * @param b second location
+     * @return squared 2D distance between the two points
+     */
+    public static double distanceSquared2D(Location a, Location b) {
+        return Math.pow(a.getX() - b.getX(), 2) + Math.pow(a.getZ() - b.getZ(), 2);
+    }
 }
