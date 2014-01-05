@@ -60,11 +60,12 @@ public class TeleportPlayerIterator extends PlayerIteratorAction {
             newLoc.setYaw(oldLoc.getYaw());
         }
 
-        newLoc.getChunk().load(true);
-        if (player.getVehicle() != null) {
-            player.getVehicle().eject();
-        }
-        player.teleport(newLoc);
+        teleport(player, newLoc);
+    }
+
+    public void teleport(Player player, Location newLoc) {
+
+        PlayerUtil.teleportTo(sender, player, newLoc, true);
     }
 
     @Override

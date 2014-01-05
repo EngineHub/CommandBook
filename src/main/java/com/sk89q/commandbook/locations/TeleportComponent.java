@@ -18,6 +18,7 @@
 
 package com.sk89q.commandbook.locations;
 
+import com.sk89q.commandbook.util.*;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -32,10 +33,6 @@ import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.CommandBookUtil;
 import com.sk89q.commandbook.session.SessionComponent;
 import com.sk89q.commandbook.session.SessionFactory;
-import com.sk89q.commandbook.util.LegacyBukkitCompat;
-import com.sk89q.commandbook.util.LocationUtil;
-import com.sk89q.commandbook.util.PlayerUtil;
-import com.sk89q.commandbook.util.TeleportPlayerIterator;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
@@ -268,17 +265,26 @@ public class TeleportComponent extends BukkitComponent implements Listener {
 
             if (target != null) {
                 if (sessions.getSession(TeleportSession.class, player).isBringable(target)) {
-                    String senderMessage = CommandBookUtil.replaceColorMacros(
+                    final String senderMessage = CommandBookUtil.replaceColorMacros(
                             CommandBookUtil.replaceMacros(sender, config.bringMessageSender))
                             .replaceAll("%ctarget%", PlayerUtil.toColoredName(target, null))
                             .replaceAll("%target%", target.getName());
-                    String targetMessage = CommandBookUtil.replaceColorMacros(
+                    final String targetMessage = CommandBookUtil.replaceColorMacros(
                             CommandBookUtil.replaceMacros(sender, config.bringMessageTarget))
                             .replaceAll("%ctarget%", PlayerUtil.toColoredName(target, null))
                             .replaceAll("%target%", target.getName());
-                    sender.sendMessage(senderMessage);
-                    target.sendMessage(targetMessage);
-                    target.teleport(player);
+
+                    (new TeleportPlayerIterator(sender, player.getLocation()) {
+                        @Override
+                        public void onVictim(CommandSender sender, Player player) {
+                            player.sendMessage(targetMessage);
+                        }
+
+                        @Override
+                        public void onInformMany(CommandSender sender, int affected) {
+                            sender.sendMessage(senderMessage);
+                        }
+                    }).iterate(PlayerUtil.matchPlayers(target));
                     return;
                 } else if (!CommandBook.inst().hasPermission(sender, "commandbook.teleport.other")) {
                     // There was a single player match, but, the target was not bringable, and the player
@@ -338,8 +344,23 @@ public class TeleportComponent extends BukkitComponent implements Listener {
             if (lastLoc != null) {
                 sessions.getSession(TeleportSession.class, player).setIgnoreLocation(lastLoc);
                 lastLoc.getChunk().load(true);
-                player.teleport(lastLoc);
-                sender.sendMessage(ChatColor.YELLOW + "You've been returned.");
+                (new TeleportPlayerIterator(sender, lastLoc) {
+                    @Override
+                    public void onCaller(Player player) {
+                        sender.sendMessage(ChatColor.YELLOW + "You've been returned.");
+                    }
+
+                    @Override
+                    public void onVictim(CommandSender sender, Player player) {
+                        player.sendMessage(ChatColor.YELLOW + "You've been returned by "
+                                + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + ".");
+                    }
+
+                    @Override
+                    public void onInformMany(CommandSender sender, int affected) {
+                        sender.sendMessage(ChatColor.YELLOW.toString() + affected + " returned.");
+                    }
+                }).iterate(PlayerUtil.matchPlayers(player));
             } else {
                 sender.sendMessage(ChatColor.RED + "There's no past location in your history.");
             }

@@ -24,9 +24,11 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import com.sk89q.commandbook.CommandBook;
@@ -366,5 +368,40 @@ public class PlayerUtil {
             }
         }
         return targets;
+    }
+
+    /**
+     * Teleports a player with vehicle support
+     *
+     * @param sender
+     * @param player
+     * @param target
+     * @param allowVehicles
+     */
+    public static void teleportTo(CommandSender sender, Player player, Location target, boolean allowVehicles) {
+        target.getChunk().load(true);
+        if (player.getVehicle() != null) {
+            Entity vehicle = player.getVehicle();
+            vehicle.eject();
+
+            player.teleport(target);
+
+            if (!allowVehicles) {
+                return;
+            }
+
+            // Check vehicle permissions
+            String permString = "commandbook.teleport.vehicle." + vehicle.getType().getName().toLowerCase();
+
+            if (CommandBook.inst().hasPermission(player, permString)) {
+                if (player.getWorld().equals(target.getWorld())
+                        || CommandBook.inst().hasPermission(player, target.getWorld(), permString)) {
+                    vehicle.teleport(player);
+                    vehicle.setPassenger(player);
+                }
+            }
+        } else {
+            player.teleport(target);
+        }
     }
 }
