@@ -156,16 +156,15 @@ public class PlayerComponent extends BukkitComponent {
 
                     // Keep track of this
                     included = true;
-                } else {
+                } else if (!args.hasFlag('s')) {
                     player.sendMessage(ChatColor.YELLOW + "Healed by "
                             + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + ".");
-
                 }
             }
 
             // The player didn't receive any items, then we need to send the
             // user a message so s/he know that something is indeed working
-            if (!included && args.hasFlag('s')) {
+            if (!included) {
                 sender.sendMessage(ChatColor.YELLOW.toString() + "Players healed.");
             }
         }
@@ -212,12 +211,9 @@ public class PlayerComponent extends BukkitComponent {
 
                     // Keep track of this
                     included = true;
-                } else {
-                    if (!args.hasFlag('s')) {
-                        player.sendMessage(ChatColor.YELLOW + "Fire extinguished by "
-                                + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + ".");
-                    }
-
+                } else if (!args.hasFlag('s')) {
+                    player.sendMessage(ChatColor.YELLOW + "Fire extinguished by "
+                            + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + ".");
                 }
             }
 
@@ -263,7 +259,7 @@ public class PlayerComponent extends BukkitComponent {
 
                     // Keep track of this
                     included = true;
-                } else {
+                } else if (!args.hasFlag('s')) {
                     player.sendMessage(ChatColor.YELLOW + "Slain by "
                             + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + ".");
 
@@ -272,7 +268,7 @@ public class PlayerComponent extends BukkitComponent {
 
             // The player didn't receive any items, then we need to send the
             // user a message so s/he know that something is indeed working
-            if (!included && args.hasFlag('s')) {
+            if (!included) {
                 sender.sendMessage(ChatColor.YELLOW.toString() + "Players slain.");
             }
         }
