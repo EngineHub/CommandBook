@@ -251,9 +251,22 @@ public class TeleportComponent extends BukkitComponent implements Listener {
         @Command(aliases = {"bring", "tphere", "summon", "s"}, usage = "<target>", desc = "Bring a player to you", min = 1, max = 1)
         public void bring(CommandContext args, CommandSender sender) throws CommandException {
             Player player = PlayerUtil.checkPlayer(sender);
-            if (!CommandBook.inst().hasPermission(sender, "commandbook.teleport.other")) {
-                Player target = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
+            Player target = null;
 
+            // If we have a single player match, check that for bringable. If we do not,
+            // then check to see if the player can bring multiple players in his current
+            // world. If that is the case then allow this to continue.
+            try {
+                target = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
+            } catch (CommandException ex) {
+                if (!CommandBook.inst().hasPermission(sender, "commandbook.teleport.other")) {
+                    // There was not a single player match, and the player does not have
+                    // permission to teleport players in his/her current world.
+                    throw ex;
+                }
+            }
+
+            if (target != null) {
                 if (sessions.getSession(TeleportSession.class, player).isBringable(target)) {
                     String senderMessage = CommandBookUtil.replaceColorMacros(
                             CommandBookUtil.replaceMacros(sender, config.bringMessageSender))
@@ -267,21 +280,24 @@ public class TeleportComponent extends BukkitComponent implements Listener {
                     target.sendMessage(targetMessage);
                     target.teleport(player);
                     return;
-                } else {
+                } else if (!CommandBook.inst().hasPermission(sender, "commandbook.teleport.other")) {
+                    // There was a single player match, but, the target was not bringable, and the player
+                    // does not have permission to teleport players in his/her current world.
                     throw new CommandException(config.bringMessageNoPerm);
                 }
             }
 
             Location loc = player.getLocation();
 
-            CommandBook.inst().checkPermission(sender, "commandbook.teleport.other");
-
+            // There was not a single player match, or that single player match did not request
+            // to be brought. The player does have permission to teleport players in his/her
+            // current world. However, we're now teleporting in targets from potentially different worlds,
+            // and we should ensure that the sender has permission to teleport players in those worlds.
             Iterable<Player> targets = PlayerUtil.matchPlayers(sender, args.getString(0));
-
-            for (Player target : targets) {
+            for (Player aTarget : targets) {
                 // We have already checked the from and current locations, we must now check the to if the world does not match
-                if (!loc.getWorld().equals(target.getWorld())) {
-                    CommandBook.inst().checkPermission(sender, target.getWorld(), "commandbook.teleport.other");
+                if (!loc.getWorld().equals(aTarget.getWorld())) {
+                    CommandBook.inst().checkPermission(sender, aTarget.getWorld(), "commandbook.teleport.other");
                 }
             }
 
