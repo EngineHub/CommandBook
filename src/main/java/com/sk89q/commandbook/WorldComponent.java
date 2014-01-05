@@ -40,7 +40,7 @@ public class WorldComponent extends BukkitComponent {
     public class Commands {
         @Command(aliases = {"weather"},
                 usage = "<'stormy'|'sunny'> [duration] [world]", desc = "Change the world weather",
-                min = 1, max = 3)
+                flags = "s", min = 1, max = 3)
         @CommandPermissions({"commandbook.weather"})
         public void weather(CommandContext args, CommandSender sender) throws CommandException {
 
@@ -58,6 +58,13 @@ public class WorldComponent extends BukkitComponent {
                 duration = args.getInteger(1);
             }
 
+            boolean broadcastChanges = CommandBook.inst().broadcastChanges;
+
+            if (broadcastChanges && args.hasFlag('s')) {
+                CommandBook.inst().checkPermission(sender, "commandbook.weather.silent");
+                broadcastChanges = false;
+            }
+
             if (weatherStr.equalsIgnoreCase("stormy")
                     || weatherStr.equalsIgnoreCase("rainy")
                     || weatherStr.equalsIgnoreCase("snowy")
@@ -72,14 +79,12 @@ public class WorldComponent extends BukkitComponent {
                     world.setWeatherDuration(duration * 20);
                 }
 
-                if (CommandBook.inst().broadcastChanges) {
+                if (broadcastChanges) {
                     CommandBook.server().broadcastMessage(ChatColor.YELLOW
                             + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + " has started on a storm on '"
                             + world.getName() + "'.");
-                }
-
-                // Tell console, since console won't get the broadcast message.
-                if (!CommandBook.inst().broadcastChanges) {
+                } else {
+                    // Tell console, since console won't get the broadcast message.
                     sender.sendMessage(ChatColor.YELLOW + "Stormy weather enabled.");
                 }
 
@@ -97,14 +102,12 @@ public class WorldComponent extends BukkitComponent {
                     world.setWeatherDuration(duration * 20);
                 }
 
-                if (CommandBook.inst().broadcastChanges) {
+                if (broadcastChanges) {
                     CommandBook.server().broadcastMessage(ChatColor.YELLOW
                             + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + " has stopped a storm on '"
                             + world.getName() + "'.");
-                }
-
-                // Tell console, since console won't get the broadcast message.
-                if (!CommandBook.inst().broadcastChanges) {
+                } else {
+                    // Tell console, since console won't get the broadcast message.
                     sender.sendMessage(ChatColor.YELLOW + "Stormy weather disabled.");
                 }
 
@@ -115,7 +118,7 @@ public class WorldComponent extends BukkitComponent {
 
         @Command(aliases = {"thunder"},
                 usage = "<'on'|'off'> [duration] [world]", desc = "Change the thunder state",
-                min = 1, max = 3)
+                flags = "s", min = 1, max = 3)
         @CommandPermissions({"commandbook.weather.thunder"})
         public void thunder(CommandContext args, CommandSender sender) throws CommandException {
 
@@ -133,6 +136,13 @@ public class WorldComponent extends BukkitComponent {
                 duration = args.getInteger(1);
             }
 
+            boolean broadcastChanges = CommandBook.inst().broadcastChanges;
+
+            if (broadcastChanges && args.hasFlag('s')) {
+                CommandBook.inst().checkPermission(sender, "commandbook.weather.thunder.silent");
+                broadcastChanges = false;
+            }
+
             if (weatherStr.equalsIgnoreCase("on")) {
                 world.setThundering(true);
 
@@ -140,7 +150,13 @@ public class WorldComponent extends BukkitComponent {
                     world.setThunderDuration(duration * 20);
                 }
 
-                sender.sendMessage(ChatColor.YELLOW + "Thunder enabled.");
+                if (broadcastChanges) {
+                    CommandBook.server().broadcastMessage(ChatColor.YELLOW
+                            + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + " has started a thunder storm on '"
+                            + world.getName() + "'.");
+                } else {
+                    sender.sendMessage(ChatColor.YELLOW + "Thunder enabled.");
+                }
             } else if (weatherStr.equalsIgnoreCase("off")) {
                 world.setThundering(false);
 
@@ -148,7 +164,13 @@ public class WorldComponent extends BukkitComponent {
                     world.setThunderDuration(duration * 20);
                 }
 
-                sender.sendMessage(ChatColor.YELLOW + "Thunder disabled.");
+                if (broadcastChanges) {
+                    CommandBook.server().broadcastMessage(ChatColor.YELLOW
+                            + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + " has stopped a thunder storm on '"
+                            + world.getName() + "'.");
+                } else {
+                    sender.sendMessage(ChatColor.YELLOW + "Thunder disabled.");
+                }
             } else {
                 throw new CommandException("Unknown thunder state! Acceptable states: on or off");
             }

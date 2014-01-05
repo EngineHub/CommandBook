@@ -222,7 +222,7 @@ public class LocationUtil {
             }
         }
 
-        List<Player> players = matchPlayerNames(filter);
+        List<Player> players = matchPlayerNames(source, filter);
 
         // Check to see if there were any matches
         if (players.size() == 0) {

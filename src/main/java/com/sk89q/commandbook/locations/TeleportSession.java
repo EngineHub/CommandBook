@@ -18,12 +18,14 @@
 
 package com.sk89q.commandbook.locations;
 
+import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.session.PersistentSession;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.zachsthings.libcomponents.config.Setting;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import sun.launcher.resources.launcher_zh_TW;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -82,8 +84,16 @@ public class TeleportSession extends PersistentSession {
     }
 
     public void rememberLocation(Location location) {
-        if (locationHistory.size() > 0 && locationHistory.peek().equals(location)) {
+        if (location == null) {
             return;
+        }
+
+        // Skip locations which are essentially teleport jitter
+        if (locationHistory.size() > 0) {
+            Location lastLoc = locationHistory.peek().clone();
+            if (lastLoc.getWorld().equals(location.getWorld()) && lastLoc.distanceSquared(location) <= 2) {
+                return;
+            }
         }
 
         locationHistory.add(0, location);

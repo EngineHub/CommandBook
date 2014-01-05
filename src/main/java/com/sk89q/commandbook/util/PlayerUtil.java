@@ -59,7 +59,21 @@ public class PlayerUtil {
      * @param filter
      * @return
      */
+    @Deprecated
     public static List<Player> matchPlayerNames(String filter) {
+
+        return matchPlayerNames(null, filter);
+    }
+
+    /**
+     * Match player names.
+     *
+     * @param source
+     * @param filter
+     * @return
+     */
+    public static List<Player> matchPlayerNames(CommandSender source, String filter) {
+
         Player[] players = CommandBook.server().getOnlinePlayers();
         boolean useDisplayNames = CommandBook.inst().lookupWithDisplayNames;
 
@@ -71,7 +85,7 @@ public class PlayerUtil {
 
             for (Player player : players) {
                 if (player.getName().equalsIgnoreCase(filter)
-                    || (useDisplayNames 
+                    || (useDisplayNames
                         && ChatColor.stripColor(player.getDisplayName()).equalsIgnoreCase(filter))) {
                     List<Player> list = new ArrayList<Player>();
                     list.add(player);
@@ -88,7 +102,7 @@ public class PlayerUtil {
 
             for (Player player : players) {
                 if (player.getName().toLowerCase().contains(filter)
-                    || (useDisplayNames 
+                    || (useDisplayNames
                         && ChatColor.stripColor(player.getDisplayName().toLowerCase()).contains(filter))) {
                     list.add(player);
                 }
@@ -102,9 +116,18 @@ public class PlayerUtil {
 
             for (Player player : players) {
                 if (player.getName().toLowerCase().startsWith(filter)
-                    || (useDisplayNames 
+                    || (useDisplayNames
                         && ChatColor.stripColor(player.getDisplayName().toLowerCase()).startsWith(filter))) {
-                    list.add(player);
+                    // Do this to maintain the behavior of the deprecated version of this method
+                    if (source != null) {
+                        if (player.equals(source)) {
+                            list.add(player);
+                        } else {
+                            list.add(0, player);
+                        }
+                    } else {
+                        list.add(player);
+                    }
                 }
             }
 
@@ -192,7 +215,7 @@ public class PlayerUtil {
             }
         }
 
-        List<Player> players = matchPlayerNames(filter);
+        List<Player> players = matchPlayerNames(source, filter);
 
         return checkPlayerMatch(players);
     }
