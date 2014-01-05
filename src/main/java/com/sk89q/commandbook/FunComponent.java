@@ -18,6 +18,7 @@
 
 package com.sk89q.commandbook;
 
+import com.google.common.collect.Lists;
 import com.zachsthings.libcomponents.bukkit.BasePlugin;
 import com.zachsthings.libcomponents.bukkit.BukkitComponent;
 import com.zachsthings.libcomponents.ComponentInformation;
@@ -37,6 +38,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 import static com.sk89q.commandbook.util.EntityUtil.matchCreatureType;
+
+import java.util.List;
 import java.util.Random;
 
 @ComponentInformation(friendlyName = "Fun", desc = "Provides some fun commands to toy with users. (/rocket and /pong are two fun ones)")
@@ -249,12 +252,12 @@ public class FunComponent extends BukkitComponent {
                 flags = "dirbt", min = 1, max = 4)
         @CommandPermissions({"commandbook.spawnmob"})
         public void spawnMob(CommandContext args, CommandSender sender) throws CommandException {
-            Location loc;
+            List<Location> locations;
 
             if (args.argsLength() >= 3) {
-                loc = LocationUtil.matchLocation(sender, args.getString(2));
+                locations = LocationUtil.matchLocations(sender, args.getString(2));
             } else {
-                loc = PlayerUtil.checkPlayer(sender).getLocation();
+                locations = Lists.newArrayList(PlayerUtil.checkPlayer(sender).getLocation());
             }
 
             String[] creatureInput = args.getString(0).split("\\|");
@@ -282,6 +285,7 @@ public class FunComponent extends BukkitComponent {
             }
 
             int count = Math.max(1, args.getInteger(1, 1));
+            int total = count * locations.size();
             EntityType type = matchCreatureType(sender, creatureName, true);
             EntityType riderType = null;
             if (hasRider) {
@@ -290,19 +294,21 @@ public class FunComponent extends BukkitComponent {
             }
             CommandBook.inst().checkPermission(sender, "commandbook.spawnmob." + type.getName());
 
-            if ((hasRider ? count * 2 : count) > 10) {
+            if ((hasRider ? total * 2 : total) > 10) {
                 CommandBook.inst().checkPermission(sender, "commandbook.spawnmob.many");
             }
 
-            for (int i = 0; i < count; i++) {
-                LivingEntity ridee = spawn(loc, type, specialType, args, sender);
-                if (hasRider) {
-                    LivingEntity rider = spawn(loc, riderType, riderSpecialType, args, sender);
-                    ridee.setPassenger(rider);
+            for (Location loc : locations) {
+                for (int i = 0; i < count; i++) {
+                    LivingEntity ridee = spawn(loc, type, specialType, args, sender);
+                    if (hasRider) {
+                        LivingEntity rider = spawn(loc, riderType, riderSpecialType, args, sender);
+                        ridee.setPassenger(rider);
+                    }
                 }
             }
 
-            sender.sendMessage(ChatColor.YELLOW + "" + count + " mob(s) spawned!");
+            sender.sendMessage(ChatColor.YELLOW + "" + total + " mob(s) spawned!");
         }
 
         @Command(aliases = {"slap"}, usage = "[target]", desc = "Slap a player", flags = "hdvs", min = 0, max = 1)

@@ -18,6 +18,7 @@
 
 package com.sk89q.commandbook.util;
 
+import com.google.common.collect.Lists;
 import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.CommandBookUtil;
 import com.sk89q.commandbook.locations.*;
@@ -28,6 +29,7 @@ import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.sk89q.commandbook.util.PlayerUtil.*;
@@ -112,10 +114,31 @@ public class LocationUtil {
      *
      * @param source
      * @param filter
-     * @return iterator for players
+     * @return first result of matchLocations
      * @throws CommandException no matches found
      */
     public static Location matchLocation(CommandSender source, String filter)
+            throws CommandException {
+
+        return matchLocations(source, filter, true).get(0);
+    }
+
+    /**
+     * Match multiple targets.
+     *
+     * @param source
+     * @param filter
+     * @return list of locations
+     * @throws CommandException no matches found
+     */
+    public static List<Location> matchLocations(CommandSender source, String filter)
+            throws CommandException {
+
+        return matchLocations(source, filter, false);
+    }
+
+    private static List<Location> matchLocations(CommandSender source, String filter,
+                                                 boolean strictMatching)
             throws CommandException {
 
         // Handle coordinates
@@ -135,10 +158,10 @@ public class LocationUtil {
             }
 
             if (args.length > 1) {
-                return new Location(matchWorld(source, args[1]), x, y, z);
+                return Lists.newArrayList(new Location(matchWorld(source, args[1]), x, y, z));
             } else {
                 Player player = checkPlayer(source);
-                return new Location(player.getWorld(), x, y, z);
+                return Lists.newArrayList(new Location(player.getWorld(), x, y, z));
             }
 
             // Handle special hash tag groups
@@ -150,10 +173,10 @@ public class LocationUtil {
             if (args[0].equalsIgnoreCase("#spawn")) {
                 CommandBook.inst().checkPermission(source, "commandbook.spawn");
                 if (args.length > 1) {
-                    return matchWorld(source, args[1]).getSpawnLocation();
+                    return Lists.newArrayList(matchWorld(source, args[1]).getSpawnLocation());
                 } else {
                     Player sourcePlayer = checkPlayer(source);
-                    return sourcePlayer.getLocation().getWorld().getSpawnLocation();
+                    return Lists.newArrayList(sourcePlayer.getLocation().getWorld().getSpawnLocation());
                 }
 
                 // Handle #target, which matches the player's target position
@@ -170,7 +193,7 @@ public class LocationUtil {
                     playerLoc.setX(loc.getX());
                     playerLoc.setY(loc.getY());
                     playerLoc.setZ(loc.getZ());
-                    return CommandBookUtil.findFreePosition(playerLoc);
+                    return Lists.newArrayList(CommandBookUtil.findFreePosition(playerLoc));
                 }
                 // Handle #home and #warp, which matches a player's home or a warp point
             } else if (args[0].equalsIgnoreCase("#home")
@@ -194,7 +217,7 @@ public class LocationUtil {
                     if (loc == null) {
                         throw new CommandException("You have not set your home yet.");
                     }
-                    return loc.getLocation();
+                    return Lists.newArrayList(loc.getLocation());
                 } else if (args.length == 2) {
                     if (source instanceof Player) {
                         Player player = (Player) source;
@@ -203,7 +226,7 @@ public class LocationUtil {
                             CommandBook.inst().checkPermission(source, "commandbook.locations." + type + ".other");
                         }
                     }
-                    return getManagedLocation(manager, checkPlayer(source).getWorld(), args[1]);
+                    return Lists.newArrayList(getManagedLocation(manager, checkPlayer(source).getWorld(), args[1]));
                 } else if (args.length == 3) {
                     if (source instanceof Player) {
                         Player player = (Player) source;
@@ -212,24 +235,34 @@ public class LocationUtil {
                             CommandBook.inst().checkPermission(source, "commandbook.locations." + type + ".other");
                         }
                     }
-                    return getManagedLocation(manager, matchWorld(source, args[2]), args[1]);
+                    return Lists.newArrayList(getManagedLocation(manager, matchWorld(source, args[2]), args[1]));
                 }
                 // Handle #me, which is for when a location argument is required
             } else if (args[0].equalsIgnoreCase("#me")) {
-                return checkPlayer(source).getLocation();
+                return Lists.newArrayList(checkPlayer(source).getLocation());
             } else {
                 throw new CommandException("Invalid group '" + filter + "'.");
             }
         }
 
-        List<Player> players = matchPlayerNames(source, filter);
+        List<Player> players;
+
+        if (strictMatching) {
+            players = matchPlayerNames(source, filter);
+        } else {
+            players = (List<Player>) matchPlayers(source, filter);
+        }
 
         // Check to see if there were any matches
         if (players.size() == 0) {
             throw new CommandException("No players matched query.");
         }
 
-        return players.get(0).getLocation();
+        List<Location> locations = new ArrayList<Location>();
+        for (Player player : players) {
+            locations.add(player.getLocation());
+        }
+        return locations;
     }
 
     /**
