@@ -110,7 +110,7 @@ public class FunComponent extends BukkitComponent {
 
         String[] types = specialTypes.split(",");
 
-        if (types.length > 0) {
+        if (!specialTypes.isEmpty() && types.length > 0) {
             outerloop:
                 for (String specialType : types) {
                     switch (creature.getType()) {
