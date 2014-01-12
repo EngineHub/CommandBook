@@ -18,14 +18,12 @@
 
 package com.sk89q.commandbook.locations;
 
-import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.session.PersistentSession;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.zachsthings.libcomponents.config.Setting;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import sun.launcher.resources.launcher_zh_TW;
 
 import java.util.HashMap;
 import java.util.LinkedList;

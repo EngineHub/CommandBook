@@ -185,7 +185,7 @@ public class MessagingComponent extends BukkitComponent implements Listener {
         @Command(aliases = {"say"}, usage = "<message...>", desc = "Send a message", min = 1, max = -1)
         @CommandPermissions({"commandbook.say"})
         public void say(CommandContext args, CommandSender sender) throws CommandException {
-            if (sender instanceof Player && sessions.getAdminSession((Player) sender).isMute()) {
+            if (sender instanceof Player && sessions.getSession(AdministrativeSession.class, (Player) sender).isMute()) {
                 sender.sendMessage(ChatColor.RED + "You are muted.");
                 return;
             }
@@ -227,7 +227,7 @@ public class MessagingComponent extends BukkitComponent implements Listener {
             String message = args.getJoinedStrings(0);
             CommandSender receiver;
 
-            String lastRecipient = sessions.getSession(sender).getLastRecipient();
+            String lastRecipient = sessions.getSession(UserSession.class, sender).getLastRecipient();
 
             if (lastRecipient != null) {
                 // This will throw errors as needed
@@ -237,8 +237,8 @@ public class MessagingComponent extends BukkitComponent implements Listener {
                 return;
             }
 
-            if (receiver instanceof Player && sessions.getSession(receiver).getIdleStatus() != null) {
-                String status = sessions.getSession(receiver).getIdleStatus();
+            if (receiver instanceof Player && sessions.getSession(UserSession.class, receiver).getIdleStatus() != null) {
+                String status = sessions.getSession(UserSession.class, receiver).getIdleStatus();
                 sender.sendMessage(config.pmColor + PlayerUtil.toColoredName(receiver, config.pmColor) + " is afk. "
                         + "They might not see your message."
                         + (status.isEmpty() ? "" : " (" + status + ")"));
@@ -258,7 +258,7 @@ public class MessagingComponent extends BukkitComponent implements Listener {
             // If the receiver hasn't had any player talk to them yet or hasn't
             // send a message, then we add it to the receiver's last message target
             // so s/he can /reply easily
-            sessions.getSession(receiver).setNewLastRecipient(sender);
+            sessions.getSession(UserSession.class, receiver).setNewLastRecipient(sender);
         }
 
         @Command(aliases = {"afk", "away"},
@@ -272,7 +272,7 @@ public class MessagingComponent extends BukkitComponent implements Listener {
             String status = "";
             if (args.argsLength() > 0) {
                 status = args.getJoinedStrings(0);
-                sessions.getSession(player).setIdleStatus(status);
+                sessions.getSession(UserSession.class, player).setIdleStatus(status);
             }
 
             player.sendMessage(ChatColor.YELLOW
@@ -289,7 +289,7 @@ public class MessagingComponent extends BukkitComponent implements Listener {
             Player player = PlayerUtil.checkPlayer(sender);
 
             player.sendMessage(ChatColor.YELLOW + "You are no longer away.");
-            sessions.getSession(player).setIdleStatus(null);
+            sessions.getSession(UserSession.class, player).setIdleStatus(null);
         }
 
         @Command(aliases = {"mute"}, usage = "<target>", desc = "Mute a player", flags = "o", min = 1, max = 1)
@@ -304,7 +304,7 @@ public class MessagingComponent extends BukkitComponent implements Listener {
                 throw new CommandException("Player " + PlayerUtil.toName(sender) + " is exempt from being muted!");
             }
 
-            if (!sessions.getAdminSession(player).setMute(true)) {
+            if (!sessions.getSession(AdministrativeSession.class, player).setMute(true)) {
 
                 if (player != sender) {
                     player.sendMessage(ChatColor.YELLOW + "You've been muted by "
@@ -322,7 +322,7 @@ public class MessagingComponent extends BukkitComponent implements Listener {
         public void unmute(CommandContext args, CommandSender sender) throws CommandException {
             Player player = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
 
-            if (sessions.getAdminSession(player).setMute(false)) {
+            if (sessions.getSession(AdministrativeSession.class, player).setMute(false)) {
                 if (player != sender) {
                     player.sendMessage(ChatColor.YELLOW + "You've been unmuted by "
                         + PlayerUtil.toColoredName(sender, ChatColor.YELLOW));

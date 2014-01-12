@@ -19,6 +19,7 @@
 package com.sk89q.commandbook;
 
 import com.sk89q.commandbook.session.SessionComponent;
+import com.sk89q.commandbook.session.UserSession;
 import com.sk89q.commandbook.util.PlayerUtil;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
@@ -76,7 +77,7 @@ public class ThorComponent extends BukkitComponent implements Listener {
     public void onInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
 
-        if (sessions.getSession(player).hasThor()) {
+        if (sessions.getSession(UserSession.class, player).hasThor()) {
             if (!config.thorItems.contains(player.getItemInHand().getTypeId())) {
                 return;
             }
@@ -198,7 +199,7 @@ public class ThorComponent extends BukkitComponent implements Listener {
             }
 
             for (final Player player : targets) {
-                sessions.getSession(player).setHasThor(true);
+                sessions.getSession(UserSession.class, player).setHasThor(true);
 
                 // Tell the user
                 if (player.equals(sender)) {
@@ -243,7 +244,7 @@ public class ThorComponent extends BukkitComponent implements Listener {
             }
 
             for (final Player player : targets) {
-                sessions.getSession(player).setHasThor(false);
+                sessions.getSession(UserSession.class, player).setHasThor(false);
 
                 // Tell the user
                 if (player.equals(sender)) {

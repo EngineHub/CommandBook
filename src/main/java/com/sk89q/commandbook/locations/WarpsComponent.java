@@ -21,6 +21,7 @@ package com.sk89q.commandbook.locations;
 import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.commands.PaginatedResult;
 import com.sk89q.commandbook.session.SessionComponent;
+import com.sk89q.commandbook.session.UserSession;
 import com.sk89q.commandbook.util.LocationUtil;
 import com.sk89q.commandbook.util.PlayerUtil;
 import com.sk89q.commandbook.util.TeleportPlayerIterator;
@@ -118,7 +119,7 @@ public class WarpsComponent extends LocationsComponent {
                 if (!existing.getCreatorName().equals(sender.getName())) {
                     CommandBook.inst().checkPermission(sender, "commandbook.warp.set.override");
                 }
-                if (!sessions.getSession(sender).checkOrQueueConfirmed(args.getCommand() + " " + args.getJoinedStrings(0))) {
+                if (!sessions.getSession(UserSession.class, sender).checkOrQueueConfirmed(args.getCommand() + " " + args.getJoinedStrings(0))) {
                     throw new CommandException("Warp already exists! Type /confirm to confirm overwriting");
                 }
             }

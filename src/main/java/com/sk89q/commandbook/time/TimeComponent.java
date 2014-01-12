@@ -40,7 +40,6 @@ import org.bukkit.event.world.WorldUnloadEvent;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 /**
  * TimeComponent contains commands and functions related to time management. These include
