@@ -18,7 +18,9 @@
 
 package com.sk89q.commandbook;
 
-import com.sk89q.commandbook.util.PlayerUtil;
+import com.sk89q.commandbook.util.ChatUtil;
+import com.sk89q.commandbook.util.InputUtil;
+import com.sk89q.commandbook.util.entity.player.PlayerUtil;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
@@ -206,9 +208,9 @@ public class GodComponent extends BukkitComponent implements Listener {
 
             // Detect arguments based on the number of arguments provided
             if (args.argsLength() == 0) {
-                targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
+                targets = InputUtil.PlayerParser.matchPlayers(PlayerUtil.checkPlayer(sender));
             } else if (args.argsLength() == 1) {
-                targets = PlayerUtil.matchPlayers(sender, args.getString(0));
+                targets = InputUtil.PlayerParser.matchPlayers(sender, args.getString(0));
             }
 
             // Check permissions!
@@ -244,7 +246,7 @@ public class GodComponent extends BukkitComponent implements Listener {
                 } else {
                     if (!args.hasFlag('s'))
                     player.sendMessage(ChatColor.YELLOW + "God enabled by "
-                            + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + ".");
+                            + ChatUtil.toColoredName(sender, ChatColor.YELLOW) + ".");
 
                 }
             }
@@ -265,9 +267,9 @@ public class GodComponent extends BukkitComponent implements Listener {
 
             // Detect arguments based on the number of arguments provided
             if (args.argsLength() == 0) {
-                targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
+                targets = InputUtil.PlayerParser.matchPlayers(PlayerUtil.checkPlayer(sender));
             } else if (args.argsLength() == 1) {
-                targets = PlayerUtil.matchPlayers(sender, args.getString(0));
+                targets = InputUtil.PlayerParser.matchPlayers(sender, args.getString(0));
             }
 
             // Check permissions!
@@ -301,7 +303,7 @@ public class GodComponent extends BukkitComponent implements Listener {
                     included = true;
                 } else {
                     player.sendMessage(ChatColor.YELLOW + "God disabled by "
-                            + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + ".");
+                            + ChatUtil.toColoredName(sender, ChatColor.YELLOW) + ".");
 
                 }
             }

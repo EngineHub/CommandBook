@@ -18,251 +18,75 @@
 
 package com.sk89q.commandbook.util;
 
-import com.google.common.collect.Lists;
-import com.sk89q.commandbook.CommandBook;
-import com.sk89q.commandbook.CommandBookUtil;
-import com.sk89q.commandbook.locations.*;
+import com.sk89q.commandbook.locations.NamedLocation;
+import com.sk89q.commandbook.locations.RootLocationManager;
 import com.sk89q.minecraft.util.commands.CommandException;
+import com.sk89q.worldedit.blocks.BlockType;
+import com.zachsthings.libcomponents.bukkit.BasePlugin;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.block.Block;
+import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static com.sk89q.commandbook.util.PlayerUtil.*;
-
 public class LocationUtil {
-    // No instantiation here...
-    private LocationUtil() {}
 
     /**
-     * Match a world.
-     * @param sender
+     * Find a position for the player to stand that is not inside a block.
+     * Blocks above the player will be iteratively tested until there is
+     * a series of two free blocks. The player will be teleported to
+     * that free position.
      *
-     * @param filter
+     * @param searchPos search position
      * @return
-     * @throws com.sk89q.minecraft.util.commands.CommandException
      */
-    public static World matchWorld(CommandSender sender, String filter) throws CommandException {
-        List<World> worlds = CommandBook.server().getWorlds();
+    public static Location findFreePosition(Location searchPos) {
+        World world = searchPos.getWorld();
+        Location loc = searchPos.clone();
+        int x = searchPos.getBlockX();
+        int y = Math.max(0, searchPos.getBlockY());
+        int origY = y;
+        int z = searchPos.getBlockZ();
 
-        // Handle special hash tag groups
-        if (filter.charAt(0) == '#') {
-            // #main for the main world
-            if (filter.equalsIgnoreCase("#main")) {
-                return worlds.get(0);
+        byte free = 0;
 
-                // #normal for the first normal world
-            } else if (filter.equalsIgnoreCase("#normal")) {
-                for (World world : worlds) {
-                    if (world.getEnvironment() == World.Environment.NORMAL) {
-                        return world;
-                    }
-                }
-
-                throw new CommandException("No normal world found.");
-
-                // #nether for the first nether world
-            } else if (filter.equalsIgnoreCase("#nether")) {
-                for (World world : worlds) {
-                    if (world.getEnvironment() == World.Environment.NETHER) {
-                        return world;
-                    }
-                }
-
-                throw new CommandException("No nether world found.");
-
-                // #skylands for the first skylands world
-            } else if (filter.equalsIgnoreCase("#skylands") || filter.equalsIgnoreCase("#theend") || filter.equalsIgnoreCase("#end")) {
-                World.Environment skylandsEnv = CommandBookUtil.getSkylandsEnvironment();
-                for (World world : worlds) {
-                    if (world.getEnvironment() == skylandsEnv) {
-                        return world;
-                    }
-                }
-
-                throw new CommandException("No skylands world found.");
-                // Handle getting a world from a player
-            } else if (filter.matches("^#player$")) {
-                String parts[] = filter.split(":", 2);
-
-                // They didn't specify an argument for the player!
-                if (parts.length == 1) {
-                    throw new CommandException("Argument expected for #player.");
-                }
-
-                return matchPlayers(sender, parts[1]).iterator().next().getWorld();
+        while (y <= world.getMaxHeight() + 2) {
+            if (BlockType.canPassThrough(world.getBlockTypeIdAt(x, y, z))) {
+                free++;
             } else {
-                throw new CommandException("Invalid identifier '" + filter + "'.");
+                free = 0;
             }
+
+            if (free == 2) {
+                if (y - 1 != origY) {
+                    loc.setX(x + 0.5);
+                    loc.setY(y - 1);
+                    loc.setZ(z + 0.5);
+                }
+
+                return loc;
+            }
+
+            y++;
         }
 
-        for (World world : worlds) {
-            if (world.getName().equals(filter)) {
-                return world;
-            }
-        }
-
-        throw new CommandException("No world by that exact name found.");
+        return null;
     }
 
     /**
-     * Match a target.
+     * Try to extract the world of a command sender.
      *
-     * @param source
-     * @param filter
-     * @return first result of matchLocations
-     * @throws CommandException no matches found
+     * @param sender command sender
+     * @return world or null
      */
-    public static Location matchLocation(CommandSender source, String filter)
-            throws CommandException {
-
-        return matchLocations(source, filter, true).get(0);
-    }
-
-    /**
-     * Match multiple targets.
-     *
-     * @param source
-     * @param filter
-     * @return list of locations
-     * @throws CommandException no matches found
-     */
-    public static List<Location> matchLocations(CommandSender source, String filter)
-            throws CommandException {
-
-        return matchLocations(source, filter, false);
-    }
-
-    private static List<Location> matchLocations(CommandSender source, String filter,
-                                                 boolean strictMatching)
-            throws CommandException {
-
-        // Handle coordinates
-        if (filter.matches("^[\\-0-9\\.]+,[\\-0-9\\.]+,[\\-0-9\\.]+(?:.+)?$")) {
-            CommandBook.inst().checkPermission(source, "commandbook.locations.coords");
-
-            String[] args = filter.split(":");
-            String[] parts = args[0].split(",");
-            double x, y, z;
-
-            try {
-                x = Double.parseDouble(parts[0]);
-                y = Double.parseDouble(parts[1]);
-                z = Double.parseDouble(parts[2]);
-            } catch (NumberFormatException e) {
-                throw new CommandException("Coordinates expected numbers!");
-            }
-
-            if (args.length > 1) {
-                return Lists.newArrayList(new Location(matchWorld(source, args[1]), x, y, z));
-            } else {
-                Player player = checkPlayer(source);
-                return Lists.newArrayList(new Location(player.getWorld(), x, y, z));
-            }
-
-            // Handle special hash tag groups
-        } else if (filter.charAt(0) == '#') {
-            String[] args = filter.split(":");
-
-            // Handle #world, which matches player of the same world as the
-            // calling source
-            if (args[0].equalsIgnoreCase("#spawn")) {
-                CommandBook.inst().checkPermission(source, "commandbook.spawn");
-                if (args.length > 1) {
-                    return Lists.newArrayList(matchWorld(source, args[1]).getSpawnLocation());
-                } else {
-                    Player sourcePlayer = checkPlayer(source);
-                    return Lists.newArrayList(sourcePlayer.getLocation().getWorld().getSpawnLocation());
-                }
-
-                // Handle #target, which matches the player's target position
-            } else if (args[0].equalsIgnoreCase("#target")) {
-                CommandBook.inst().checkPermission(source, "commandbook.locations.target");
-                Player player = checkPlayer(source);
-                Location playerLoc = player.getLocation();
-                Block targetBlock = player.getTargetBlock(null, 100);
-
-                if (targetBlock == null) {
-                    throw new CommandException("Failed to find a block in your target!");
-                } else {
-                    Location loc = targetBlock.getLocation();
-                    playerLoc.setX(loc.getX());
-                    playerLoc.setY(loc.getY());
-                    playerLoc.setZ(loc.getZ());
-                    return Lists.newArrayList(CommandBookUtil.findFreePosition(playerLoc));
-                }
-                // Handle #home and #warp, which matches a player's home or a warp point
-            } else if (args[0].equalsIgnoreCase("#home")
-                    || args[0].equalsIgnoreCase("#warp")) {
-                String type = args[0].substring(1);
-                CommandBook.inst().checkPermission(source, "commandbook.locations." + type);
-                LocationsComponent component = type.equalsIgnoreCase("warp")
-                        ? CommandBook.inst().getComponentManager().getComponent(WarpsComponent.class)
-                        : CommandBook.inst().getComponentManager().getComponent(HomesComponent.class);
-                if (component == null)  {
-                    throw new CommandException("This type of location is not enabled!");
-                }
-                RootLocationManager<NamedLocation> manager = component.getManager();
-                if (args.length == 1) {
-                    if (type.equalsIgnoreCase("warp")) {
-                        throw new CommandException("Please specify a warp name.");
-                    }
-                    // source player home
-                    Player ply = checkPlayer(source);
-                    NamedLocation loc = manager.get(ply.getWorld(), ply.getName());
-                    if (loc == null) {
-                        throw new CommandException("You have not set your home yet.");
-                    }
-                    return Lists.newArrayList(loc.getLocation());
-                } else if (args.length == 2) {
-                    if (source instanceof Player) {
-                        Player player = (Player) source;
-                        NamedLocation loc = manager.get(player.getWorld(), args[1]);
-                        if (loc != null && !(loc.getCreatorName().equalsIgnoreCase(player.getName()))) {
-                            CommandBook.inst().checkPermission(source, "commandbook.locations." + type + ".other");
-                        }
-                    }
-                    return Lists.newArrayList(getManagedLocation(manager, checkPlayer(source).getWorld(), args[1]));
-                } else if (args.length == 3) {
-                    if (source instanceof Player) {
-                        Player player = (Player) source;
-                        NamedLocation loc = manager.get(matchWorld(source, args[2]), args[1]);
-                        if (loc != null && !(loc.getCreatorName().equalsIgnoreCase(player.getName()))) {
-                            CommandBook.inst().checkPermission(source, "commandbook.locations." + type + ".other");
-                        }
-                    }
-                    return Lists.newArrayList(getManagedLocation(manager, matchWorld(source, args[2]), args[1]));
-                }
-                // Handle #me, which is for when a location argument is required
-            } else if (args[0].equalsIgnoreCase("#me")) {
-                return Lists.newArrayList(checkPlayer(source).getLocation());
-            } else {
-                throw new CommandException("Invalid group '" + filter + "'.");
-            }
-        }
-
-        List<Player> players;
-
-        if (strictMatching) {
-            players = matchPlayerNames(source, filter);
+    public static World extractWorld(CommandSender sender) {
+        if (sender instanceof Player) {
+            return ((Player) sender).getWorld();
+        } else if (sender instanceof BlockCommandSender) {
+            return ((BlockCommandSender) sender).getBlock().getWorld();
         } else {
-            players = (List<Player>) matchPlayers(source, filter);
+            return BasePlugin.server().getWorlds().get(0);
         }
-
-        // Check to see if there were any matches
-        if (players.size() == 0) {
-            throw new CommandException("No players matched query.");
-        }
-
-        List<Location> locations = new ArrayList<Location>();
-        for (Player player : players) {
-            locations.add(player.getLocation());
-        }
-        return locations;
     }
 
     /**
@@ -279,13 +103,6 @@ public class LocationUtil {
         NamedLocation loc = manager.get(world, id);
         if (loc == null) throw new CommandException("A location by that name could not be found.");
         return loc.getLocation();
-    }
-    
-    public static String toFriendlyString(Location location) {
-        return location.getBlockX() + "," + 
-                location.getBlockY() + "," + 
-                location.getBlockZ() + "@" + 
-                location.getWorld().getName();
     }
 
     /**

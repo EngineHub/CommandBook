@@ -20,8 +20,8 @@ package com.sk89q.commandbook.locations;
 
 import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.commands.PaginatedResult;
-import com.sk89q.commandbook.util.LocationUtil;
-import com.sk89q.commandbook.util.PlayerUtil;
+import com.sk89q.commandbook.util.InputUtil;
+import com.sk89q.commandbook.util.entity.player.PlayerUtil;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.zachsthings.libcomponents.bukkit.BukkitComponent;
@@ -97,7 +97,7 @@ public abstract class LocationsComponent extends BukkitComponent {
         World world = null;
         if (getManager().isPerWorld()) {
             if (args.hasFlag('w')) {
-                world = LocationUtil.matchWorld(sender, args.getFlag('w'));
+                world = InputUtil.matchWorld(sender, args.getFlag('w'));
             } else {
                 world = PlayerUtil.checkPlayer(sender).getWorld();
             }

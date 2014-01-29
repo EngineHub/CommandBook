@@ -19,9 +19,10 @@
 package com.sk89q.commandbook.locations;
 
 import com.sk89q.commandbook.CommandBook;
-import com.sk89q.commandbook.util.LocationUtil;
-import com.sk89q.commandbook.util.PlayerIteratorAction;
-import com.sk89q.commandbook.util.PlayerUtil;
+import com.sk89q.commandbook.util.ChatUtil;
+import com.sk89q.commandbook.util.InputUtil;
+import com.sk89q.commandbook.util.entity.player.PlayerUtil;
+import com.sk89q.commandbook.util.entity.player.iterators.PlayerIteratorAction;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
@@ -111,7 +112,7 @@ public class SpawnLocationsComponent extends BukkitComponent implements Listener
 
             // Detect arguments based on the number of arguments provided
             if (args.argsLength() == 1) {
-                targets = PlayerUtil.matchPlayers(sender, args.getString(0));
+                targets = InputUtil.PlayerParser.matchPlayers(sender, args.getString(0));
 
                 // Check permissions!
                 for (Player target : targets) {
@@ -121,7 +122,7 @@ public class SpawnLocationsComponent extends BukkitComponent implements Listener
                     }
                 }
             } else {
-                targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
+                targets = InputUtil.PlayerParser.matchPlayers(PlayerUtil.checkPlayer(sender));
             }
 
             (new PlayerIteratorAction(sender) {
@@ -139,7 +140,7 @@ public class SpawnLocationsComponent extends BukkitComponent implements Listener
                 @Override
                 public void onVictim(CommandSender sender, Player player) {
                     player.sendMessage(ChatColor.YELLOW + "Teleported to spawn by "
-                            + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + ".");
+                            + ChatUtil.toColoredName(sender, ChatColor.YELLOW) + ".");
                 }
 
                 @Override
@@ -166,7 +167,7 @@ public class SpawnLocationsComponent extends BukkitComponent implements Listener
                 world = player.getWorld();
                 loc = player.getLocation();
             } else {
-                loc = LocationUtil.matchLocation(sender, args.getString(0));
+                loc = InputUtil.matchLocation(sender, args.getString(0));
                 world = loc.getWorld();
             }
 

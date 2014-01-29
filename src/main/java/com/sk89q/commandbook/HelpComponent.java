@@ -24,7 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-import static com.sk89q.commandbook.CommandBookUtil.replaceColorMacros;
+import static com.sk89q.commandbook.util.ChatUtil.replaceColorMacros;
 
 /**
  * Simple but very messy Help component.

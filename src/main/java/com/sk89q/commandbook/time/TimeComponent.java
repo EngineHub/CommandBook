@@ -19,9 +19,9 @@
 package com.sk89q.commandbook.time;
 
 import com.sk89q.commandbook.CommandBook;
-import com.sk89q.commandbook.CommandBookUtil;
-import com.sk89q.commandbook.util.LocationUtil;
-import com.sk89q.commandbook.util.PlayerUtil;
+import com.sk89q.commandbook.util.ChatUtil;
+import com.sk89q.commandbook.util.InputUtil;
+import com.sk89q.commandbook.util.entity.player.PlayerUtil;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
@@ -80,7 +80,7 @@ public class TimeComponent extends BukkitComponent implements Listener {
                 int time = 0;
 
                 try {
-                    time = CommandBookUtil.matchMCWorldTime(String.valueOf(entry.getValue()));
+                    time = InputUtil.TimeParser.matchMCWorldTime(String.valueOf(entry.getValue()));
                 } catch (CommandException e) {
                     CommandBook.logger().warning("Time lock: Failed to parse time '"
                             + entry.getValue() + "'");
@@ -100,7 +100,7 @@ public class TimeComponent extends BukkitComponent implements Listener {
                 world.setTime(time);
                 lock(world);
                 CommandBook.logger().info("Time locked to '"
-                        + CommandBookUtil.getTimeString(time) + "' for world '"
+                        + ChatUtil.getTimeString(time) + "' for world '"
                         + world.getName() + "'");
             }
         }
@@ -129,7 +129,7 @@ public class TimeComponent extends BukkitComponent implements Listener {
             world.setTime(lockedTime);
             lock(world);
             CommandBook.logger().info("Time locked to '"
-                    + CommandBookUtil.getTimeString(lockedTime) + "' for world '"
+                    + ChatUtil.getTimeString(lockedTime) + "' for world '"
                     + world.getName() + "'");
         }
     }
@@ -173,7 +173,7 @@ public class TimeComponent extends BukkitComponent implements Listener {
     @Deprecated
     public static int matchTime(String timeStr) throws CommandException {
 
-        return CommandBookUtil.matchMCWorldTime(timeStr);
+        return InputUtil.TimeParser.matchMCWorldTime(timeStr);
     }
 
     public class Commands {
@@ -196,7 +196,7 @@ public class TimeComponent extends BukkitComponent implements Listener {
                 world = PlayerUtil.checkPlayer(sender).getWorld();
                 timeStr = args.getString(0);
             } else { // A world was specified!
-                world = LocationUtil.matchWorld(sender, args.getString(0));
+                world = InputUtil.matchWorld(sender, args.getString(0));
                 timeStr = args.getString(1);
             }
 
@@ -216,7 +216,7 @@ public class TimeComponent extends BukkitComponent implements Listener {
                 if (!args.hasFlag('l')) {
                     CommandBook.inst().checkPermission(sender, "commandbook.time.check");
                     sender.sendMessage(ChatColor.YELLOW
-                            + "Time: " + CommandBookUtil.getTimeString(world.getTime()));
+                            + "Time: " + ChatUtil.getTimeString(world.getTime()));
                     return;
                 }
 
@@ -227,7 +227,7 @@ public class TimeComponent extends BukkitComponent implements Listener {
 
             if (!onlyLock) {
                 unlock(world);
-                world.setTime(CommandBookUtil.matchMCWorldTime(timeStr));
+                world.setTime(InputUtil.TimeParser.matchMCWorldTime(timeStr));
             }
 
             String verb = "set";
@@ -241,12 +241,12 @@ public class TimeComponent extends BukkitComponent implements Listener {
 
             if (broadcastChanges) {
                 CommandBook.server().broadcastMessage(ChatColor.YELLOW
-                        + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + " " + verb + " the time of '"
+                        + ChatUtil.toColoredName(sender, ChatColor.YELLOW) + " " + verb + " the time of '"
                         + world.getName() + "' to "
-                        + CommandBookUtil.getTimeString(world.getTime()) + ".");
+                        + ChatUtil.getTimeString(world.getTime()) + ".");
             } else {
                 sender.sendMessage(ChatColor.YELLOW + "Time " + verb + " to "
-                        + CommandBookUtil.getTimeString(world.getTime()) + ".");
+                        + ChatUtil.getTimeString(world.getTime()) + ".");
             }
         }
 
@@ -263,15 +263,15 @@ public class TimeComponent extends BukkitComponent implements Listener {
                 if (args.argsLength() == 1) {
                     timeStr = args.getString(0);
                     if (reset) {
-                        players = PlayerUtil.matchPlayers(sender, timeStr);
+                        players = InputUtil.PlayerParser.matchPlayers(sender, timeStr);
                     }
                 }
 
                 if (players == null) {
-                    players = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
+                    players = InputUtil.PlayerParser.matchPlayers(PlayerUtil.checkPlayer(sender));
                 }
             } else {
-                players = PlayerUtil.matchPlayers(sender, args.getString(0));
+                players = InputUtil.PlayerParser.matchPlayers(sender, args.getString(0));
                 timeStr = args.getString(1);
             }
 
@@ -305,22 +305,22 @@ public class TimeComponent extends BukkitComponent implements Listener {
                     || timeStr.equalsIgnoreCase("now")) {
                 CommandBook.inst().checkPermission(sender, "commandbook.time.player.check");
                 sender.sendMessage(ChatColor.YELLOW
-                        + "Player Time: " + CommandBookUtil.getTimeString(PlayerUtil.matchSinglePlayer(sender,
+                        + "Player Time: " + ChatUtil.getTimeString(InputUtil.PlayerParser.matchSinglePlayer(sender,
                         args.getString(0, PlayerUtil.checkPlayer(sender).getName())).getPlayerTime()));
                 return;
             }
 
-            int time = CommandBookUtil.matchMCWorldTime(timeStr);
+            int time = InputUtil.TimeParser.matchMCWorldTime(timeStr);
 
             for (Player player : players) {
-                player.sendMessage(ChatColor.YELLOW + "Your time set to " + CommandBookUtil.getTimeString(player.getPlayerTime()));
+                player.sendMessage(ChatColor.YELLOW + "Your time set to " + ChatUtil.getTimeString(player.getPlayerTime()));
                 if (player.equals(sender)) {
                     included = true;
                 }
                 player.setPlayerTime(args.hasFlag('w') ? Integer.parseInt(timeStr) : time, args.hasFlag('w'));
             }
             if (!included) {
-                sender.sendMessage(ChatColor.YELLOW + "Player times set to " + CommandBookUtil.getTimeString(time));
+                sender.sendMessage(ChatColor.YELLOW + "Player times set to " + ChatUtil.getTimeString(time));
             }
         }
     }

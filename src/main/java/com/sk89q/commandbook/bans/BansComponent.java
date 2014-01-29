@@ -19,9 +19,9 @@
 package com.sk89q.commandbook.bans;
 
 import com.sk89q.commandbook.CommandBook;
-import com.sk89q.commandbook.CommandBookUtil;
 import com.sk89q.commandbook.InfoComponent;
-import com.sk89q.commandbook.util.PlayerUtil;
+import com.sk89q.commandbook.util.ChatUtil;
+import com.sk89q.commandbook.util.InputUtil;
 import com.sk89q.minecraft.util.commands.*;
 import com.zachsthings.libcomponents.ComponentInformation;
 import com.zachsthings.libcomponents.bukkit.BasePlugin;
@@ -125,7 +125,7 @@ public class BansComponent extends BukkitComponent implements Listener {
                 flags = "os", min = 1, max = -1)
         @CommandPermissions({"commandbook.kick"})
         public void kick(CommandContext args, CommandSender sender) throws CommandException {
-            Iterable<Player> targets = PlayerUtil.matchPlayers(sender, args.getString(0));
+            Iterable<Player> targets = InputUtil.PlayerParser.matchPlayers(sender, args.getString(0));
             String message = args.argsLength() >= 2 ? args.getJoinedStrings(1)
                     : "Kicked!";
 
@@ -138,7 +138,7 @@ public class BansComponent extends BukkitComponent implements Listener {
                     continue;
                 }
                 player.kickPlayer(message);
-                broadcastPlayers += PlayerUtil.toColoredName(player, ChatColor.YELLOW) + " ";
+                broadcastPlayers += ChatUtil.toColoredName(player, ChatColor.YELLOW) + " ";
                 getBanDatabase().logKick(player, sender, message);
             }
 
@@ -147,7 +147,7 @@ public class BansComponent extends BukkitComponent implements Listener {
                 //Broadcast the Message
                 if (config.broadcastKicks && !args.hasFlag('s')) {
                     BasePlugin.server().broadcastMessage(ChatColor.YELLOW
-                            + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + " has kicked " + broadcastPlayers
+                            + ChatUtil.toColoredName(sender, ChatColor.YELLOW) + " has kicked " + broadcastPlayers
                             + " - " + message);
                 }
             }
@@ -159,7 +159,7 @@ public class BansComponent extends BukkitComponent implements Listener {
         public void ban(CommandContext args, CommandSender sender) throws CommandException {
             String banName;
             String banAddress = null;
-            long endDate = args.hasFlag('t') ? CommandBookUtil.matchFutureDate(args.getFlag('t')) : 0L;
+            long endDate = args.hasFlag('t') ? InputUtil.TimeParser.matchFutureDate(args.getFlag('t')) : 0L;
             String message = args.argsLength() >= 2 ? args.getJoinedStrings(1)
                     : "Banned!";
 
@@ -171,9 +171,9 @@ public class BansComponent extends BukkitComponent implements Listener {
 
                 // Exact mode matches names exactly
                 if (args.hasFlag('e')) {
-                    player = PlayerUtil.matchPlayerExactly(sender, args.getString(0));
+                    player = InputUtil.PlayerParser.matchPlayerExactly(sender, args.getString(0));
                 } else {
-                    player = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
+                    player = InputUtil.PlayerParser.matchSinglePlayer(sender, args.getString(0));
                 }
 
                 if (CommandBook.inst().hasPermission(player, "commandbook.bans.exempt") && !hasExemptOverride) {
@@ -204,7 +204,7 @@ public class BansComponent extends BukkitComponent implements Listener {
             //Broadcast the Message
             if (config.broadcastBans && !args.hasFlag('s')) {
                 CommandBook.server().broadcastMessage(ChatColor.YELLOW
-                        + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + " has banned " + banName
+                        + ChatUtil.toColoredName(sender, ChatColor.YELLOW) + " has banned " + banName
                         + " - " + message);
             }
 
@@ -224,7 +224,7 @@ public class BansComponent extends BukkitComponent implements Listener {
 
                 String message = args.argsLength() >= 2 ? args.getJoinedStrings(1)
                         : "Banned!";
-                long endDate = args.hasFlag('t') ? CommandBookUtil.matchFutureDate(args.getFlag('t')) : 0L;
+                long endDate = args.hasFlag('t') ? InputUtil.TimeParser.matchFutureDate(args.getFlag('t')) : 0L;
 
                 String addr = args.getString(0)
                             .replace("\r", "")

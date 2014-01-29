@@ -19,13 +19,14 @@
 package com.sk89q.commandbook.kits;
 
 import com.sk89q.commandbook.CommandBook;
-import com.sk89q.commandbook.util.PlayerUtil;
+import com.sk89q.commandbook.util.ChatUtil;
+import com.sk89q.commandbook.util.InputUtil;
+import com.sk89q.commandbook.util.entity.player.PlayerUtil;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.zachsthings.libcomponents.ComponentInformation;
 import com.zachsthings.libcomponents.bukkit.BukkitComponent;
-
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -130,9 +131,9 @@ public class KitsComponent extends BukkitComponent implements Listener {
                 boolean included = false;
 
                 if (args.argsLength() == 2) {
-                    targets = PlayerUtil.matchPlayers(sender, args.getString(1));
+                    targets = InputUtil.PlayerParser.matchPlayers(sender, args.getString(1));
                 } else {
-                    targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
+                    targets = InputUtil.PlayerParser.matchPlayers(PlayerUtil.checkPlayer(sender));
                 }
 
                 for (Player player : targets) {
@@ -166,7 +167,7 @@ public class KitsComponent extends BukkitComponent implements Listener {
                         if (success) {
                             player.sendMessage(ChatColor.YELLOW + "You've been given " +
                                     "the '" + id + "' kit by "
-                                    + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + ".");
+                                    + ChatUtil.toColoredName(sender, ChatColor.YELLOW) + ".");
                         } else {
                             player.sendMessage(ChatColor.RED + "A kit could not be given to you because it has been too soon.");
                         }

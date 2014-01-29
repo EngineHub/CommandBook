@@ -18,8 +18,9 @@
 
 package com.sk89q.commandbook;
 
-import com.sk89q.commandbook.util.LocationUtil;
-import com.sk89q.commandbook.util.PlayerUtil;
+import com.sk89q.commandbook.util.ChatUtil;
+import com.sk89q.commandbook.util.InputUtil;
+import com.sk89q.commandbook.util.entity.player.PlayerUtil;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
@@ -54,7 +55,7 @@ public class WorldComponent extends BukkitComponent {
                 world = PlayerUtil.checkPlayer(sender).getWorld();
                 duration = args.getInteger(1);
             } else { // A world was specified!
-                world = LocationUtil.matchWorld(sender, args.getString(2));
+                world = InputUtil.matchWorld(sender, args.getString(2));
                 duration = args.getInteger(1);
             }
 
@@ -81,7 +82,7 @@ public class WorldComponent extends BukkitComponent {
 
                 if (broadcastChanges) {
                     CommandBook.server().broadcastMessage(ChatColor.YELLOW
-                            + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + " has started on a storm on '"
+                            + ChatUtil.toColoredName(sender, ChatColor.YELLOW) + " has started on a storm on '"
                             + world.getName() + "'.");
                 } else {
                     // Tell console, since console won't get the broadcast message.
@@ -104,7 +105,7 @@ public class WorldComponent extends BukkitComponent {
 
                 if (broadcastChanges) {
                     CommandBook.server().broadcastMessage(ChatColor.YELLOW
-                            + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + " has stopped a storm on '"
+                            + ChatUtil.toColoredName(sender, ChatColor.YELLOW) + " has stopped a storm on '"
                             + world.getName() + "'.");
                 } else {
                     // Tell console, since console won't get the broadcast message.
@@ -132,7 +133,7 @@ public class WorldComponent extends BukkitComponent {
                 world = PlayerUtil.checkPlayer(sender).getWorld();
                 duration = args.getInteger(1);
             } else { // A world was specified!
-                world = LocationUtil.matchWorld(sender, args.getString(2));
+                world = InputUtil.matchWorld(sender, args.getString(2));
                 duration = args.getInteger(1);
             }
 
@@ -152,7 +153,7 @@ public class WorldComponent extends BukkitComponent {
 
                 if (broadcastChanges) {
                     CommandBook.server().broadcastMessage(ChatColor.YELLOW
-                            + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + " has started a thunder storm on '"
+                            + ChatUtil.toColoredName(sender, ChatColor.YELLOW) + " has started a thunder storm on '"
                             + world.getName() + "'.");
                 } else {
                     sender.sendMessage(ChatColor.YELLOW + "Thunder enabled.");
@@ -166,7 +167,7 @@ public class WorldComponent extends BukkitComponent {
 
                 if (broadcastChanges) {
                     CommandBook.server().broadcastMessage(ChatColor.YELLOW
-                            + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + " has stopped a thunder storm on '"
+                            + ChatUtil.toColoredName(sender, ChatColor.YELLOW) + " has stopped a thunder storm on '"
                             + world.getName() + "'.");
                 } else {
                     sender.sendMessage(ChatColor.YELLOW + "Thunder disabled.");

@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.sk89q.commandbook.util;
+package com.sk89q.commandbook.util.entity.player.iterators;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;

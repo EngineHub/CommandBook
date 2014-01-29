@@ -1,17 +1,9 @@
 package com.sk89q.commandbook;
 
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerGameModeChangeEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-
 import com.sk89q.commandbook.session.PersistentSession;
 import com.sk89q.commandbook.session.SessionComponent;
-import com.sk89q.commandbook.util.PlayerUtil;
+import com.sk89q.commandbook.util.InputUtil;
+import com.sk89q.commandbook.util.entity.player.PlayerUtil;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
@@ -21,6 +13,14 @@ import com.zachsthings.libcomponents.InjectComponent;
 import com.zachsthings.libcomponents.bukkit.BukkitComponent;
 import com.zachsthings.libcomponents.config.ConfigurationBase;
 import com.zachsthings.libcomponents.config.Setting;
+import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerGameModeChangeEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 
 @ComponentInformation(friendlyName = "Flight", desc = "Allows players to fly and control flight speed")
 public class FlightComponent extends BukkitComponent implements Listener {
@@ -110,14 +110,14 @@ public class FlightComponent extends BukkitComponent implements Listener {
             Player player;
             float flightMultiplier = 1f;
             if (args.argsLength() == 2) {
-                player = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
+                player = InputUtil.PlayerParser.matchSinglePlayer(sender, args.getString(0));
                 flightMultiplier = (float) args.getDouble(1);
             } else if (args.argsLength() == 1) {
                 try {
                     flightMultiplier = (float) args.getDouble(0);
                     player = PlayerUtil.checkPlayer(sender);
                 } catch (NumberFormatException e) {
-                    player = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
+                    player = InputUtil.PlayerParser.matchSinglePlayer(sender, args.getString(0));
                 }
             } else {
                 player = PlayerUtil.checkPlayer(sender);
@@ -147,14 +147,14 @@ public class FlightComponent extends BukkitComponent implements Listener {
             Player player;
             float walkMultiplier = 1f;
             if (args.argsLength() == 2) {
-                player = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
+                player = InputUtil.PlayerParser.matchSinglePlayer(sender, args.getString(0));
                 walkMultiplier = (float) args.getDouble(1);
             } else if (args.argsLength() == 1) {
                 try {
                     walkMultiplier = (float) args.getDouble(0);
                     player = PlayerUtil.checkPlayer(sender);
                 } catch (NumberFormatException e) {
-                    player = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
+                    player = InputUtil.PlayerParser.matchSinglePlayer(sender, args.getString(0));
                 }
             } else {
                 player = PlayerUtil.checkPlayer(sender);

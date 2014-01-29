@@ -16,14 +16,60 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.commandbook.util;
+package com.sk89q.commandbook.util.entity;
 
 import com.sk89q.minecraft.util.commands.CommandException;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 
 public class EntityUtil {
+
+    /**
+     * Get the cardinal compass direction of an entity.
+     *
+     * @param entity
+     * @return
+     */
+    public static String getCardinalDirection(Entity entity) {
+        double rot = (entity.getLocation().getYaw() - 90) % 360;
+        if (rot < 0) {
+            rot += 360.0;
+        }
+        return getDirection(rot);
+    }
+
+    /**
+     * Converts a rotation to a cardinal direction name.
+     *
+     * @param rot
+     * @return
+     */
+    private static String getDirection(double rot) {
+        if (0 <= rot && rot < 22.5) {
+            return "West";
+        } else if (22.5 <= rot && rot < 67.5) {
+            return "Northwest";
+        } else if (67.5 <= rot && rot < 112.5) {
+            return "North";
+        } else if (112.5 <= rot && rot < 157.5) {
+            return "Northeast";
+        } else if (157.5 <= rot && rot < 202.5) {
+            return "East";
+        } else if (202.5 <= rot && rot < 247.5) {
+            return "Southeast";
+        } else if (247.5 <= rot && rot < 292.5) {
+            return "South";
+        } else if (292.5 <= rot && rot < 337.5) {
+            return "Southwest";
+        } else if (337.5 <= rot && rot < 360.0) {
+            return "West";
+        } else {
+            return null;
+        }
+    }
+
     /**
      * Attempts to match a creature type.
      *

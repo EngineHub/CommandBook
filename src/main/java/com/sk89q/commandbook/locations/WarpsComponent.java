@@ -22,9 +22,9 @@ import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.commands.PaginatedResult;
 import com.sk89q.commandbook.session.SessionComponent;
 import com.sk89q.commandbook.session.UserSession;
-import com.sk89q.commandbook.util.LocationUtil;
-import com.sk89q.commandbook.util.PlayerUtil;
-import com.sk89q.commandbook.util.TeleportPlayerIterator;
+import com.sk89q.commandbook.util.InputUtil;
+import com.sk89q.commandbook.util.entity.player.PlayerUtil;
+import com.sk89q.commandbook.util.entity.player.iterators.TeleportPlayerIterator;
 import com.sk89q.minecraft.util.commands.*;
 import com.zachsthings.libcomponents.ComponentInformation;
 import com.zachsthings.libcomponents.InjectComponent;
@@ -59,10 +59,10 @@ public class WarpsComponent extends LocationsComponent {
             // Detect arguments based on the number of arguments provided
             if (args.argsLength() == 1) {
                 Player player = PlayerUtil.checkPlayer(sender);
-                targets = PlayerUtil.matchPlayers(player);
+                targets = InputUtil.PlayerParser.matchPlayers(player);
                 warp = getManager().get(player.getWorld(), args.getString(0));
             } else if (args.argsLength() == 2) {
-                targets = PlayerUtil.matchPlayers(sender, args.getString(0));
+                targets = InputUtil.PlayerParser.matchPlayers(sender, args.getString(0));
                 if (getManager().isPerWorld()) {
                     Player player = PlayerUtil.checkPlayer(sender);
                     warp = getManager().get(player.getWorld(), args.getString(1));
@@ -70,9 +70,9 @@ public class WarpsComponent extends LocationsComponent {
                     warp = getManager().get(null, args.getString(1));
                 }
             } else if (args.argsLength() == 3) {
-                targets = PlayerUtil.matchPlayers(sender, args.getString(1));
+                targets = InputUtil.PlayerParser.matchPlayers(sender, args.getString(1));
                 warp = getManager().get(
-                        LocationUtil.matchWorld(sender, args.getString(0)), args.getString(2));
+                        InputUtil.matchWorld(sender, args.getString(0)), args.getString(2));
             }
 
             // Check permissions!
@@ -109,7 +109,7 @@ public class WarpsComponent extends LocationsComponent {
                 player = PlayerUtil.checkPlayer(sender);
                 loc = player.getLocation();
             } else {
-                loc = LocationUtil.matchLocation(sender, args.getString(1));
+                loc = InputUtil.matchLocation(sender, args.getString(1));
                 if (sender instanceof Player) {
                     player = (Player) sender;
                 }
@@ -147,7 +147,7 @@ public class WarpsComponent extends LocationsComponent {
             World world;
             String warpName = args.getString(0);
             if (args.argsLength() == 2) {
-                world = LocationUtil.matchWorld(sender, args.getString(1));
+                world = InputUtil.matchWorld(sender, args.getString(1));
             } else {
                 world = PlayerUtil.checkPlayer(sender).getWorld();
             }

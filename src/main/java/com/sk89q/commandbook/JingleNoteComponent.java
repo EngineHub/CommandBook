@@ -18,23 +18,8 @@
 
 package com.sk89q.commandbook;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.logging.Level;
-
-import javax.sound.midi.InvalidMidiDataException;
-import javax.sound.midi.MidiUnavailableException;
-
-import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-
-import com.sk89q.commandbook.util.PlayerUtil;
+import com.sk89q.commandbook.util.InputUtil;
+import com.sk89q.commandbook.util.entity.player.PlayerUtil;
 import com.sk89q.jinglenote.JingleNoteManager;
 import com.sk89q.jinglenote.MidiJingleSequencer;
 import com.sk89q.minecraft.util.commands.Command;
@@ -43,6 +28,20 @@ import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.zachsthings.libcomponents.ComponentInformation;
 import com.zachsthings.libcomponents.bukkit.BukkitComponent;
+import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+
+import javax.sound.midi.InvalidMidiDataException;
+import javax.sound.midi.MidiUnavailableException;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.logging.Level;
 
 @ComponentInformation(friendlyName = "JingleNote", desc = "MIDI sequencer for note blocks with commands.")
 public class JingleNoteComponent extends BukkitComponent implements Listener {
@@ -109,9 +108,9 @@ public class JingleNoteComponent extends BukkitComponent implements Listener {
 
             Iterable<Player> targets;
             if (args.argsLength() == 0) {
-                targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
+                targets = InputUtil.PlayerParser.matchPlayers(PlayerUtil.checkPlayer(sender));
             } else {
-                targets = PlayerUtil.matchPlayers(sender, args.getString(0));
+                targets = InputUtil.PlayerParser.matchPlayers(sender, args.getString(0));
             }
 
             for (Player target : targets) {
@@ -147,9 +146,9 @@ public class JingleNoteComponent extends BukkitComponent implements Listener {
         public void midi(CommandContext args, CommandSender sender) throws CommandException {
             Iterable<Player> targets;
             if (args.hasFlag('p')) {
-                targets = PlayerUtil.matchPlayers(sender, args.getFlag('p'));
+                targets = InputUtil.PlayerParser.matchPlayers(sender, args.getFlag('p'));
             } else {
-                targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
+                targets = InputUtil.PlayerParser.matchPlayers(PlayerUtil.checkPlayer(sender));
             }
 
             for (Player target : targets) {

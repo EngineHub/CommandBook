@@ -20,7 +20,8 @@ package com.sk89q.commandbook;
 
 import com.sk89q.commandbook.session.PersistentSession;
 import com.sk89q.commandbook.session.SessionComponent;
-import com.sk89q.commandbook.util.PlayerUtil;
+import com.sk89q.commandbook.util.ChatUtil;
+import com.sk89q.commandbook.util.InputUtil;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
@@ -131,34 +132,34 @@ public class FreezeComponent extends BukkitComponent implements Listener, Runnab
         @Command(aliases = {"freeze"}, usage = "<target>", desc = "Freeze a player", min = 1, max = 1)
         @CommandPermissions({"commandbook.freeze"})
         public void freeze(CommandContext args, CommandSender sender) throws CommandException {
-            Player player = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
+            Player player = InputUtil.PlayerParser.matchSinglePlayer(sender, args.getString(0));
 
             if (!freezePlayer(player)) {
                 player.sendMessage(ChatColor.YELLOW + "You've been frozen by "
-                        + PlayerUtil.toColoredName(sender, ChatColor.YELLOW));
+                        + ChatUtil.toColoredName(sender, ChatColor.YELLOW));
                 sender.sendMessage(ChatColor.YELLOW + "You've frozen "
-                        + PlayerUtil.toColoredName(player, ChatColor.YELLOW));
+                        + ChatUtil.toColoredName(player, ChatColor.YELLOW));
             } else {
                 player.sendMessage(ChatColor.YELLOW + "Your freeze location has been updated by "
-                        + PlayerUtil.toColoredName(sender, ChatColor.YELLOW));
+                        + ChatUtil.toColoredName(sender, ChatColor.YELLOW));
                 sender.sendMessage(ChatColor.YELLOW + "You have updated the freeze location of "
-                        + PlayerUtil.toColoredName(player, ChatColor.YELLOW));
+                        + ChatUtil.toColoredName(player, ChatColor.YELLOW));
             }
         }
 
         @Command(aliases = {"unfreeze"}, usage = "<target>", desc = "Unfreeze a player", min = 1, max = 1)
         @CommandPermissions({"commandbook.freeze"})
         public void unfreeze(CommandContext args, CommandSender sender) throws CommandException {
-            Player player = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
+            Player player = InputUtil.PlayerParser.matchSinglePlayer(sender, args.getString(0));
 
             if (unfreezePlayer(player)) {
 
                 player.sendMessage(ChatColor.YELLOW + "You've been unfrozen by "
-                        + PlayerUtil.toColoredName(sender, ChatColor.YELLOW));
+                        + ChatUtil.toColoredName(sender, ChatColor.YELLOW));
                 sender.sendMessage(ChatColor.YELLOW + "You've unfrozen "
-                        + PlayerUtil.toColoredName(player, ChatColor.YELLOW));
+                        + ChatUtil.toColoredName(player, ChatColor.YELLOW));
             } else {
-                throw new CommandException(PlayerUtil.toName(player) + " was not frozen");
+                throw new CommandException(ChatUtil.toName(player) + " was not frozen");
             }
         }
     }

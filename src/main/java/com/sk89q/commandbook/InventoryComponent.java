@@ -19,7 +19,10 @@
 package com.sk89q.commandbook;
 
 import com.sk89q.commandbook.commands.PaginatedResult;
-import com.sk89q.commandbook.util.PlayerUtil;
+import com.sk89q.commandbook.util.ChatUtil;
+import com.sk89q.commandbook.util.InputUtil;
+import com.sk89q.commandbook.util.entity.player.PlayerUtil;
+import com.sk89q.commandbook.util.item.ItemUtil;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
@@ -41,8 +44,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
 
-import static com.sk89q.commandbook.CommandBookUtil.giveItem;
-import static com.sk89q.commandbook.CommandBookUtil.takeItem;
+import static com.sk89q.commandbook.util.item.InventoryUtil.giveItem;
+import static com.sk89q.commandbook.util.item.InventoryUtil.takeItem;
 
 @ComponentInformation(friendlyName = "Inventory",
         desc = "Inventory-related commands, such as /give and /clear, are handled in this component.")
@@ -113,7 +116,7 @@ public class InventoryComponent extends BukkitComponent {
     }
 
     private ItemStack matchItem(String name) throws CommandException {
-        return CommandBook.inst().getCommandItem(name);
+        return ItemUtil.getCommandItem(name);
     }
 
     public class Commands {
@@ -133,17 +136,17 @@ public class InventoryComponent extends BukkitComponent {
             // One argument: Just the item type and amount 1
             if (args.argsLength() == 1) {
                 item = matchItem(args.getString(0));
-                targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
+                targets = InputUtil.PlayerParser.matchPlayers(PlayerUtil.checkPlayer(sender));
                 // Two arguments: Item type and amount
             } else if (args.argsLength() == 2) {
                 item = matchItem(args.getString(0));
                 amt = args.getInteger(1);
-                targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
+                targets = InputUtil.PlayerParser.matchPlayers(PlayerUtil.checkPlayer(sender));
                 // Three arguments: Player, item type, and item amount
             } else if (args.argsLength() == 3) {
                 item = matchItem(args.getString(1));
                 amt = args.getInteger(2);
-                targets = PlayerUtil.matchPlayers(sender, args.getString(0));
+                targets = InputUtil.PlayerParser.matchPlayers(sender, args.getString(0));
 
                 // Make sure that this player has permission to give items to other
                 // players!
@@ -175,11 +178,11 @@ public class InventoryComponent extends BukkitComponent {
 
             // Two arguments: Player, item type
             if (args.argsLength() == 2) {
-                targets = PlayerUtil.matchPlayers(sender, args.getString(0));
+                targets = InputUtil.PlayerParser.matchPlayers(sender, args.getString(0));
                 item = matchItem(args.getString(1));
                 // Three arguments: Player, item type, and item amount
             } else if (args.argsLength() == 3) {
-                targets = PlayerUtil.matchPlayers(sender, args.getString(0));
+                targets = InputUtil.PlayerParser.matchPlayers(sender, args.getString(0));
                 item = matchItem(args.getString(1));
                 amt = args.getInteger(2);
             }
@@ -210,10 +213,10 @@ public class InventoryComponent extends BukkitComponent {
             boolean included = false;
 
             if (args.argsLength() == 0) {
-                targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
+                targets = InputUtil.PlayerParser.matchPlayers(PlayerUtil.checkPlayer(sender));
                 // A different player
             } else {
-                targets = PlayerUtil.matchPlayers(sender, args.getString(0));
+                targets = InputUtil.PlayerParser.matchPlayers(sender, args.getString(0));
             }
 
             for (Player player : targets) {
@@ -257,7 +260,7 @@ public class InventoryComponent extends BukkitComponent {
                 } else {
                     player.sendMessage(ChatColor.YELLOW
                             + "Your inventory has been cleared by "
-                            + PlayerUtil.toColoredName(sender, ChatColor.YELLOW));
+                            + ChatUtil.toColoredName(sender, ChatColor.YELLOW));
 
                 }
             }
@@ -289,10 +292,10 @@ public class InventoryComponent extends BukkitComponent {
             boolean included = false;
 
             if (args.argsLength() == 0) {
-                targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
+                targets = InputUtil.PlayerParser.matchPlayers(PlayerUtil.checkPlayer(sender));
             // A different player
             } else {
-                targets = PlayerUtil.matchPlayers(sender, args.getString(0));
+                targets = InputUtil.PlayerParser.matchPlayers(sender, args.getString(0));
             }
 
             for (Player player : targets) {
@@ -309,10 +312,10 @@ public class InventoryComponent extends BukkitComponent {
 
                 if (moreAll) {
                     for (int i = 0; i < 39; i++) {
-                        CommandBookUtil.expandStack(inventory.getItem(i), infinite, overrideStackSize);
+                        ItemUtil.expandStack(inventory.getItem(i), infinite, overrideStackSize);
                     }
                 } else {
-                    CommandBookUtil.expandStack(player.getItemInHand(), infinite, overrideStackSize);
+                    ItemUtil.expandStack(player.getItemInHand(), infinite, overrideStackSize);
                 }
 
                 // Tell the user about the given item
@@ -325,7 +328,7 @@ public class InventoryComponent extends BukkitComponent {
                 } else {
                     player.sendMessage(ChatColor.YELLOW
                             + "Your item(s) has been expanded in stack size by "
-                            + PlayerUtil.toColoredName(sender, ChatColor.YELLOW));
+                            + ChatUtil.toColoredName(sender, ChatColor.YELLOW));
 
                 }
             }
@@ -349,11 +352,11 @@ public class InventoryComponent extends BukkitComponent {
 
             // Two arguments: Player, item type
             if (args.argsLength() == 2) {
-                target = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
+                target = InputUtil.PlayerParser.matchSinglePlayer(sender, args.getString(0));
                 item = matchItem(args.getString(1));
                 // Three arguments: Player, item type, and item amount
             } else if (args.argsLength() == 3) {
-                target = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
+                target = InputUtil.PlayerParser.matchSinglePlayer(sender, args.getString(0));
                 item = matchItem(args.getString(1));
                 amt = args.getInteger(2);
             }

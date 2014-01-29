@@ -18,21 +18,14 @@
 
 package com.sk89q.commandbook.locations;
 
-import com.sk89q.commandbook.util.*;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerRespawnEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
-
 import com.sk89q.commandbook.CommandBook;
-import com.sk89q.commandbook.CommandBookUtil;
 import com.sk89q.commandbook.session.SessionComponent;
 import com.sk89q.commandbook.session.SessionFactory;
+import com.sk89q.commandbook.util.ChatUtil;
+import com.sk89q.commandbook.util.InputUtil;
+import com.sk89q.commandbook.util.LocationUtil;
+import com.sk89q.commandbook.util.entity.player.PlayerUtil;
+import com.sk89q.commandbook.util.entity.player.iterators.TeleportPlayerIterator;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
@@ -44,6 +37,15 @@ import com.zachsthings.libcomponents.bukkit.BasePlugin;
 import com.zachsthings.libcomponents.bukkit.BukkitComponent;
 import com.zachsthings.libcomponents.config.ConfigurationBase;
 import com.zachsthings.libcomponents.config.Setting;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 
 @ComponentInformation(friendlyName = "Teleports", desc = "Teleport-related commands")
 @Depend(components = SessionComponent.class)
@@ -140,19 +142,19 @@ public class TeleportComponent extends BukkitComponent implements Listener {
              */
             // TODO: reduce code duplication, currently just trying to catch every case
             if (args.argsLength() == 1) {
-                loc = LocationUtil.matchLocation(sender, args.getString(0)); // matches both #7 and #8
+                loc = InputUtil.matchLocation(sender, args.getString(0)); // matches both #7 and #8
                 // go to the center of the block if we're on the edge
                 if (loc.getX() == loc.getBlockX()) loc.add(0.5, 0, 0);
                 if (loc.getZ() == loc.getBlockZ()) loc.add(0, 0, 0.5);
-                targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
+                targets = InputUtil.PlayerParser.matchPlayers(PlayerUtil.checkPlayer(sender));
             } else if (args.argsLength() == 2) {
-                targets = PlayerUtil.matchPlayers(sender, args.getString(0));
-                loc = LocationUtil.matchLocation(sender, args.getString(1)); // matches both #4 and #5
+                targets = InputUtil.PlayerParser.matchPlayers(sender, args.getString(0));
+                loc = InputUtil.matchLocation(sender, args.getString(1)); // matches both #4 and #5
                 if (loc.getX() == loc.getBlockX()) loc.add(0.5, 0, 0);
                 if (loc.getZ() == loc.getBlockZ()) loc.add(0, 0, 0.5);
             } else if (args.argsLength() == 3) {
                 // matches #2 - can only be used by a player
-                targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
+                targets = InputUtil.PlayerParser.matchPlayers(PlayerUtil.checkPlayer(sender));
                 double x = args.getDouble(0);
                 double y = args.getDouble(1);
                 double z = args.getDouble(2);
@@ -162,7 +164,7 @@ public class TeleportComponent extends BukkitComponent implements Listener {
                 // check location permission
                 CommandBook.inst().checkPermission(sender, loc.getWorld(), "commandbook.locations.coords");
             } else if (args.argsLength() == 4) {
-                targets = PlayerUtil.matchPlayers(sender, args.getString(0)); // matches #1
+                targets = InputUtil.PlayerParser.matchPlayers(sender, args.getString(0)); // matches #1
                 // support relative location (~5 -> current coord + 5)
                 String xArg = args.getString(1);
                 String yArg = args.getString(2);
@@ -179,7 +181,7 @@ public class TeleportComponent extends BukkitComponent implements Listener {
                 double z = Double.parseDouble(zArg.replace("~", ""));
                 World world;
                 try { // for CommandBlock support
-                    world = LegacyBukkitCompat.extractWorld(sender);
+                    world = LocationUtil.extractWorld(sender);
                 } catch (Throwable t) {
                     if (sender instanceof Player) {
                         world = ((Player) sender).getWorld();
@@ -226,21 +228,21 @@ public class TeleportComponent extends BukkitComponent implements Listener {
         @CommandPermissions({"commandbook.call"})
         public void requestTeleport(CommandContext args, CommandSender sender) throws CommandException {
             Player player = PlayerUtil.checkPlayer(sender);
-            Player target = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
+            Player target = InputUtil.PlayerParser.matchSinglePlayer(sender, args.getString(0));
 
             CommandBook.inst().checkPermission(sender, target.getWorld(), "commandbook.call");
 
             sessions.getSession(TeleportSession.class, player).checkLastTeleportRequest(target);
             sessions.getSession(TeleportSession.class, target).addBringable(player);
 
-            String senderMessage = CommandBookUtil.replaceColorMacros(
-                    CommandBookUtil.replaceMacros(sender, config.callMessageSender))
-                    .replaceAll("%ctarget%", PlayerUtil.toColoredName(target, null))
-                    .replaceAll("%target%", PlayerUtil.toName(target));
-            String targetMessage = CommandBookUtil.replaceColorMacros(
-                    CommandBookUtil.replaceMacros(sender, config.callMessageTarget))
-                    .replaceAll("%ctarget%", PlayerUtil.toColoredName(target, null))
-                    .replaceAll("%target%", PlayerUtil.toName(target));
+            String senderMessage = ChatUtil.replaceColorMacros(
+                    ChatUtil.replaceMacros(sender, config.callMessageSender))
+                    .replaceAll("%ctarget%", ChatUtil.toColoredName(target, null))
+                    .replaceAll("%target%", ChatUtil.toName(target));
+            String targetMessage = ChatUtil.replaceColorMacros(
+                    ChatUtil.replaceMacros(sender, config.callMessageTarget))
+                    .replaceAll("%ctarget%", ChatUtil.toColoredName(target, null))
+                    .replaceAll("%target%", ChatUtil.toName(target));
             sender.sendMessage(senderMessage);
             target.sendMessage(targetMessage);
         }
@@ -254,7 +256,7 @@ public class TeleportComponent extends BukkitComponent implements Listener {
             // then check to see if the player can bring multiple players in his current
             // world. If that is the case then allow this to continue.
             try {
-                target = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
+                target = InputUtil.PlayerParser.matchSinglePlayer(sender, args.getString(0));
             } catch (CommandException ex) {
                 if (!CommandBook.inst().hasPermission(sender, "commandbook.teleport.other")) {
                     // There was not a single player match, and the player does not have
@@ -265,13 +267,13 @@ public class TeleportComponent extends BukkitComponent implements Listener {
 
             if (target != null) {
                 if (sessions.getSession(TeleportSession.class, player).isBringable(target)) {
-                    final String senderMessage = CommandBookUtil.replaceColorMacros(
-                            CommandBookUtil.replaceMacros(sender, config.bringMessageSender))
-                            .replaceAll("%ctarget%", PlayerUtil.toColoredName(target, null))
+                    final String senderMessage = ChatUtil.replaceColorMacros(
+                            ChatUtil.replaceMacros(sender, config.bringMessageSender))
+                            .replaceAll("%ctarget%", ChatUtil.toColoredName(target, null))
                             .replaceAll("%target%", target.getName());
-                    final String targetMessage = CommandBookUtil.replaceColorMacros(
-                            CommandBookUtil.replaceMacros(sender, config.bringMessageTarget))
-                            .replaceAll("%ctarget%", PlayerUtil.toColoredName(target, null))
+                    final String targetMessage = ChatUtil.replaceColorMacros(
+                            ChatUtil.replaceMacros(sender, config.bringMessageTarget))
+                            .replaceAll("%ctarget%", ChatUtil.toColoredName(target, null))
                             .replaceAll("%target%", target.getName());
 
                     (new TeleportPlayerIterator(sender, player.getLocation()) {
@@ -284,7 +286,7 @@ public class TeleportComponent extends BukkitComponent implements Listener {
                         public void onInformMany(CommandSender sender, int affected) {
                             sender.sendMessage(senderMessage);
                         }
-                    }).iterate(PlayerUtil.matchPlayers(target));
+                    }).iterate(InputUtil.PlayerParser.matchPlayers(target));
                     return;
                 } else if (!CommandBook.inst().hasPermission(sender, "commandbook.teleport.other")) {
                     // There was a single player match, but, the target was not bringable, and the player
@@ -299,7 +301,7 @@ public class TeleportComponent extends BukkitComponent implements Listener {
             // to be brought. The player does have permission to teleport players in his/her
             // current world. However, we're now teleporting in targets from potentially different worlds,
             // and we should ensure that the sender has permission to teleport players in those worlds.
-            Iterable<Player> targets = PlayerUtil.matchPlayers(sender, args.getString(0));
+            Iterable<Player> targets = InputUtil.PlayerParser.matchPlayers(sender, args.getString(0));
             for (Player aTarget : targets) {
                 // We have already checked the from and current locations, we must now check the to if the world does not match
                 if (!loc.getWorld().equals(aTarget.getWorld())) {
@@ -314,8 +316,8 @@ public class TeleportComponent extends BukkitComponent implements Listener {
                 desc = "Put a player at where you are looking", min = 1, max = 1)
         @CommandPermissions({"commandbook.teleport.other"})
         public void put(CommandContext args, CommandSender sender) throws CommandException {
-            Iterable<Player> targets = PlayerUtil.matchPlayers(sender, args.getString(0));
-            Location loc = LocationUtil.matchLocation(sender, "#target");
+            Iterable<Player> targets = InputUtil.PlayerParser.matchPlayers(sender, args.getString(0));
+            Location loc = InputUtil.matchLocation(sender, "#target");
 
             for (Player target : targets) {
                 // We have already checked the from and current locations, we must now check the to if the world does not match
@@ -332,7 +334,7 @@ public class TeleportComponent extends BukkitComponent implements Listener {
         public void ret(CommandContext args, CommandSender sender) throws CommandException {
             Player player;
             if (args.argsLength() > 0) {
-                player = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
+                player = InputUtil.PlayerParser.matchSinglePlayer(sender, args.getString(0));
                 if (player != sender) {
                     CommandBook.inst().checkPermission(sender, "commandbook.return.other");
                 }
@@ -353,14 +355,14 @@ public class TeleportComponent extends BukkitComponent implements Listener {
                     @Override
                     public void onVictim(CommandSender sender, Player player) {
                         player.sendMessage(ChatColor.YELLOW + "You've been returned by "
-                                + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + ".");
+                                + ChatUtil.toColoredName(sender, ChatColor.YELLOW) + ".");
                     }
 
                     @Override
                     public void onInformMany(CommandSender sender, int affected) {
                         sender.sendMessage(ChatColor.YELLOW.toString() + affected + " returned.");
                     }
-                }).iterate(PlayerUtil.matchPlayers(player));
+                }).iterate(InputUtil.PlayerParser.matchPlayers(player));
             } else {
                 sender.sendMessage(ChatColor.RED + "There's no past location in your history.");
             }

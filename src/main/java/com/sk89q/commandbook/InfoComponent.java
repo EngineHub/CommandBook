@@ -19,8 +19,9 @@
 package com.sk89q.commandbook;
 
 import com.sk89q.commandbook.commands.PaginatedResult;
-import com.sk89q.commandbook.util.LocationUtil;
-import com.sk89q.commandbook.util.PlayerUtil;
+import com.sk89q.commandbook.util.ChatUtil;
+import com.sk89q.commandbook.util.InputUtil;
+import com.sk89q.commandbook.util.entity.player.PlayerUtil;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
@@ -38,7 +39,7 @@ import org.bukkit.event.HandlerList;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import static com.sk89q.commandbook.CommandBookUtil.getCardinalDirection;
+import static com.sk89q.commandbook.util.entity.EntityUtil.getCardinalDirection;
 
 @ComponentInformation(friendlyName = "Info", desc = "Info contains commands that allow users to gather " +
         "information about the world, without being able to make changes.")
@@ -119,7 +120,7 @@ public class InfoComponent extends BukkitComponent {
             if (args.argsLength() == 0) {
                 player = PlayerUtil.checkPlayer(sender);
             } else {
-                player = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
+                player = InputUtil.PlayerParser.matchSinglePlayer(sender, args.getString(0));
                 if (player != sender) {
                     CommandBook.inst().checkPermission(sender, "commandbook.whereami.other");
                 }
@@ -158,7 +159,7 @@ public class InfoComponent extends BukkitComponent {
                 offline = PlayerUtil.checkPlayer(sender);
             } else {
                 try {
-                    offline = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
+                    offline = InputUtil.PlayerParser.matchSinglePlayer(sender, args.getString(0));
                 } catch (CommandException e) {
                     if (args.hasFlag('o')) {
                         offline = CommandBook.server().getOfflinePlayer(args.getString(0));
@@ -190,7 +191,7 @@ public class InfoComponent extends BukkitComponent {
             Location bedSpawn = offline.getBedSpawnLocation();
             if (bedSpawn != null) {
                 event.addWhoisInformation("Bed spawn location",
-                        LocationUtil.toFriendlyString(bedSpawn));
+                        ChatUtil.toFriendlyString(bedSpawn));
             } else {
                 event.addWhoisInformation(null, "No bed spawn location");
             }
@@ -228,7 +229,7 @@ public class InfoComponent extends BukkitComponent {
             if (args.argsLength() == 0) {
                 player = PlayerUtil.checkPlayer(sender);
             } else {
-                player = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
+                player = InputUtil.PlayerParser.matchSinglePlayer(sender, args.getString(0));
                 if (player != sender) {
                     CommandBook.inst().checkPermission(sender, "commandbook.whereami.compass.other");
                 }
@@ -250,7 +251,7 @@ public class InfoComponent extends BukkitComponent {
             if (args.argsLength() == 0) {
                 player = PlayerUtil.checkPlayer(sender);
             } else {
-                player = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
+                player = InputUtil.PlayerParser.matchSinglePlayer(sender, args.getString(0));
                 if (player != sender) {
                     CommandBook.inst().checkPermission(sender, "commandbook.biome.other");
                 }
@@ -261,7 +262,7 @@ public class InfoComponent extends BukkitComponent {
             if (player.equals(sender)) {
                 sender.sendMessage(ChatColor.YELLOW + "You are in the " + biomeName + " biome.");
             } else {
-                sender.sendMessage(ChatColor.YELLOW + PlayerUtil.toColoredName(player, ChatColor.YELLOW) + " is in the " + biomeName + " biome.");
+                sender.sendMessage(ChatColor.YELLOW + ChatUtil.toColoredName(player, ChatColor.YELLOW) + " is in the " + biomeName + " biome.");
             }
 
         }

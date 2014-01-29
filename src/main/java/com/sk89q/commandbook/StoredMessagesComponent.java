@@ -19,6 +19,7 @@
 package com.sk89q.commandbook;
 
 import com.sk89q.commandbook.events.MOTDSendEvent;
+import com.sk89q.commandbook.util.ChatUtil;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
@@ -37,8 +38,8 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.sk89q.commandbook.CommandBookUtil.replaceColorMacros;
-import static com.sk89q.commandbook.CommandBookUtil.sendMessage;
+import static com.sk89q.commandbook.util.ChatUtil.replaceColorMacros;
+import static com.sk89q.commandbook.util.ChatUtil.sendMessage;
 
 @ComponentInformation(friendlyName = "Stored Messages", desc = "Handles stored messages, such as the MOTD and rules pages.")
 public class StoredMessagesComponent extends BukkitComponent implements Listener {
@@ -100,7 +101,7 @@ public class StoredMessagesComponent extends BukkitComponent implements Listener
 
             sendMessage(player,
                     replaceColorMacros(
-                            CommandBookUtil.replaceMacros(
+                            ChatUtil.replaceMacros(
                                     player, motd)));
         }
 
@@ -122,7 +123,7 @@ public class StoredMessagesComponent extends BukkitComponent implements Listener
 
                 sendMessage(sender,
                         replaceColorMacros(
-                                CommandBookUtil.replaceMacros(
+                                ChatUtil.replaceMacros(
                                         sender, motd)));
             }
         }
@@ -140,7 +141,7 @@ public class StoredMessagesComponent extends BukkitComponent implements Listener
             } else {
                 sendMessage(sender,
                         replaceColorMacros(
-                                CommandBookUtil.replaceMacros(
+                                ChatUtil.replaceMacros(
                                         sender, motd)));
             }
         }

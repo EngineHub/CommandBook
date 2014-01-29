@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.logging.*;
 
 import static com.sk89q.commandbook.CommandBook.logger;
-import static com.sk89q.commandbook.util.PlayerUtil.toUniqueName;
+import static com.sk89q.commandbook.util.ChatUtil.toUniqueName;
 
 /**
  * Flat file ban database.

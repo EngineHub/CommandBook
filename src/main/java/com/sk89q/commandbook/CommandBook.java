@@ -26,7 +26,6 @@ import com.sk89q.commandbook.session.SessionComponent;
 import com.sk89q.minecraft.util.commands.*;
 import com.sk89q.util.yaml.YAMLFormat;
 import com.sk89q.util.yaml.YAMLProcessor;
-import com.sk89q.worldedit.blocks.ItemType;
 import com.zachsthings.libcomponents.InjectComponent;
 import com.zachsthings.libcomponents.InjectComponentAnnotationHandler;
 import com.zachsthings.libcomponents.bukkit.BasePlugin;
@@ -41,21 +40,18 @@ import com.zachsthings.libcomponents.loader.StaticComponentLoader;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
-import org.bukkit.inventory.ItemStack;
 import org.yaml.snakeyaml.error.YAMLException;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import static com.sk89q.commandbook.util.ItemUtil.matchItemData;
 
 /**
  * Base plugin class for CommandBook.
@@ -68,7 +64,7 @@ public final class CommandBook extends BasePlugin {
 
     private CommandsManager<CommandSender> commands;
 
-    protected Map<String, Integer> itemNames;
+    private Map<String, Integer> itemNames;
     public boolean broadcastChanges;
     public boolean useDisplayNames;
     public boolean lookupWithDisplayNames;
@@ -285,110 +281,9 @@ public final class CommandBook extends BasePlugin {
         }
     }
 
-    /**
-     * Returns a matched item.
-     *
-     * @param name The name to match
-     * @return item
-     * @see  #getCommandItem(String)
-     */
-    public ItemStack getItem(String name) {
-        try {
-            return getCommandItem(name);
-        } catch (CommandException e) {
-            return null;
-        }
-    }
+    public Map<String, Integer> getItemNames() {
 
-
-    public ItemStack getCommandItem(String name) throws CommandException {
-        int id;
-        int dmg = 0;
-        String dataName = null;
-        String enchantmentName = null;
-
-        if (name.contains("|")) {
-            String[] parts = name.split("\\|");
-            name = parts[0];
-            enchantmentName = parts[1];
-        }
-
-        if (name.contains(":")) {
-            String[] parts = name.split(":", 2);
-            dataName = parts[1];
-            name = parts[0];
-        }
-
-
-
-        try {
-            id = Integer.parseInt(name);
-        } catch (NumberFormatException e) {
-            // First check the configurable list of aliases
-            Integer idTemp = CommandBook.inst().itemNames.get(name.toLowerCase());
-
-            if (idTemp != null) {
-                id = idTemp;
-            } else {
-                // Then check WorldEdit
-                ItemType type = ItemType.lookup(name);
-
-                if (type == null) {
-                    throw new CommandException("No item type known by '" + name + "'");
-                }
-
-                id = type.getID();
-            }
-        }
-
-        // If the user specified an item data or damage value, let's try
-        // to parse it!
-        if (dataName != null) {
-            dmg = matchItemData(id, dataName);
-        }
-
-        ItemStack stack = new ItemStack(id, 1, (short)dmg);
-
-        if (enchantmentName != null) {
-            String[] enchantments = enchantmentName.split(",");
-            for (String enchStr : enchantments) {
-                int level = 1;
-                if (enchStr.contains(":")) {
-                    String[] parts = enchStr.split(":");
-                    enchStr = parts[0];
-                    try {
-                        level = Integer.parseInt(parts[1]);
-                    } catch (NumberFormatException ignore) {}
-                }
-
-                Enchantment ench = null;
-                final String testName = enchStr.toLowerCase().replaceAll("[_\\-]", "");
-                for (Enchantment possible : Enchantment.values()) {
-                    if (possible.getName().toLowerCase().replaceAll("[_\\-]", "").equals(testName)) {
-                        ench = possible;
-                        break;
-                    }
-                }
-
-                if (ench == null) {
-                    throw new CommandException("Unknown enchantment '" + enchStr + "'");
-                }
-
-                if (!ench.canEnchantItem(stack)) {
-                    throw new CommandException("Invalid enchantment '" +  ench.getName() + "' for item '" + name + "'");
-                }
-
-                if (ench.getMaxLevel() < level) {
-                    throw new CommandException("Level '" + level +
-                            "' is above the maximum level for enchantment '" + ench.getName() + "'");
-                }
-
-                stack.addEnchantment(ench, level);
-            }
-
-        }
-
-        return stack;
+        return Collections.unmodifiableMap(itemNames);
     }
 
     /**

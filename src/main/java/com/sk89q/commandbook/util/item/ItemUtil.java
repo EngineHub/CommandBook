@@ -16,14 +16,17 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.commandbook.util;
+package com.sk89q.commandbook.util.item;
 
+import com.sk89q.commandbook.CommandBook;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.blocks.BlockID;
 import com.sk89q.worldedit.blocks.BlockType;
 import com.sk89q.worldedit.blocks.ClothColor;
 import com.sk89q.worldedit.blocks.ItemType;
 import org.bukkit.DyeColor;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.Random;
 
@@ -45,6 +48,136 @@ public class ItemUtil {
             return type.getName();
         } else {
             return "#" + id;
+        }
+    }
+
+    /**
+     * Returns a matched item.
+     *
+     * @param name The name to match
+     * @return item
+     * @see  #getCommandItem(String)
+     */
+    public static ItemStack getItem(String name) {
+        try {
+            return getCommandItem(name);
+        } catch (CommandException e) {
+            return null;
+        }
+    }
+
+
+    public static ItemStack getCommandItem(String name) throws CommandException {
+        int id;
+        int dmg = 0;
+        String dataName = null;
+        String enchantmentName = null;
+
+        if (name.contains("|")) {
+            String[] parts = name.split("\\|");
+            name = parts[0];
+            enchantmentName = parts[1];
+        }
+
+        if (name.contains(":")) {
+            String[] parts = name.split(":", 2);
+            dataName = parts[1];
+            name = parts[0];
+        }
+
+
+
+        try {
+            id = Integer.parseInt(name);
+        } catch (NumberFormatException e) {
+            // First check the configurable list of aliases
+            Integer idTemp = CommandBook.inst().getItemNames().get(name.toLowerCase());
+
+            if (idTemp != null) {
+                id = idTemp;
+            } else {
+                // Then check WorldEdit
+                ItemType type = ItemType.lookup(name);
+
+                if (type == null) {
+                    throw new CommandException("No item type known by '" + name + "'");
+                }
+
+                id = type.getID();
+            }
+        }
+
+        // If the user specified an item data or damage value, let's try
+        // to parse it!
+        if (dataName != null) {
+            dmg = matchItemData(id, dataName);
+        }
+
+        ItemStack stack = new ItemStack(id, 1, (short)dmg);
+
+        if (enchantmentName != null) {
+            String[] enchantments = enchantmentName.split(",");
+            for (String enchStr : enchantments) {
+                int level = 1;
+                if (enchStr.contains(":")) {
+                    String[] parts = enchStr.split(":");
+                    enchStr = parts[0];
+                    try {
+                        level = Integer.parseInt(parts[1]);
+                    } catch (NumberFormatException ignore) {}
+                }
+
+                Enchantment ench = null;
+                final String testName = enchStr.toLowerCase().replaceAll("[_\\-]", "");
+                for (Enchantment possible : Enchantment.values()) {
+                    if (possible.getName().toLowerCase().replaceAll("[_\\-]", "").equals(testName)) {
+                        ench = possible;
+                        break;
+                    }
+                }
+
+                if (ench == null) {
+                    throw new CommandException("Unknown enchantment '" + enchStr + "'");
+                }
+
+                if (!ench.canEnchantItem(stack)) {
+                    throw new CommandException("Invalid enchantment '" +  ench.getName() + "' for item '" + name + "'");
+                }
+
+                if (ench.getMaxLevel() < level) {
+                    throw new CommandException("Level '" + level +
+                            "' is above the maximum level for enchantment '" + ench.getName() + "'");
+                }
+
+                stack.addEnchantment(ench, level);
+            }
+
+        }
+
+        return stack;
+    }
+
+    /**
+     * Expand a stack of items.
+     *
+     * @param item
+     * @param infinite
+     */
+    public static void expandStack(ItemStack item, boolean infinite, boolean overrideStackSize) {
+        if (item == null || item.getAmount() == 0 || item.getTypeId() <= 0) {
+            return;
+        }
+
+        int stackSize = overrideStackSize ? 64 : item.getType().getMaxStackSize();
+
+        if (item.getType().getMaxStackSize() == 1) {
+            return;
+        }
+
+        if (infinite) {
+            item.setAmount(-1);
+        } else if (item.getAmount() < stackSize){
+            item.setAmount(stackSize);
         }
     }
 

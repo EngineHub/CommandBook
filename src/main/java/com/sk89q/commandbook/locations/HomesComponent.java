@@ -20,9 +20,9 @@ package com.sk89q.commandbook.locations;
 
 import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.commands.PaginatedResult;
-import com.sk89q.commandbook.util.LocationUtil;
-import com.sk89q.commandbook.util.PlayerUtil;
-import com.sk89q.commandbook.util.TeleportPlayerIterator;
+import com.sk89q.commandbook.util.InputUtil;
+import com.sk89q.commandbook.util.entity.player.PlayerUtil;
+import com.sk89q.commandbook.util.entity.player.iterators.TeleportPlayerIterator;
 import com.sk89q.minecraft.util.commands.*;
 import com.zachsthings.libcomponents.ComponentInformation;
 import org.bukkit.ChatColor;
@@ -53,14 +53,14 @@ public class HomesComponent extends LocationsComponent {
             // Detect arguments based on the number of arguments provided
             if (args.argsLength() == 0) {
                 Player player = PlayerUtil.checkPlayer(sender);
-                targets = PlayerUtil.matchPlayers(player);
+                targets = InputUtil.PlayerParser.matchPlayers(player);
                 home = getManager().get(player.getWorld(), player.getName());
             } else if (args.argsLength() == 1) {
                 Player player = PlayerUtil.checkPlayer(sender);
-                targets = PlayerUtil.matchPlayers(player);
+                targets = InputUtil.PlayerParser.matchPlayers(player);
                 home = getManager().get(player.getWorld(), args.getString(0));
             } else if (args.argsLength() == 2) {
-                targets = PlayerUtil.matchPlayers(sender, args.getString(0));
+                targets = InputUtil.PlayerParser.matchPlayers(sender, args.getString(0));
                 if (getManager().isPerWorld()) {
                     Player player = PlayerUtil.checkPlayer(sender);
                     home = getManager().get(player.getWorld(), args.getString(1));
@@ -76,9 +76,9 @@ public class HomesComponent extends LocationsComponent {
                     }
                 }
             } else if (args.argsLength() == 3) {
-                targets = PlayerUtil.matchPlayers(sender, args.getString(1));
+                targets = InputUtil.PlayerParser.matchPlayers(sender, args.getString(1));
                 home = getManager().get(
-                        LocationUtil.matchWorld(sender, args.getString(0)), args.getString(2));
+                        InputUtil.matchWorld(sender, args.getString(0)), args.getString(2));
 
                 // Check permissions!
                 for (Player target : targets) {
@@ -124,7 +124,7 @@ public class HomesComponent extends LocationsComponent {
                 }
             } else {
                 homeName = args.getString(1);
-                loc = LocationUtil.matchLocation(sender, args.getString(0));
+                loc = InputUtil.matchLocation(sender, args.getString(0));
 
                 // Check permissions!
                 if (!homeName.equals(sender.getName())) {
@@ -155,7 +155,7 @@ public class HomesComponent extends LocationsComponent {
             World world;
             String name = sender.getName();
             if (args.argsLength() == 2) {
-                world = LocationUtil.matchWorld(sender, args.getString(1));
+                world = InputUtil.matchWorld(sender, args.getString(1));
             } else {
                 world = PlayerUtil.checkPlayer(sender).getWorld();
             }
