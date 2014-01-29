@@ -245,7 +245,7 @@ public class TeleportComponent extends BukkitComponent implements Listener {
             target.sendMessage(targetMessage);
         }
 
-        @Command(aliases = {"bring", "tphere", "summon", "s"}, usage = "<target>", desc = "Bring a player to you", min = 1, max = 1)
+        @Command(aliases = {"bring", "tphere", "grab", "g"}, usage = "<target>", desc = "Bring a player to you", min = 1, max = 1)
         public void bring(CommandContext args, CommandSender sender) throws CommandException {
             Player player = PlayerUtil.checkPlayer(sender);
             Player target = null;
