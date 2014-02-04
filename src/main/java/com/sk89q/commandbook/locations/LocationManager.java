@@ -52,7 +52,7 @@ public interface LocationManager<T> {
      * Get by name.
      *
      * @param id The name to get
-     * @return The {@link T} if registered
+     * @return The object <i>T</i> if registered
      */
     public T get(String id);
 

@@ -36,7 +36,7 @@ public class ItemUtil {
      * Gets the name of an item.
      *
      * @param id
-     * @return
+     * @return the name of this id's corrisponding item
      */
     public static String toItemName(int id) {
         ItemType type = ItemType.fromID(id);
@@ -53,7 +53,7 @@ public class ItemUtil {
      *
      * @param id
      * @param filter
-     * @return
+     * @return the data value
      * @throws com.sk89q.minecraft.util.commands.CommandException
      */
     public static int matchItemData(int id, String filter) throws CommandException {
@@ -113,9 +113,10 @@ public class ItemUtil {
 
     /**
      * Attempt to match a dye color for sheep wool.
+     * pass in "random" for one of the random 16 {@link DyeColor}
      *
      * @param filter
-     * @return
+     * @return the {@link DyeColor}
      * @throws CommandException
      */
     public static DyeColor matchDyeColor(String filter) throws CommandException {

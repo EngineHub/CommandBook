@@ -161,7 +161,7 @@ public interface BanDatabase extends Iterable<Ban> {
      * @param address
      * @param source
      * @param reason
-     * @return
+     * @return whether the name or address was found
      */
     public boolean unban(String name, String address, CommandSender source, String reason);
 
