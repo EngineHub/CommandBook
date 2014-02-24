@@ -21,6 +21,7 @@ package com.sk89q.commandbook.locations;
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
 import com.sk89q.commandbook.CommandBook;
+import org.apache.commons.lang.Validate;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -211,6 +212,7 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
 
     public NamedLocation create(String id, Location loc, Player player) {
         id = id.trim();
+        Validate.isTrue(id.matches("^[a-zA-Z0-9-_]*$"), "Location ID contains invalid characters!");
         NamedLocation warp = new NamedLocation(id, loc);
         locations.put(id.toLowerCase(), warp);
         if (player != null) {

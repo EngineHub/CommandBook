@@ -124,7 +124,11 @@ public class WarpsComponent extends LocationsComponent {
                 }
             }
 
-            getManager().create(warpName, loc, player);
+            try {
+                getManager().create(warpName, loc, player);
+            } catch (IllegalArgumentException ex) {
+                throw new CommandException("Invalid warp name!");
+            }
 
             sender.sendMessage(ChatColor.YELLOW + "Warp '" + warpName + "' created.");
         }

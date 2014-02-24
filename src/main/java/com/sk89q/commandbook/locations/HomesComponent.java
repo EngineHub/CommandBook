@@ -132,7 +132,11 @@ public class HomesComponent extends LocationsComponent {
                 }
             }
 
-            getManager().create(homeName, loc, player);
+            try {
+                getManager().create(homeName, loc, player);
+            } catch (IllegalArgumentException ex) {
+                throw new CommandException("Invalid home name!");
+            }
 
             sender.sendMessage(ChatColor.YELLOW + "Home set.");
         }
