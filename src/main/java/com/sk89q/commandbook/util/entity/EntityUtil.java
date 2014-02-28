@@ -23,8 +23,43 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Projectile;
+import org.bukkit.util.Vector;
+
+import java.util.Set;
 
 public class EntityUtil {
+
+    /**
+     * Send a projectile from an entity's eye level.
+     *
+     * @param entity
+     * @param dir
+     * @param speed
+     * @param clazz
+     */
+    public static <T extends Projectile> T sendProjectileFromEntity(LivingEntity entity, Vector dir, float speed, Class<T> clazz) {
+        T projectile = ProjectileUtil.sendProjectileFromLocation(entity.getEyeLocation(), dir, speed, clazz);
+        projectile.setShooter(entity);
+        return projectile;
+    }
+
+    /**
+     * Send projectile from an entity's eye level.
+     *
+     * @param entity
+     * @param amt number of projectiles to shoot (evenly spaced)
+     * @param speed
+     * @param clazz
+     */
+    public static <T extends Projectile> Set<T> sendProjectilesFromEntity(LivingEntity entity, int amt, float speed, Class<T> clazz) {
+
+        Set<T> projectiles = ProjectileUtil.sendProjectilesFromLocation(entity.getEyeLocation(), amt, speed, clazz);
+        for (T projectile : projectiles) {
+            projectile.setShooter(entity);
+        }
+        return projectiles;
+    }
 
     /**
      * Get the cardinal compass direction of an entity.

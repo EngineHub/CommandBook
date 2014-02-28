@@ -3,6 +3,7 @@ package com.sk89q.commandbook.util.entity;
 import org.bukkit.Location;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Fireball;
+import org.bukkit.entity.Projectile;
 import org.bukkit.util.Vector;
 
 import java.util.HashSet;
@@ -11,40 +12,42 @@ import java.util.Set;
 public class ProjectileUtil {
 
     /**
-     * Send an arrow from a player eye level.
+     * Send a projectile from an entity's eye level.
      *
      * @param loc
      * @param dir
      * @param speed
      */
-    public static Arrow sendArrowFromLocation(Location loc,
-                                           Vector dir, float speed) {
+    public static <T extends Projectile> T sendProjectileFromLocation(Location loc, Vector dir, float speed, Class<T> clazz) {
+
+        loc = loc.clone();
+
         Vector actualDir = dir.clone().normalize();
         Vector finalVecLoc = loc.toVector().add(actualDir.multiply(2));
         loc.setX(finalVecLoc.getX());
         loc.setY(finalVecLoc.getY());
         loc.setZ(finalVecLoc.getZ());
-        Arrow arrow = loc.getWorld().spawn(loc, Arrow.class);
-        arrow.setVelocity(dir.multiply(speed));
-        return arrow;
+        T projectile = loc.getWorld().spawn(loc, clazz);
+        if (projectile instanceof Fireball) {
+            ((Fireball) projectile).setDirection(dir.multiply(speed));
+        } else {
+            projectile.setVelocity(dir.multiply(speed));
+        }
+        return projectile;
     }
 
     /**
-     * Send fireballs from a player eye level.
+     * Send projectiles from an entity's eye level.
      *
      * @param loc
      * @param amt number of fireballs to shoot (evenly spaced)
      */
-    public static Set<Fireball> sendFireballsFromLocation(Location loc, int amt) {
+    public static <T extends Projectile> Set<T> sendProjectilesFromLocation(Location loc, int amt, float speed, Class<T> clazz) {
         final double tau = 2 * Math.PI;
         double arc = tau / amt;
-        Set<Fireball> resultSet = new HashSet<Fireball>();
+        Set<T> resultSet = new HashSet<T>();
         for (double a = 0; a < tau; a += arc) {
-            Vector dir = new Vector(Math.cos(a), 0, Math.sin(a));
-            Location spawn = loc.toVector().add(dir.multiply(2)).toLocation(loc.getWorld(), 0.0F, 0.0F);
-            Fireball fball = loc.getWorld().spawn(spawn, Fireball.class);
-            fball.setDirection(dir.multiply(10));
-            resultSet.add(fball);
+            resultSet.add(sendProjectileFromLocation(loc, new Vector(Math.cos(a), 0, Math.sin(a)), speed, clazz));
         }
         return resultSet;
     }

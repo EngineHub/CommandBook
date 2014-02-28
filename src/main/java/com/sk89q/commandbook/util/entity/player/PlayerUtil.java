@@ -25,44 +25,13 @@ import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Fireball;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.util.Vector;
 
 import java.util.List;
 import java.util.Set;
 
 public class PlayerUtil {
-
-    /**
-     * Send an arrow from a player eye level.
-     *
-     * @param player
-     * @param dir
-     * @param speed
-     */
-    public static Arrow sendArrowFromPlayer(Player player, Vector dir, float speed) {
-        Arrow arrow = ProjectileUtil.sendArrowFromLocation(player.getEyeLocation(), dir, speed);
-        arrow.setShooter(player);
-        return arrow;
-    }
-
-    /**
-     * Send fireballs from a player eye level.
-     *
-     * @param player
-     * @param amt number of fireballs to shoot (evenly spaced)
-     */
-    public static Set<Fireball> sendFireballsFromPlayer(Player player, int amt) {
-
-        Set<Fireball> fireballs = ProjectileUtil.sendFireballsFromLocation(player.getEyeLocation(), amt);
-        for (Fireball fireball : fireballs) {
-            fireball.setShooter(player);
-        }
-        return fireballs;
-    }
 
     /**
      * Checks to see if the sender is a player, otherwise throw an exception.

@@ -21,6 +21,7 @@ package com.sk89q.commandbook;
 import com.google.common.collect.Lists;
 import com.sk89q.commandbook.util.ChatUtil;
 import com.sk89q.commandbook.util.InputUtil;
+import com.sk89q.commandbook.util.entity.EntityUtil;
 import com.sk89q.commandbook.util.entity.player.PlayerUtil;
 import com.sk89q.commandbook.util.item.ItemUtil;
 import com.sk89q.minecraft.util.commands.Command;
@@ -477,11 +478,7 @@ public class FunComponent extends BukkitComponent {
             }
 
             for (Player player : targets) {
-                double diff = (2 * Math.PI) / 24.0;
-                for (double a = 0; a < 2 * Math.PI; a += diff) {
-                    Vector vel = new Vector(Math.cos(a), 0, Math.sin(a));
-                    PlayerUtil.sendArrowFromPlayer(player, vel, 2);
-                }
+                EntityUtil.sendProjectilesFromEntity(player, 24, 2, Arrow.class);
 
                 if (args.hasFlag('s')) {
                     // Tell the user
@@ -544,7 +541,7 @@ public class FunComponent extends BukkitComponent {
 
             for (Player player : targets) {
                 // moved math to util because I felt like it
-                PlayerUtil.sendFireballsFromPlayer(player, 8);
+                EntityUtil.sendProjectilesFromEntity(player, 8, 10, Fireball.class);
 
                 if (args.hasFlag('s')) {
                     // Tell the user
