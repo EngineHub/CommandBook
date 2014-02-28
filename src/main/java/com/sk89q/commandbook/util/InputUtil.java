@@ -245,32 +245,35 @@ public class InputUtil {
                 // Handle #world, which matches player of the same world as the
                 // calling source
                 if (filter.equalsIgnoreCase("#world")) {
-                    List<Player> players = new ArrayList<Player>();
-                    Player sourcePlayer = checkPlayer(source);
-                    World sourceWorld = sourcePlayer.getWorld();
+                    World sourceWorld = checkPlayer(source).getWorld();
                     CommandBook.inst().checkPermission(source, "commandbook.targets.world." + sourceWorld.getName());
-
-                    for (Player player : CommandBook.server().getOnlinePlayers()) {
-                        if (player.getWorld().equals(sourceWorld)) {
-                            players.add(player);
-                        }
-                    }
-
-                    return checkPlayerMatch(players);
+                    return checkPlayerMatch(sourceWorld.getPlayers());
 
                     // Handle #near, which is for nearby players.
-                } else if (filter.equalsIgnoreCase("#near")) {
+                } else if (filter.startsWith("#near")) {
                     CommandBook.inst().checkPermission(source, "commandbook.targets.near");
                     List<Player> players = new ArrayList<Player>();
                     Player sourcePlayer = checkPlayer(source);
                     World sourceWorld = sourcePlayer.getWorld();
-                    org.bukkit.util.Vector sourceVector
-                            = sourcePlayer.getLocation().toVector();
+                    Location sourceLocation = sourcePlayer.getLocation();
 
+                    double targetDistance = 30;
+
+                    String[] split = filter.split(":");
+                    if (split.length == 2) {
+                        try {
+                            targetDistance = Double.parseDouble(split[1]);
+                        } catch (NumberFormatException ignored) { }
+                    }
+
+                    // Square the target distance so that we don't have to calculate the
+                    // square root in this distance calculation
+                    targetDistance = Math.pow(targetDistance, 2);
+
+                    Location k = sourceLocation.clone(); // Included for optimization
                     for (Player player : CommandBook.server().getOnlinePlayers()) {
-                        if (player.getWorld().equals(sourceWorld)
-                                && player.getLocation().toVector().distanceSquared(
-                                sourceVector) < 900) { // 30 * 30
+                        if (!player.getWorld().equals(sourceWorld)) continue;
+                        if (player.getLocation(k).distanceSquared(sourceLocation) < targetDistance) {
                             players.add(player);
                         }
                     }
@@ -282,9 +285,7 @@ public class InputUtil {
                 }
             }
 
-            List<Player> players = matchPlayerNames(source, filter);
-
-            return checkPlayerMatch(players);
+            return checkPlayerMatch(matchPlayerNames(source, filter));
         }
 
         /**
