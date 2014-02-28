@@ -286,17 +286,5 @@ public final class CommandBook extends BasePlugin {
         return Collections.unmodifiableMap(itemNames);
     }
 
-    /**
-     * Gets the IP address of a command sender.
-     *
-     * @param sender The sender to get an address for
-     * @return The address string of the sender
-     */
-    public String toInetAddressString(CommandSender sender) {
-        if (sender instanceof Player) {
-            return ((Player) sender).getAddress().getAddress().getHostAddress();
-        } else {
-            return "127.0.0.1";
-        }
-    }
+
 }

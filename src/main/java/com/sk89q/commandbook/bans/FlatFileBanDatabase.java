@@ -19,6 +19,8 @@
 package com.sk89q.commandbook.bans;
 
 import com.sk89q.commandbook.CommandBook;
+import com.sk89q.commandbook.util.ServerUtil;
+import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -216,7 +218,7 @@ public class FlatFileBanDatabase implements BanDatabase {
     public synchronized void banName(String name, CommandSender source, String reason) {
         auditLogger.info(String.format("BAN: %s (%s) banned name '%s': %s",
                 toUniqueName(source),
-                CommandBook.inst().toInetAddressString(source),
+                ServerUtil.toInetAddressString(source),
                 name,
                 reason));
 
@@ -241,7 +243,7 @@ public class FlatFileBanDatabase implements BanDatabase {
         if (removed) {
             auditLogger.info(String.format("UNBAN: %s (%s) unbanned name '%s': %s",
                     toUniqueName(source),
-                    CommandBook.inst().toInetAddressString(source),
+                    ServerUtil.toInetAddressString(source),
                     name,
                     reason));
         }
@@ -260,7 +262,7 @@ public class FlatFileBanDatabase implements BanDatabase {
     public void logKick(Player player, CommandSender source, String reason) {
         auditLogger.info(String.format("KICKED: %s (%s) kicked player '%s': %s",
                 toUniqueName(source),
-                CommandBook.inst().toInetAddressString(source),
+                ServerUtil.toInetAddressString(source),
                 player.getName(),
                 reason));
     }

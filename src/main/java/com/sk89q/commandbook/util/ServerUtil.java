@@ -2,6 +2,7 @@ package com.sk89q.commandbook.util;
 
 import com.sk89q.commandbook.CommandBook;
 import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class ServerUtil {
@@ -42,5 +43,19 @@ public class ServerUtil {
         }
 
         return out.toString();
+    }
+
+    /**
+     * Gets the IP address of a command sender.
+     *
+     * @param sender The sender to get an address for
+     * @return The address string of the sender
+     */
+    public static String toInetAddressString(CommandSender sender) {
+        if (sender instanceof Player) {
+            return ((Player) sender).getAddress().getAddress().getHostAddress();
+        } else {
+            return "127.0.0.1";
+        }
     }
 }

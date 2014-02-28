@@ -4,6 +4,7 @@ import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
 import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.util.ChatUtil;
+import com.sk89q.commandbook.util.ServerUtil;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -221,7 +222,7 @@ public class CSVBanDatabase implements BanDatabase {
             bans.add(ban);
             auditLogger.info(String.format("BAN: %s (%s) banned %s '%s': %s",
                     source == null ? "Plugin" : ChatUtil.toUniqueName(source),
-                    source == null ? "local" : CommandBook.inst().toInetAddressString(source),
+                    source == null ? "local" : ServerUtil.toInetAddressString(source),
                     banned,
                     bannedName,
                     reason));
@@ -267,7 +268,7 @@ public class CSVBanDatabase implements BanDatabase {
             bans.remove(ban);
             auditLogger.info(String.format("UNBAN: %s (%s) unbanned %s '%s': %s",
                     source == null ? "Plugin" : ChatUtil.toUniqueName(source),
-                    source == null ? "local" : CommandBook.inst().toInetAddressString(source),
+                    source == null ? "local" : ServerUtil.toInetAddressString(source),
                     banned,
                     bannedName,
                     reason));
@@ -299,7 +300,7 @@ public class CSVBanDatabase implements BanDatabase {
     public void logKick(Player player, CommandSender source, String reason) {
         auditLogger.info(String.format("KICKED: %s (%s) kicked player '%s': %s",
                 ChatUtil.toUniqueName(source),
-                CommandBook.inst().toInetAddressString(source),
+                ServerUtil.toInetAddressString(source),
                 player.getName(),
                 reason));
     }
