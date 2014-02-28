@@ -18,6 +18,7 @@
 
 package com.sk89q.commandbook;
 
+import com.google.common.collect.Lists;
 import com.sk89q.commandbook.commands.PaginatedResult;
 import com.sk89q.commandbook.util.ChatUtil;
 import com.sk89q.commandbook.util.InputUtil;
@@ -136,12 +137,12 @@ public class InventoryComponent extends BukkitComponent {
             // One argument: Just the item type and amount 1
             if (args.argsLength() == 1) {
                 item = matchItem(args.getString(0));
-                targets = InputUtil.PlayerParser.matchPlayers(PlayerUtil.checkPlayer(sender));
+                targets = Lists.newArrayList(PlayerUtil.checkPlayer(sender));
                 // Two arguments: Item type and amount
             } else if (args.argsLength() == 2) {
                 item = matchItem(args.getString(0));
                 amt = args.getInteger(1);
-                targets = InputUtil.PlayerParser.matchPlayers(PlayerUtil.checkPlayer(sender));
+                targets = Lists.newArrayList(PlayerUtil.checkPlayer(sender));
                 // Three arguments: Player, item type, and item amount
             } else if (args.argsLength() == 3) {
                 item = matchItem(args.getString(1));
@@ -213,7 +214,7 @@ public class InventoryComponent extends BukkitComponent {
             boolean included = false;
 
             if (args.argsLength() == 0) {
-                targets = InputUtil.PlayerParser.matchPlayers(PlayerUtil.checkPlayer(sender));
+                targets = Lists.newArrayList(PlayerUtil.checkPlayer(sender));
                 // A different player
             } else {
                 targets = InputUtil.PlayerParser.matchPlayers(sender, args.getString(0));
@@ -292,7 +293,7 @@ public class InventoryComponent extends BukkitComponent {
             boolean included = false;
 
             if (args.argsLength() == 0) {
-                targets = InputUtil.PlayerParser.matchPlayers(PlayerUtil.checkPlayer(sender));
+                targets = Lists.newArrayList(PlayerUtil.checkPlayer(sender));
             // A different player
             } else {
                 targets = InputUtil.PlayerParser.matchPlayers(sender, args.getString(0));

@@ -18,6 +18,7 @@
 
 package com.sk89q.commandbook.kits;
 
+import com.google.common.collect.Lists;
 import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.util.ChatUtil;
 import com.sk89q.commandbook.util.InputUtil;
@@ -133,7 +134,7 @@ public class KitsComponent extends BukkitComponent implements Listener {
                 if (args.argsLength() == 2) {
                     targets = InputUtil.PlayerParser.matchPlayers(sender, args.getString(1));
                 } else {
-                    targets = InputUtil.PlayerParser.matchPlayers(PlayerUtil.checkPlayer(sender));
+                    targets = Lists.newArrayList(PlayerUtil.checkPlayer(sender));
                 }
 
                 for (Player player : targets) {

@@ -18,6 +18,7 @@
 
 package com.sk89q.commandbook.locations;
 
+import com.google.common.collect.Lists;
 import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.util.ChatUtil;
 import com.sk89q.commandbook.util.InputUtil;
@@ -122,7 +123,7 @@ public class SpawnLocationsComponent extends BukkitComponent implements Listener
                     }
                 }
             } else {
-                targets = InputUtil.PlayerParser.matchPlayers(PlayerUtil.checkPlayer(sender));
+                targets = Lists.newArrayList(PlayerUtil.checkPlayer(sender));
             }
 
             (new PlayerIteratorAction(sender) {

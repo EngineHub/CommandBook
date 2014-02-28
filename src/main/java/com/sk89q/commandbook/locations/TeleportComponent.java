@@ -18,6 +18,7 @@
 
 package com.sk89q.commandbook.locations;
 
+import com.google.common.collect.Lists;
 import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.session.SessionComponent;
 import com.sk89q.commandbook.session.SessionFactory;
@@ -146,7 +147,7 @@ public class TeleportComponent extends BukkitComponent implements Listener {
                 // go to the center of the block if we're on the edge
                 if (loc.getX() == loc.getBlockX()) loc.add(0.5, 0, 0);
                 if (loc.getZ() == loc.getBlockZ()) loc.add(0, 0, 0.5);
-                targets = InputUtil.PlayerParser.matchPlayers(PlayerUtil.checkPlayer(sender));
+                targets = Lists.newArrayList(PlayerUtil.checkPlayer(sender));
             } else if (args.argsLength() == 2) {
                 targets = InputUtil.PlayerParser.matchPlayers(sender, args.getString(0));
                 loc = InputUtil.matchLocation(sender, args.getString(1)); // matches both #4 and #5
@@ -154,7 +155,7 @@ public class TeleportComponent extends BukkitComponent implements Listener {
                 if (loc.getZ() == loc.getBlockZ()) loc.add(0, 0, 0.5);
             } else if (args.argsLength() == 3) {
                 // matches #2 - can only be used by a player
-                targets = InputUtil.PlayerParser.matchPlayers(PlayerUtil.checkPlayer(sender));
+                targets = Lists.newArrayList(PlayerUtil.checkPlayer(sender));
                 double x = args.getDouble(0);
                 double y = args.getDouble(1);
                 double z = args.getDouble(2);
@@ -286,7 +287,7 @@ public class TeleportComponent extends BukkitComponent implements Listener {
                         public void onInformMany(CommandSender sender, int affected) {
                             sender.sendMessage(senderMessage);
                         }
-                    }).iterate(InputUtil.PlayerParser.matchPlayers(target));
+                    }).iterate(Lists.newArrayList(target));
                     return;
                 } else if (!CommandBook.inst().hasPermission(sender, "commandbook.teleport.other")) {
                     // There was a single player match, but, the target was not bringable, and the player
@@ -362,7 +363,7 @@ public class TeleportComponent extends BukkitComponent implements Listener {
                     public void onInformMany(CommandSender sender, int affected) {
                         sender.sendMessage(ChatColor.YELLOW.toString() + affected + " returned.");
                     }
-                }).iterate(InputUtil.PlayerParser.matchPlayers(player));
+                }).iterate(Lists.newArrayList(player));
             } else {
                 sender.sendMessage(ChatColor.RED + "There's no past location in your history.");
             }

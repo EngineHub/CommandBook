@@ -354,16 +354,6 @@ public class InputUtil {
         }
 
         /**
-         * Get a single player as an iterator for players.
-         *
-         * @param player
-         * @return iterator for players
-         */
-        public static Iterable<Player> matchPlayers(Player player) {
-            return Lists.newArrayList(player);
-        }
-
-        /**
          * Checks if the given list of players is greater than size 0, otherwise
          * throw an exception.
          *

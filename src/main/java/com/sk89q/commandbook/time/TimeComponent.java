@@ -18,6 +18,7 @@
 
 package com.sk89q.commandbook.time;
 
+import com.google.common.collect.Lists;
 import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.util.ChatUtil;
 import com.sk89q.commandbook.util.InputUtil;
@@ -268,7 +269,7 @@ public class TimeComponent extends BukkitComponent implements Listener {
                 }
 
                 if (players == null) {
-                    players = InputUtil.PlayerParser.matchPlayers(PlayerUtil.checkPlayer(sender));
+                    players = Lists.newArrayList(PlayerUtil.checkPlayer(sender));
                 }
             } else {
                 players = InputUtil.PlayerParser.matchPlayers(sender, args.getString(0));

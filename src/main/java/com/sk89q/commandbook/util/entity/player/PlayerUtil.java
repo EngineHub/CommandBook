@@ -18,18 +18,16 @@
 
 package com.sk89q.commandbook.util.entity.player;
 
+import com.google.common.collect.Lists;
 import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.util.InputUtil;
-import com.sk89q.commandbook.util.entity.ProjectileUtil;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.*;
-import org.bukkit.util.Vector;
 
 import java.util.List;
-import java.util.Set;
 
 public class PlayerUtil {
 
@@ -50,14 +48,14 @@ public class PlayerUtil {
 
 
     public static Iterable<Player> detectTargets(CommandSender sender, CommandContext args, String perm) throws CommandException {
-        Iterable<Player> targets;
+        List<Player> targets;
         // Detect targets based on the number of arguments provided
         if (args.argsLength() == 0) {
-            targets = InputUtil.PlayerParser.matchPlayers(PlayerUtil.checkPlayer(sender));
+            targets = Lists.newArrayList(PlayerUtil.checkPlayer(sender));
         } else {
             targets = InputUtil.PlayerParser.matchPlayers(sender, args.getString(0));
         }
-        InputUtil.PlayerParser.checkPlayerMatch((List<Player>) targets);
+        InputUtil.PlayerParser.checkPlayerMatch(targets);
         // Check permissions!
         for (Player player : targets) {
             if (player.equals(sender)) {

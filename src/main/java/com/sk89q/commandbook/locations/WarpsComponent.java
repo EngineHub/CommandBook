@@ -18,6 +18,7 @@
 
 package com.sk89q.commandbook.locations;
 
+import com.google.common.collect.Lists;
 import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.commands.PaginatedResult;
 import com.sk89q.commandbook.session.SessionComponent;
@@ -59,7 +60,7 @@ public class WarpsComponent extends LocationsComponent {
             // Detect arguments based on the number of arguments provided
             if (args.argsLength() == 1) {
                 Player player = PlayerUtil.checkPlayer(sender);
-                targets = InputUtil.PlayerParser.matchPlayers(player);
+                targets = Lists.newArrayList(player);
                 warp = getManager().get(player.getWorld(), args.getString(0));
             } else if (args.argsLength() == 2) {
                 targets = InputUtil.PlayerParser.matchPlayers(sender, args.getString(0));

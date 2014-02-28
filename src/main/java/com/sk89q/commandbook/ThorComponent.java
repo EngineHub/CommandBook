@@ -18,6 +18,7 @@
 
 package com.sk89q.commandbook;
 
+import com.google.common.collect.Lists;
 import com.sk89q.commandbook.session.SessionComponent;
 import com.sk89q.commandbook.session.UserSession;
 import com.sk89q.commandbook.util.ChatUtil;
@@ -106,7 +107,7 @@ public class ThorComponent extends BukkitComponent implements Listener {
 
             // Detect arguments based on the number of arguments provided
             if (args.argsLength() == 0) {
-                targets = InputUtil.PlayerParser.matchPlayers(PlayerUtil.checkPlayer(sender));
+                targets = Lists.newArrayList(PlayerUtil.checkPlayer(sender));
             } else if (args.argsLength() == 1) {
                 targets = InputUtil.PlayerParser.matchPlayers(sender, args.getString(0));
             }
@@ -186,7 +187,7 @@ public class ThorComponent extends BukkitComponent implements Listener {
 
             // Detect arguments based on the number of arguments provided
             if (args.argsLength() == 0) {
-                targets = InputUtil.PlayerParser.matchPlayers(PlayerUtil.checkPlayer(sender));
+                targets = Lists.newArrayList(PlayerUtil.checkPlayer(sender));
             } else if (args.argsLength() == 1) {
                 targets = InputUtil.PlayerParser.matchPlayers(sender, args.getString(0));
             }
@@ -231,7 +232,7 @@ public class ThorComponent extends BukkitComponent implements Listener {
 
             // Detect arguments based on the number of arguments provided
             if (args.argsLength() == 0) {
-                targets = InputUtil.PlayerParser.matchPlayers(PlayerUtil.checkPlayer(sender));
+                targets = Lists.newArrayList(PlayerUtil.checkPlayer(sender));
             } else if (args.argsLength() == 1) {
                 targets = InputUtil.PlayerParser.matchPlayers(sender, args.getString(0));
             }

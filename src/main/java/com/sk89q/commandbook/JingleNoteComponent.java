@@ -18,6 +18,7 @@
 
 package com.sk89q.commandbook;
 
+import com.google.common.collect.Lists;
 import com.sk89q.commandbook.util.InputUtil;
 import com.sk89q.commandbook.util.entity.player.PlayerUtil;
 import com.sk89q.jinglenote.JingleNoteManager;
@@ -108,7 +109,7 @@ public class JingleNoteComponent extends BukkitComponent implements Listener {
 
             Iterable<Player> targets;
             if (args.argsLength() == 0) {
-                targets = InputUtil.PlayerParser.matchPlayers(PlayerUtil.checkPlayer(sender));
+                targets = Lists.newArrayList(PlayerUtil.checkPlayer(sender));
             } else {
                 targets = InputUtil.PlayerParser.matchPlayers(sender, args.getString(0));
             }
@@ -148,7 +149,7 @@ public class JingleNoteComponent extends BukkitComponent implements Listener {
             if (args.hasFlag('p')) {
                 targets = InputUtil.PlayerParser.matchPlayers(sender, args.getFlag('p'));
             } else {
-                targets = InputUtil.PlayerParser.matchPlayers(PlayerUtil.checkPlayer(sender));
+                targets = Lists.newArrayList(PlayerUtil.checkPlayer(sender));
             }
 
             for (Player target : targets) {
