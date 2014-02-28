@@ -20,10 +20,7 @@ package com.sk89q.commandbook.util.item;
 
 import com.sk89q.commandbook.CommandBook;
 import com.sk89q.minecraft.util.commands.CommandException;
-import com.sk89q.worldedit.blocks.BlockID;
-import com.sk89q.worldedit.blocks.BlockType;
-import com.sk89q.worldedit.blocks.ClothColor;
-import com.sk89q.worldedit.blocks.ItemType;
+import com.sk89q.worldedit.blocks.*;
 import org.bukkit.DyeColor;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
@@ -222,13 +219,16 @@ public class ItemUtil {
                     throw new CommandException("Unknown slab material of '" + filter + "'.");
                 }
             case BlockID.CLOTH:
+            case BlockID.STAINED_CLAY:
+            case BlockID.STAINED_GLASS:
+            case BlockID.STAINED_GLASS_PANE:
                 ClothColor col = ClothColor.lookup(filter);
                 if (col != null) {
                     return col.getID();
                 }
 
                 throw new CommandException("Unknown wool color name of '" + filter + "'.");
-            case 351: // Dye
+            case ItemID.INK_SACK: // Dye
                 ClothColor dyeCol = ClothColor.lookup(filter);
                 if (dyeCol != null) {
                     return 15 - dyeCol.getID();
