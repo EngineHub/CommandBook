@@ -317,20 +317,7 @@ public class InputUtil {
          * @throws CommandException
          */
         public static Player matchSinglePlayer(CommandSender sender, String filter) throws CommandException {
-            // This will throw an exception if there are no matches
-            Iterator<Player> players = matchPlayers(sender, filter).iterator();
-
-            Player match = players.next();
-
-            // We don't want to match the wrong person, so fail if if multiple
-            // players were found (we don't want to just pick off the first one,
-            // as that may be the wrong player)
-            if (players.hasNext()) {
-                throw new CommandException("More than one player found! " +
-                        "Use @<name> for exact matching.");
-            }
-
-            return match;
+            return checkSinglePlayerMatch(matchPlayers(sender, filter));
         }
 
         /**
@@ -366,8 +353,22 @@ public class InputUtil {
             if (players.isEmpty()) {
                 throw new CommandException("No players matched query.");
             }
-
             return players;
+        }
+
+        /**
+         * Checks if the given list of players contains only one player, otherwise
+         * throw an exception.
+         *
+         * @param players
+         * @return
+         * @throws CommandException
+         */
+        public static Player checkSinglePlayerMatch(List<Player> players) throws CommandException {
+            if (players.size() > 1) {
+                throw new CommandException("More than one player found! Use @<name> for exact matching.");
+            }
+            return players.get(0);
         }
     }
 
