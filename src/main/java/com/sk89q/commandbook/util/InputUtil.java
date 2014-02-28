@@ -3,6 +3,7 @@ package com.sk89q.commandbook.util;
 import com.google.common.collect.Lists;
 import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.locations.*;
+import com.sk89q.commandbook.util.entity.player.comparison.PlayerComparisonUtil;
 import com.sk89q.minecraft.util.commands.CommandException;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -167,58 +168,66 @@ public class InputUtil {
 
             filter = filter.toLowerCase();
 
-            // Allow exact name matching
-            if (filter.charAt(0) == '@' && filter.length() >= 2) {
-                filter = filter.substring(1);
+            if (filter.length() >= 2) {
+                boolean exactMatch = filter.charAt(0) == '@';
+                boolean startWildCard = filter.charAt(0) == '*';
+                boolean endWildCard = filter.charAt(filter.length() - 1) == '*';
 
-                for (Player player : players) {
-                    if (player.getName().equalsIgnoreCase(filter)
-                            || (useDisplayNames
-                            && ChatColor.stripColor(player.getDisplayName()).equalsIgnoreCase(filter))) {
-                        return Lists.newArrayList(player);
+                if (exactMatch) { // Exact matching requested
+                    try {
+                        return Lists.newArrayList(matchPlayerExactly(source, filter.substring(1)));
+                    } catch (CommandException e) {
+                        return new ArrayList<Player>();
                     }
-                }
-
-                return new ArrayList<Player>();
-                // Allow partial name matching
-            } else if (filter.charAt(0) == '*' && filter.length() >= 2) {
-                filter = filter.substring(1);
-
-                List<Player> list = new ArrayList<Player>();
-
-                for (Player player : players) {
-                    if (player.getName().toLowerCase().contains(filter)
-                            || (useDisplayNames
-                            && ChatColor.stripColor(player.getDisplayName().toLowerCase()).contains(filter))) {
-                        list.add(player);
+                } else if (startWildCard || endWildCard) { // Wild card matching requested
+                    // Remove the wild cards from the string
+                    if (startWildCard && endWildCard) {
+                        filter = filter.substring(1, filter.length() - 1);
+                    } else if (startWildCard) {
+                        filter = filter.substring(1);
+                    } else {
+                        filter = filter.substring(0, filter.length() - 1);
                     }
-                }
 
-                return list;
+                    List<Player> list = new ArrayList<Player>();
 
-                // Start with name matching
-            } else {
-                List<Player> list = new ArrayList<Player>();
-
-                for (Player player : players) {
-                    if (player.getName().toLowerCase().startsWith(filter)
-                            || (useDisplayNames
-                            && ChatColor.stripColor(player.getDisplayName().toLowerCase()).startsWith(filter))) {
-                        // Do this to maintain the behavior of the deprecated version of this method
-                        if (source != null) {
-                            if (player.equals(source)) {
+                    // Match based on the positioning of the wild card
+                    for (Player player : players) {
+                        String targetName = player.getName().toLowerCase();
+                        String targetDisplayName = ChatColor.stripColor(player.getDisplayName().toLowerCase());
+                        if (startWildCard && endWildCard) {
+                            if (targetName.contains(filter)
+                                    || (useDisplayNames && targetDisplayName.contains(filter))) {
                                 list.add(player);
-                            } else {
-                                list.add(0, player);
+                            }
+                        } else if (startWildCard) {
+                            if (targetName.endsWith(filter)
+                                    || (useDisplayNames && targetDisplayName.endsWith(filter))) {
+                                list.add(player);
                             }
                         } else {
-                            list.add(player);
+                            if (targetName.startsWith(filter)
+                                    || (useDisplayNames && targetDisplayName.startsWith(filter))) {
+                                list.add(player);
+                            }
                         }
                     }
-                }
 
-                return list;
+                    return PlayerComparisonUtil.prioritySort(source, list);
+                }
             }
+            // Start with name matching
+            List<Player> list = new ArrayList<Player>();
+
+            for (Player player : players) {
+                if (player.getName().toLowerCase().startsWith(filter)
+                        || (useDisplayNames
+                        && ChatColor.stripColor(player.getDisplayName().toLowerCase()).startsWith(filter))) {
+                    list.add(player);
+                }
+            }
+
+            return PlayerComparisonUtil.prioritySort(source, list);
         }
 
         /**

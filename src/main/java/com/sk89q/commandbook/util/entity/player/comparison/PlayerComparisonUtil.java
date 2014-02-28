@@ -8,7 +8,7 @@ import java.util.List;
 
 public class PlayerComparisonUtil {
 
-    public static List<Player> proritySort(CommandSender source, List<Player> players) {
+    public static List<Player> prioritySort(CommandSender source, List<Player> players) {
         if (source instanceof Player) {
             Collections.sort(players, new PlayerPrioritySort((Player) source));
         }
