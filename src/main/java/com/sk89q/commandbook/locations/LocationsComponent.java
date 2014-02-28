@@ -97,7 +97,7 @@ public abstract class LocationsComponent extends BukkitComponent {
         World world = null;
         if (getManager().isPerWorld()) {
             if (args.hasFlag('w')) {
-                world = InputUtil.matchWorld(sender, args.getFlag('w'));
+                world = InputUtil.LocationParser.matchWorld(sender, args.getFlag('w'));
             } else {
                 world = PlayerUtil.checkPlayer(sender).getWorld();
             }

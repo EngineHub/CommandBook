@@ -257,7 +257,7 @@ public class FunComponent extends BukkitComponent {
             List<Location> locations;
 
             if (args.argsLength() >= 3) {
-                locations = InputUtil.matchLocations(sender, args.getString(2));
+                locations = InputUtil.LocationParser.matchLocations(sender, args.getString(2));
             } else {
                 locations = Lists.newArrayList(PlayerUtil.checkPlayer(sender).getLocation());
             }

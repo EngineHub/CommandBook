@@ -168,7 +168,7 @@ public class SpawnLocationsComponent extends BukkitComponent implements Listener
                 world = player.getWorld();
                 loc = player.getLocation();
             } else {
-                loc = InputUtil.matchLocation(sender, args.getString(0));
+                loc = InputUtil.LocationParser.matchLocation(sender, args.getString(0));
                 world = loc.getWorld();
             }
 

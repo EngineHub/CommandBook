@@ -79,7 +79,7 @@ public class HomesComponent extends LocationsComponent {
             } else if (args.argsLength() == 3) {
                 targets = InputUtil.PlayerParser.matchPlayers(sender, args.getString(1));
                 home = getManager().get(
-                        InputUtil.matchWorld(sender, args.getString(0)), args.getString(2));
+                        InputUtil.LocationParser.matchWorld(sender, args.getString(0)), args.getString(2));
 
                 // Check permissions!
                 for (Player target : targets) {
@@ -125,7 +125,7 @@ public class HomesComponent extends LocationsComponent {
                 }
             } else {
                 homeName = args.getString(1);
-                loc = InputUtil.matchLocation(sender, args.getString(0));
+                loc = InputUtil.LocationParser.matchLocation(sender, args.getString(0));
 
                 // Check permissions!
                 if (!homeName.equals(sender.getName())) {
@@ -156,7 +156,7 @@ public class HomesComponent extends LocationsComponent {
             World world;
             String name = sender.getName();
             if (args.argsLength() == 2) {
-                world = InputUtil.matchWorld(sender, args.getString(1));
+                world = InputUtil.LocationParser.matchWorld(sender, args.getString(1));
             } else {
                 world = PlayerUtil.checkPlayer(sender).getWorld();
             }

@@ -143,14 +143,14 @@ public class TeleportComponent extends BukkitComponent implements Listener {
              */
             // TODO: reduce code duplication, currently just trying to catch every case
             if (args.argsLength() == 1) {
-                loc = InputUtil.matchLocation(sender, args.getString(0)); // matches both #7 and #8
+                loc = InputUtil.LocationParser.matchLocation(sender, args.getString(0)); // matches both #7 and #8
                 // go to the center of the block if we're on the edge
                 if (loc.getX() == loc.getBlockX()) loc.add(0.5, 0, 0);
                 if (loc.getZ() == loc.getBlockZ()) loc.add(0, 0, 0.5);
                 targets = Lists.newArrayList(PlayerUtil.checkPlayer(sender));
             } else if (args.argsLength() == 2) {
                 targets = InputUtil.PlayerParser.matchPlayers(sender, args.getString(0));
-                loc = InputUtil.matchLocation(sender, args.getString(1)); // matches both #4 and #5
+                loc = InputUtil.LocationParser.matchLocation(sender, args.getString(1)); // matches both #4 and #5
                 if (loc.getX() == loc.getBlockX()) loc.add(0.5, 0, 0);
                 if (loc.getZ() == loc.getBlockZ()) loc.add(0, 0, 0.5);
             } else if (args.argsLength() == 3) {
@@ -318,7 +318,7 @@ public class TeleportComponent extends BukkitComponent implements Listener {
         @CommandPermissions({"commandbook.teleport.other"})
         public void put(CommandContext args, CommandSender sender) throws CommandException {
             Iterable<Player> targets = InputUtil.PlayerParser.matchPlayers(sender, args.getString(0));
-            Location loc = InputUtil.matchLocation(sender, "#target");
+            Location loc = InputUtil.LocationParser.matchLocation(sender, "#target");
 
             for (Player target : targets) {
                 // We have already checked the from and current locations, we must now check the to if the world does not match

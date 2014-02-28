@@ -197,7 +197,7 @@ public class TimeComponent extends BukkitComponent implements Listener {
                 world = PlayerUtil.checkPlayer(sender).getWorld();
                 timeStr = args.getString(0);
             } else { // A world was specified!
-                world = InputUtil.matchWorld(sender, args.getString(0));
+                world = InputUtil.LocationParser.matchWorld(sender, args.getString(0));
                 timeStr = args.getString(1);
             }
 

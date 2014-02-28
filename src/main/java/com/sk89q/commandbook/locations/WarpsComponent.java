@@ -73,7 +73,7 @@ public class WarpsComponent extends LocationsComponent {
             } else if (args.argsLength() == 3) {
                 targets = InputUtil.PlayerParser.matchPlayers(sender, args.getString(1));
                 warp = getManager().get(
-                        InputUtil.matchWorld(sender, args.getString(0)), args.getString(2));
+                        InputUtil.LocationParser.matchWorld(sender, args.getString(0)), args.getString(2));
             }
 
             // Check permissions!
@@ -110,7 +110,7 @@ public class WarpsComponent extends LocationsComponent {
                 player = PlayerUtil.checkPlayer(sender);
                 loc = player.getLocation();
             } else {
-                loc = InputUtil.matchLocation(sender, args.getString(1));
+                loc = InputUtil.LocationParser.matchLocation(sender, args.getString(1));
                 if (sender instanceof Player) {
                     player = (Player) sender;
                 }
@@ -148,7 +148,7 @@ public class WarpsComponent extends LocationsComponent {
             World world;
             String warpName = args.getString(0);
             if (args.argsLength() == 2) {
-                world = InputUtil.matchWorld(sender, args.getString(1));
+                world = InputUtil.LocationParser.matchWorld(sender, args.getString(1));
             } else {
                 world = PlayerUtil.checkPlayer(sender).getWorld();
             }

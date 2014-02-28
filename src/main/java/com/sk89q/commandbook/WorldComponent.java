@@ -55,7 +55,7 @@ public class WorldComponent extends BukkitComponent {
                 world = PlayerUtil.checkPlayer(sender).getWorld();
                 duration = args.getInteger(1);
             } else { // A world was specified!
-                world = InputUtil.matchWorld(sender, args.getString(2));
+                world = InputUtil.LocationParser.matchWorld(sender, args.getString(2));
                 duration = args.getInteger(1);
             }
 
@@ -133,7 +133,7 @@ public class WorldComponent extends BukkitComponent {
                 world = PlayerUtil.checkPlayer(sender).getWorld();
                 duration = args.getInteger(1);
             } else { // A world was specified!
-                world = InputUtil.matchWorld(sender, args.getString(2));
+                world = InputUtil.LocationParser.matchWorld(sender, args.getString(2));
                 duration = args.getInteger(1);
             }
 
