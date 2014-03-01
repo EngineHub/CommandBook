@@ -280,8 +280,10 @@ public class PlayerUtil {
             throws CommandException {
 
         // Let's see if console is wanted
+        String consoleName;
+        consoleName = CommandBook.inst().consoleName;
         if (filter.equalsIgnoreCase("#console")
-                || filter.equalsIgnoreCase("*console*")
+                || filter.equalsIgnoreCase(consoleName)
                 || filter.equalsIgnoreCase("!")) {
             return CommandBook.server().getConsoleSender();
         }
@@ -317,6 +319,8 @@ public class PlayerUtil {
      * @return
      */
     public static String toColoredName(CommandSender sender, ChatColor endColor) {
+        String consoleName;
+        consoleName = CommandBook.inst().consoleName;
         if (sender instanceof Player) {
             String name = CommandBook.inst().useDisplayNames
                     ? ((Player) sender).getDisplayName()
@@ -326,7 +330,7 @@ public class PlayerUtil {
             }
             return name;
         } else if (sender instanceof ConsoleCommandSender) {
-            return "*Console*";
+            return consoleName;
         } else {
             return sender.getName();
         }
@@ -340,10 +344,12 @@ public class PlayerUtil {
      * @return
      */
     public static String toUniqueName(CommandSender sender) {
+        String consoleName;
+        consoleName = CommandBook.inst().consoleName;
         if (sender instanceof Player) {
             return (sender).getName();
         } else {
-            return "*Console*";
+            return consoleName;
         }
     }
 

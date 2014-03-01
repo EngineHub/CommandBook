@@ -26,3 +26,4 @@ crappy-wrapper-compat: Disables some features to be compatible with badly-writte
 use-display-names: Use users' display names rather than than their raw username in various messages. Display names are set by other plugins.
 lookup-with-display-names: Similar to use-display-names, this allows usage of users' display names when looking up players.
 broadcast-changes: For /time, /weather, and other commands, broadcast change messages to everyone when you change world information with the commands.
+console-broadcast-name: The display name of the console when commands are issued through the console. No-Effect with broadcast-changes set to false.
