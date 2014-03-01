@@ -142,7 +142,7 @@ public class TimeComponent extends BukkitComponent implements Listener {
     /**
      * Get locked times.
      *
-     * @return
+     * @return the map of world to time values
      */
     public Map<String, Integer> getLockedTimes() {
         return lockedTimes;
@@ -167,7 +167,7 @@ public class TimeComponent extends BukkitComponent implements Listener {
      * Parse a time string.
      *
      * @param timeStr
-     * @return
+     * @return the parsed integer
      * @throws CommandException
      */
     @Deprecated

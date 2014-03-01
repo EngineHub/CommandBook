@@ -66,7 +66,7 @@ public class JingleNoteComponent extends BukkitComponent implements Listener {
     /**
      * Get the jingle note manager.
      *
-     * @return
+     * @return the {@link JingleNoteManager}
      */
     public JingleNoteManager getJingleNoteManager() {
         return jingleNoteManager;

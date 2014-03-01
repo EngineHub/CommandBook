@@ -118,7 +118,7 @@ public class FlatFileBanDatabase implements BanDatabase {
      * Read a list from file. Each line is trimmed and made lower case.
      *
      * @param file
-     * @return
+     * @return a map of Player names (Strings) to {@link Ban}s
      * @throws IOException
      */
     protected synchronized Map<String, Ban> readLowercaseList(File file) throws IOException {

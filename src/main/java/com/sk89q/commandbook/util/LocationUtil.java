@@ -38,10 +38,10 @@ public class LocationUtil {
 
     /**
      * Match a world.
-     * @param sender
      *
+     * @param sender
      * @param filter
-     * @return
+     * @return the world
      * @throws com.sk89q.minecraft.util.commands.CommandException
      */
     public static World matchWorld(CommandSender sender, String filter) throws CommandException {

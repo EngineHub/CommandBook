@@ -193,7 +193,7 @@ public class CommandBookUtil {
      * Get the 24-hour time string for a given Minecraft time.
      *
      * @param time
-     * @return
+     * @return the 24-hour time
      */
     public static String getTimeString(long time) {
         int hours = (int) ((time / 1000 + 8) % 24);
@@ -212,7 +212,7 @@ public class CommandBookUtil {
      *
      * @param online
      * @param color
-     * @return
+     * @return a comma seperated list of players
      */
     public static String getOnlineList(Player[] online, ChatColor color) {
         StringBuilder out = new StringBuilder();
@@ -245,7 +245,7 @@ public class CommandBookUtil {
      * Get the cardinal compass direction of a player.
      *
      * @param player
-     * @return
+     * @return the cardinal direction
      */
     public static String getCardinalDirection(Player player) {
         double rot = (player.getLocation().getYaw() - 90) % 360;
@@ -422,7 +422,7 @@ public class CommandBookUtil {
      * that free position.
      *
      * @param searchPos search position
-     * @return
+     * @return an open {@link Location}
      */
     public static Location findFreePosition(Location searchPos) {
         World world = searchPos.getWorld();
@@ -553,7 +553,7 @@ public class CommandBookUtil {
      *
      * @param sender
      * @param message
-     * @return
+     * @return the filtered string
      */
     public static String replaceMacros(CommandSender sender, String message) {
         Player[] online = CommandBook.server().getOnlinePlayers();

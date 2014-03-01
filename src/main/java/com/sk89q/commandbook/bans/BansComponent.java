@@ -84,7 +84,7 @@ public class BansComponent extends BukkitComponent implements Listener {
     /**
      * Get the ban database.
      *
-     * @return
+     * @return the BanDatabase
      */
     public BanDatabase getBanDatabase() {
         return bans;

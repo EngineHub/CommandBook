@@ -81,7 +81,7 @@ public class EntityUtil {
      * Get a list of creature names.
      *
      * @param requireSpawnable Whether to only show entries that are spawnable
-     * @return
+     * @return the list of creature names in CSV form
      */
     public static String getCreatureNameList(boolean requireSpawnable) {
         StringBuilder str = new StringBuilder();

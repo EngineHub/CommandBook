@@ -41,7 +41,7 @@ public class PlayerUtil {
      * Checks to see if the sender is a player, otherwise throw an exception.
      *
      * @param sender
-     * @return
+     * @return the {@link Player} if sender is a Player
      * @throws com.sk89q.minecraft.util.commands.CommandException
      */
     public static Player checkPlayer(CommandSender sender)
@@ -57,7 +57,7 @@ public class PlayerUtil {
      * Match player names.
      *
      * @param filter
-     * @return
+     * @return the list of {@link Player}
      */
     @Deprecated
     public static List<Player> matchPlayerNames(String filter) {
@@ -70,7 +70,7 @@ public class PlayerUtil {
      *
      * @param source
      * @param filter
-     * @return
+     * @return the list of {@link Player}
      */
     public static List<Player> matchPlayerNames(CommandSender source, String filter) {
 
@@ -140,7 +140,7 @@ public class PlayerUtil {
      * throw an exception.
      *
      * @param players
-     * @return
+     * @return iterator for players
      * @throws CommandException
      */
     protected static Iterable<Player> checkPlayerMatch(List<Player> players)
@@ -225,7 +225,7 @@ public class PlayerUtil {
      *
      * @param sender
      * @param filter
-     * @return
+     * @return the matching player
      * @throws CommandException
      */
     public static Player matchPlayerExactly(CommandSender sender, String filter)
@@ -247,7 +247,7 @@ public class PlayerUtil {
      *
      * @param sender
      * @param filter
-     * @return
+     * @return the matching player
      * @throws CommandException
      */
     public static Player matchSinglePlayer(CommandSender sender, String filter)
@@ -273,7 +273,7 @@ public class PlayerUtil {
      *
      * @param sender
      * @param filter
-     * @return
+     * @return the {@link CommandSender}
      * @throws CommandException
      */
     public static CommandSender matchPlayerOrConsole(CommandSender sender, String filter)
@@ -303,7 +303,7 @@ public class PlayerUtil {
      * Gets the name of a command sender. This may be a display name.
      *
      * @param sender
-     * @return
+     * @return the name of this {@link CommandSender}
      */
     public static String toName(CommandSender sender) {
         return ChatColor.stripColor(toColoredName(sender, null));
@@ -314,7 +314,7 @@ public class PlayerUtil {
      *
      * @param sender
      * @param endColor
-     * @return
+     * @return the colored name of this {@link CommandSender}
      */
     public static String toColoredName(CommandSender sender, ChatColor endColor) {
         if (sender instanceof Player) {
@@ -337,7 +337,7 @@ public class PlayerUtil {
      * method should never return a "display name".
      *
      * @param sender
-     * @return
+     * @return the name of this {@link CommandSender}
      */
     public static String toUniqueName(CommandSender sender) {
         if (sender instanceof Player) {

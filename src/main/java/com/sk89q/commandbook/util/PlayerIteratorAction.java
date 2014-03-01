@@ -77,7 +77,7 @@ public abstract class PlayerIteratorAction {
     /**
      * Get the sender.
      * 
-     * @return
+     * @return the {@link CommandSender}
      */
     public CommandSender getSender() {
         return sender;
