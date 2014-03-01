@@ -137,11 +137,6 @@ public class ItemUtil {
                     throw new CommandException("Unknown enchantment '" + enchStr + "'");
                 }
 
-                if (ench.getMaxLevel() < level) {
-                    throw new CommandException("Level '" + level +
-                            "' is above the maximum level for enchantment '" + ench.getName() + "'");
-                }
-
                 stack.addUnsafeEnchantment(ench, level);
             }
 
