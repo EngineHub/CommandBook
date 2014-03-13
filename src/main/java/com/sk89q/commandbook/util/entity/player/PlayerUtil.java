@@ -46,28 +46,6 @@ public class PlayerUtil {
         }
     }
 
-
-    public static Iterable<Player> detectTargets(CommandSender sender, CommandContext args, String perm) throws CommandException {
-        List<Player> targets;
-        // Detect targets based on the number of arguments provided
-        if (args.argsLength() == 0) {
-            targets = Lists.newArrayList(PlayerUtil.checkPlayer(sender));
-        } else {
-            targets = InputUtil.PlayerParser.matchPlayers(sender, args.getString(0));
-        }
-        InputUtil.PlayerParser.checkPlayerMatch(targets);
-        // Check permissions!
-        for (Player player : targets) {
-            if (player.equals(sender)) {
-                CommandBook.inst().checkPermission(sender, perm);
-            } else {
-                CommandBook.inst().checkPermission(sender, perm + ".other");
-                break;
-            }
-        }
-        return targets;
-    }
-
     /**
      * Teleports a player with vehicle support
      *

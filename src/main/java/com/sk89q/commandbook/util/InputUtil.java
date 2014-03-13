@@ -3,7 +3,9 @@ package com.sk89q.commandbook.util;
 import com.google.common.collect.Lists;
 import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.locations.*;
+import com.sk89q.commandbook.util.entity.player.PlayerUtil;
 import com.sk89q.commandbook.util.entity.player.comparison.PlayerComparisonUtil;
+import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -348,6 +350,27 @@ public class InputUtil {
             }
 
             return matchSinglePlayer(sender, filter);
+        }
+
+        public static Iterable<Player> detectTargets(CommandSender sender, CommandContext args, String perm) throws CommandException {
+            List<Player> targets;
+            // Detect targets based on the number of arguments provided
+            if (args.argsLength() == 0) {
+                targets = Lists.newArrayList(PlayerUtil.checkPlayer(sender));
+            } else {
+                targets = InputUtil.PlayerParser.matchPlayers(sender, args.getString(0));
+            }
+            InputUtil.PlayerParser.checkPlayerMatch(targets);
+            // Check permissions!
+            for (Player player : targets) {
+                if (player.equals(sender)) {
+                    CommandBook.inst().checkPermission(sender, perm);
+                } else {
+                    CommandBook.inst().checkPermission(sender, perm + ".other");
+                    break;
+                }
+            }
+            return targets;
         }
 
         /**

@@ -54,7 +54,7 @@ public class FlightComponent extends BukkitComponent implements Listener {
             Iterable<Player> targets = null;
             boolean included = false;
 
-            targets = PlayerUtil.detectTargets(sender, args, "commandbook.flight.toggle");
+            targets = InputUtil.PlayerParser.detectTargets(sender, args, "commandbook.flight.toggle");
 
             for (Player player : targets) {
                 FlightSession session = sessions.getSession(FlightSession.class, player);
@@ -83,7 +83,7 @@ public class FlightComponent extends BukkitComponent implements Listener {
             Iterable<Player> targets = null;
             boolean included = false;
 
-            targets = PlayerUtil.detectTargets(sender, args, "commandbook.flight.reverse");
+            targets = InputUtil.PlayerParser.detectTargets(sender, args, "commandbook.flight.reverse");
 
             for (Player player : targets) {
                 player.setFlySpeed(-player.getFlySpeed());
