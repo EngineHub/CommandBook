@@ -19,6 +19,8 @@
 package com.sk89q.commandbook.util.item;
 
 import com.sk89q.commandbook.CommandBook;
+import com.sk89q.commandbook.util.item.itemstack.SerializableItemStack;
+import com.sk89q.commandbook.util.item.itemstack.SerializableItemStackFactory;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.blocks.*;
 import org.bukkit.DyeColor;
@@ -253,5 +255,20 @@ public class ItemUtil {
             }
         } catch (IllegalArgumentException ignored) {}
         throw new CommandException("Unknown dye color name of '" + filter + "'.");
+    }
+
+    /**
+     * Clones an entire array of item stacks
+     *
+     * @param stacks the stacks to clone
+     * @return the cloned stacks
+     */
+    public static ItemStack[] clone(ItemStack[] stacks) {
+
+        ItemStack[] returnStack = new ItemStack[stacks.length];
+        for (int i = 0; i < stacks.length; i++) {
+            returnStack[i] = stacks[i] == null ? null : stacks[i].clone();
+        }
+        return returnStack;
     }
 }
