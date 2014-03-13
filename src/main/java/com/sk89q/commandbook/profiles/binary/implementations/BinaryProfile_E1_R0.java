@@ -103,73 +103,61 @@ public class BinaryProfile_E1_R0 implements Profile_E1 {
 
     @Override
     public double getHealth() {
-
         return health;
     }
 
     @Override
     public void setHealth(double health) {
-
         this.health = health;
     }
 
     @Override
     public int getHunger() {
-
         return hunger;
     }
 
     @Override
     public void setHunger(int hunger) {
-
         this.hunger = hunger;
     }
 
     @Override
     public float getSaturation() {
-
         return saturation;
     }
 
     @Override
     public void setSaturation(float saturation) {
-
         this.saturation = saturation;
     }
 
     @Override
     public float getExhaustion() {
-
         return exhaustion;
     }
 
     @Override
     public void setExhaustion(float exhaustion) {
-
         this.exhaustion = exhaustion;
     }
 
     @Override
     public int getLevel() {
-
         return level;
     }
 
     @Override
     public void setLevel(int level) {
-
         this.level = level;
     }
 
     @Override
     public float getExperience() {
-
         return experience;
     }
 
     @Override
     public void setExperience(float experience) {
-
         this.experience = experience;
     }
 
