@@ -6,6 +6,7 @@ import com.sk89q.commandbook.util.item.ItemUtil;
 import com.sk89q.commandbook.util.item.itemstack.SerializableItemStack;
 import com.sk89q.commandbook.util.item.itemstack.SerializationUtil;
 import org.apache.commons.lang.Validate;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
 
@@ -42,7 +43,7 @@ public class BinaryProfile_E1_R0 implements Profile_E1 {
 
     // Location
     // For Serialization
-    private String worldName;
+    private String worldName = "";
     private double x, y, z;
     private float yaw, pitch;
     // For Usage
@@ -174,13 +175,30 @@ public class BinaryProfile_E1_R0 implements Profile_E1 {
 
     @Override
     public Location getLocation() {
-
-        return location;
+        if (location == null) {
+            if (worldName.isEmpty()) {
+                return null;
+            } else {
+                location = new Location(Bukkit.getWorld(worldName), x, y, z, yaw, pitch);
+            }
+        }
+        return location.clone();
     }
 
     @Override
     public void setLocation(Location location) {
-        this.location = location == null ? null : location.clone();
+        if (location == null) {
+            this.location = null;
+            this.worldName = "";
+            return;
+        }
+        this.location = location.clone();
+        this.worldName = location.getWorld().getName();
+        this.x = location.getX();
+        this.y = location.getY();
+        this.z = location.getZ();
+        this.yaw = location.getYaw();
+        this.pitch = location.getPitch();
     }
 
 }
