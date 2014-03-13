@@ -16,8 +16,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.sk89q.commandbook.util;
+package com.sk89q.commandbook.util.entity.player.iterators;
 
+import com.sk89q.commandbook.util.ChatUtil;
+import com.sk89q.commandbook.util.entity.player.PlayerUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
@@ -60,11 +62,12 @@ public class TeleportPlayerIterator extends PlayerIteratorAction {
             newLoc.setYaw(oldLoc.getYaw());
         }
 
-        newLoc.getChunk().load(true);
-        if (player.getVehicle() != null) {
-            player.getVehicle().eject();
-        }
-        player.teleport(newLoc);
+        teleport(player, newLoc);
+    }
+
+    public void teleport(Player player, Location newLoc) {
+
+        PlayerUtil.teleportTo(sender, player, newLoc, true);
     }
 
     @Override
@@ -79,10 +82,10 @@ public class TeleportPlayerIterator extends PlayerIteratorAction {
 
         if (oldLoc.getWorld().equals(loc.getWorld())) {
             player.sendMessage(ChatColor.YELLOW + "You've been teleported by "
-                    + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + ".");
+                    + ChatUtil.toColoredName(sender, ChatColor.YELLOW) + ".");
         } else {
             player.sendMessage(ChatColor.YELLOW + "You've been teleported by "
-                    + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + " to world '"
+                    + ChatUtil.toColoredName(sender, ChatColor.YELLOW) + " to world '"
                     + loc.getWorld().getName() + "'.");
         }
     }

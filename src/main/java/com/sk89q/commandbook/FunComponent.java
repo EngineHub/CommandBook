@@ -18,16 +18,19 @@
 
 package com.sk89q.commandbook;
 
-import com.zachsthings.libcomponents.bukkit.BasePlugin;
-import com.zachsthings.libcomponents.bukkit.BukkitComponent;
-import com.zachsthings.libcomponents.ComponentInformation;
-import com.sk89q.commandbook.util.ItemUtil;
-import com.sk89q.commandbook.util.LocationUtil;
-import com.sk89q.commandbook.util.PlayerUtil;
+import com.google.common.collect.Lists;
+import com.sk89q.commandbook.util.ChatUtil;
+import com.sk89q.commandbook.util.InputUtil;
+import com.sk89q.commandbook.util.entity.EntityUtil;
+import com.sk89q.commandbook.util.entity.player.PlayerUtil;
+import com.sk89q.commandbook.util.item.ItemUtil;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
+import com.zachsthings.libcomponents.ComponentInformation;
+import com.zachsthings.libcomponents.bukkit.BasePlugin;
+import com.zachsthings.libcomponents.bukkit.BukkitComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -36,8 +39,10 @@ import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
-import static com.sk89q.commandbook.util.EntityUtil.matchCreatureType;
+import java.util.List;
 import java.util.Random;
+
+import static com.sk89q.commandbook.util.entity.EntityUtil.matchCreatureType;
 
 @ComponentInformation(friendlyName = "Fun", desc = "Provides some fun commands to toy with users. (/rocket and /pong are two fun ones)")
 public class FunComponent extends BukkitComponent {
@@ -172,7 +177,7 @@ public class FunComponent extends BukkitComponent {
                         }
                         break;
                     case ENDERMAN:
-                        ItemStack item = CommandBook.inst().getItem(specialType);
+                        ItemStack item = ItemUtil.getItem(specialType);
                         if (item == null) return creature;
                         ((Enderman) creature).setCarriedMaterial(item.getData());
                         break outerloop; // only one set of hands
@@ -242,19 +247,19 @@ public class FunComponent extends BukkitComponent {
         public void pong(CommandContext args, CommandSender sender) throws CommandException {
 
             sender.sendMessage(ChatColor.YELLOW +
-                    "I hear " + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + " likes cute Asian boys.");
+                    "I hear " + ChatUtil.toColoredName(sender, ChatColor.YELLOW) + " likes cute Asian boys.");
         }
 
         @Command(aliases = {"spawnmob"}, usage = "<mob>[|rider] [count] [location]", desc = "Spawn a mob",
                 flags = "dirbt", min = 1, max = 4)
         @CommandPermissions({"commandbook.spawnmob"})
         public void spawnMob(CommandContext args, CommandSender sender) throws CommandException {
-            Location loc;
+            List<Location> locations;
 
             if (args.argsLength() >= 3) {
-                loc = LocationUtil.matchLocation(sender, args.getString(2));
+                locations = InputUtil.LocationParser.matchLocations(sender, args.getString(2));
             } else {
-                loc = PlayerUtil.checkPlayer(sender).getLocation();
+                locations = Lists.newArrayList(PlayerUtil.checkPlayer(sender).getLocation());
             }
 
             String[] creatureInput = args.getString(0).split("\\|");
@@ -282,6 +287,7 @@ public class FunComponent extends BukkitComponent {
             }
 
             int count = Math.max(1, args.getInteger(1, 1));
+            int total = count * locations.size();
             EntityType type = matchCreatureType(sender, creatureName, true);
             EntityType riderType = null;
             if (hasRider) {
@@ -290,19 +296,21 @@ public class FunComponent extends BukkitComponent {
             }
             CommandBook.inst().checkPermission(sender, "commandbook.spawnmob." + type.getName());
 
-            if ((hasRider ? count * 2 : count) > 10) {
+            if ((hasRider ? total * 2 : total) > 10) {
                 CommandBook.inst().checkPermission(sender, "commandbook.spawnmob.many");
             }
 
-            for (int i = 0; i < count; i++) {
-                LivingEntity ridee = spawn(loc, type, specialType, args, sender);
-                if (hasRider) {
-                    LivingEntity rider = spawn(loc, riderType, riderSpecialType, args, sender);
-                    ridee.setPassenger(rider);
+            for (Location loc : locations) {
+                for (int i = 0; i < count; i++) {
+                    LivingEntity ridee = spawn(loc, type, specialType, args, sender);
+                    if (hasRider) {
+                        LivingEntity rider = spawn(loc, riderType, riderSpecialType, args, sender);
+                        ridee.setPassenger(rider);
+                    }
                 }
             }
 
-            sender.sendMessage(ChatColor.YELLOW + "" + count + " mob(s) spawned!");
+            sender.sendMessage(ChatColor.YELLOW + "" + total + " mob(s) spawned!");
         }
 
         @Command(aliases = {"slap"}, usage = "[target]", desc = "Slap a player", flags = "hdvs", min = 0, max = 1)
@@ -314,9 +322,9 @@ public class FunComponent extends BukkitComponent {
 
             // Detect arguments based on the number of arguments provided
             if (args.argsLength() == 0) {
-                targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
+                targets = Lists.newArrayList(PlayerUtil.checkPlayer(sender));
             } else if (args.argsLength() == 1) {
-                targets = PlayerUtil.matchPlayers(sender, args.getString(0));
+                targets = InputUtil.PlayerParser.matchPlayers(sender, args.getString(0));
             }
 
             // Check permissions!
@@ -328,7 +336,6 @@ public class FunComponent extends BukkitComponent {
             }
 
             for (Player player : targets) {
-                count++;
 
                 if (args.hasFlag('v')) {
                     player.setVelocity(new Vector(
@@ -360,19 +367,20 @@ public class FunComponent extends BukkitComponent {
                         included = true;
                     } else {
                         player.sendMessage(ChatColor.YELLOW + "You've been slapped by "
-                                + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + ".");
+                                + ChatUtil.toColoredName(sender, ChatColor.YELLOW) + ".");
 
                     }
                 } else {
-                    if (count < 6) {
+                    if (count < 3) {
                         BasePlugin.server().broadcastMessage(
-                                ChatColor.YELLOW + PlayerUtil.toColoredName(sender, ChatColor.YELLOW)
-                                + " slapped " + PlayerUtil.toColoredName(player, ChatColor.YELLOW));
-                    } else if (count == 6) {
+                                ChatColor.YELLOW + ChatUtil.toColoredName(sender, ChatColor.YELLOW)
+                                + " slapped " + ChatUtil.toColoredName(player, ChatColor.YELLOW));
+                    } else if (count == 3) {
                         BasePlugin.server().broadcastMessage(
-                                ChatColor.YELLOW + PlayerUtil.toColoredName(sender, ChatColor.YELLOW)
+                                ChatColor.YELLOW + ChatUtil.toColoredName(sender, ChatColor.YELLOW)
                                 + " slapped more people...");
                     }
+                    count++;
                 }
             }
 
@@ -392,9 +400,9 @@ public class FunComponent extends BukkitComponent {
 
             // Detect arguments based on the number of arguments provided
             if (args.argsLength() == 0) {
-                targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
+                targets = Lists.newArrayList(PlayerUtil.checkPlayer(sender));
             } else if (args.argsLength() == 1) {
-                targets = PlayerUtil.matchPlayers(sender, args.getString(0));
+                targets = InputUtil.PlayerParser.matchPlayers(sender, args.getString(0));
             }
 
             // Check permissions!
@@ -421,20 +429,20 @@ public class FunComponent extends BukkitComponent {
                         included = true;
                     } else {
                         player.sendMessage(ChatColor.YELLOW + "You've been rocketed by "
-                                + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + ".");
+                                + ChatUtil.toColoredName(sender, ChatColor.YELLOW) + ".");
 
                     }
                 } else {
-                    ++count;
-                    if (count < 6) {
+                    if (count < 3) {
                         BasePlugin.server().broadcastMessage(
-                                ChatColor.YELLOW + PlayerUtil.toColoredName(sender, ChatColor.YELLOW)
-                                + " rocketed " + PlayerUtil.toColoredName(player, ChatColor.YELLOW));
-                    } else if (count == 6) {
+                                ChatColor.YELLOW + ChatUtil.toColoredName(sender, ChatColor.YELLOW)
+                                + " rocketed " + ChatUtil.toColoredName(player, ChatColor.YELLOW));
+                    } else if (count == 3) {
                         BasePlugin.server().broadcastMessage(
-                                ChatColor.YELLOW + PlayerUtil.toColoredName(sender, ChatColor.YELLOW)
+                                ChatColor.YELLOW + ChatUtil.toColoredName(sender, ChatColor.YELLOW)
                                 + " rocketed more people...");
                     }
+                    count++;
                 }
             }
 
@@ -454,9 +462,9 @@ public class FunComponent extends BukkitComponent {
 
             // Detect arguments based on the number of arguments provided
             if (args.argsLength() == 0) {
-                targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
+                targets = Lists.newArrayList(PlayerUtil.checkPlayer(sender));
             } else if (args.argsLength() == 1) {
-                targets = PlayerUtil.matchPlayers(sender, args.getString(0));
+                targets = InputUtil.PlayerParser.matchPlayers(sender, args.getString(0));
             }
 
             // Check permissions!
@@ -470,11 +478,7 @@ public class FunComponent extends BukkitComponent {
             }
 
             for (Player player : targets) {
-                double diff = (2 * Math.PI) / 24.0;
-                for (double a = 0; a < 2 * Math.PI; a += diff) {
-                    Vector vel = new Vector(Math.cos(a), 0, Math.sin(a));
-                    CommandBookUtil.sendArrowFromPlayer(player, vel, 2);
-                }
+                EntityUtil.sendProjectilesFromEntity(player, 24, 2, Arrow.class);
 
                 if (args.hasFlag('s')) {
                     // Tell the user
@@ -485,19 +489,20 @@ public class FunComponent extends BukkitComponent {
                         included = true;
                     } else {
                         player.sendMessage(ChatColor.YELLOW + "BARRAGE attack from "
-                                + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + ".");
+                                + ChatUtil.toColoredName(sender, ChatColor.YELLOW) + ".");
 
                     }
                 } else {
-                    if (count < 6) {
+                    if (count < 3) {
                         BasePlugin.server().broadcastMessage(
-                                ChatColor.YELLOW + PlayerUtil.toColoredName(sender, ChatColor.YELLOW)
-                                + " used BARRAGE on " + PlayerUtil.toColoredName(player, ChatColor.YELLOW));
-                    } else if (count == 6) {
+                                ChatColor.YELLOW + ChatUtil.toColoredName(sender, ChatColor.YELLOW)
+                                + " used BARRAGE on " + ChatUtil.toColoredName(player, ChatColor.YELLOW));
+                    } else if (count == 3) {
                         BasePlugin.server().broadcastMessage(
-                                ChatColor.YELLOW + PlayerUtil.toColoredName(sender, ChatColor.YELLOW)
+                                ChatColor.YELLOW + ChatUtil.toColoredName(sender, ChatColor.YELLOW)
                                 + " used it on more people...");
                     }
+                    count++;
                 }
             }
 
@@ -519,9 +524,9 @@ public class FunComponent extends BukkitComponent {
 
             // Detect arguments based on the number of arguments provided
             if (args.argsLength() == 0) {
-                targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
+                targets = Lists.newArrayList(PlayerUtil.checkPlayer(sender));
             } else if (args.argsLength() == 1) {
-                targets = PlayerUtil.matchPlayers(sender, args.getString(0));
+                targets = InputUtil.PlayerParser.matchPlayers(sender, args.getString(0));
             }
 
             // Check permissions!
@@ -536,7 +541,7 @@ public class FunComponent extends BukkitComponent {
 
             for (Player player : targets) {
                 // moved math to util because I felt like it
-                CommandBookUtil.sendFireballsFromPlayer(player, 8);
+                EntityUtil.sendProjectilesFromEntity(player, 8, 10, Fireball.class);
 
                 if (args.hasFlag('s')) {
                     // Tell the user
@@ -547,19 +552,20 @@ public class FunComponent extends BukkitComponent {
                         included = true;
                     } else {
                         player.sendMessage(ChatColor.YELLOW + "Fireball attack from "
-                                + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + ".");
+                                + ChatUtil.toColoredName(sender, ChatColor.YELLOW) + ".");
 
                     }
                 } else {
-                    if (count < 6) {
+                    if (count < 3) {
                         BasePlugin.server().broadcastMessage(
-                                ChatColor.YELLOW + PlayerUtil.toColoredName(sender, ChatColor.YELLOW)
-                                + " used Fireball attack on " + PlayerUtil.toColoredName(player, ChatColor.YELLOW));
-                    } else if (count == 6) {
+                                ChatColor.YELLOW + ChatUtil.toColoredName(sender, ChatColor.YELLOW)
+                                + " used Fireball attack on " + ChatUtil.toColoredName(player, ChatColor.YELLOW));
+                    } else if (count == 3) {
                         BasePlugin.server().broadcastMessage(
-                                ChatColor.YELLOW + PlayerUtil.toColoredName(sender, ChatColor.YELLOW)
+                                ChatColor.YELLOW + ChatUtil.toColoredName(sender, ChatColor.YELLOW)
                                 + " used it on more people...");
                     }
+                    count++;
                 }
             }
 
@@ -581,9 +587,9 @@ public class FunComponent extends BukkitComponent {
 
             // Detect arguments based on the number of arguments provided
             if (args.argsLength() == 0) {
-                targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
+                targets = Lists.newArrayList(PlayerUtil.checkPlayer(sender));
             } else if (args.argsLength() == 1) {
-                targets = PlayerUtil.matchPlayers(sender, args.getString(0));
+                targets = InputUtil.PlayerParser.matchPlayers(sender, args.getString(0));
             }
 
             // Check permissions!
@@ -599,7 +605,7 @@ public class FunComponent extends BukkitComponent {
             for (Player player : targets) {
                 double diff = (2 * Math.PI) / 24.0;
                 for (double a = 0; a < 2 * Math.PI; a += diff) {
-                    CommandBookUtil.sendCannonToPlayer(player);
+                    player.getWorld().spawnEntity(player.getEyeLocation(), EntityType.FIREBALL);
                 }
 
                 if (args.hasFlag('s')) {
@@ -611,19 +617,20 @@ public class FunComponent extends BukkitComponent {
                         included = true;
                     } else {
                         player.sendMessage(ChatColor.YELLOW + "Fireball attack from "
-                                + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + ".");
+                                + ChatUtil.toColoredName(sender, ChatColor.YELLOW) + ".");
 
                     }
                 } else {
-                    if (count < 6) {
+                    if (count < 3) {
                         BasePlugin.server().broadcastMessage(
-                                ChatColor.YELLOW + PlayerUtil.toColoredName(sender, ChatColor.YELLOW)
-                                + " used Fireball attack on " + PlayerUtil.toColoredName(player, ChatColor.YELLOW));
-                    } else if (count == 6) {
+                                ChatColor.YELLOW + ChatUtil.toColoredName(sender, ChatColor.YELLOW)
+                                + " used Fireball attack on " + ChatUtil.toColoredName(player, ChatColor.YELLOW));
+                    } else if (count == 3) {
                         BasePlugin.server().broadcastMessage(
-                                ChatColor.YELLOW + PlayerUtil.toColoredName(sender, ChatColor.YELLOW)
+                                ChatColor.YELLOW + ChatUtil.toColoredName(sender, ChatColor.YELLOW)
                                 + " used it more people...");
                     }
+                    count++;
                 }
             }
 

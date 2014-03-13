@@ -30,7 +30,7 @@ import java.io.*;
 import java.util.*;
 
 import static com.sk89q.commandbook.CommandBook.logger;
-import static com.sk89q.commandbook.CommandBookUtil.getNestedList;
+import static com.sk89q.commandbook.util.NestUtil.getNestedList;
 
 public class FlatFileLocationsManager implements LocationManager<NamedLocation> {
 

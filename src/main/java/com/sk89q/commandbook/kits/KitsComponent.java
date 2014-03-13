@@ -18,8 +18,11 @@
 
 package com.sk89q.commandbook.kits;
 
+import com.google.common.collect.Lists;
 import com.sk89q.commandbook.CommandBook;
-import com.sk89q.commandbook.util.PlayerUtil;
+import com.sk89q.commandbook.util.ChatUtil;
+import com.sk89q.commandbook.util.InputUtil;
+import com.sk89q.commandbook.util.entity.player.PlayerUtil;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
@@ -28,12 +31,16 @@ import com.zachsthings.libcomponents.bukkit.BukkitComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 
 import java.io.File;
 import java.util.Map;
+import java.util.Map.Entry;
 
 @ComponentInformation(friendlyName = "Kits", desc = "Distributes kits to players on command (with cooldowns)")
-public class KitsComponent extends BukkitComponent {
+public class KitsComponent extends BukkitComponent implements Listener {
     private KitManager kits;
 
     @Override
@@ -48,12 +55,26 @@ public class KitsComponent extends BukkitComponent {
                 CommandBook.inst(), new GarbageCollector(this),
                 GarbageCollector.CHECK_FREQUENCY, GarbageCollector.CHECK_FREQUENCY);
         registerCommands(Commands.class);
+        CommandBook.registerEvents(this);
     }
 
     @Override
     public void reload() {
         super.reload();
         kits.load();
+    }
+
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+
+        if (!player.hasPlayedBefore()) {
+            for (Entry<String, Kit> map : kits.getKits().entrySet()) {
+                if (CommandBook.inst().hasPermission(player, "commandbook.kits.onfirstlogin." + map.getKey())) {
+                    map.getValue().distribute(player);
+                }
+            }
+        }
     }
 
     /**
@@ -111,9 +132,9 @@ public class KitsComponent extends BukkitComponent {
                 boolean included = false;
 
                 if (args.argsLength() == 2) {
-                    targets = PlayerUtil.matchPlayers(sender, args.getString(1));
+                    targets = InputUtil.PlayerParser.matchPlayers(sender, args.getString(1));
                 } else {
-                    targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
+                    targets = Lists.newArrayList(PlayerUtil.checkPlayer(sender));
                 }
 
                 for (Player player : targets) {
@@ -147,7 +168,7 @@ public class KitsComponent extends BukkitComponent {
                         if (success) {
                             player.sendMessage(ChatColor.YELLOW + "You've been given " +
                                     "the '" + id + "' kit by "
-                                    + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + ".");
+                                    + ChatUtil.toColoredName(sender, ChatColor.YELLOW) + ".");
                         } else {
                             player.sendMessage(ChatColor.RED + "A kit could not be given to you because it has been too soon.");
                         }

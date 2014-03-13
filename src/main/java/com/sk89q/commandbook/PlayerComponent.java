@@ -18,18 +18,20 @@
 
 package com.sk89q.commandbook;
 
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
-import com.sk89q.commandbook.util.PlayerUtil;
+import com.google.common.collect.Lists;
+import com.sk89q.commandbook.util.ChatUtil;
+import com.sk89q.commandbook.util.InputUtil;
+import com.sk89q.commandbook.util.entity.player.PlayerUtil;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.zachsthings.libcomponents.ComponentInformation;
 import com.zachsthings.libcomponents.bukkit.BukkitComponent;
+import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 @ComponentInformation(friendlyName = "Player Commands", desc = "Various player-related commands.")
 public class PlayerComponent extends BukkitComponent {
@@ -54,7 +56,7 @@ public class PlayerComponent extends BukkitComponent {
                 mode = player.getGameMode();
             } else {
                 if (args.hasFlag('c')) { //check other player
-                    player = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
+                    player = InputUtil.PlayerParser.matchSinglePlayer(sender, args.getString(0));
                     mode = player.getGameMode();
                 } else {
                     change = true;
@@ -70,10 +72,10 @@ public class PlayerComponent extends BukkitComponent {
                         // HERP DERP VANILLA COMMAND BLOCKS
                         try {
                             modeString = String.valueOf(args.getInteger(0));
-                            player = PlayerUtil.matchSinglePlayer(sender, args.getString(1));
+                            player = InputUtil.PlayerParser.matchSinglePlayer(sender, args.getString(1));
                         } catch (NumberFormatException e) {
                             // NOPE NOT VANILLA COMMAND BLOCKS
-                            player = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
+                            player = InputUtil.PlayerParser.matchSinglePlayer(sender, args.getString(0));
                             modeString = args.getString(1);
                         }
                     }
@@ -128,10 +130,10 @@ public class PlayerComponent extends BukkitComponent {
 
             // Detect arguments based on the number of arguments provided
             if (args.argsLength() == 0) {
-                targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
+                targets = Lists.newArrayList(PlayerUtil.checkPlayer(sender));
 
             } else if (args.argsLength() == 1) {
-                targets = PlayerUtil.matchPlayers(sender, args.getString(0));
+                targets = InputUtil.PlayerParser.matchPlayers(sender, args.getString(0));
 
             }
 
@@ -156,19 +158,74 @@ public class PlayerComponent extends BukkitComponent {
 
                     // Keep track of this
                     included = true;
-                } else {
+                } else if (!args.hasFlag('s')) {
                     player.sendMessage(ChatColor.YELLOW + "Healed by "
-                            + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + ".");
-
+                            + ChatUtil.toColoredName(sender, ChatColor.YELLOW) + ".");
                 }
             }
 
             // The player didn't receive any items, then we need to send the
             // user a message so s/he know that something is indeed working
-            if (!included && args.hasFlag('s')) {
+            if (!included) {
                 sender.sendMessage(ChatColor.YELLOW.toString() + "Players healed.");
             }
         }
+
+        @Command(aliases = {"extinguish"},
+                usage = "[player]", desc = "Put out a fire on a player",
+                flags = "s", min = 0, max = 1)
+        @CommandPermissions({"commandbook.extinguish", "commandbook.extinguish.other"})
+        public void extinguish(CommandContext args,CommandSender sender) throws CommandException {
+
+            Iterable<Player> targets;
+            boolean included = false;
+
+            // Detect arguments based on the number of arguments provided
+            if (args.argsLength() > 0) {
+                targets = InputUtil.PlayerParser.matchPlayers(sender, args.getString(0));
+            } else {
+                targets = Lists.newArrayList(PlayerUtil.checkPlayer(sender));
+            }
+
+            for (Player player : targets) {
+                if (player != sender) {
+                    // Check permissions!
+                    CommandBook.inst().checkPermission(sender, "commandbook.extinguish.other");
+                } else {
+                    CommandBook.inst().checkPermission(sender, "commandbook.extinguish");
+                }
+            }
+
+            for (Player player : targets) {
+
+                if (player.getFireTicks() < 1) {
+                    player.sendMessage(ChatColor.RED +
+                            ChatUtil.toColoredName(player, ChatColor.RED)
+                            + " was not on fire!");
+                    continue;
+                }
+
+                player.setFireTicks(0);
+
+                // Tell the user
+                if (player.equals(sender)) {
+                    player.sendMessage(ChatColor.YELLOW + "Fire extinguished!");
+
+                    // Keep track of this
+                    included = true;
+                } else if (!args.hasFlag('s')) {
+                    player.sendMessage(ChatColor.YELLOW + "Fire extinguished by "
+                            + ChatUtil.toColoredName(sender, ChatColor.YELLOW) + ".");
+                }
+            }
+
+            // The player didn't receive any items, then we need to send the
+            // user a message so s/he know that something is indeed working
+            if (!included) {
+                sender.sendMessage(ChatColor.YELLOW.toString() + "Fires extinguished.");
+            }
+        }
+
         @Command(aliases = {"slay"},
         		usage = "[player]", desc = "Slay a player",
         		flags = "s", min = 0, max = 1)
@@ -181,9 +238,9 @@ public class PlayerComponent extends BukkitComponent {
 
             // Detect arguments based on the number of arguments provided
             if (args.argsLength() == 0) {
-                targets = PlayerUtil.matchPlayers(PlayerUtil.checkPlayer(sender));
+                targets = Lists.newArrayList(PlayerUtil.checkPlayer(sender));
             } else if (args.argsLength() == 1) {
-                targets = PlayerUtil.matchPlayers(sender, args.getString(0));
+                targets = InputUtil.PlayerParser.matchPlayers(sender, args.getString(0));
             }
 
             for (Player player : targets) {
@@ -204,16 +261,16 @@ public class PlayerComponent extends BukkitComponent {
 
                     // Keep track of this
                     included = true;
-                } else {
+                } else if (!args.hasFlag('s')) {
                     player.sendMessage(ChatColor.YELLOW + "Slain by "
-                            + PlayerUtil.toColoredName(sender, ChatColor.YELLOW) + ".");
+                            + ChatUtil.toColoredName(sender, ChatColor.YELLOW) + ".");
 
                 }
             }
 
             // The player didn't receive any items, then we need to send the
             // user a message so s/he know that something is indeed working
-            if (!included && args.hasFlag('s')) {
+            if (!included) {
                 sender.sendMessage(ChatColor.YELLOW.toString() + "Players slain.");
             }
         }
@@ -228,7 +285,7 @@ public class PlayerComponent extends BukkitComponent {
 
                 sender.sendMessage(ChatColor.YELLOW.toString() + "Compass reset to spawn.");
             } else {
-                Player target = PlayerUtil.matchSinglePlayer(sender, args.getString(0));
+                Player target = InputUtil.PlayerParser.matchSinglePlayer(sender, args.getString(0));
                 player.setCompassTarget(target.getLocation());
 
                 sender.sendMessage(ChatColor.YELLOW.toString() + "Compass repointed.");

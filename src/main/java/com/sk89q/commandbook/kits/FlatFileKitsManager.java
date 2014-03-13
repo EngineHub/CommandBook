@@ -18,7 +18,7 @@
 
 package com.sk89q.commandbook.kits;
 
-import com.sk89q.commandbook.CommandBook;
+import com.sk89q.commandbook.util.item.ItemUtil;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.*;
@@ -101,7 +101,7 @@ public class FlatFileKitsManager implements KitManager {
                 }
 
                 String[] parts = line.split(",");
-                ItemStack item = CommandBook.inst().getItem(parts[0].replace(" ", ""));
+                ItemStack item = ItemUtil.getItem(parts[0].replace(" ", ""));
 
                 if (item == null) {
                     logger().warning(" Unknown kit item '" + parts[0].replaceAll(" ", "") + "'");

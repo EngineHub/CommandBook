@@ -21,7 +21,7 @@ package com.sk89q.commandbook;
 import com.sk89q.commandbook.commands.PaginatedResult;
 import com.sk89q.commandbook.session.PersistentSession;
 import com.sk89q.commandbook.session.SessionComponent;
-import com.sk89q.commandbook.util.PlayerUtil;
+import com.sk89q.commandbook.util.InputUtil;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
@@ -43,7 +43,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.*;
 
-import static com.sk89q.commandbook.CommandBookUtil.getNestedMap;
+import static com.sk89q.commandbook.util.NestUtil.getNestedMap;
 
 /**
  * This component provides command warmups and cooldowns, measured in seconds, by using
@@ -290,7 +290,7 @@ public class CooldownsComponent extends BukkitComponent implements Listener, Run
             if (args.argsLength() == 0) {
                 target = sender;
             } else {
-                target = PlayerUtil.matchPlayerOrConsole(sender, args.getString(0));
+                target = InputUtil.PlayerParser.matchPlayerOrConsole(sender, args.getString(0));
             }
             getListOutput().display(sender, getActive(target), args.getFlagInteger('p', 1));
         }
@@ -351,7 +351,7 @@ public class CooldownsComponent extends BukkitComponent implements Listener, Run
             if (args.argsLength() == 0) {
                 target = sender;
             } else {
-                target = PlayerUtil.matchPlayerOrConsole(sender, args.getString(0));
+                target = InputUtil.PlayerParser.matchPlayerOrConsole(sender, args.getString(0));
             }
             getListOutput().display(sender, getActive(target), args.getFlagInteger('p', 1));
         }
@@ -419,7 +419,7 @@ public class CooldownsComponent extends BukkitComponent implements Listener, Run
             if (args.argsLength() == 0) {
                 target = sender;
             } else {
-                target = PlayerUtil.matchPlayerOrConsole(sender, args.getString(0));
+                target = InputUtil.PlayerParser.matchPlayerOrConsole(sender, args.getString(0));
             }
             getListOutput().display(sender, getActive(target), args.getFlagInteger('p', 1));
         }
