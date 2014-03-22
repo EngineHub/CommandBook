@@ -44,7 +44,7 @@ public class ProfilesComponent extends BukkitComponent {
             ProfileSettings settings = new ProfileSettings();
             settings.storeInventory = args.hasFlag('i');
             settings.storeVitals = args.hasFlag('v');
-            settings.storeExpirence = args.hasFlag('e');
+            settings.storeExperience = args.hasFlag('e');
 
             if (!manager.saveProfile(profileName, manager.createProfile(player, settings))) {
                 throw new CommandException("The profile: " + profileName + ", failed to save!");
@@ -80,7 +80,7 @@ public class ProfilesComponent extends BukkitComponent {
                 player.setSaturation(profile.getSaturation());
                 player.setExhaustion(profile.getExhaustion());
             }
-            if (args.hasFlag('e') && settings.storeExpirence) {
+            if (args.hasFlag('e') && settings.storeExperience) {
                 player.setLevel(profile.getLevel());
                 player.setExp(profile.getExperience());
             }
