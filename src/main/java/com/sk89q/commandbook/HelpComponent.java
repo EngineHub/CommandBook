@@ -137,8 +137,7 @@ public class HelpComponent extends BukkitComponent {
         if (commandMap == null) {
             return Collections.emptySet();
         }
-        Set<org.bukkit.command.Command> cmds =
-                new HashSet<org.bukkit.command.Command>(((SimpleCommandMap) commandMap).getFallbackCommands());
+        Set<org.bukkit.command.Command> cmds = new HashSet<org.bukkit.command.Command>();
         cmds.addAll(((SimpleCommandMap)commandMap).getCommands());
         return cmds;
     }

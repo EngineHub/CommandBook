@@ -21,6 +21,7 @@ package com.sk89q.commandbook.locations;
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
 import com.sk89q.commandbook.CommandBook;
+import com.sk89q.commandbook.util.entity.player.UUIDUtil;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -58,6 +59,7 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
     public void load() throws IOException {
         FileInputStream input = null;
         Map<String, NamedLocation> locs = new HashMap<String, NamedLocation>();
+        boolean needsSaved = false;
 
         if (file.getParentFile().mkdirs()) {
             if (!file.exists()) {
@@ -73,18 +75,20 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
             CSVReader csv = new CSVReader(reader);
             String[] line;
             while ((line = csv.readNext()) != null) {
-                if (line.length < 8) {
+                int lineLen = line.length;
+                if (lineLen < 8) {
                     logger().warning(type + " data file has an invalid line with < 8 fields");
                 } else {
                     try {
-                        String name = line[0].trim().replace(" ", "");
-                        String worldName = line[1]; // Set to null if the world exists
-                        String creator = line[2];
-                        double x = Double.parseDouble(line[3]);
-                        double y = Double.parseDouble(line[4]);
-                        double z = Double.parseDouble(line[5]);
-                        float pitch = Float.parseFloat(line[6]);
-                        float yaw = Float.parseFloat(line[7]);
+                        int i = 0;
+                        String name = line[i++].trim().replace(" ", "");
+                        String worldName = line[i++]; // Set to null if the world exists
+                        String creator = line[i++];
+                        double x = Double.parseDouble(line[i++]);
+                        double y = Double.parseDouble(line[i++]);
+                        double z = Double.parseDouble(line[i++]);
+                        float pitch = Float.parseFloat(line[i++]);
+                        float yaw = Float.parseFloat(line[i++]);
 
                         World world = CommandBook.server().getWorld(worldName);
 
@@ -99,14 +103,32 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
                         Location loc = new Location(world, x, y, z, yaw, pitch);
                         NamedLocation warp = new NamedLocation(name, loc);
                         warp.setWorldName(worldName);
-                        warp.setCreatorName(creator);
+
+                        try {
+                            warp.setCreatorID(UUID.fromString(creator));
+                        } catch (IllegalArgumentException ex) {
+                            logger().finest("Converting " + type + " " + name + "'s owner record to UUID...");
+                            UUID creatorID = UUIDUtil.convert(creator);
+                            if (creatorID != null) {
+                                warp.setCreatorID(creatorID);
+                                needsSaved = true;
+                                logger().finest("Success!");
+                            } else {
+                                warp.setCreatorName(creator);
+                                logger().warning(type + " " + name + "'s owner could not be converted!");
+                            }
+                        }
                         if (world == null) {
                             getNestedList(unloadedLocations, worldName).add(warp);
                         } else {
                             locs.put(name.toLowerCase(), warp);
                         }
-                    } catch (NumberFormatException e) {
-                        logger().warning(type + " data file has an invalid line with non-numeric numeric fields");
+                    } catch (IllegalArgumentException e) {
+                        if (e instanceof NumberFormatException) {
+                            logger().warning(type + " data file has an invalid line with an invalid UUID field");
+                        } else {
+                            logger().warning(type + " data file has an invalid line with non-numeric numeric fields");
+                        }
                     }
                 }
             }
@@ -127,6 +149,7 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
                 }
             }
         }
+        if (needsSaved) save();
     }
 
     public void save() throws IOException {
@@ -148,11 +171,12 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
 
                 for (NamedLocation warp : toStore) {
 
+                    UUID ID = warp.getCreatorID();
                     csv.writeNext(new String[] {
                             warp.getName(),
                             warp.getWorldName() != null ? warp.getWorldName()
                                     : warp.getLocation().getWorld().getName(),
-                            warp.getCreatorName(),
+                            String.valueOf(ID != null ? ID : warp.getCreatorName()),
                             String.valueOf(warp.getLocation().getX()),
                             String.valueOf(warp.getLocation().getY()),
                             String.valueOf(warp.getLocation().getZ()),
@@ -217,6 +241,7 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
         locations.put(id.toLowerCase(), warp);
         if (player != null) {
             warp.setCreatorName(player.getName());
+            warp.setCreatorID(player.getUniqueId());
         } else {
             warp.setCreatorName("");
         }

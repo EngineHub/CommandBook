@@ -30,6 +30,7 @@ import com.zachsthings.libcomponents.config.Setting;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.WorldLoadEvent;
@@ -85,7 +86,7 @@ public abstract class LocationsComponent extends BukkitComponent {
         if (loc == null) {
             throw new CommandException("No " + name.toLowerCase() + " found for " + name + " in world " + world.getName());
         }
-        if (!loc.getCreatorName().equals(sender.getName())) {
+        if (!(sender instanceof Player) || !((Player) sender).getUniqueId().equals(loc.getCreatorID())) {
             CommandBook.inst().checkPermission(sender, "commandbook." + this.name.toLowerCase() + ".remove.other");
         }
 

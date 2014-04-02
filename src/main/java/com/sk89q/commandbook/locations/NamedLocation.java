@@ -18,12 +18,16 @@
 
 package com.sk89q.commandbook.locations;
 
+import com.sk89q.commandbook.CommandBook;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+
+import java.util.UUID;
 
 public class NamedLocation {
 
     private String name;
+    private UUID creatorID;
     private String creatorName;
     private String worldName;
     private Location loc;
@@ -49,7 +53,18 @@ public class NamedLocation {
         this.worldName = worldName;
     }
 
+    public UUID getCreatorID() {
+        return creatorID;
+    }
+
+    public void setCreatorID(UUID creatorID) {
+        this.creatorID = creatorID;
+    }
+
     public String getCreatorName() {
+        if (creatorName == null || creatorName.isEmpty()) {
+            return CommandBook.server().getOfflinePlayer(creatorID).getName();
+        }
         return creatorName;
     }
 
@@ -69,5 +84,4 @@ public class NamedLocation {
         loc.getChunk().load(true);
         player.teleport(loc);
     }
-    
 }

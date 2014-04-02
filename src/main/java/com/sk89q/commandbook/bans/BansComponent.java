@@ -36,9 +36,9 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
 
-import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.UUID;
 
 @ComponentInformation(friendlyName = "Bans", desc = "A system for kicks and bans.")
 public class BansComponent extends BukkitComponent implements Listener {
@@ -52,13 +52,6 @@ public class BansComponent extends BukkitComponent implements Listener {
         // Setup the ban database
         bans = new CSVBanDatabase(CommandBook.inst().getDataFolder());
         bans.load();
-        if (FlatFileBanDatabase.toImport(CommandBook.inst().getDataFolder())) {
-            BanDatabase banDb = new FlatFileBanDatabase(CommandBook.inst().getDataFolder(), this);
-            banDb.load();
-            bans.importFrom(banDb);
-            final File oldBansFile = new File(CommandBook.inst().getDataFolder(), "banned_names.txt");
-            oldBansFile.renameTo(new File(oldBansFile.getAbsolutePath() + ".old"));
-        }
         CommandBook.registerEvents(this);
         registerCommands(Commands.class);
     }
@@ -100,13 +93,12 @@ public class BansComponent extends BukkitComponent implements Listener {
         final Player player = event.getPlayer();
 
         if (!CommandBook.inst().hasPermission(player, "commandbook.bans.exempt")) {
-            if (getBanDatabase().isBannedName(player.getName())) {
+            if (getBanDatabase().isBanned(player.getUniqueId())) {
                 event.disallow(PlayerLoginEvent.Result.KICK_BANNED,
-                        getBanDatabase().getBannedNameMessage(player.getName()));
-            } else if (getBanDatabase().isBannedAddress(
-                    event.getAddress())) {
-                event.disallow(PlayerLoginEvent.Result.KICK_BANNED, getBanDatabase().getBannedAddressMessage(
-                        event.getAddress().getHostAddress()));
+                        getBanDatabase().getBannedMessage(player.getUniqueId()));
+            } else if (getBanDatabase().isBanned(event.getAddress())) {
+                event.disallow(PlayerLoginEvent.Result.KICK_BANNED,
+                        getBanDatabase().getBannedMessage(event.getAddress().getHostAddress()));
             }
         }
     }
@@ -115,7 +107,7 @@ public class BansComponent extends BukkitComponent implements Listener {
     public void playerWhois(InfoComponent.PlayerWhoisEvent event) {
         if (CommandBook.inst().hasPermission(event.getSource(), "commandbook.bans.isbanned")) {
             event.addWhoisInformation(null, "Player " +
-                    (getBanDatabase().isBannedName(event.getPlayer().getName()) ? "is"
+                    (getBanDatabase().isBanned(event.getPlayer().getUniqueId()) ? "is"
                             : "is not") + " banned.");
         }
     }
@@ -157,7 +149,8 @@ public class BansComponent extends BukkitComponent implements Listener {
                 desc = "Ban a user or IP address (with the -i flag)", flags = "set:o", min = 1, max = -1)
         @CommandPermissions({"commandbook.bans.ban"})
         public void ban(CommandContext args, CommandSender sender) throws CommandException {
-            String banName;
+            UUID banID;
+            String playerName = args.getString(0);
             String banAddress = null;
             long endDate = args.hasFlag('t') ? InputUtil.TimeParser.matchFutureDate(args.getFlag('t')) : 0L;
             String message = args.argsLength() >= 2 ? args.getJoinedStrings(1)
@@ -165,50 +158,46 @@ public class BansComponent extends BukkitComponent implements Listener {
 
             final boolean hasExemptOverride = args.hasFlag('o')
                     && CommandBook.inst().hasPermission(sender, "commandbook.bans.exempt.override");
-            // Check if it's a player in the server right now
-            try {
-                Player player;
+            Player player;
 
-                // Exact mode matches names exactly
+            // Exact mode matches names exactly
+            try {
+
                 if (args.hasFlag('e')) {
-                    player = InputUtil.PlayerParser.matchPlayerExactly(sender, args.getString(0));
+                    player = InputUtil.PlayerParser.matchPlayerExactly(sender, playerName);
                 } else {
-                    player = InputUtil.PlayerParser.matchSinglePlayer(sender, args.getString(0));
+                    player = InputUtil.PlayerParser.matchSinglePlayer(sender, playerName);
                 }
+            } catch (CommandException ex) {
+                player = null;
+            }
+
+            // Grab their UUID
+            if (player == null) {
+                banID = CommandBook.server().getOfflinePlayer(playerName).getUniqueId();
+            } else {
+                banID = player.getUniqueId();
 
                 if (CommandBook.inst().hasPermission(player, "commandbook.bans.exempt") && !hasExemptOverride) {
                     throw new CommandException("This player is exempt from being banned! " +
                             "(use -o flag to override if you have commandbook.bans.exempt.override)");
                 }
 
-                // Need to kick + log
+                // Need to kick & log
                 player.kickPlayer(message);
                 getBanDatabase().logKick(player, sender, message);
-
-                banName = player.getName();
-
-                sender.sendMessage(ChatColor.YELLOW + player.getName()
-                        + " (" + player.getDisplayName() + ChatColor.YELLOW
-                        + ") banned and kicked.");
-            } catch (CommandException e) {
-                banName = args.getString(0)
-                        .replace("\r", "")
-                        .replace("\n", "")
-                        .replace("\0", "")
-                        .replace("\b", "");
-
-                sender.sendMessage(ChatColor.YELLOW + banName
-                        + " banned.");
             }
+
+            sender.sendMessage(ChatColor.YELLOW + playerName + " banned and kicked.");
 
             //Broadcast the Message
             if (config.broadcastBans && !args.hasFlag('s')) {
                 CommandBook.server().broadcastMessage(ChatColor.YELLOW
-                        + ChatUtil.toColoredName(sender, ChatColor.YELLOW) + " has banned " + banName
+                        + ChatUtil.toColoredName(sender, ChatColor.YELLOW) + " has banned " + playerName
                         + " - " + message);
             }
 
-            getBanDatabase().ban(banName, banAddress, sender, message, endDate);
+            getBanDatabase().ban(banID, playerName, banAddress, sender, message, endDate);
 
             if (!getBanDatabase().save()) {
                 sender.sendMessage(ChatColor.RED + "Bans database failed to save. See console.");
@@ -240,7 +229,7 @@ public class BansComponent extends BukkitComponent implements Listener {
                     }
                 }
 
-                getBanDatabase().ban(null, addr, sender, message, endDate);
+                getBanDatabase().ban(null, null, addr, sender, message, endDate);
 
                 sender.sendMessage(ChatColor.YELLOW + addr + " banned.");
 
@@ -261,7 +250,9 @@ public class BansComponent extends BukkitComponent implements Listener {
                     .replace("\0", "")
                     .replace("\b", "");
 
-            if (getBanDatabase().unban(banName, null, sender, message)) {
+            UUID ID = CommandBook.server().getOfflinePlayer(banName).getUniqueId();
+
+            if (getBanDatabase().unban(ID, null, sender, message) || getBanDatabase().unbanName(banName, sender, message)) {
                 sender.sendMessage(ChatColor.YELLOW + banName + " unbanned.");
 
                 if (!getBanDatabase().save()) {
@@ -307,7 +298,9 @@ public class BansComponent extends BukkitComponent implements Listener {
                     .replace("\0", "")
                     .replace("\b", "");
 
-            if (getBanDatabase().isBannedName(banName)) {
+            UUID ID = CommandBook.server().getOfflinePlayer(banName).getUniqueId();
+
+            if (getBanDatabase().isBanned(ID)) {
                 sender.sendMessage(ChatColor.YELLOW + banName + " is banned.");
             } else {
                 sender.sendMessage(ChatColor.YELLOW + banName + " NOT banned.");
@@ -326,7 +319,9 @@ public class BansComponent extends BukkitComponent implements Listener {
                     .replace("\0", "")
                     .replace("\b", "");
 
-            Ban ban = getBanDatabase().getBannedName(banName);
+            UUID ID = CommandBook.server().getOfflinePlayer(banName).getUniqueId();
+
+            Ban ban = getBanDatabase().getBanned(ID);
 
             if (ban == null) {
                 sender.sendMessage(ChatColor.YELLOW + banName + " is NOT banned.");
