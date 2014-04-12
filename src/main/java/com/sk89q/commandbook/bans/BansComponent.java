@@ -90,16 +90,14 @@ public class BansComponent extends BukkitComponent implements Listener {
      */
     @EventHandler(priority = EventPriority.NORMAL)
     public void playerLogin(PlayerLoginEvent event) {
-        final Player player = event.getPlayer();
+        Player player = event.getPlayer();
 
-        if (!CommandBook.inst().hasPermission(player, "commandbook.bans.exempt")) {
-            if (getBanDatabase().isBanned(player.getUniqueId())) {
-                event.disallow(PlayerLoginEvent.Result.KICK_BANNED,
-                        getBanDatabase().getBannedMessage(player.getUniqueId()));
-            } else if (getBanDatabase().isBanned(event.getAddress())) {
-                event.disallow(PlayerLoginEvent.Result.KICK_BANNED,
-                        getBanDatabase().getBannedMessage(event.getAddress().getHostAddress()));
-            }
+        if (getBanDatabase().isBanned(player.getUniqueId())) {
+            event.disallow(PlayerLoginEvent.Result.KICK_BANNED,
+                    getBanDatabase().getBannedMessage(player.getUniqueId()));
+        } else if (getBanDatabase().isBanned(event.getAddress())) {
+            event.disallow(PlayerLoginEvent.Result.KICK_BANNED,
+                    getBanDatabase().getBannedMessage(event.getAddress().getHostAddress()));
         }
     }
 
