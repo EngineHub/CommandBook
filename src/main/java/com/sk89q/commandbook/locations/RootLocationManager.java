@@ -18,6 +18,7 @@
 
 package com.sk89q.commandbook.locations;
 
+import com.sk89q.commandbook.CommandBook;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -42,6 +43,9 @@ public class RootLocationManager<T> {
 
         if (perWorld) {
             managers = new HashMap<String, LocationManager<T>>();
+            for (World world : CommandBook.server().getWorlds()) {
+                updateWorlds(world);
+            }
         } else {
             rootManager = factory.createManager();
 

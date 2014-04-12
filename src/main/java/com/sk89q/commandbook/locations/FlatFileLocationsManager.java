@@ -61,7 +61,7 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
         Map<String, NamedLocation> locs = new HashMap<String, NamedLocation>();
         boolean needsSaved = false;
 
-        if (file.getParentFile().mkdirs()) {
+        if (file.getParentFile().exists() || file.getParentFile().mkdirs()) {
             if (!file.exists()) {
                 file.createNewFile();
             }
