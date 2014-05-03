@@ -24,6 +24,7 @@ import com.sk89q.commandbook.util.InputUtil;
 import com.sk89q.commandbook.util.entity.player.PlayerUtil;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
+import com.zachsthings.libcomponents.TemplateComponent;
 import com.zachsthings.libcomponents.bukkit.BukkitComponent;
 import com.zachsthings.libcomponents.config.ConfigurationBase;
 import com.zachsthings.libcomponents.config.Setting;
@@ -39,6 +40,7 @@ import org.bukkit.event.world.WorldUnloadEvent;
 /**
  * Parent class for components that use a RootLocationManager<NamedLocation> and deal with locations
  */
+@TemplateComponent
 public abstract class LocationsComponent extends BukkitComponent {
 
     private final String name;
