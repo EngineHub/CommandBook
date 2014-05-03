@@ -29,6 +29,7 @@ import com.zachsthings.libcomponents.bukkit.BukkitComponent;
 import com.zachsthings.libcomponents.config.ConfigurationBase;
 import com.zachsthings.libcomponents.config.Setting;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -83,17 +84,50 @@ public abstract class LocationsComponent extends BukkitComponent {
 
     // -- Command helper methods
 
+    public void info(String name, World world, CommandSender sender) throws CommandException {
+
+        NamedLocation loc = getManager().get(world, name);
+        if (loc == null) {
+            throw new CommandException("No " + this.name.toLowerCase() + " by that name could be found in " + world.getName() + ".");
+        }
+
+        // Resolve the world name
+        String worldN = loc.getWorldName();
+        if (worldN == null) {
+            worldN = CommandBook.server().getWorlds().get(0).getName();
+        }
+
+        // Resolve the quards
+        Location l = loc.getLocation();
+        int x = l.getBlockX();
+        int y = l.getBlockY();
+        int z = l.getBlockZ();
+
+        // Print the header
+        sender.sendMessage(ChatColor.GOLD + this.name + " Information for: "
+                + ChatColor.BLUE + loc.getName().toUpperCase());
+        // Print the owner details
+        sender.sendMessage(ChatColor.YELLOW + "Owner:");
+        sender.sendMessage(ChatColor.YELLOW + " - " + ChatColor.WHITE + loc.getCreatorName());
+        // Print the Location details
+        sender.sendMessage(ChatColor.YELLOW + "Location: ");
+        sender.sendMessage(ChatColor.YELLOW + " - World: " + ChatColor.WHITE + worldN);
+        sender.sendMessage(ChatColor.YELLOW + " - X: " + ChatColor.WHITE + x
+                + ChatColor.YELLOW + ", Y: " + ChatColor.WHITE + y
+                + ChatColor.YELLOW + ", Z: " + ChatColor.WHITE + z);
+    }
+
     public void remove(String name, World world, CommandSender sender) throws CommandException {
         NamedLocation loc = getManager().get(world, name);
         if (loc == null) {
-            throw new CommandException("No " + name.toLowerCase() + " found for " + name + " in world " + world.getName());
+            throw new CommandException("No " + this.name.toLowerCase() + " by that name could be found in " + world.getName() + ".");
         }
         if (!(sender instanceof Player) || !((Player) sender).getUniqueId().equals(loc.getCreatorID())) {
             CommandBook.inst().checkPermission(sender, "commandbook." + this.name.toLowerCase() + ".remove.other");
         }
 
         getManager().remove(world, name);
-        sender.sendMessage(ChatColor.YELLOW + name + " for " + name + " removed.");
+        sender.sendMessage(ChatColor.YELLOW + this.name + ": " + name.toUpperCase() + " removed.");
     }
 
     public void list(CommandContext args, CommandSender sender) throws CommandException {

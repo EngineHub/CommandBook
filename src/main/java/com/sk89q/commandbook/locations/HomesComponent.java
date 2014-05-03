@@ -149,6 +149,21 @@ public class HomesComponent extends LocationsComponent {
     }
 
     public class ManagementCommands {
+        @Command(aliases = {"info", "inf"}, usage = "<name> [world]",
+                desc = "Get information about a home", min = 1, max = 2
+        )
+        @CommandPermissions({"commandbook.home.info"})
+        public void infoCmd(CommandContext args, CommandSender sender) throws CommandException {
+            World world;
+            String warpName = args.getString(0);
+            if (args.argsLength() == 2) {
+                world = InputUtil.LocationParser.matchWorld(sender, args.getString(1));
+            } else {
+                world = PlayerUtil.checkPlayer(sender).getWorld();
+            }
+            info(warpName, world, sender);
+        }
+
         @Command(aliases = {"del", "delete", "remove", "rem"},
                 usage = "[name] [world]", desc = "Remove a home", min = 0, max = 2 )
         @CommandPermissions({"commandbook.home.remove"})
@@ -175,13 +190,14 @@ public class HomesComponent extends LocationsComponent {
     @Override
     public PaginatedResult<NamedLocation> getListResult() {
         final String defaultWorld = CommandBook.server().getWorlds().get(0).getName();
-        return new PaginatedResult<NamedLocation>("Owner - World  - Location") {
+        return new PaginatedResult<NamedLocation>(ChatColor.GOLD + "Homes") {
             @Override
             public String format(NamedLocation entry) {
-                return entry.getCreatorName()
-                        + " - " + (entry.getWorldName() == null ? defaultWorld : entry.getWorldName())
-                        + " - " + entry.getLocation().getBlockX() + "," + entry.getLocation().getBlockY()
-                        + "," + entry.getLocation().getBlockZ();
+                return ChatColor.BLUE + entry.getName().toUpperCase() + ChatColor.YELLOW
+                        + " (Owner: " + ChatColor.WHITE + entry.getCreatorName()
+                        + ChatColor.YELLOW + ", World: "
+                        + ChatColor.WHITE + (entry.getWorldName() == null ? defaultWorld : entry.getWorldName())
+                        + ChatColor.YELLOW + ")";
             }
         };
     }
