@@ -20,9 +20,11 @@
 package com.sk89q.commandbook;
 
 import com.sk89q.bukkit.util.CommandsManagerRegistration;
+import com.sk89q.commandbook.api.ItemProvider;
 import com.sk89q.commandbook.commands.CommandBookCommands;
 import com.sk89q.commandbook.config.LegacyCommandBookConfigurationMigrator;
 import com.sk89q.commandbook.session.SessionComponent;
+import com.sk89q.commandbook.util.item.ItemUtil;
 import com.sk89q.minecraft.util.commands.*;
 import com.sk89q.util.yaml.YAMLFormat;
 import com.sk89q.util.yaml.YAMLProcessor;
@@ -42,6 +44,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+import org.bukkit.plugin.Plugin;
 import org.yaml.snakeyaml.error.YAMLException;
 
 import java.io.File;
@@ -287,4 +290,17 @@ public final class CommandBook extends BasePlugin {
     }
 
 
+    /**
+     * This is an API method another Plugin can use to add an ItemProvider to CommandBook.
+     *
+     * This will allow admins to add custom items from other plugins in a CommandBook kit.
+     *
+     * TODO: Is it necessary to track the owning Plugin instances, and perhaps handle plugin enable/disable?
+     *
+     * @param plugin The Plugin instance that owns the provider.
+     * @param provider The ItemProvider that handles creating items for this Plugin
+     */
+    public void addItemProvider(Plugin plugin, ItemProvider provider) {
+        ItemUtil.addItemProvider(provider);
+    }
 }
