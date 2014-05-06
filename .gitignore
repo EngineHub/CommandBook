@@ -2,5 +2,6 @@
 .project
 .settings
 target
-
+.idea
+commandbook.iml
 .DS_Store
