@@ -18,10 +18,13 @@
 
 package com.sk89q.commandbook.kits;
 
+import com.sk89q.commandbook.util.item.ItemUtil;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
+
+import static com.sk89q.commandbook.CommandBook.logger;
 
 /**
  * Specifies the kit.
@@ -30,8 +33,28 @@ import java.util.*;
  */
 public class Kit {
 
+    private class KitItem {
+        public final String id;
+        public final int amount;
+
+        public KitItem(String id, int amount) {
+            this.id = id;
+            this.amount = amount;
+        }
+
+        public ItemStack getItem() {
+            ItemStack template = ItemUtil.getItem(id);
+            if (template != null) {
+                template.setAmount(amount);
+            } else {
+                logger().warning("Invalid kit item: '" + id + "'");
+            }
+            return template;
+        }
+    }
+
     private volatile long coolDown;
-    private final LinkedList<ItemStack> items = new LinkedList<ItemStack>();
+    private final LinkedList<KitItem> items = new LinkedList<KitItem>();
     private final Map<String, Long> lastDistribution = new HashMap<String, Long>();
 
     /**
@@ -55,10 +78,11 @@ public class Kit {
     /**
      * Add an item to the kit.
      *
-     * @param item The item to add
+     * @param itemId The item id (key) of the item to add
+     * @param amount The amount of item to give
      */
-    public void addItem(ItemStack item) {
-        items.add(item);
+    public void addItem(String itemId, int amount) {
+        items.add(new KitItem(itemId, amount));
     }
 
     /**
@@ -82,8 +106,8 @@ public class Kit {
             lastDistribution.put(player.getName(), now);
         }
 
-        for (ItemStack item : items) {
-            player.getInventory().addItem(item.clone());
+        for (KitItem item : items) {
+            player.getInventory().addItem(item.getItem());
         }
 
         return true;
