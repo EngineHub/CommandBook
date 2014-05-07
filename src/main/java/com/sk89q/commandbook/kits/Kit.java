@@ -33,6 +33,11 @@ import static com.sk89q.commandbook.CommandBook.logger;
  */
 public class Kit {
 
+    /**
+     * A helper class to store an id/amount combination.
+     *
+     * This will be used to create an ItemStack on demand using ItemUtil.
+     */
     private class KitItem {
         public final String id;
         public final int amount;
