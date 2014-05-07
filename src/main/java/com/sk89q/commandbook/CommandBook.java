@@ -23,23 +23,25 @@ import com.sk89q.bukkit.util.CommandsManagerRegistration;
 import com.sk89q.commandbook.api.ItemProvider;
 import com.sk89q.commandbook.commands.CommandBookCommands;
 import com.sk89q.commandbook.config.LegacyCommandBookConfigurationMigrator;
+import com.sk89q.commandbook.locations.NamedLocation;
+import com.sk89q.commandbook.locations.RootLocationManager;
+import com.sk89q.commandbook.locations.WarpsComponent;
 import com.sk89q.commandbook.session.SessionComponent;
 import com.sk89q.commandbook.util.item.ItemUtil;
 import com.sk89q.minecraft.util.commands.*;
 import com.sk89q.util.yaml.YAMLFormat;
 import com.sk89q.util.yaml.YAMLProcessor;
+import com.zachsthings.libcomponents.ComponentManager;
 import com.zachsthings.libcomponents.InjectComponent;
 import com.zachsthings.libcomponents.InjectComponentAnnotationHandler;
-import com.zachsthings.libcomponents.bukkit.BasePlugin;
-import com.zachsthings.libcomponents.bukkit.DefaultsFileYAMLProcessor;
-import com.zachsthings.libcomponents.bukkit.YAMLNodeConfigurationNode;
-import com.zachsthings.libcomponents.bukkit.YAMLProcessorConfigurationFile;
+import com.zachsthings.libcomponents.bukkit.*;
 import com.zachsthings.libcomponents.config.ConfigurationFile;
 import com.zachsthings.libcomponents.loader.ClassLoaderComponentLoader;
 import com.zachsthings.libcomponents.loader.ConfigListedComponentLoader;
 import com.zachsthings.libcomponents.loader.JarFilesComponentLoader;
 import com.zachsthings.libcomponents.loader.StaticComponentLoader;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -61,7 +63,7 @@ import java.util.logging.Logger;
  *
  * @author sk89q
  */
-public final class CommandBook extends BasePlugin {
+public final class CommandBook extends BasePlugin implements com.sk89q.commandbook.api.CommandBook {
 
     private static CommandBook instance;
 
@@ -300,7 +302,27 @@ public final class CommandBook extends BasePlugin {
      * @param plugin The Plugin instance that owns the provider.
      * @param provider The ItemProvider that handles creating items for this Plugin
      */
+    @Override
     public void addItemProvider(Plugin plugin, ItemProvider provider) {
         ItemUtil.addItemProvider(provider);
+    }
+
+    /**
+     * Retrieve a warp location by name
+     *
+     * @param warpName The name of the warp to lookup
+     * @return The Location of the warp, or null if unknown
+     */
+    @Override
+    public Location getWarp(String warpName) {
+        ComponentManager<BukkitComponent> componentManager = getComponentManager();
+        if (componentManager == null) return null;
+        WarpsComponent warpsComponent = componentManager.getComponent(WarpsComponent.class);
+        if (warpsComponent == null) return null;
+        RootLocationManager<NamedLocation> locationManager = warpsComponent.getManager();
+        if (locationManager == null) return null;
+        NamedLocation location = locationManager.get(null, warpName);
+        if (location == null) return null;
+        return location.getLocation();
     }
 }
