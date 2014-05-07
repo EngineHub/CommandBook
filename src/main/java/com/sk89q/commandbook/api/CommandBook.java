@@ -11,7 +11,7 @@ import org.bukkit.plugin.Plugin;
  */
 public interface CommandBook {
     /**
-     * This allows another Plugin can use to add an ItemProvider to CommandBook.
+     * This can be used by another Plugin to add an ItemProvider to CommandBook.
      *
      * This will allow admins to add custom items from other plugins in a CommandBook kit.
      *
