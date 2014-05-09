@@ -110,6 +110,7 @@ public class CSVBanDatabase implements BanDatabase {
                     long endDate = Long.parseLong(line[i++]);
                     if ("".equals(name) || "null".equals(name)) name = null;
                     if ("".equals(address) || "null".equals(address)) address = null;
+                    if ("".equals(reason) || "null".equals(reason)) reason = null;
                     Ban ban = new Ban(ID, name, address, reason, startDate, endDate);
                     if (ID != null) {
                         UUIDBan.put(ID, ban);

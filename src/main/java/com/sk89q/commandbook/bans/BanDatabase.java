@@ -73,6 +73,7 @@ public interface BanDatabase extends Iterable<Ban> {
      * @param ID The ID to check
      * @return The banned message for the given ID
      */
+    @Deprecated
     public String getBannedMessage(UUID ID);
 
     /**
@@ -81,6 +82,7 @@ public interface BanDatabase extends Iterable<Ban> {
      * @param address The address to check
      * @return The banned message for the given address
      */
+    @Deprecated
     public String getBannedMessage(String address);
 
     /**

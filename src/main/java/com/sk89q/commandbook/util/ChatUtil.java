@@ -11,6 +11,8 @@ import org.bukkit.entity.Player;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Calendar;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -197,5 +199,23 @@ public class ChatUtil {
         return String.format("%02d:%02d (%d:%02d %s)",
                 hours, minutes, (hours % 12) == 0 ? 12 : hours % 12, minutes,
                 hours < 12 ? "am" : "pm");
+    }
+
+    public static String getFriendlyTime(long time) {
+        StringBuilder builder = new StringBuilder();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(time);
+
+        builder.append(calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.US));
+        builder.append(" ");
+        builder.append(calendar.get(Calendar.DAY_OF_MONTH));
+        builder.append(" ");
+        builder.append(calendar.get(Calendar.YEAR));
+        builder.append(" at ");
+        builder.append(calendar.get(Calendar.HOUR));
+        builder.append(":");
+        builder.append(String.format("%02d", calendar.get(Calendar.MINUTE)));
+        builder.append(calendar.get(Calendar.AM_PM) == 0 ? "AM" : "PM");
+        return builder.toString();
     }
 }

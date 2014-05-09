@@ -36,8 +36,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.net.InetAddress;
 import java.util.UUID;
 
 @ComponentInformation(friendlyName = "Bans", desc = "A system for kicks and bans.")
@@ -92,12 +91,21 @@ public class BansComponent extends BukkitComponent implements Listener {
     public void playerLogin(PlayerLoginEvent event) {
         Player player = event.getPlayer();
 
+        Ban ban = null;
+
         if (getBanDatabase().isBanned(player.getUniqueId())) {
-            event.disallow(PlayerLoginEvent.Result.KICK_BANNED,
-                    getBanDatabase().getBannedMessage(player.getUniqueId()));
+            ban = getBanDatabase().getBanned(player.getUniqueId());
         } else if (getBanDatabase().isBanned(event.getAddress())) {
-            event.disallow(PlayerLoginEvent.Result.KICK_BANNED,
-                    getBanDatabase().getBannedMessage(event.getAddress().getHostAddress()));
+            ban = getBanDatabase().getBanned(event.getAddress().getHostAddress());
+        }
+
+        if (ban != null) {
+            String reason = ban.getReason();
+            boolean hasReason = reason != null;
+            String how = "You are " + (ban.getAddress() != null ? "IP " : "") + "banned" + (hasReason ? " for:" : ".");
+            String end = "Expires: " + (ban.getEnd() == 0L ? ChatColor.DARK_RED + "Never" : ChatUtil.getFriendlyTime(ban.getEnd()));
+
+            event.disallow(PlayerLoginEvent.Result.KICK_BANNED, how + (hasReason ? "\n" + reason : "") + "\n" + end);
         }
     }
 
@@ -144,15 +152,15 @@ public class BansComponent extends BukkitComponent implements Listener {
         }
 
         @Command(aliases = {"ban"}, usage = "[-t end ] <target> [reason...]",
-                desc = "Ban a user or IP address (with the -i flag)", flags = "set:o", min = 1, max = -1)
+                desc = "Ban a user (and their address with the -i flag)", flags = "iset:o", min = 1, max = -1)
         @CommandPermissions({"commandbook.bans.ban"})
         public void ban(CommandContext args, CommandSender sender) throws CommandException {
             UUID banID;
             String playerName = args.getString(0);
-            String banAddress = null;
+            InetAddress banAddress = null;
             long endDate = args.hasFlag('t') ? InputUtil.TimeParser.matchFutureDate(args.getFlag('t')) : 0L;
-            String message = args.argsLength() >= 2 ? args.getJoinedStrings(1)
-                    : "Banned!";
+            String message = args.argsLength() >= 2 ? args.getJoinedStrings(1) : null;
+            boolean kicked = false;
 
             final boolean hasExemptOverride = args.hasFlag('o')
                     && CommandBook.inst().hasPermission(sender, "commandbook.bans.exempt.override");
@@ -173,6 +181,10 @@ public class BansComponent extends BukkitComponent implements Listener {
             // Grab their UUID
             if (player == null) {
                 banID = CommandBook.server().getOfflinePlayer(playerName).getUniqueId();
+
+                if (args.hasFlag('i')) {
+                    throw new CommandException("This player must be online to ban their IP address as well.");
+                }
             } else {
                 banID = player.getUniqueId();
 
@@ -181,66 +193,77 @@ public class BansComponent extends BukkitComponent implements Listener {
                             "(use -o flag to override if you have commandbook.bans.exempt.override)");
                 }
 
+                kicked = true;
+
                 // Need to kick & log
-                player.kickPlayer(message);
-                getBanDatabase().logKick(player, sender, message);
+                if (args.hasFlag('i')) {
+                    CommandBook.inst().checkPermission(sender, "commandbook.bans.ban.ip");
+                    banAddress = player.getAddress().getAddress();
+                    for (Player aPlayer : CommandBook.server().getOnlinePlayers()) {
+                        if (aPlayer.getAddress().getAddress().equals(banAddress)) {
+                            player.kickPlayer(message == null ? "Banned!" : message);
+                            getBanDatabase().logKick(player, sender, message);
+                        }
+                    }
+                } else {
+                    player.kickPlayer(message == null ? "Banned!" : message);
+                    getBanDatabase().logKick(player, sender, message);
+                }
             }
 
-            sender.sendMessage(ChatColor.YELLOW + playerName + " banned and kicked.");
+            sender.sendMessage(ChatColor.YELLOW + playerName + " banned" + (kicked ? "" : " and kicked") + '.');
 
-            //Broadcast the Message
+            // Broadcast the Message
             if (config.broadcastBans && !args.hasFlag('s')) {
                 CommandBook.server().broadcastMessage(ChatColor.YELLOW
                         + ChatUtil.toColoredName(sender, ChatColor.YELLOW) + " has banned " + playerName
-                        + " - " + message);
+                        + (message == null ? "" : " - " + message));
             }
 
-            getBanDatabase().ban(banID, playerName, banAddress, sender, message, endDate);
+            getBanDatabase().ban(banID, playerName, banAddress != null ? banAddress.getHostAddress() : null, sender, message, endDate);
 
             if (!getBanDatabase().save()) {
                 sender.sendMessage(ChatColor.RED + "Bans database failed to save. See console.");
             }
         }
 
-            @Command(aliases = {"banip", "ipban"},
-                    usage = "<target> [reason...]", desc = "Ban an IP address", flags = "st:",
-                    min = 1, max = -1)
-            @CommandPermissions({"commandbook.bans.ban.ip"})
-            public void banIP(CommandContext args,
-                    CommandSender sender) throws CommandException {
+        @Command(aliases = {"banip", "ipban"},
+                usage = "<target> [reason...]", desc = "Ban an IP address", flags = "st:",
+                min = 1, max = -1)
+        @CommandPermissions({"commandbook.bans.ban.ip"})
+        public void banIP(CommandContext args, CommandSender sender) throws CommandException {
 
-                String message = args.argsLength() >= 2 ? args.getJoinedStrings(1)
-                        : "Banned!";
-                long endDate = args.hasFlag('t') ? InputUtil.TimeParser.matchFutureDate(args.getFlag('t')) : 0L;
+            String message = args.argsLength() >= 2 ? args.getJoinedStrings(1)
+                    : null;
+            long endDate = args.hasFlag('t') ? InputUtil.TimeParser.matchFutureDate(args.getFlag('t')) : 0L;
 
-                String addr = args.getString(0)
-                            .replace("\r", "")
-                            .replace("\n", "")
-                            .replace("\0", "")
-                            .replace("\b", "");
+            String addr = args.getString(0)
+                        .replace("\r", "")
+                        .replace("\n", "")
+                        .replace("\0", "")
+                        .replace("\b", "");
 
-                // Need to kick + log
-                for (Player player : CommandBook.server().getOnlinePlayers()) {
-                    if (player.getAddress().getAddress().getHostAddress().equals(addr)) {
-                        player.kickPlayer(message);
-                        getBanDatabase().logKick(player, sender, message);
-                    }
-                }
-
-                getBanDatabase().ban(null, null, addr, sender, message, endDate);
-
-                sender.sendMessage(ChatColor.YELLOW + addr + " banned.");
-
-                if (!getBanDatabase().save()) {
-                    sender.sendMessage(ChatColor.RED + "Bans database failed to save. See console.");
+            // Need to kick + log
+            for (Player player : CommandBook.server().getOnlinePlayers()) {
+                if (player.getAddress().getAddress().getHostAddress().equals(addr)) {
+                    player.kickPlayer(message == null ? "Banned!" : message);
+                    getBanDatabase().logKick(player, sender, message);
                 }
             }
+
+            getBanDatabase().ban(null, null, addr, sender, message, endDate);
+
+            sender.sendMessage(ChatColor.YELLOW + addr + " banned.");
+
+            if (!getBanDatabase().save()) {
+                sender.sendMessage(ChatColor.RED + "Bans database failed to save. See console.");
+            }
+        }
 
         @Command(aliases = {"unban"}, usage = "<target>", desc = "Unban a user", min = 1, max = -1)
         @CommandPermissions({"commandbook.bans.unban"})
         public void unban(CommandContext args, CommandSender sender) throws CommandException {
-            String message = args.argsLength() >= 2 ? args.getJoinedStrings(1)
-                    : "Unbanned!";
+            String message = args.argsLength() >= 2 ? args.getJoinedStrings(1) : "Unbanned!";
 
             String banName = args.getString(0)
                     .replace("\r", "")
@@ -287,29 +310,8 @@ public class BansComponent extends BukkitComponent implements Listener {
             }
         }
 
-        @Command(aliases = {"isbanned"}, usage = "<target>", desc = "Check if a user is banned", min = 1, max = 1)
-        @CommandPermissions({"commandbook.bans.isbanned"})
-        public void isBanned(CommandContext args,  CommandSender sender) throws CommandException {
-            String banName = args.getString(0)
-                    .replace("\r", "")
-                    .replace("\n", "")
-                    .replace("\0", "")
-                    .replace("\b", "");
-
-            UUID ID = CommandBook.server().getOfflinePlayer(banName).getUniqueId();
-
-            if (getBanDatabase().isBanned(ID)) {
-                sender.sendMessage(ChatColor.YELLOW + banName + " is banned.");
-            } else {
-                sender.sendMessage(ChatColor.YELLOW + banName + " NOT banned.");
-            }
-        }
-
-        private final SimpleDateFormat dateFormat =
-                new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-
-        @Command(aliases = {"baninfo"}, usage = "<target>", desc = "Check if a user is banned", min = 1, max = 1)
-        @CommandPermissions({"commandbook.bans.baninfo"})
+        @Command(aliases = {"baninfo", "isbanned"}, usage = "<target>", desc = "Check if a user is banned", min = 1, max = 1)
+        @CommandPermissions({"commandbook.bans.isbanned", "commandbook.bans.baninfo"})
         public void banInfo(CommandContext args,  CommandSender sender) throws CommandException {
             String banName = args.getString(0)
                     .replace("\r", "")
@@ -322,12 +324,16 @@ public class BansComponent extends BukkitComponent implements Listener {
             Ban ban = getBanDatabase().getBanned(ID);
 
             if (ban == null) {
-                sender.sendMessage(ChatColor.YELLOW + banName + " is NOT banned.");
+                sender.sendMessage(ChatColor.YELLOW + banName + " is " + ChatColor.RED + "not " + ChatColor.YELLOW + "banned.");
             } else {
-                sender.sendMessage(ChatColor.YELLOW + "Ban for " + banName + ":"  + ban.getAddress()
-                        + " for reason: '" + ban.getReason() + "' until " +
-                        (ban.getEnd() == 0L ? " forever" : dateFormat.format(new Date(ban.getEnd()))));
-
+                String add = ban.getAddress() == null ? "" : " (Address: " + ban.getAddress() + ")";
+                sender.sendMessage(ChatColor.YELLOW + banName + add + ChatColor.RED + " is" + ChatColor.YELLOW + " banned.");
+                if (!CommandBook.inst().hasPermission(sender, "commandbook.bans.baninfo")) return;
+                sender.sendMessage(ChatColor.YELLOW + "Duration: " + (ban.getEnd() == 0L ? "Indefinite"
+                                              : "Until " + ChatUtil.getFriendlyTime(ban.getEnd())));
+                if (ban.getReason() != null) {
+                    sender.sendMessage(ChatColor.YELLOW + "Reason: " + ban.getReason());
+                }
             }
         }
 
