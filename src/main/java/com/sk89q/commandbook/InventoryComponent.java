@@ -20,6 +20,7 @@ package com.sk89q.commandbook;
 
 import com.google.common.collect.Lists;
 import com.sk89q.commandbook.commands.PaginatedResult;
+import com.sk89q.commandbook.item.ItemComponent;
 import com.sk89q.commandbook.util.ChatUtil;
 import com.sk89q.commandbook.util.InputUtil;
 import com.sk89q.commandbook.util.entity.player.PlayerUtil;
@@ -30,6 +31,8 @@ import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.worldedit.blocks.ItemType;
 import com.zachsthings.libcomponents.ComponentInformation;
+import com.zachsthings.libcomponents.Depend;
+import com.zachsthings.libcomponents.InjectComponent;
 import com.zachsthings.libcomponents.bukkit.BukkitComponent;
 import com.zachsthings.libcomponents.config.ConfigurationBase;
 import com.zachsthings.libcomponents.config.Setting;
@@ -50,8 +53,11 @@ import static com.sk89q.commandbook.util.item.InventoryUtil.takeItem;
 
 @ComponentInformation(friendlyName = "Inventory",
         desc = "Inventory-related commands, such as /give and /clear, are handled in this component.")
+@Depend(components = {ItemComponent.class})
 public class InventoryComponent extends BukkitComponent {
     protected LocalConfiguration config;
+
+    @InjectComponent ItemComponent items;
 
     @Override
     public void enable() {
@@ -117,7 +123,7 @@ public class InventoryComponent extends BukkitComponent {
     }
 
     private ItemStack matchItem(String name) throws CommandException {
-        return ItemUtil.getCommandItem(name);
+        return items.request(items.parse(name));
     }
 
     public class Commands {

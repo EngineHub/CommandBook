@@ -177,7 +177,8 @@ public class FunComponent extends BukkitComponent {
                         }
                         break;
                     case ENDERMAN:
-                        ItemStack item = ItemUtil.getItem(specialType);
+                        // TODO Port to using the Item Component
+                        ItemStack item = null; /* ItemComponent.request(specialType); */
                         if (item == null) return creature;
                         ((Enderman) creature).setCarriedMaterial(item.getData());
                         break outerloop; // only one set of hands

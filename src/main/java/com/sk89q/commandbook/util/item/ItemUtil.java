@@ -19,6 +19,7 @@
 package com.sk89q.commandbook.util.item;
 
 import com.sk89q.commandbook.CommandBook;
+import com.sk89q.commandbook.item.ItemIdentifier;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.blocks.*;
 import org.bukkit.DyeColor;
@@ -31,6 +32,18 @@ import java.util.Random;
  * Various item helper methods that do not depend on user-configurable information.
  */
 public class ItemUtil {
+
+    /**
+     * Obtains an {@link com.sk89q.commandbook.item.ItemIdentifier} based on the provided
+     * detail
+     *
+     * @param name The name of the item
+     * @param detail The construction details
+     * @return The relevant {@link com.sk89q.commandbook.item.ItemIdentifier}
+     */
+    public static ItemIdentifier identify(String name, String detail) {
+        return new ItemIdentifier(name, detail);
+    }
 
     /**
      * Gets the name of an item.

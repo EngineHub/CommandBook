@@ -18,6 +18,7 @@
 
 package com.sk89q.commandbook.kits;
 
+import com.sk89q.commandbook.item.ItemComponent;
 import com.sk89q.commandbook.util.item.ItemUtil;
 import org.bukkit.inventory.ItemStack;
 
@@ -40,6 +41,7 @@ public class FlatFileKitsManager implements KitManager {
             Pattern.compile("^\\[([^\\]=]+)(?:= *([0-9]+) *)?\\]$");
 
     private final File file;
+    private final ItemComponent items;
     private Map<String, Kit> kits = new HashMap<String, Kit>();
 
     /**
@@ -47,8 +49,9 @@ public class FlatFileKitsManager implements KitManager {
      *
      * @param file The file to read kits from
      */
-    public FlatFileKitsManager(File file) {
+    public FlatFileKitsManager(File file, ItemComponent items) {
         this.file = file;
+        this.items = items;
     }
 
     public synchronized void load() {
@@ -101,7 +104,9 @@ public class FlatFileKitsManager implements KitManager {
                 }
 
                 String[] parts = line.split(",");
-                ItemStack item = ItemUtil.getItem(parts[0].replace(" ", ""));
+
+                // TODO provide data parsing access for kits flat file storage
+                ItemStack item = items.request(ItemUtil.identify(parts[0], ""));
 
                 if (item == null) {
                     logger().warning(" Unknown kit item '" + parts[0].replaceAll(" ", "") + "'");
