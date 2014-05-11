@@ -35,6 +35,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -375,7 +376,7 @@ public class SessionComponent extends BukkitComponent implements Runnable, Liste
     }
 
     // -- Events
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onLogin(PlayerLoginEvent event) {
         Player player = event.getPlayer();
         String type = getType(player.getClass());
@@ -391,7 +392,7 @@ public class SessionComponent extends BukkitComponent implements Runnable, Liste
      *
      * @param event Relevant event details
      */
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         String type = getType(player.getClass());
