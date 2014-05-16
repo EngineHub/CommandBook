@@ -129,8 +129,8 @@ public class SpawnLocationsComponent extends BukkitComponent implements Listener
             (new PlayerIteratorAction(sender) {
 
                 @Override
-                public void perform(Player player) {
-                    PlayerUtil.teleportTo(sender, player, getSpawnManager().getWorldSpawn(player.getWorld()), true);
+                public boolean perform(Player player) {
+                    return PlayerUtil.teleportTo(sender, player, getSpawnManager().getWorldSpawn(player.getWorld()), true);
                 }
 
                 @Override

@@ -48,7 +48,7 @@ public class TeleportPlayerIterator extends PlayerIteratorAction {
     }
 
     @Override
-    public void perform(Player player) {
+    public boolean perform(Player player) {
         oldLoc = player.getLocation();
         Location newLoc = loc;
         // for each coord, if it is relative, add the given location's coord
@@ -62,12 +62,12 @@ public class TeleportPlayerIterator extends PlayerIteratorAction {
             newLoc.setYaw(oldLoc.getYaw());
         }
 
-        teleport(player, newLoc);
+        return teleport(player, newLoc);
     }
 
-    public void teleport(Player player, Location newLoc) {
+    public boolean teleport(Player player, Location newLoc) {
 
-        PlayerUtil.teleportTo(sender, player, newLoc, true);
+        return PlayerUtil.teleportTo(sender, player, newLoc, true);
     }
 
     @Override

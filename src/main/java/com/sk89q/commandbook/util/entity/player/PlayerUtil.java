@@ -18,16 +18,12 @@
 
 package com.sk89q.commandbook.util.entity.player;
 
-import com.google.common.collect.Lists;
 import com.sk89q.commandbook.CommandBook;
-import com.sk89q.commandbook.util.InputUtil;
-import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.*;
-
-import java.util.List;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 
 public class PlayerUtil {
 
@@ -54,16 +50,16 @@ public class PlayerUtil {
      * @param target
      * @param allowVehicles
      */
-    public static void teleportTo(CommandSender sender, Player player, Location target, boolean allowVehicles) {
+    public static boolean teleportTo(CommandSender sender, Player player, Location target, boolean allowVehicles) {
         target.getChunk().load(true);
         if (player.getVehicle() != null) {
             Entity vehicle = player.getVehicle();
             vehicle.eject();
 
-            player.teleport(target);
+            boolean success = player.teleport(target);
 
             if (!allowVehicles) {
-                return;
+                return success;
             }
 
             // Check vehicle permissions
@@ -72,12 +68,13 @@ public class PlayerUtil {
             if (CommandBook.inst().hasPermission(player, permString)) {
                 if (player.getWorld().equals(target.getWorld())
                         || CommandBook.inst().hasPermission(player, target.getWorld(), permString)) {
-                    vehicle.teleport(player);
+                    success = success && vehicle.teleport(player);
                     vehicle.setPassenger(player);
                 }
             }
+            return success;
         } else {
-            player.teleport(target);
+            return player.teleport(target);
         }
     }
 }

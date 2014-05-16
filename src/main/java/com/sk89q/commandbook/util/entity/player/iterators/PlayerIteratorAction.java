@@ -49,7 +49,7 @@ public abstract class PlayerIteratorAction {
      */
     public void iterate(Iterable<Player> targets) {
         for (Player player : targets) {
-            perform(player);
+            if (!perform(player)) continue;
             
             // Tell the user
             if (player.equals(sender)) {
@@ -88,7 +88,7 @@ public abstract class PlayerIteratorAction {
      * 
      * @param player
      */
-    public abstract void perform(Player player);
+    public abstract boolean perform(Player player);
     
     /**
      * Called when the caller is affected by the action.
