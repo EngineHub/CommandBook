@@ -73,7 +73,7 @@ public class MessagingComponent extends BukkitComponent implements Listener {
 
     private static class LocalConfiguration extends ConfigurationBase {
         @Setting("console-say-format") public String consoleSayFormat = "<`r*Console`w> %s";
-        @Setting("broadcast-format") public String broadcastFormat = "`r[Ogloszenie] %s";
+        public String broadcastFormat = "`r[Ogloszenie] %s";
         @Setting("pm-color") private String pmColorString = "GRAY";
         @Setting("pm-text-color") private String pmTextColorString = "RESET";
         public ChatColor pmColor = ChatColor.GRAY; // Color for PM label
@@ -257,7 +257,7 @@ public class MessagingComponent extends BukkitComponent implements Listener {
             } else {
                 throw new CommandException("Player " + ChatUtil.toName(player) + " is already muted!");
             }
-    }
+        }
 
         @Command(aliases = {"unmute"}, usage = "<target>", desc = "Unmute a player", min = 1, max = 1)
         @CommandPermissions({"commandbook.mute"})
