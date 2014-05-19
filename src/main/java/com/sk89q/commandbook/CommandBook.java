@@ -179,7 +179,7 @@ public final class CommandBook extends BasePlugin {
         try {
             commands.execute(cmd.getName(), args, sender, sender);
         } catch (CommandPermissionsException e) {
-            sender.sendMessage(ChatColor.RED + "You don't have permission.");
+            sender.sendMessage(ChatColor.RED + "Nie posiadasz uprawnien do tej komendy.");
         } catch (MissingNestedCommandException e) {
             sender.sendMessage(ChatColor.RED + e.getUsage());
         } catch (CommandUsageException e) {
@@ -187,9 +187,9 @@ public final class CommandBook extends BasePlugin {
             sender.sendMessage(ChatColor.RED + e.getUsage());
         } catch (WrappedCommandException e) {
             if (e.getCause() instanceof NumberFormatException) {
-                sender.sendMessage(ChatColor.RED + "Number expected, string received instead.");
+                sender.sendMessage(ChatColor.RED + "Musisz podac liczbe!");
             } else {
-                sender.sendMessage(ChatColor.RED + "An error has occurred. See console.");
+                sender.sendMessage(ChatColor.RED + "OPS, WYKRYTO BLAD! ZGLOS TO NIEZWLOCZNIE DO ADMINISTRACJI!");
                 e.printStackTrace();
             }
         } catch (CommandException e) {
