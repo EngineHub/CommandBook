@@ -41,7 +41,6 @@ public class FlatFileKitsManager implements KitManager {
             Pattern.compile("^\\[([^\\]=]+)(?:= *([0-9]+) *)?\\]$");
 
     private final File file;
-    private final ItemComponent items;
     private Map<String, Kit> kits = new HashMap<String, Kit>();
 
     /**
@@ -49,9 +48,8 @@ public class FlatFileKitsManager implements KitManager {
      *
      * @param file The file to read kits from
      */
-    public FlatFileKitsManager(File file, ItemComponent items) {
+    public FlatFileKitsManager(File file) {
         this.file = file;
-        this.items = items;
     }
 
     public synchronized void load() {
@@ -106,7 +104,7 @@ public class FlatFileKitsManager implements KitManager {
                 String[] parts = line.split(",");
 
                 // TODO provide data parsing access for kits flat file storage
-                ItemStack item = items.request(ItemUtil.identify(parts[0], ""));
+                ItemStack item = ItemComponent.request(ItemUtil.identify(parts[0], ""));
 
                 if (item == null) {
                     logger().warning(" Unknown kit item '" + parts[0].replaceAll(" ", "") + "'");

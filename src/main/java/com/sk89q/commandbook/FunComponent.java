@@ -19,6 +19,7 @@
 package com.sk89q.commandbook;
 
 import com.google.common.collect.Lists;
+import com.sk89q.commandbook.item.ItemComponent;
 import com.sk89q.commandbook.util.ChatUtil;
 import com.sk89q.commandbook.util.InputUtil;
 import com.sk89q.commandbook.util.entity.EntityUtil;
@@ -29,6 +30,7 @@ import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.zachsthings.libcomponents.ComponentInformation;
+import com.zachsthings.libcomponents.Depend;
 import com.zachsthings.libcomponents.bukkit.BasePlugin;
 import com.zachsthings.libcomponents.bukkit.BukkitComponent;
 import org.bukkit.ChatColor;
@@ -45,6 +47,7 @@ import java.util.Random;
 import static com.sk89q.commandbook.util.entity.EntityUtil.matchCreatureType;
 
 @ComponentInformation(friendlyName = "Fun", desc = "Provides some fun commands to toy with users. (/rocket and /pong are two fun ones)")
+@Depend(components = {ItemComponent.class})
 public class FunComponent extends BukkitComponent {
     private static final Random random = new Random();
 
@@ -177,8 +180,7 @@ public class FunComponent extends BukkitComponent {
                         }
                         break;
                     case ENDERMAN:
-                        // TODO Port to using the Item Component
-                        ItemStack item = null; /* ItemComponent.request(specialType); */
+                        ItemStack item = ItemComponent.request(ItemComponent.parse(specialType));
                         if (item == null) return creature;
                         ((Enderman) creature).setCarriedMaterial(item.getData());
                         break outerloop; // only one set of hands

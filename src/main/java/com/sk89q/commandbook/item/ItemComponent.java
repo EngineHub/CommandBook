@@ -14,11 +14,13 @@ import java.util.regex.Pattern;
 public class ItemComponent extends BukkitComponent {
 
     private static HashMap<Pattern, ItemProvider> items = new HashMap<Pattern, ItemProvider>();
-    private LocalConfiguration config;
+    private static DefaultProvider provider;
+    private static LocalConfiguration config;
 
     static {
-        addItem(new DefaultProvider());
+        addItem(provider = new DefaultProvider());
     }
+
     @Override
     public void enable() {
         config = configure(new LocalConfiguration());
@@ -42,7 +44,7 @@ public class ItemComponent extends BukkitComponent {
         }
     }
 
-    public ItemIdentifier parse(String input) {
+    public static ItemIdentifier parse(String input) {
         String[] split = input.split(config.dataSplit);
         String data = "";
         if (split.length > 1) {
@@ -59,7 +61,7 @@ public class ItemComponent extends BukkitComponent {
      * @return   The found {@link org.bukkit.inventory.ItemStack} if one exist,
      *           or null if one is not
      */
-    public ItemStack request(ItemIdentifier id) {
+    public static ItemStack request(ItemIdentifier id) {
         for (Map.Entry<Pattern, ItemProvider> entry : items.entrySet()) {
             if (entry.getKey().matcher(id.getName()).matches()) {
                 ItemStack result = entry.getValue().build(id);
@@ -79,7 +81,7 @@ public class ItemComponent extends BukkitComponent {
      * @param id The item identifier to process
      * @return   A {@link java.util.HashSet} of all found {@link org.bukkit.inventory.ItemStack}
      */
-    public Set<ItemStack> requestAll(ItemIdentifier id) {
+    public static Set<ItemStack> requestAll(ItemIdentifier id) {
         Set<ItemStack> created = new HashSet<ItemStack>();
         for (Map.Entry<Pattern, ItemProvider> entry : items.entrySet()) {
             if (entry.getKey().matcher(id.getName()).matches()) {

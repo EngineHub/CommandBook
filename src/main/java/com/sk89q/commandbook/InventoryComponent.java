@@ -32,7 +32,6 @@ import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.worldedit.blocks.ItemType;
 import com.zachsthings.libcomponents.ComponentInformation;
 import com.zachsthings.libcomponents.Depend;
-import com.zachsthings.libcomponents.InjectComponent;
 import com.zachsthings.libcomponents.bukkit.BukkitComponent;
 import com.zachsthings.libcomponents.config.ConfigurationBase;
 import com.zachsthings.libcomponents.config.Setting;
@@ -56,8 +55,6 @@ import static com.sk89q.commandbook.util.item.InventoryUtil.takeItem;
 @Depend(components = {ItemComponent.class})
 public class InventoryComponent extends BukkitComponent {
     protected LocalConfiguration config;
-
-    @InjectComponent ItemComponent items;
 
     @Override
     public void enable() {
@@ -123,7 +120,7 @@ public class InventoryComponent extends BukkitComponent {
     }
 
     private ItemStack matchItem(String name) throws CommandException {
-        return items.request(items.parse(name));
+        return ItemComponent.request(ItemComponent.parse(name));
     }
 
     public class Commands {

@@ -29,7 +29,6 @@ import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.zachsthings.libcomponents.ComponentInformation;
 import com.zachsthings.libcomponents.Depend;
-import com.zachsthings.libcomponents.InjectComponent;
 import com.zachsthings.libcomponents.bukkit.BukkitComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -47,14 +46,12 @@ import java.util.Map.Entry;
 public class KitsComponent extends BukkitComponent implements Listener {
     private KitManager kits;
 
-    @InjectComponent ItemComponent items;
-
     @Override
     public void enable() {
         CommandBook.inst().createDefaultConfiguration("kits.txt");
 
         // Setup kits
-        kits = new FlatFileKitsManager(new File(CommandBook.inst().getDataFolder(), "kits.txt"), items);
+        kits = new FlatFileKitsManager(new File(CommandBook.inst().getDataFolder(), "kits.txt"));
         kits.load();
 
         CommandBook.server().getScheduler().scheduleAsyncRepeatingTask(
