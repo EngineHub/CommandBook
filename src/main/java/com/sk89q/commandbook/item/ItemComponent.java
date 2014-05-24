@@ -1,7 +1,6 @@
 package com.sk89q.commandbook.item;
 
 import com.sk89q.commandbook.util.item.ItemUtil;
-import com.sk89q.worldedit.blocks.ItemType;
 import com.zachsthings.libcomponents.ComponentInformation;
 import com.zachsthings.libcomponents.bukkit.BukkitComponent;
 import com.zachsthings.libcomponents.config.ConfigurationBase;
@@ -17,6 +16,9 @@ public class ItemComponent extends BukkitComponent {
     private static HashMap<Pattern, ItemProvider> items = new HashMap<Pattern, ItemProvider>();
     private LocalConfiguration config;
 
+    static {
+        addItem(new DefaultProvider());
+    }
     @Override
     public void enable() {
         config = configure(new LocalConfiguration());
@@ -60,10 +62,11 @@ public class ItemComponent extends BukkitComponent {
     public ItemStack request(ItemIdentifier id) {
         for (Map.Entry<Pattern, ItemProvider> entry : items.entrySet()) {
             if (entry.getKey().matcher(id.getName()).matches()) {
-                return entry.getValue().build(id);
+                ItemStack result = entry.getValue().build(id);
+                if (result != null) return result;
             }
         }
-        return inbuilt(id);
+        return null;
     }
 
     /**
@@ -83,23 +86,7 @@ public class ItemComponent extends BukkitComponent {
                 created.add(entry.getValue().build(id));
             }
         }
-        created.add(inbuilt(id));
         created.removeAll(Collections.singleton(null));
         return created;
-    }
-
-    /**
-     * Fetches any inbuilt items that match the specified name
-     *
-     * @param id The item identifier to process
-     * @return
-     */
-    public ItemStack inbuilt(ItemIdentifier id) {
-        // TODO This needs to be WAYYYYYY more advanced
-        // possibly investigate CraftBook item processing
-        // and implement that here
-        ItemType type = ItemType.lookup(id.getName());
-        if (type == null) return null;
-        return new ItemStack(type.getID());
     }
 }
