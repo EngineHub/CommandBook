@@ -73,7 +73,7 @@ public class MessagingComponent extends BukkitComponent implements Listener {
 
     private static class LocalConfiguration extends ConfigurationBase {
         @Setting("console-say-format") public String consoleSayFormat = "<`r*Console`w> %s";
-        @Setting("broadcast-format") public String broadcastFormat = "`r[Broadcast] %s";
+        public String broadcastFormat = "`r[Ogloszenie] %s";
         @Setting("pm-color") private String pmColorString = "GRAY";
         @Setting("pm-text-color") private String pmTextColorString = "RESET";
         public ChatColor pmColor = ChatColor.GRAY; // Color for PM label
@@ -118,11 +118,11 @@ public class MessagingComponent extends BukkitComponent implements Listener {
                     + (status.trim().length() == 0 ? "" : " (" + status + ")"));
         }
 
-        receiver.sendMessage(config.pmColor + "(From "
+        receiver.sendMessage(config.pmColor + "(Od "
                 + ChatUtil.toColoredName(sender, config.pmColor) + "): "
                 + config.pmTextColor + message);
 
-        sender.sendMessage(config.pmColor + "(To "
+        sender.sendMessage(config.pmColor + "(Do "
                 + ChatUtil.toColoredName(receiver, config.pmColor) + "): "
                 + config.pmTextColor + message);
 
@@ -216,19 +216,19 @@ public class MessagingComponent extends BukkitComponent implements Listener {
             }
         }
 
-        @Command(aliases = {"msg", "message", "whisper", "pm", "tell", "w"}, usage = "<target> <message...>", desc = "Private message a user", min = 2, max = -1)
+        @Command(aliases = {"msg", "message", "whisper", "pm", "tell", "w"}, usage = "<target> <message...>", desc = "Wyslij prywatna wiadomosc do gracza", min = 2, max = -1)
         @CommandPermissions({"commandbook.msg"})
         public void msg(CommandContext args, CommandSender sender) throws CommandException {
             // This will throw errors as needed
             messagePlayer(sender, args.getString(0), args.getJoinedStrings(1));
         }
 
-        @Command(aliases = {"reply", "r"}, usage = "<message...>", desc = "Reply to last user", min = 1, max = -1)
+        @Command(aliases = {"reply", "r"}, usage = "<message...>", desc = "Odpowiedz ostatniemu graczowi", min = 1, max = -1)
         @CommandPermissions({"commandbook.msg"})
         public void reply(CommandContext args, CommandSender sender) throws CommandException {
             String lastRecipient = sessions.getSession(UserSession.class, sender).getLastRecipient();
             if (lastRecipient == null) {
-                throw new CommandException("You haven't messaged anyone.");
+                throw new CommandException("Nie masz komu odpowiedziec.");
             }
 
             messagePlayer(sender, lastRecipient, args.getJoinedStrings(0));
@@ -257,7 +257,7 @@ public class MessagingComponent extends BukkitComponent implements Listener {
             } else {
                 throw new CommandException("Player " + ChatUtil.toName(player) + " is already muted!");
             }
-    }
+        }
 
         @Command(aliases = {"unmute"}, usage = "<target>", desc = "Unmute a player", min = 1, max = 1)
         @CommandPermissions({"commandbook.mute"})
@@ -276,7 +276,7 @@ public class MessagingComponent extends BukkitComponent implements Listener {
             }
         }
 
-        @Command(aliases = {"broadcast"}, usage = "<message...>", desc = "Broadcast a message", min = 1, max = -1)
+        @Command(aliases = {"broadcast"}, usage = "<message...>", desc = "Oglos wiadomosc", min = 1, max = -1)
         @CommandPermissions({"commandbook.broadcast"})
         public void broadcast(CommandContext args, CommandSender sender) throws CommandException {
             BasePlugin.server().broadcastMessage(
