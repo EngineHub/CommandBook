@@ -38,7 +38,7 @@ public class AFKComponent extends BukkitComponent implements Runnable, Listener 
     private final Logger log = CommandBook.logger();
     private final Server server = CommandBook.server();
 
-    @InjectComponent private GodComponent godComponent;
+    @InjectComponent private GodComponent godComp;
     @InjectComponent private SessionComponent sessions;
 
     private LocalConfiguration config;
@@ -197,8 +197,8 @@ public class AFKComponent extends BukkitComponent implements Runnable, Listener 
         session.setIdleStatus(null);
 
         // Restore god mode setting
-        if (godComponent.hasGodMode(player) && session.isProtected()) {
-            godComponent.disableGodMode(player);
+        if (godComp != null && session.isProtected() && godComp.hasGodMode(player)) {
+            godComp.disableGodMode(player);
             session.setProtected(false);
         }
     }
@@ -249,9 +249,9 @@ public class AFKComponent extends BukkitComponent implements Runnable, Listener 
                 }
 
                 // Check and set god mode
-                if (canProtect(session.isRequested()) || (passedTime && canProtect(false))) {
-                    if (!godComponent.hasGodMode(target)) {
-                        godComponent.enableGodMode(target);
+                if (godComp != null && canProtect(session.isRequested()) || (passedTime && canProtect(false))) {
+                    if (!godComp.hasGodMode(target)) {
+                        godComp.enableGodMode(target);
                         session.setProtected(true);
                     }
                 }
