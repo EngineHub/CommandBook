@@ -42,6 +42,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
@@ -128,7 +129,7 @@ public class InventoryComponent extends BukkitComponent {
         public void item(CommandContext args, CommandSender sender) throws CommandException {
             ItemStack item = null;
             int amt = config.defaultItemStackSize;
-            Iterable<Player> targets = null;
+            Collection<Player> targets = null;
 
             // How this command handles parameters depends on how many there
             // are, so the following code splits the incoming input
@@ -171,7 +172,7 @@ public class InventoryComponent extends BukkitComponent {
         public void give(CommandContext args, CommandSender sender) throws CommandException {
             ItemStack item = null;
             int amt = config.defaultItemStackSize;
-            Iterable<Player> targets = null;
+            Collection<Player> targets = null;
 
             // How this command handles parameters depends on how many there
             // are, so the following code splits the incoming input

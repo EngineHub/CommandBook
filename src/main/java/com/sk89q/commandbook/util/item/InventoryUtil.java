@@ -9,6 +9,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Collection;
+
 public class InventoryUtil {
 
     /**
@@ -24,10 +26,10 @@ public class InventoryUtil {
      */
     @SuppressWarnings("deprecation")
     public static void giveItem(CommandSender sender, ItemStack item, int amt,
-                                Iterable<Player> targets, InventoryComponent component, boolean drop, boolean overrideStackSize)
+                                Collection<Player> targets, InventoryComponent component, boolean drop, boolean overrideStackSize)
             throws CommandException {
 
-        boolean included = false; // Is the command sender also receiving items?
+        boolean infinite = false; // Is the stack infinite?
 
         int maxStackSize = overrideStackSize ? 64 : item.getType().getMaxStackSize();
 
@@ -39,6 +41,7 @@ public class InventoryUtil {
         } else if (amt == -1) {
             // Check to see if the player can give infinite items
             CommandBook.inst().checkPermission(sender, "commandbook.give.infinite");
+            infinite = true;
         } else if (overrideStackSize) {
             CommandBook.inst().checkPermission(sender, "commandbook.override.maxstacksize");
         } else if (amt > maxStackSize * 5) {
@@ -51,17 +54,22 @@ public class InventoryUtil {
             CommandBook.inst().checkPermission(sender, "commandbook.give.stacks");
         }
 
-        if(amt > 2240 && !drop) amt = 2240;
+        int targetQuantity = targets.size();
+        // Send the message ahead of time so that we can follow up with any errors
+        if (targetQuantity > 1 || !targets.contains(sender)) {
+            sender.sendMessage(ChatColor.YELLOW.toString() + targetQuantity + " player(s)"
+                    + " have been given " + getAmountText(false, infinite, amt)
+                    + ' ' + ItemUtil.toItemName(item.getTypeId()) + '.');
+        }
 
-        // Get a nice amount name
-        String amtText = amt == -1 ? "an infinite stack of" : String.valueOf(amt);
 
         for (Player player : targets) {
             int left = amt;
 
             // Give individual stacks
-            while (left > 0 || amt == -1) {
+            while (left > 0 || infinite) {
                 int givenAmt = Math.min(maxStackSize, left);
+                item = item.clone(); // This prevents the possibility of a linked ItemStack issue
                 item.setAmount(givenAmt);
                 left -= givenAmt;
 
@@ -70,7 +78,19 @@ public class InventoryUtil {
                 if (drop) {
                     player.getWorld().dropItemNaturally(player.getLocation(), item);
                 } else {
-                    player.getInventory().addItem(item);
+                    Collection<ItemStack> result = player.getInventory().addItem(item).values();
+                    // Check for items that couldn't be added
+                    if (!result.isEmpty()) {
+                        for (ItemStack stack : result) {
+                            left += stack.getAmount();
+                            sender.sendMessage(ChatColor.RED + getAmountText(true, infinite, left)
+                                    + ' ' + ItemUtil.toItemName(stack.getTypeId())
+                                    + " could not be given to "
+                                    + player.getName() + " (their inventory is probably full)!");
+                        }
+                        // End the loop so we don't waste time, seeing as the item cannot be added
+                        break;
+                    }
                 }
 
                 if (amt == -1) {
@@ -81,28 +101,23 @@ public class InventoryUtil {
             // workaround for having inventory open while giving items (eg TMI mod)
             player.updateInventory();
 
+            String amtString = getAmountText(false, infinite, amt - left);
             // Tell the user about the given item
             if (player.equals(sender)) {
-                player.sendMessage(ChatColor.YELLOW + "You've been given " + amtText + " "
+                player.sendMessage(ChatColor.YELLOW + "You've been given " + amtString + " "
                         + ItemUtil.toItemName(item.getTypeId()) + ".");
-
-                // Keep track of this
-                included = true;
             } else {
                 player.sendMessage(ChatColor.YELLOW + "Given from "
                         + ChatUtil.toColoredName(sender, ChatColor.YELLOW) + ": "
-                        + amtText + " "
+                        + amtString + " "
                         + ItemUtil.toItemName(item.getTypeId()) + ".");
 
             }
         }
+    }
 
-        // The player didn't receive any items, then we need to send the
-        // user a message so s/he know that something is indeed working
-        if (!included) {
-            sender.sendMessage(ChatColor.YELLOW.toString() + amtText + " "
-                    + ItemUtil.toItemName(item.getTypeId()) + " has been given.");
-        }
+    private static String getAmountText(boolean sentenceStart, boolean infinite, int amount) {
+        return infinite ? (sentenceStart ? "An" : "an") + " infinite stack of" : String.valueOf(amount);
     }
 
     /**
