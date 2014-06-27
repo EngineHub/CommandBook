@@ -233,6 +233,7 @@ public class AFKComponent extends BukkitComponent implements Runnable, Listener 
 
                     // Grey out list name
                     String name = target.getName();
+                    session.setLastTabName(target.getPlayerListName());
                     target.setPlayerListName(ChatColor.GRAY + name.substring(0, Math.min(14, name.length())));
 
                     // Mark the player as AFK
@@ -258,7 +259,8 @@ public class AFKComponent extends BukkitComponent implements Runnable, Listener 
             } else if (session.isAFK()) {
 
                 // Fix list name
-                target.setPlayerListName(target.getName());
+                String lastName = session.getLastTabName();
+                target.setPlayerListName(lastName == null ? target.getName() : lastName);
 
                 // Restore sleep ignored setting
                 if (session.isSleepIgnored()) {
@@ -382,6 +384,7 @@ public class AFKComponent extends BukkitComponent implements Runnable, Listener 
     public static class AFKSession extends PersistentSession {
 
         @Setting("idle-status") private String idleStatus = "null";
+        private String lastTabName;
         private long lastUpdate = 0;
         private boolean protect = false;
         private boolean sleepIgnored = false;
@@ -402,6 +405,14 @@ public class AFKComponent extends BukkitComponent implements Runnable, Listener 
 
         public void setIdleStatus(String status) {
             this.idleStatus = status == null ? "null" : status;
+        }
+
+        public String getLastTabName() {
+            return lastTabName;
+        }
+
+        public void setLastTabName(String lastTabName) {
+            this.lastTabName = lastTabName;
         }
 
         public boolean isRequested() {
