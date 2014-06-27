@@ -314,11 +314,11 @@ public class TimeComponent extends BukkitComponent implements Listener {
             int time = InputUtil.TimeParser.matchMCWorldTime(timeStr);
 
             for (Player player : players) {
-                player.sendMessage(ChatColor.YELLOW + "Your time set to " + ChatUtil.getTimeString(player.getPlayerTime()));
                 if (player.equals(sender)) {
                     included = true;
                 }
                 player.setPlayerTime(args.hasFlag('w') ? Integer.parseInt(timeStr) : time, args.hasFlag('w'));
+                player.sendMessage(ChatColor.YELLOW + "Your time set to " + ChatUtil.getTimeString(player.getPlayerTime()));
             }
             if (!included) {
                 sender.sendMessage(ChatColor.YELLOW + "Player times set to " + ChatUtil.getTimeString(time));
