@@ -227,8 +227,8 @@ public class HomesComponent extends LocationsComponent {
             }
         }
 
-        @Command(aliases = {"list", "show"}, usage = "[-w world] [page]", desc = "List homes",
-                flags = "w:", min = 0, max = 1 )
+        @Command(aliases = {"list", "show"}, usage = "[-w world] [-p page]", desc = "List homes",
+                flags = "w:p:", min = 0, max = 0)
         @CommandPermissions({"commandbook.home.list"})
         public void listCmd(CommandContext args, CommandSender sender) throws CommandException {
             list(args, sender);
