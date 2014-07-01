@@ -85,12 +85,17 @@ public class WarpsComponent extends LocationsComponent {
             }
 
             if (warp != null) {
-                try {
-                    CommandBook.inst().checkPermission(sender, "commandbook.warp.teleport");
-                } catch (CommandPermissionsException e) {
-                    CommandBook.inst().checkPermission(sender, "commandbook.warp.warp." + warp.getName());
-                }
                 loc = warp.getLocation();
+                try {
+                    try {
+                        CommandBook.inst().checkPermission(sender, loc.getWorld(), "commandbook.warp.teleport");
+                    } catch (CommandPermissionsException e) {
+                        String postfix = warp.getCreatorID().equals(PlayerUtil.checkPlayer(sender).getUniqueId()) ? "self" : warp.getCreatorName();
+                        CommandBook.inst().checkPermission(sender, loc.getWorld(), "commandbook.warp.owner." + postfix);
+                    }
+                } catch (CommandException e) {
+                    CommandBook.inst().checkPermission(sender, loc.getWorld(), "commandbook.warp.warp." + warp.getName());
+                }
             } else {
                 throw new CommandException("A warp by the given name does not exist.");
             }
@@ -125,11 +130,7 @@ public class WarpsComponent extends LocationsComponent {
                 }
             }
 
-            try {
-                getManager().create(warpName, loc, player);
-            } catch (IllegalArgumentException ex) {
-                throw new CommandException("Invalid warp name!");
-            }
+            create(warpName, loc, player);
 
             sender.sendMessage(ChatColor.YELLOW + "Warp '" + warpName + "' created.");
         }
@@ -172,8 +173,8 @@ public class WarpsComponent extends LocationsComponent {
         }
 
 
-        @Command(aliases = {"list", "show"}, usage = "[ -p owner] [-w world] [page]",
-                desc = "List warps", flags = "p:w:", min = 0, max = 1 )
+        @Command(aliases = {"list", "show"}, usage = "[-o owner] [-w world] [-p page]",
+                desc = "List warps", flags = "o:w:p:", min = 0, max = 0)
         @CommandPermissions({"commandbook.warp.list"})
         public void listCmd(CommandContext args, CommandSender sender) throws CommandException {
             list(args, sender);

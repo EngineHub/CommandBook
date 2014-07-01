@@ -24,6 +24,7 @@ import org.bukkit.entity.Player;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 public interface LocationManager<T> {
 
@@ -85,4 +86,11 @@ public interface LocationManager<T> {
      * @return This location manager's locations.
      */
     public List<T> getLocations();
+
+    /**
+     * Gets all the locations that this location manager has.
+     *
+     * @return This location manager's locations.
+     */
+    public List<T> getLocations(UUID owner);
 }

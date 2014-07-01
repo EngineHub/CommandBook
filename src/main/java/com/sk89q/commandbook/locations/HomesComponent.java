@@ -133,11 +133,7 @@ public class HomesComponent extends LocationsComponent {
                 }
             }
 
-            try {
-                getManager().create(homeName, loc, player);
-            } catch (IllegalArgumentException ex) {
-                throw new CommandException("Invalid home name!");
-            }
+            create(homeName, loc, player);
 
             sender.sendMessage(ChatColor.YELLOW + "Home set.");
         }
@@ -179,8 +175,8 @@ public class HomesComponent extends LocationsComponent {
             remove(name, world, sender);
         }
 
-        @Command(aliases = {"list", "show"}, usage = "[-w world] [page]", desc = "List homes",
-                flags = "w:", min = 0, max = 1 )
+        @Command(aliases = {"list", "show"}, usage = "[-w world] [-p page]", desc = "List homes",
+                flags = "w:p:", min = 0, max = 0)
         @CommandPermissions({"commandbook.home.list"})
         public void listCmd(CommandContext args, CommandSender sender) throws CommandException {
             list(args, sender);

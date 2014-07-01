@@ -234,6 +234,16 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
         return new ArrayList<NamedLocation>(locations.values());
     }
 
+    public List<NamedLocation> getLocations(UUID owner) {
+        List<NamedLocation> returnedList = new ArrayList<NamedLocation>();
+        for (NamedLocation location : locations.values()) {
+            if (owner.equals(location.getCreatorID())) {
+                returnedList.add(location);
+            }
+        }
+        return returnedList;
+    }
+
     public NamedLocation create(String id, Location loc, Player player) {
         id = id.trim();
         Validate.isTrue(id.matches("^[a-zA-Z0-9-_]*$"), "Location ID contains invalid characters!");

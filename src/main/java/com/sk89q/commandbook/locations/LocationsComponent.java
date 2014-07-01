@@ -28,15 +28,15 @@ import com.zachsthings.libcomponents.TemplateComponent;
 import com.zachsthings.libcomponents.bukkit.BukkitComponent;
 import com.zachsthings.libcomponents.config.ConfigurationBase;
 import com.zachsthings.libcomponents.config.Setting;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
+
+import java.util.*;
 
 /**
  * Parent class for components that use a RootLocationManager<NamedLocation> and deal with locations
@@ -46,6 +46,7 @@ public abstract class LocationsComponent extends BukkitComponent {
 
     private final String name;
 
+    private LocalConfiguration config;
     private RootLocationManager<NamedLocation> manager;
 
     protected LocationsComponent(String name) {
@@ -54,15 +55,22 @@ public abstract class LocationsComponent extends BukkitComponent {
 
     @Override
     public void enable() {
-        LocalConfiguration config = configure(new LocalConfiguration());
+        config = configure(new LocalConfiguration());
         LocationManagerFactory<LocationManager<NamedLocation>> warpsFactory =
                 new FlatFileLocationsManager.LocationsFactory(CommandBook.inst().getDataFolder(), name + "s");
         manager = new RootLocationManager<NamedLocation>(warpsFactory, config.perWorld);
         CommandBook.registerEvents(new WorldListener());
     }
 
+    @Override
+    public void reload() {
+        super.reload();
+        configure(config);
+    }
+
     private static class LocalConfiguration extends ConfigurationBase {
         @Setting("per-world") public boolean perWorld;
+        @Setting("limits") public List<String> limits = new ArrayList<String>();
     }
 
 
@@ -117,6 +125,37 @@ public abstract class LocationsComponent extends BukkitComponent {
                 + ChatColor.YELLOW + ", Z: " + ChatColor.WHITE + z);
     }
 
+    public void create(String name, Location location, Player player) throws CommandException {
+        if (!config.limits.isEmpty()) {
+            CommandBook inst = CommandBook.inst();
+            if (!inst.hasPermission(player,
+                    location.getWorld(), "commandbook." + this.name.toLowerCase() + ".limits.unlimited")) {
+                int held = getManager().getLocations(location.getWorld(), player.getUniqueId()).size();
+                found: {
+                    for (String entry : config.limits) {
+                        String[] parts = entry.split(":");
+                        if (parts.length < 2) continue;
+                        try {
+                            int val = Integer.parseInt(parts[1]);
+                            if (val > held) {
+                                if (inst.hasPermission(player, location.getWorld(),
+                                        "commandbook." + this.name.toLowerCase() + ".limits." + parts[0])) {
+                                    break found;
+                                }
+                            }
+                        } catch (NumberFormatException ignored) { }
+                    }
+                    throw new CommandException("You don't have permission to create any more " + this.name.toLowerCase() + "s!");
+                }
+            }
+        }
+        try {
+            getManager().create(name, location, player);
+        } catch (IllegalArgumentException ex) {
+            throw new CommandException("Invalid " + this.name.toLowerCase() + " name!");
+        }
+    }
+
     public void remove(String name, World world, CommandSender sender) throws CommandException {
         NamedLocation loc = getManager().get(world, name);
         if (loc == null) {
@@ -140,7 +179,35 @@ public abstract class LocationsComponent extends BukkitComponent {
             }
             if (world == null) throw new CommandException("Error finding world to use!");
         }
-        getListResult().display(sender, getManager().getLocations(world), args.getInteger(0, 1));
+        UUID targetID = null;
+        if (args.hasFlag('o')) {
+            OfflinePlayer player = Bukkit.getOfflinePlayer(args.getFlag('o'));
+            if (player != null) {
+                targetID = player.getUniqueId();
+            }
+            if (targetID == null) throw new CommandException("No owner by that name found!");
+        }
+        List<NamedLocation> locations = getManager().getLocations(world);
+        Iterator<NamedLocation> it = locations.iterator();
+        UUID senderID = null;
+        boolean canSeeOther = CommandBook.inst().hasPermission(sender, world, "commandbook.warp.list.other");
+        try {
+            senderID = PlayerUtil.checkPlayer(sender).getUniqueId();
+        } catch (CommandException e) {
+            canSeeOther = true;
+        }
+        while (it.hasNext()) {
+            NamedLocation next = it.next();
+            if (targetID != null && !next.getCreatorID().equals(targetID)) {
+                it.remove();
+                continue;
+            }
+            if (!canSeeOther && !next.getCreatorID().equals(senderID)) {
+                it.remove();
+                continue;
+            }
+        }
+        getListResult().display(sender, locations, args.getFlagInteger('p', 1));
     }
 
     public abstract PaginatedResult<NamedLocation> getListResult();
