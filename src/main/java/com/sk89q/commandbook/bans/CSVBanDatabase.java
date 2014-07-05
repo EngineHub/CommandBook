@@ -263,9 +263,17 @@ public class CSVBanDatabase implements BanDatabase {
         Validate.isTrue(ID != null || address != null, "You must specify either an ID, or address");
         Ban ban = new Ban(ID, name, address, reason, System.currentTimeMillis(), end);
         if (ID != null) {
+            Ban oldBan = UUIDBan.remove(ID);
+            if (oldBan != null) {
+                bans.remove(oldBan);
+            }
             UUIDBan.put(ID, ban);
         }
         if (address != null) {
+            Ban oldBan = ipBan.remove(address);
+            if (oldBan != null) {
+                bans.remove(oldBan);
+            }
             ipBan.put(address, ban);
         }
         bans.add(ban);
