@@ -450,10 +450,12 @@ public class InventoryComponent extends BukkitComponent {
 
         @Command(aliases = {"enchantments", "listenchant", "lsenchant"}, desc = "List available enchantments", usage = "[-p page]", flags = "p:")
         public void enchantments(CommandContext args, CommandSender sender) throws CommandException {
-            new PaginatedResult<Enchantment>("Name - ID - Max Level") {
+            new PaginatedResult<Enchantment>(ChatColor.GOLD + "Enchantments") {
                 @Override
                 public String format(Enchantment entry) {
-                    return entry.getName() + " - " + entry.getId() + " - " + entry.getMaxLevel();
+                    return ChatColor.BLUE + entry.getName().toUpperCase() + ChatColor.YELLOW
+                            + " (ID: " + ChatColor.WHITE + entry.getId() + ChatColor.YELLOW
+                            + ", Max Level: " + ChatColor.WHITE + entry.getMaxLevel() + ChatColor.YELLOW + ')';
                 }
             }.display(sender, Arrays.asList(Enchantment.values()), args.getFlagInteger('p', 1));
         }
