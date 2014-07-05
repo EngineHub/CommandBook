@@ -1,4 +1,76 @@
-2.3
+2.4:
+- Added support for horses to /spawnmob
+- Updated /compass directions
+- Added zombie:villager to /spawnmob
+- /spawnmob modifiers can now be combined
+- Fixed an issue where the warp owner was not set when using the two argument
+  form of /setwarp
+- Players will now be centered on the targeted block when they teleport to a specific block
+- Added .other permissions to the flight commands
+- Updated the Jinglenote library
+- Added silencing flags to the time, thunder, and weather commands
+- Added support for spawning baby zombies with the -b flag in the /spawnmob command
+- Fixed an issue where Skeletons would not always be given bows when spawned with
+  the /spawnmob command
+- Fixed an issue where Pig Zombies would not always be given their golden swords
+- Added a /tpa alias for the /call command
+- Fixed permissions checks in the the /tp, /bring, and /put commands
+  - This also fixes various exceptions related to multi world teleporting
+- Fixed players teleporting to themselves when providing partial names
+- Fixed the heal command not setting the correct hunger values
+- Improved the reliability of the /ret command
+- Fixed an issue where homes and warp names could cause the CSV table to break
+- Added a new advanced AFK Component
+- Added support for teleporting vehicles/mobs with the player
+  (commandbook.teleport.vehicle.<pig/horse/etc>)
+- Added support for specifying more than one target using /spawnmob
+- Added the /extinguish command to put out ignited players
+- Fixed the silent flag (-s) in the heal and slay commands
+- Reduced the spam of Fun Component commands
+- Added a permission to recevie kits on first join (commandbook.kits.onfirstlogin.<kit name>)
+- Replaced the /summon and /s aliases for the bring command with /grab and /g
+- Large refactoring of internal utilities
+- Added support for "unsafe" enchantments to the give command
+- Added support for specifying color to stained glass and clay (/i stainedclay:black)
+- Removed the enchantment level caps from the give command
+- Added UUID support
+  - The initial conversion may take some time for larger tables
+  - New player sessions will now be stored in a CraftPlayer folder,
+    or the relevant implementing class for the player
+  - Any developer who hooks into our bans API must update their implementation
+- Fixed a warning caused by locations not being loaded properly at startup
+- Fixed an issue where players with commandbook.bans.exempt couldn't be banned by players
+  with commandbook.bans.exempt.override
+- All list now list up to 9 items
+- Sessions are now loaded earlier in the login process, and released later
+- Homes and warps lists are now much cleaner looking
+- Added a /homes info <home> and /warps info <home> to view more information
+  about the relevant home or warp
+- Fixed an issue where the /homes del <home> and /warps del <warp> were not properly formatted
+- Bans now better represent the ban reasons
+- Banned players are now informed of their expiration date of their ban,
+  and the reason they were banned when attempting to login to the server
+- /isbanned and /baninfo are now the same command with varying permissions to view different
+  infromation
+- Added support for banning a player by IP and name by using the -i flag in the ban command
+- Output messages for bans are now pay more attention to the actions that actually took place
+- UUIDs are now shown in the /whois command
+- Fixed an issue where CommandBook would assume that all players had been teleported without
+  actually verifying that was the case
+- Fixed an issue where the /playertime command was outputting the current time, rather than
+  the new time
+- Give will now tell the sender if all items were not given, and in what quantities they were
+  given
+- The readability of the /enchantments command has been improved
+- Fixed an issue where banning a player who has already been banned would result in the
+  original ban information being used instead of the updated information.
+
+Thank you to ewized for his contributions this release.
+
+Special notes: Developers should take note that there were several changes
+to CommandBook's internal structure which may affect other plugins using CommandBook methods.
+
+2.3:
 - Fixed missing support for enchantments in kits.
 - Added storm and sun commands as aliases.
 - Added node commandbook.locations.target for #target. (eg /tp #target, /put)
