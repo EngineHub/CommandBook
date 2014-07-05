@@ -211,7 +211,7 @@ public class BansComponent extends BukkitComponent implements Listener {
                 }
             }
 
-            sender.sendMessage(ChatColor.YELLOW + playerName + " banned" + (kicked ? "" : " and kicked") + '.');
+            sender.sendMessage(ChatColor.YELLOW + playerName + " banned" + (!kicked ? "" : " and kicked") + '.');
 
             // Broadcast the Message
             if (config.broadcastBans && !args.hasFlag('s')) {
