@@ -19,6 +19,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 
@@ -37,6 +38,7 @@ public class FlightComponent extends BukkitComponent implements Listener {
 
     private static class LocalConfiguration extends ConfigurationBase {
         @Setting("auto-enable") public boolean autoEnable = false;
+        @Setting("check-world-change") public boolean checkWorldChange = true;
     }
 
     public static class FlightSession extends PersistentSession {
@@ -206,6 +208,17 @@ public class FlightComponent extends BukkitComponent implements Listener {
         FlightSession session = sessions.getSession(FlightSession.class, player);
         if (event.getNewGameMode() != GameMode.CREATIVE) {
             player.setAllowFlight(session.canFly);
+        }
+    }
+
+    @EventHandler
+    public void onPlayerworldChange(PlayerChangedWorldEvent event) {
+        Player player = event.getPlayer();
+        FlightSession session = sessions.getSession(FlightSession.class, player);
+        if (config.checkWorldChange
+                    && player.getGameMode() != GameMode.CREATIVE
+                    && !CommandBook.inst().hasPermission(player, "commandbook.flight." + player.getWorld().getName())) {
+            player.setAllowFlight(session.canFly = false);
         }
     }
 }
