@@ -41,10 +41,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Set;
+import java.util.*;
 
 import static com.sk89q.commandbook.util.item.InventoryUtil.giveItem;
 import static com.sk89q.commandbook.util.item.InventoryUtil.takeItem;
@@ -446,6 +443,88 @@ public class InventoryComponent extends BukkitComponent {
             }
 
             player.sendMessage(ChatColor.YELLOW + "Items compacted into stacks!");
+        }
+
+        @Command(aliases = {"repair"},
+                usage = "[targets]", desc = "Repair items",
+                flags = "ahe", min = 0, max = 1)
+        @CommandPermissions({"commandbook.repair"})
+        public void repair(CommandContext args, CommandSender sender) throws CommandException {
+            Iterable<Player> targets;
+            boolean repairAll = args.hasFlag('a');
+            boolean repairHotbar = args.hasFlag('h');
+            boolean repairEquipment = args.hasFlag('e');
+            boolean included = false;
+
+            if (args.argsLength() == 0) {
+                targets = Lists.newArrayList(PlayerUtil.checkPlayer(sender));
+                // A different player
+            } else {
+                targets = InputUtil.PlayerParser.matchPlayers(sender, args.getString(0));
+            }
+
+            for (Player player : targets) {
+                if (sender != player) {
+                    // Make sure that this player can clear other players!
+                    CommandBook.inst().checkPermission(sender, "commandbook.repair.other");
+                    break;
+                }
+            }
+
+            for (Player player : targets) {
+                Inventory inventory = player.getInventory();
+
+                if (!repairAll && !repairHotbar && !repairEquipment) {
+                    ItemStack stack = player.getItemInHand();
+                    if (stack != null && !ItemType.usesDamageValue(stack.getTypeId())) {
+                        stack.setDurability((short) 0);
+                    }
+                } else {
+                    if (repairAll || repairHotbar) {
+                        for (int i = (repairAll ? 36 : 8); i >= 0; --i) {
+                            ItemStack stack = inventory.getItem(i);
+                            if (stack != null && !ItemType.usesDamageValue(stack.getTypeId())) {
+                                stack.setDurability((short) 0);
+                            }
+                        }
+                    }
+
+                    if (repairAll || repairEquipment) {
+                        // Armor slots
+                        for (int i = 36; i <= 39; i++) {
+                            ItemStack stack = inventory.getItem(i);
+                            if (stack != null && !ItemType.usesDamageValue(stack.getTypeId())) {
+                                stack.setDurability((short) 0);
+                            }
+                        }
+                    }
+                }
+
+                // Tell the user about the given item
+                if (player.equals(sender)) {
+                    if (repairAll || repairHotbar || repairEquipment) {
+                        player.sendMessage(ChatColor.YELLOW
+                                + "Your items have been repaired.");
+                    } else {
+                        player.sendMessage(ChatColor.YELLOW
+                                + "Your held item has been repaired. Use -a to repair all.");
+                    }
+
+                    // Keep track of this
+                    included = true;
+                } else {
+                    player.sendMessage(ChatColor.YELLOW
+                            + "One or more of your item(s) has been repaired by "
+                            + ChatUtil.toColoredName(sender, ChatColor.YELLOW));
+
+                }
+            }
+
+            // The player didn't receive any items, then we need to send the
+            // user a message so s/he know that something is indeed working
+            if (!included) {
+                sender.sendMessage(ChatColor.YELLOW + "Items repaired.");
+            }
         }
 
         @Command(aliases = {"enchantments", "listenchant", "lsenchant"}, desc = "List available enchantments", usage = "[-p page]", flags = "p:")
