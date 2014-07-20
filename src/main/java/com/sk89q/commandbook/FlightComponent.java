@@ -182,9 +182,21 @@ public class FlightComponent extends BukkitComponent implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
-        FlightSession session = sessions.getSession(FlightSession.class, event.getPlayer());
-        if (config.autoEnable && CommandBook.inst().hasPermission(event.getPlayer(), "commandbook.flight.onjoin")) {
-            event.getPlayer().setAllowFlight(session.canFly = true);
+        if (config.autoEnable) {
+            final Player player = event.getPlayer();
+            CommandBook.server().getScheduler().runTaskLater(CommandBook.inst(), new Runnable() {
+                @Override
+                public void run() {
+                    if (CommandBook.inst().hasPermission(player, "commandbook.flight.onjoin")) {
+                        FlightSession session = sessions.getSession(FlightSession.class, player);
+                        player.setAllowFlight(session.canFly = true);
+                        //noinspection deprecation
+                        if (!player.isOnGround()) {
+                            player.setFlying(true);
+                        }
+                    }
+                }
+            }, 1);
         }
     }
 
