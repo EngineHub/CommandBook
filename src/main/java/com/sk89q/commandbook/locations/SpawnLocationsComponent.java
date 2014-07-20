@@ -71,14 +71,21 @@ public class SpawnLocationsComponent extends BukkitComponent implements Listener
         return spawns;
     }
 
+    public Location getSpawnPoint(World world) {
+        Location target = spawns.getWorldSpawn(world);
+        if (config.centeredTeleport) target.add(.5, 0, .5);
+        return target;
+    }
+
     private static class LocalConfiguration extends ConfigurationBase {
         @Setting("exact-spawn") public boolean exactSpawn;
+        @Setting("centered-teleport") public boolean centeredTeleport;
     }
 
     @EventHandler
     public void onRespawn(PlayerRespawnEvent event) {
         if (config.exactSpawn && !event.isBedSpawn()) {
-            event.setRespawnLocation(spawns.getWorldSpawn(event.getPlayer().getWorld()));
+            event.setRespawnLocation(getSpawnPoint(event.getPlayer().getWorld()));
         }
     }
 
@@ -94,14 +101,14 @@ public class SpawnLocationsComponent extends BukkitComponent implements Listener
             return;
         }
         if (loc.equals(loc.getWorld().getSpawnLocation())) {
-            event.setTo(spawns.getWorldSpawn(loc.getWorld()));
+            event.setTo(getSpawnPoint(loc.getWorld()));
         }
     }
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         if (!event.getPlayer().hasPlayedBefore() && config.exactSpawn) {
-            event.getPlayer().teleport(spawns.getWorldSpawn(event.getPlayer().getWorld()));
+            event.getPlayer().teleport(getSpawnPoint(event.getPlayer().getWorld()));
         }
     }
 
@@ -130,7 +137,7 @@ public class SpawnLocationsComponent extends BukkitComponent implements Listener
 
                 @Override
                 public boolean perform(Player player) {
-                    return PlayerUtil.teleportTo(sender, player, getSpawnManager().getWorldSpawn(player.getWorld()), true);
+                    return PlayerUtil.teleportTo(sender, player, getSpawnPoint(player.getWorld()), true);
                 }
 
                 @Override
