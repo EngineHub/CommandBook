@@ -64,6 +64,7 @@ public class SpawnLocationsComponent extends BukkitComponent implements Listener
     @Override
     public void reload() {
         super.reload();
+        configure(config);
         spawns.load();
     }
 
