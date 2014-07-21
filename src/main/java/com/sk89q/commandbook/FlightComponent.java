@@ -60,7 +60,7 @@ public class FlightComponent extends BukkitComponent implements Listener {
 
             for (Player player : targets) {
                 FlightSession session = sessions.getSession(FlightSession.class, player);
-                session.canFly = !session.canFly;
+                session.canFly = session.canFly && !player.getAllowFlight() || !session.canFly;
                 player.setAllowFlight(session.canFly);
                 if (!included && player.equals(sender)) {
                     included = true;
