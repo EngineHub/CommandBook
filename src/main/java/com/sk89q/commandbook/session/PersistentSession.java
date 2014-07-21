@@ -18,7 +18,6 @@
 
 package com.sk89q.commandbook.session;
 
-import com.sk89q.commandbook.util.entity.player.UUIDUtil;
 import com.zachsthings.libcomponents.config.ConfigurationBase;
 import com.zachsthings.libcomponents.config.Setting;
 import org.bukkit.command.CommandSender;
@@ -32,8 +31,7 @@ public abstract class PersistentSession extends ConfigurationBase {
     private final long maxTime;
     @Setting("last-update") private long lastUpdate;
     private CommandSender sender;
-    @Deprecated private String senderName;
-    private String uniqueName;
+    private String senderName;
 
     protected PersistentSession(long maxTime) {
         this.maxTime = maxTime;
@@ -51,13 +49,8 @@ public abstract class PersistentSession extends ConfigurationBase {
         return sender;
     }
 
-    @Deprecated
     public String getSenderName() {
         return senderName;
-    }
-
-    public String getUniqueName() {
-        return uniqueName;
     }
 
     public void handleDisconnect() {
@@ -71,7 +64,6 @@ public abstract class PersistentSession extends ConfigurationBase {
         }
         this.sender = sender;
         this.senderName = sender.getName();
-        this.uniqueName = UUIDUtil.toUniqueString(sender);
     }
 
 }
