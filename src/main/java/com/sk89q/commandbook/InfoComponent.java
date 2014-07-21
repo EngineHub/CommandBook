@@ -175,7 +175,6 @@ public class InfoComponent extends BukkitComponent {
 
             PlayerWhoisEvent event = new PlayerWhoisEvent(offline, sender);
 
-            event.addWhoisInformation("UUID", offline.getUniqueId());
             if (offline instanceof Player) {
                 Player player = (Player) offline;
                 event.addWhoisInformation("Display name", player.getDisplayName());
