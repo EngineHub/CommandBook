@@ -70,7 +70,6 @@ public class ChatUtil {
      * @param sender
      * @return
      */
-    @Deprecated
     public static String toUniqueName(CommandSender sender) {
         if (sender instanceof Player) {
             return (sender).getName();

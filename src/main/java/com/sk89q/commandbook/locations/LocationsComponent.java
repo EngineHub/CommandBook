@@ -32,7 +32,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.WorldLoadEvent;
@@ -122,7 +121,7 @@ public abstract class LocationsComponent extends BukkitComponent {
         if (loc == null) {
             throw new CommandException("No " + this.name.toLowerCase() + " by that name could be found in " + world.getName() + ".");
         }
-        if (!(sender instanceof Player) || !((Player) sender).getUniqueId().equals(loc.getCreatorID())) {
+        if (!loc.getCreatorName().equals(sender.getName())) {
             CommandBook.inst().checkPermission(sender, "commandbook." + this.name.toLowerCase() + ".remove.other");
         }
 

@@ -22,7 +22,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.net.InetAddress;
-import java.util.UUID;
 
 /**
  * Interface for a ban database.
@@ -52,29 +51,38 @@ public interface BanDatabase extends Iterable<Ban> {
     public boolean unload();
 
     /**
-     * Checks if a player's UUID is banned.
+     * Checks if a player's name is banned.
      *
-     * @param ID The UUID to check
-     * @return Whether the UUID is banned
+     * @param name The name to check
+     * @return Whether name is banned
      */
-    public boolean isBanned(UUID ID);
+    public boolean isBannedName(String name);
 
     /**
-     * Checks if a player's address is banned.
+     * Checks if a player's ddress is banned.
      *
      * @param address The address to check
      * @return Whether the given address is banned
      */
-    public boolean isBanned(InetAddress address);
+    public boolean isBannedAddress(InetAddress address);
 
     /**
-     * Gets the ban message for a banned UUID.
-     *
-     * @param ID The ID to check
-     * @return The banned message for the given ID
+     * Gets the ban message for a banned name.
+     * WARNING: This method's is spelled incorrectly and will be removed soon
+     * @param name The name to check
+     * @return The banned message for the given name
+     * @see #getBannedNameMessage(String)
      */
     @Deprecated
-    public String getBannedMessage(UUID ID);
+    public String getBannedNameMesage(String name);
+
+    /**
+     * Gets the ban message for a banned name.
+     *
+     * @param name The name to check
+     * @return The banned message for the given name
+     */
+    public String getBannedNameMessage(String name);
 
     /**
      * Gets the ban message for a banned address.
@@ -82,11 +90,30 @@ public interface BanDatabase extends Iterable<Ban> {
      * @param address The address to check
      * @return The banned message for the given address
      */
-    @Deprecated
-    public String getBannedMessage(String address);
+    public String getBannedAddressMessage(String address);
 
     /**
-     * Bans a player by UUID and address.
+     * Bans a name.
+     *
+     * @param name
+     * @param source
+     * @param reason
+     */
+    @Deprecated
+    public void banName(String name, CommandSender source, String reason);
+
+    /**
+     * Bans an address.
+     *
+     * @param address
+     * @param source
+     * @param reason
+     */
+    @Deprecated
+    public void banAddress(String address, CommandSender source, String reason);
+
+    /**
+     * Bans a player by name and address
      *
      * @param player
      * @param source
@@ -96,21 +123,17 @@ public interface BanDatabase extends Iterable<Ban> {
     public void ban(Player player, CommandSender source, String reason, long end);
 
     /**
-     * Bans a UUID and or address.
-     *
-     * @param ID
+     * Bans a name and or address.
      * @param name
      * @param address
      * @param source
      * @param reason
      * @param end
      */
-    public void ban(UUID ID, String name, String address, CommandSender source, String reason, long end);
+    public void ban(String name, String address, CommandSender source, String reason, long end);
 
     /**
      * Unbans a name.
-     *
-     * WARNING: This method only works for cases where the UUID for the record is null.
      *
      * @param name
      * @param source
@@ -121,27 +144,26 @@ public interface BanDatabase extends Iterable<Ban> {
     public boolean unbanName(String name, CommandSender source, String reason);
 
     /**
-     * Unban a player by UUID.
+     * Unbans an address.
      *
-     * WARNING: This method will not unban a player's address
-     *
-     * @param player
+     * @param address
      * @param source
      * @param reason
-     * @return
+     * @return whether the address was found
      */
-    public boolean unban(Player player, CommandSender source, String reason);
+    @Deprecated
+    public boolean unbanAddress(String address, CommandSender source, String reason);
 
     /**
-     * Unban a player and/or address. First looks up by UUID, then if not found looks up by address.
+     * Unban a name and/or address. First looks up by name, then if not found looks up by address.
      *
-     * @param ID
+     * @param name
      * @param address
      * @param source
      * @param reason
      * @return
      */
-    public boolean unban(UUID ID, String address, CommandSender source, String reason);
+    public boolean unban(String name, String address, CommandSender source, String reason);
 
     /**
      * Unbans a name.
@@ -160,16 +182,16 @@ public interface BanDatabase extends Iterable<Ban> {
     public void importFrom(BanDatabase bans);
 
     /**
-     * Returns a Ban with the given UUID
-     * @param ID The UUID of the banned player.
+     * Returns a Ban with the given name
+     * @param name The name given to the ban.
      * @return The applicable ban
      */
-    public Ban getBanned(UUID ID);
+    public Ban getBannedName(String name);
 
     /**
      * Returns a Ban with the given address
      * @param address The address given to the ban.
      * @return The applicable ban
      */
-    public Ban getBanned(String address);
+    public Ban getBannedAddress(String address);
 }

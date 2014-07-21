@@ -37,7 +37,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
 
 import java.net.InetAddress;
-import java.util.UUID;
 
 @ComponentInformation(friendlyName = "Bans", desc = "A system for kicks and bans.")
 public class BansComponent extends BukkitComponent implements Listener {
@@ -93,10 +92,10 @@ public class BansComponent extends BukkitComponent implements Listener {
 
         Ban ban = null;
 
-        if (getBanDatabase().isBanned(player.getUniqueId())) {
-            ban = getBanDatabase().getBanned(player.getUniqueId());
-        } else if (getBanDatabase().isBanned(event.getAddress())) {
-            ban = getBanDatabase().getBanned(event.getAddress().getHostAddress());
+        if (getBanDatabase().isBannedName(player.getName())) {
+            ban = getBanDatabase().getBannedName(player.getName());
+        } else if (getBanDatabase().isBannedAddress(event.getAddress())) {
+            ban = getBanDatabase().getBannedAddress(event.getAddress().getHostAddress());
         }
 
         if (ban != null) {
@@ -113,7 +112,7 @@ public class BansComponent extends BukkitComponent implements Listener {
     public void playerWhois(InfoComponent.PlayerWhoisEvent event) {
         if (CommandBook.inst().hasPermission(event.getSource(), "commandbook.bans.isbanned")) {
             event.addWhoisInformation(null, "Player " +
-                    (getBanDatabase().isBanned(event.getPlayer().getUniqueId()) ? "is"
+                    (getBanDatabase().isBannedName(event.getPlayer().getName()) ? "is"
                             : "is not") + " banned.");
         }
     }
@@ -155,7 +154,7 @@ public class BansComponent extends BukkitComponent implements Listener {
                 desc = "Ban a user (and their address with the -i flag)", flags = "iset:o", min = 1, max = -1)
         @CommandPermissions({"commandbook.bans.ban"})
         public void ban(CommandContext args, CommandSender sender) throws CommandException {
-            UUID banID;
+            String banName;
             String playerName = args.getString(0);
             InetAddress banAddress = null;
             long endDate = args.hasFlag('t') ? InputUtil.TimeParser.matchFutureDate(args.getFlag('t')) : 0L;
@@ -180,13 +179,13 @@ public class BansComponent extends BukkitComponent implements Listener {
 
             // Grab their UUID
             if (player == null) {
-                banID = CommandBook.server().getOfflinePlayer(playerName).getUniqueId();
+                banName = playerName;
 
                 if (args.hasFlag('i')) {
                     throw new CommandException("This player must be online to ban their IP address as well.");
                 }
             } else {
-                banID = player.getUniqueId();
+                banName = player.getName();
 
                 if (CommandBook.inst().hasPermission(player, "commandbook.bans.exempt") && !hasExemptOverride) {
                     throw new CommandException("This player is exempt from being banned! " +
@@ -220,7 +219,7 @@ public class BansComponent extends BukkitComponent implements Listener {
                         + (message == null ? "" : " - " + message));
             }
 
-            getBanDatabase().ban(banID, playerName, banAddress != null ? banAddress.getHostAddress() : null, sender, message, endDate);
+            getBanDatabase().ban(banName, banAddress != null ? banAddress.getHostAddress() : null, sender, message, endDate);
 
             if (!getBanDatabase().save()) {
                 sender.sendMessage(ChatColor.RED + "Bans database failed to save. See console.");
@@ -251,7 +250,7 @@ public class BansComponent extends BukkitComponent implements Listener {
                 }
             }
 
-            getBanDatabase().ban(null, null, addr, sender, message, endDate);
+            getBanDatabase().ban(null, addr, sender, message, endDate);
 
             sender.sendMessage(ChatColor.YELLOW + addr + " banned.");
 
@@ -271,9 +270,9 @@ public class BansComponent extends BukkitComponent implements Listener {
                     .replace("\0", "")
                     .replace("\b", "");
 
-            UUID ID = CommandBook.server().getOfflinePlayer(banName).getUniqueId();
+            String name = banName;
 
-            if (getBanDatabase().unban(ID, null, sender, message) || getBanDatabase().unbanName(banName, sender, message)) {
+            if (getBanDatabase().unban(name, null, sender, message)) {
                 sender.sendMessage(ChatColor.YELLOW + banName + " unbanned.");
 
                 if (!getBanDatabase().save()) {
@@ -319,9 +318,9 @@ public class BansComponent extends BukkitComponent implements Listener {
                     .replace("\0", "")
                     .replace("\b", "");
 
-            UUID ID = CommandBook.server().getOfflinePlayer(banName).getUniqueId();
+            String name = banName;
 
-            Ban ban = getBanDatabase().getBanned(ID);
+            Ban ban = getBanDatabase().getBannedName(name);
 
             if (ban == null) {
                 sender.sendMessage(ChatColor.YELLOW + banName + " is " + ChatColor.RED + "not " + ChatColor.YELLOW + "banned.");
