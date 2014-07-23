@@ -3,7 +3,10 @@ package com.sk89q.commandbook.profiles;
 import com.sk89q.commandbook.profiles.profile.Inventory;
 import com.sk89q.commandbook.profiles.profile.Profile;
 import com.sk89q.commandbook.profiles.profile.Vitals;
+import com.sk89q.commandbook.profiles.scope.GlobalScope;
+import com.sk89q.commandbook.profiles.scope.PersonalScope;
 import com.sk89q.commandbook.profiles.scope.ProfileScope;
+import com.sk89q.commandbook.profiles.scope.TagScope;
 import com.sk89q.commandbook.util.entity.player.PlayerUtil;
 import com.sk89q.minecraft.util.commands.*;
 import com.zachsthings.libcomponents.bukkit.BukkitComponent;
@@ -34,6 +37,17 @@ public class ProfilesComponent extends BukkitComponent {
     }
 
     public class NestedProfileCommands {
+
+        private ProfileType parseType(String name) {
+            if (name.startsWith("#")) {
+                return ProfileType.TAG;
+            } else if (name.startsWith("@")) {
+                return ProfileType.GLOBAL;
+            } else {
+                return ProfileType.PERSONAL;
+            }
+        }
+
         @Command(aliases = {"save"},
                 usage = "<profile name>", desc = "Save an inventory as a profile",
                 flags = "viel", min = 1, max = 1)
@@ -44,6 +58,17 @@ public class ProfilesComponent extends BukkitComponent {
             final String profileName = args.getString(0);
 
             ProfileScope scope = null;
+            switch (parseType(profileName)) {
+                case GLOBAL:
+                    scope = new GlobalScope();
+                    break;
+                case PERSONAL:
+                    scope = new PersonalScope(player.getUniqueId());
+                    break;
+                case TAG:
+                    scope = new TagScope();
+                    break;
+            }
             Profile profile = manager.getProfile(scope, profileName);
 
             if (profile != null && !args.hasFlag('o')) {
@@ -74,7 +99,19 @@ public class ProfilesComponent extends BukkitComponent {
 
             final String profileName = args.getString(0);
 
-            Profile profile = manager.getProfile(null, profileName);
+            ProfileScope scope = null;
+            switch (parseType(profileName)) {
+                case GLOBAL:
+                    scope = new GlobalScope();
+                    break;
+                case PERSONAL:
+                    scope = new PersonalScope(player.getUniqueId());
+                    break;
+                case TAG:
+                    scope = new TagScope();
+                    break;
+            }
+            Profile profile = manager.getProfile(scope, profileName);
 
             if (profile == null) {
                 throw new CommandException("A profile by that name doesn't exist!");
