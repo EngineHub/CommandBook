@@ -8,11 +8,11 @@ import java.io.File;
 
 public class ProfileManager {
 
-    public void saveProfile(ProfileScope scope, Profile profile) {
-        write(profile, new File(scope.getDir(), profile.getName() + ".yml"));
+    public boolean saveProfile(ProfileScope scope, Profile profile) {
+        return write(profile, new File(scope.getDir(), profile.getName() + ".yml"));
     }
 
-    private void write(Profile profile, File file) {
+    private boolean write(Profile profile, File file) {
         YAMLProcessor processor = new YAMLProcessor(file, false, YAMLFormat.EXTENDED);
         throw new UnsupportedOperationException();
     }
