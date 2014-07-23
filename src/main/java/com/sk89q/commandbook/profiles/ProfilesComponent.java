@@ -20,7 +20,7 @@ public class ProfilesComponent extends BukkitComponent {
 
     @Override
     public void enable() {
-        manager = new ProfileManager();
+        manager = new YAMLProfileManager();
         factory = new ProfileFactory();
     }
 
