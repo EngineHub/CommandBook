@@ -51,7 +51,7 @@ public class ProfilesComponent extends BukkitComponent {
 
             ProfileSettings settings = new ProfileSettings(
                     profileName,
-                    args.hasFlag('v'), 
+                    args.hasFlag('v'),
                     args.hasFlag('i'),
                     args.hasFlag('e'),
                     args.hasFlag('l')
@@ -88,7 +88,7 @@ public class ProfilesComponent extends BukkitComponent {
                 player.setSaturation((float) proVit.getSaturation());
                 player.setExhaustion((float) proVit.getExhaustion());
             }
-            if (proVit != null) {
+            if (proInv != null) {
                 List<ItemStack> items = proInv.getItems();
                 PlayerInventory pInv = player.getInventory();
                 for (int i = 0; i < Math.min(items.size(), pInv.getSize()); ++i) {
