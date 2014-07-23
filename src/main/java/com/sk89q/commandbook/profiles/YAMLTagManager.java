@@ -11,7 +11,7 @@ public class YAMLTagManager implements TagManager {
     }
 
     @Override
-    public boolean loadTag(UUID player, ProfileTag tag) {
+    public boolean addTag(UUID player, ProfileTag tag) {
         throw new UnsupportedOperationException();
     }
 

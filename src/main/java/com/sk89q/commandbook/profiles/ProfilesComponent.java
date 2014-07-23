@@ -157,6 +157,10 @@ public class ProfilesComponent extends BukkitComponent {
             player.sendMessage(ChatColor.YELLOW + "Current tag profile(s) cleared!");
         }
 
+        private boolean applyTag(Player player, ProfileTag tag) {
+            return tags.addTag(player.getUniqueId(), tag);
+        }
+
         private void loadTag(Player player, String tagName) throws CommandException {
             List<ProfileTag> activeTags = tags.getActiveTags(player.getUniqueId());
             if (!activeTags.isEmpty()) {
@@ -167,7 +171,7 @@ public class ProfilesComponent extends BukkitComponent {
             if (tag == null) {
                 throw new CommandException("No such tag exist!");
             }
-            if (!tags.loadTag(player.getUniqueId(), tag)) {
+            if (!applyTag(player, tag)) {
                 throw new CommandException("That tag has already been loaded!");
             }
 
