@@ -6,9 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Inventory {
-    private List<ItemStack> inventory = new ArrayList<ItemStack>();
+    private List<ItemStack> inventory;
 
-    public Inventory() { }
+    public Inventory() {
+        this(new ArrayList<ItemStack>());
+    }
 
     public Inventory(List<ItemStack> inventory) {
         this.inventory = inventory;
