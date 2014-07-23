@@ -3,6 +3,7 @@ package com.sk89q.commandbook.profiles;
 import com.sk89q.commandbook.profiles.profile.Inventory;
 import com.sk89q.commandbook.profiles.profile.Profile;
 import com.sk89q.commandbook.profiles.profile.Vitals;
+import com.sk89q.commandbook.profiles.scope.ProfileScope;
 import com.sk89q.commandbook.util.entity.player.PlayerUtil;
 import com.sk89q.minecraft.util.commands.*;
 import com.zachsthings.libcomponents.bukkit.BukkitComponent;

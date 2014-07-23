@@ -1,6 +1,7 @@
 package com.sk89q.commandbook.profiles;
 
 import com.sk89q.commandbook.profiles.profile.Profile;
+import com.sk89q.commandbook.profiles.scope.ProfileScope;
 import com.sk89q.util.yaml.YAMLFormat;
 import com.sk89q.util.yaml.YAMLProcessor;
 

@@ -1,4 +1,6 @@
-package com.sk89q.commandbook.profiles;
+package com.sk89q.commandbook.profiles.scope;
+
+import com.sk89q.commandbook.profiles.ProfileType;
 
 import java.io.File;
 
