@@ -1,30 +1,28 @@
 package com.sk89q.commandbook.profiles;
 
-import com.sk89q.commandbook.profiles.editions.Profile_E1;
-import org.bukkit.entity.Player;
+import com.sk89q.commandbook.profiles.profile.Profile;
+import com.sk89q.util.yaml.YAMLFormat;
+import com.sk89q.util.yaml.YAMLProcessor;
 
-public abstract class ProfileManager {
+import java.io.File;
 
-    private String defaultDomain;
+public class ProfileManager {
 
-    public ProfileManager() {
-        defaultDomain = "default";
+    public void saveProfile(ProfileScope scope, Profile profile) {
+        write(profile, new File(scope.getDir(), profile.getName() + ".yml"));
     }
 
-    public Profile_E1 getProfile(String profileName) {
-        return getProfile(defaultDomain, profileName);
+    private void write(Profile profile, File file) {
+        YAMLProcessor processor = new YAMLProcessor(file, false, YAMLFormat.EXTENDED);
+        throw new UnsupportedOperationException();
     }
 
-    public boolean saveProfile(String profileName, Profile_E1 profile) {
-        return saveProfile(defaultDomain, profileName, profile);
+    public Profile getProfile(ProfileScope scope, String name) {
+        return load(new File(scope.getDir(), name + ".yml"));
     }
 
-    public boolean deleteProfile(String profileName) {
-        return deleteProfile(defaultDomain, profileName);
+    private Profile load(File file) {
+        YAMLProcessor processor = new YAMLProcessor(file, false, YAMLFormat.EXTENDED);
+        throw new UnsupportedOperationException();
     }
-
-    public abstract Profile_E1 createProfile(Player player, ProfileSettings settings);
-    public abstract Profile_E1 getProfile(String domain, String profileName);
-    public abstract boolean saveProfile(String domain, String profileName, Profile_E1 profile);
-    public abstract boolean deleteProfile(String domain, String profileName);
 }
