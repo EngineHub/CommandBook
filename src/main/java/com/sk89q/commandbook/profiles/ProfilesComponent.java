@@ -93,6 +93,18 @@ public class ProfilesComponent extends BukkitComponent {
             }
         }
 
+        private ProfileScope resolveScope(Player player, ProfileType type) {
+            switch (type) {
+                case GLOBAL:
+                    return new GlobalScope();
+                case PERSONAL:
+                    return new PersonalScope(player.getUniqueId());
+                case TAG:
+                    return new TagScope();
+            }
+            return null;
+        }
+
         @Command(aliases = {"save"},
                 usage = "<profile name>", desc = "Save an inventory as a profile",
                 flags = "viel", min = 1, max = 1)
@@ -102,20 +114,10 @@ public class ProfilesComponent extends BukkitComponent {
             Player player = PlayerUtil.checkPlayer(sender);
             String profileName = args.getString(0);
 
-            ProfileScope scope = null;
             ProfileTypeName typeName = parseType(profileName);
             profileName = typeName.getName();
-            switch (typeName.getType()) {
-                case GLOBAL:
-                    scope = new GlobalScope();
-                    break;
-                case PERSONAL:
-                    scope = new PersonalScope(player.getUniqueId());
-                    break;
-                case TAG:
-                    scope = new TagScope();
-                    break;
-            }
+            ProfileScope scope = resolveScope(player, typeName.getType());
+
             Profile profile = manager.getProfile(scope, profileName);
 
             if (profile != null && !args.hasFlag('o')) {
@@ -189,20 +191,10 @@ public class ProfilesComponent extends BukkitComponent {
 
             String profileName = args.getString(0);
 
-            ProfileScope scope = null;
             ProfileTypeName typeName = parseType(profileName);
             profileName = typeName.getName();
-            switch (typeName.getType()) {
-                case GLOBAL:
-                    scope = new GlobalScope();
-                    break;
-                case PERSONAL:
-                    scope = new PersonalScope(player.getUniqueId());
-                    break;
-                case TAG:
-                    scope = new TagScope();
-                    break;
-            }
+            ProfileScope scope = resolveScope(player, typeName.getType());
+
             Profile profile = manager.getProfile(scope, profileName);
 
             if (profile == null) {
@@ -229,20 +221,10 @@ public class ProfilesComponent extends BukkitComponent {
             Player player = PlayerUtil.checkPlayer(sender);
             String profileName = args.getString(0);
 
-            ProfileScope scope = null;
             ProfileTypeName typeName = parseType(profileName);
             profileName = typeName.getName();
-            switch (typeName.getType()) {
-                case GLOBAL:
-                    scope = new GlobalScope();
-                    break;
-                case PERSONAL:
-                    scope = new PersonalScope(player.getUniqueId());
-                    break;
-                case TAG:
-                    scope = new TagScope();
-                    break;
-            }
+            ProfileScope scope = resolveScope(player, typeName.getType());
+
             Profile profile = manager.getProfile(scope, profileName);
             if (profile == null) {
                 throw new CommandException("A profile by that name doesn't exist.");
