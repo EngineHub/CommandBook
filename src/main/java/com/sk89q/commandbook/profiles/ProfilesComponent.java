@@ -19,12 +19,13 @@ public class ProfilesComponent extends BukkitComponent {
 
     private static final String defaultSave = "DEFAULT";
 
-    private TagManager tags = null;
+    private TagManager tags;
     private ProfileManager manager;
     private ProfileFactory factory;
 
     @Override
     public void enable() {
+        tags = new YAMLTagManager();
         manager = new YAMLProfileManager();
         factory = new ProfileFactory();
     }
