@@ -5,5 +5,6 @@ import com.sk89q.commandbook.profiles.scope.ProfileScope;
 
 public interface ProfileManager {
     public boolean saveProfile(ProfileScope scope, Profile profile);
+    public boolean remProfile(ProfileScope scope, Profile profile);
     public Profile getProfile(ProfileScope scope, String name);
 }
