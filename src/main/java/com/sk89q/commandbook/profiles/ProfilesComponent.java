@@ -31,6 +31,17 @@ public class ProfilesComponent extends BukkitComponent {
     }
 
     public static boolean restore(Player player, Profile profile) {
+        return restore(player, profile, null);
+    }
+
+    public static boolean restore(Player player, Profile profile, ProfileTag tag) {
+
+        if (tag != null) {
+            for (String group : tag.getGroups()) {
+                // TODO Remove the groups
+            }
+        }
+
         Vitals proVit = profile.getVitals();
         Inventory proInv = profile.getInventory();
         if (proVit != null) {
@@ -150,7 +161,7 @@ public class ProfilesComponent extends BukkitComponent {
             ProfileScope scope = new PersonalTagScope(player.getUniqueId());
             for (ProfileTag tag : tags.getActiveTags(player.getUniqueId())) {
                 Profile profile = manager.getProfile(scope, tag.getName());
-                restore(player, profile);
+                restore(player, profile, tag);
                 manager.remProfile(scope, profile);
             }
             tags.clearTags(player.getUniqueId());
@@ -158,6 +169,9 @@ public class ProfilesComponent extends BukkitComponent {
         }
 
         private boolean applyTag(Player player, ProfileTag tag) {
+            for (String group : tag.getGroups()) {
+                // TODO Apply the groups
+            }
             return tags.addTag(player.getUniqueId(), tag);
         }
 
