@@ -250,7 +250,7 @@ public class AFKComponent extends BukkitComponent implements Runnable, Listener 
                 }
 
                 // Check and set god mode
-                if (godComp != null && canProtect(session.isRequested()) || (passedTime && canProtect(false))) {
+                if (godComp != null && (canProtect(session.isRequested()) || (passedTime && canProtect(false)))) {
                     if (!godComp.hasGodMode(target)) {
                         godComp.enableGodMode(target);
                         session.setProtected(true);
