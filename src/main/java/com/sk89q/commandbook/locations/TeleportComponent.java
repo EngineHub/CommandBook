@@ -267,7 +267,9 @@ public class TeleportComponent extends BukkitComponent implements Listener {
             }
 
             if (target != null) {
-                if (sessions.getSession(TeleportSession.class, player).isBringable(target)) {
+                TeleportSession session = sessions.getSession(TeleportSession.class, player);
+                if (session.isBringable(target)) {
+                    session.removeBringable(target);
                     final String senderMessage = ChatUtil.replaceColorMacros(
                             ChatUtil.replaceMacros(sender, config.bringMessageSender))
                             .replaceAll("%ctarget%", ChatUtil.toColoredName(target, null))

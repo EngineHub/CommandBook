@@ -63,12 +63,12 @@ public class TeleportSession extends PersistentSession {
     }
 
     public void removeBringable(Player player) {
-        bringable.put(player.getName(), System.currentTimeMillis());
+        bringable.remove(player.getName());
     }
 
     public boolean isBringable(Player player) {
         long now = System.currentTimeMillis();
-        Long time = bringable.remove(player.getName());
+        Long time = bringable.get(player.getName());
         return (time != null && (now - time) < BRINGABLE_TIME);
     }
 
