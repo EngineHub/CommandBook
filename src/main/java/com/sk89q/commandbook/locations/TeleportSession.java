@@ -26,6 +26,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -66,14 +67,37 @@ public class TeleportSession extends PersistentSession {
         bringable.remove(player.getName());
     }
 
+    /**
+     * Get the total number of valid bring request held by this session
+     *
+     * @return the amount of available bring request
+     */
+    public int totalBringRequest() {
+        Iterator<Map.Entry<String, Long>> it = bringable.entrySet().iterator();
+        int i;
+        for (i = 0; it.hasNext();) {
+            Map.Entry<String, Long> next = it.next();
+            if (!canBring(next.getValue())) {
+                it.remove();
+                continue;
+            }
+            ++i;
+        }
+        return i;
+    }
+
     public void clearBringable() {
         bringable.clear();
     }
 
-    public boolean isBringable(Player player) {
+    private boolean canBring(Long time) {
         long now = System.currentTimeMillis();
+        return time != null && (now - time) < BRINGABLE_TIME;
+    }
+
+    public boolean isBringable(Player player) {
         Long time = bringable.get(player.getName());
-        return (time != null && (now - time) < BRINGABLE_TIME);
+        return canBring(time);
     }
 
     public void checkLastTeleportRequest(Player target) throws CommandException {
