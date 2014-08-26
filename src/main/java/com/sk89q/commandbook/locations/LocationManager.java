@@ -19,11 +19,14 @@
 package com.sk89q.commandbook.locations;
 
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public interface LocationManager<T> {
 
@@ -57,18 +60,38 @@ public interface LocationManager<T> {
     public T get(String id);
 
     /**
+     * Get an unmodifiable map of locations, where the key is the
+     * location's ID, and the value is a {@link T}.
+     *
+     * If a {@link T} does not have a UUID it will not
+     * be obtainable via this method, and must be
+     * obtained by it's name via {@link #get(String)}.
+     *
+     * @param id The UUID of the owner
+     * @return The {@link Map} of {@link T}s
+     *         keyed by a {@link java.lang.String} ID.
+     *
+     *         If no locations are found an empty unmodifiable
+     *         map will be returned
+     */
+    public Map<String, T> get(UUID id);
+
+    /**
      * Updates warps from unloaded worlds.
      */
     public void updateWorlds();
 
     /**
-     * Create a location.
+     * Create a location. No arguments may be null.
      *
      * @param id The name of the location
      * @param loc The location
      * @param player The player to own the location
      * @return The created location
      */
+    public T create(String id, Location loc, OfflinePlayer player);
+
+    @Deprecated
     public T create(String id, Location loc, Player player);
 
     /**
@@ -78,6 +101,15 @@ public interface LocationManager<T> {
      * @return whether it was removed
      */
     public boolean remove(String id);
+
+    /**
+     * Removes all {@link T} owned by the player with the specified UUID.
+     *
+     * @param id The UUID of the player who's {@link T}s should be removed
+     * @return true if all {@link T}s owned by the specified
+     *         player were removed successfully
+     */
+    public boolean remove(UUID id);
 
     /**
      * Gets all the locations that this location manager has.

@@ -21,9 +21,11 @@ package com.sk89q.commandbook.locations;
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
 import com.sk89q.commandbook.CommandBook;
+import com.sk89q.commandbook.util.NestUtil;
 import com.sk89q.commandbook.util.entity.player.UUIDUtil;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
@@ -32,12 +34,14 @@ import java.util.*;
 
 import static com.sk89q.commandbook.CommandBook.logger;
 import static com.sk89q.commandbook.util.NestUtil.getNestedList;
+import static com.sk89q.commandbook.util.NestUtil.getNestedMap;
 
 public class FlatFileLocationsManager implements LocationManager<NamedLocation> {
 
     private World castWorld;
     private final File file;
     private Map<String, NamedLocation> locations = new HashMap<String, NamedLocation>();
+    private Map<UUID, Map<String, NamedLocation>> UUIDMappedLocations = new HashMap<UUID, Map<String, NamedLocation>>();
     private final Map<String, List<NamedLocation>> unloadedLocations = new HashMap<String, List<NamedLocation>>();
     private final String type;
 
@@ -59,6 +63,7 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
     public void load() throws IOException {
         FileInputStream input = null;
         Map<String, NamedLocation> locs = new HashMap<String, NamedLocation>();
+        Map<UUID, Map<String, NamedLocation>> UUIDMappedLocations = new HashMap<UUID, Map<String, NamedLocation>>();
         boolean needsSaved = false;
 
         if (file.getParentFile().exists() || file.getParentFile().mkdirs()) {
@@ -83,7 +88,7 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
                         int i = 0;
                         String name = line[i++].trim().replace(" ", "");
                         String worldName = line[i++]; // Set to null if the world exists
-                        String creator = line[i++];
+                        String owner = line[i++];
                         double x = Double.parseDouble(line[i++]);
                         double y = Double.parseDouble(line[i++]);
                         double z = Double.parseDouble(line[i++]);
@@ -101,27 +106,32 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
                         }
 
                         Location loc = new Location(world, x, y, z, yaw, pitch);
-                        NamedLocation warp = new NamedLocation(name, loc);
-                        warp.setWorldName(worldName);
-
+                        UUID ownerID;
+                        String ownerName = null;
                         try {
-                            warp.setCreatorID(UUID.fromString(creator));
+                            ownerID = UUID.fromString(owner);
                         } catch (IllegalArgumentException ex) {
                             logger().finest("Converting " + type + " " + name + "'s owner record to UUID...");
-                            UUID creatorID = UUIDUtil.convert(creator);
-                            if (creatorID != null) {
-                                warp.setCreatorID(creatorID);
+                            ownerID = UUIDUtil.convert(owner);
+                            if (ownerID != null) {
                                 needsSaved = true;
                                 logger().finest("Success!");
                             } else {
-                                warp.setCreatorName(creator);
+                                ownerName = owner;
                                 logger().warning(type + " " + name + "'s owner could not be converted!");
                             }
                         }
+
+                        NamedLocation namedLoc = new NamedLocation(name, ownerID, ownerName, loc);
+
                         if (world == null) {
-                            getNestedList(unloadedLocations, worldName).add(warp);
+                            getNestedList(unloadedLocations, worldName).add(namedLoc);
                         } else {
-                            locs.put(name.toLowerCase(), warp);
+                            locs.put(name.toLowerCase(), namedLoc);
+                        }
+
+                        if (ownerID != null) {
+                            getNestedMap(UUIDMappedLocations, ownerID).put(name.toLowerCase(), namedLoc);
                         }
                     } catch (IllegalArgumentException e) {
                         if (e instanceof NumberFormatException) {
@@ -134,6 +144,7 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
             }
 
             this.locations = locs;
+            this.UUIDMappedLocations = UUIDMappedLocations;
 
             if (castWorld != null) {
                 logger().info(locs.size() + " " + type + "(s) loaded for "
@@ -226,25 +237,74 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
         return locations.get(id.toLowerCase());
     }
 
+    public Map<String, NamedLocation> get(UUID id) {
+        Map<String, NamedLocation> locMap = UUIDMappedLocations.get(id);
+        if (locMap == null) {
+            locMap = new HashMap<String, NamedLocation>();
+        }
+        return Collections.unmodifiableMap(locMap);
+    }
+
     public boolean remove(String id) {
-        return locations.remove(id.toLowerCase()) != null;
+        NamedLocation namedLoc = locations.remove(id.toLowerCase());
+        if (namedLoc != null) {
+            // If conversion failed the UUID will return null, so check that ahead of time
+            if (namedLoc.getOwnerID() != null) {
+                NestUtil.getNestedMap(UUIDMappedLocations, namedLoc.getOwnerID()).remove(id);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public boolean remove(UUID id) {
+        Map<String, NamedLocation> locations = get(id);
+        Iterator<String> it = locations.keySet().iterator();
+        boolean removed = true;
+        while (it.hasNext()) {
+            boolean newVal = remove(it.next());
+            if (!newVal) {
+                removed = false;
+            }
+        }
+        return removed;
     }
 
     public List<NamedLocation> getLocations() {
         return new ArrayList<NamedLocation>(locations.values());
     }
 
+    public NamedLocation create(String id, Location loc, OfflinePlayer player) {
+        id = id.trim();
+        Validate.isTrue(id.matches("^[a-zA-Z0-9-_]*$"), "Location ID contains invalid characters!");
+        Validate.notNull(id);
+        Validate.notNull(loc);
+        Validate.notNull(player);
+
+        NamedLocation warp = new NamedLocation(id, player, loc);
+
+        NestUtil.getNestedMap(
+                UUIDMappedLocations,
+                warp.getCreatorID()
+        ).put(warp.getName(), warp);       // Add to the owner map
+        locations.put(id.toLowerCase(), warp); // Add to the name map
+        return warp;
+    }
+
     public NamedLocation create(String id, Location loc, Player player) {
         id = id.trim();
         Validate.isTrue(id.matches("^[a-zA-Z0-9-_]*$"), "Location ID contains invalid characters!");
-        NamedLocation warp = new NamedLocation(id, loc);
-        locations.put(id.toLowerCase(), warp);
+        NamedLocation warp;
         if (player != null) {
-            warp.setCreatorName(player.getName());
-            warp.setCreatorID(player.getUniqueId());
+            warp = new NamedLocation(id, player, loc);
+            NestUtil.getNestedMap(
+                    UUIDMappedLocations,
+                    warp.getCreatorID()
+            ).put(warp.getName(), warp);       // Add to the owner map
         } else {
-            warp.setCreatorName("");
+            warp = new NamedLocation(id, null, "", loc);
         }
+        locations.put(id.toLowerCase(), warp); // Add to the name map
         return warp;
     }
 
