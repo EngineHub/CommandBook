@@ -265,7 +265,7 @@ public class OnlineListComponent extends BukkitComponent implements Listener {
             for (Player player : online) {
                 // Process the filter
                 if (!player.getName().toLowerCase().contains(filter)) {
-                    break;
+                    continue;
                 }
 
                 if (!first) {
