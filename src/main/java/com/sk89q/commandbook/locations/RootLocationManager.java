@@ -20,6 +20,7 @@ package com.sk89q.commandbook.locations;
 
 import com.sk89q.commandbook.CommandBook;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
@@ -27,6 +28,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static com.sk89q.commandbook.CommandBook.logger;
 
@@ -86,6 +88,11 @@ public class RootLocationManager<T> {
         return getManager(world).get(id);
     }
 
+    public Map<String, T> get(World world, UUID owner) {
+        return getManager(world).get(owner);
+    }
+
+    @Deprecated
     public T create(String id, Location loc, Player player) {
         LocationManager<T> manager = getManager(loc.getWorld());
         T ret = manager.create(id, loc, player);
@@ -93,7 +100,21 @@ public class RootLocationManager<T> {
         return ret;
     }
 
+    public T create(String id, Location loc, OfflinePlayer player) {
+        LocationManager<T> manager = getManager(loc.getWorld());
+        T ret = manager.create(id, loc, player);
+        save(manager);
+        return ret;
+    }
+
     public boolean remove(World world, String id) {
+        LocationManager<T> manager = getManager(world);
+        boolean ret = getManager(world).remove(id);
+        save(manager);
+        return ret;
+    }
+
+    public boolean remove(World world, UUID id) {
         LocationManager<T> manager = getManager(world);
         boolean ret = getManager(world).remove(id);
         save(manager);
