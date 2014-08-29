@@ -165,7 +165,7 @@ public class InputUtil {
          */
         public static List<Player> matchPlayerNames(CommandSender source, String filter) {
 
-            Player[] players = CommandBook.server().getOnlinePlayers();
+            Collection<? extends Player> players = CommandBook.server().getOnlinePlayers();
             boolean useDisplayNames = CommandBook.inst().lookupWithDisplayNames;
 
             filter = filter.toLowerCase();
@@ -242,13 +242,13 @@ public class InputUtil {
          */
         public static List<Player> matchPlayers(CommandSender source, String filter) throws CommandException {
 
-            if (CommandBook.server().getOnlinePlayers().length == 0) {
+            if (CommandBook.server().getOnlinePlayers().isEmpty()) {
                 throw new CommandException("No players matched query.");
             }
 
             if (filter.equals("*")) {
                 CommandBook.inst().checkPermission(source, "commandbook.targets.everyone");
-                return checkPlayerMatch(Arrays.asList(CommandBook.server().getOnlinePlayers()));
+                return checkPlayerMatch(Lists.newArrayList(CommandBook.server().getOnlinePlayers()));
             }
 
             // Handle special hash tag groups
@@ -308,7 +308,7 @@ public class InputUtil {
          * @throws CommandException
          */
         public static Player matchPlayerExactly(CommandSender sender, String filter) throws CommandException {
-            Player[] players = CommandBook.server().getOnlinePlayers();
+            Collection<? extends Player> players = CommandBook.server().getOnlinePlayers();
             for (Player player : players) {
                 if (player.getName().equalsIgnoreCase(filter)
                         || (CommandBook.inst().lookupWithDisplayNames
@@ -381,7 +381,24 @@ public class InputUtil {
          * @return
          * @throws CommandException
          */
+        @Deprecated
         public static List<Player> checkPlayerMatch(List<Player> players) throws CommandException {
+            // Check to see if there were any matches
+            if (players.isEmpty()) {
+                throw new CommandException("No players matched query.");
+            }
+            return players;
+        }
+
+        /**
+         * Checks if the given list of players is greater than size 0, otherwise
+         * throw an exception.
+         *
+         * @param players
+         * @return
+         * @throws CommandException
+         */
+        public static <T extends Collection<? extends Player>> T checkPlayerMatch(T players) throws CommandException {
             // Check to see if there were any matches
             if (players.isEmpty()) {
                 throw new CommandException("No players matched query.");
