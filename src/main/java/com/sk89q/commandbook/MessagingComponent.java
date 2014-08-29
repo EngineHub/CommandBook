@@ -44,7 +44,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
-import java.util.Arrays;
 import java.util.HashSet;
 
 import static com.sk89q.commandbook.util.ChatUtil.replaceColorMacros;
@@ -197,7 +196,7 @@ public class MessagingComponent extends BukkitComponent implements Listener {
             if (sender instanceof Player) {
                 if (BasePlugin.callEvent(
                         new AsyncPlayerChatEvent(false, (Player) sender, msg,
-                                new HashSet<Player>(Arrays.asList(BasePlugin.server().getOnlinePlayers())))).isCancelled()) {
+                                new HashSet<Player>(BasePlugin.server().getOnlinePlayers()))).isCancelled()) {
                     return;
                 }
             }
