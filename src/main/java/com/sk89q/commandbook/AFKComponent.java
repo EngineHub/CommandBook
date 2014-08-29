@@ -27,6 +27,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.*;
 
+import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
@@ -84,6 +85,8 @@ public class AFKComponent extends BukkitComponent implements Runnable, Listener 
         public boolean afkGeneralProtection = true;
         @Setting("afk-command-protection")
         public boolean afkCommandProtection = false;
+        @Setting("npc-compatibility-mode")
+        public boolean npcCompatibilty = false;
     }
 
     /**
@@ -130,7 +133,7 @@ public class AFKComponent extends BukkitComponent implements Runnable, Listener 
         if (config.afkKickMinutes < 1) return false;
 
         double maxP = server.getMaxPlayers();
-        double curP = server.getOnlinePlayers().length;
+        double curP = server.getOnlinePlayers().size();
 
         double fraction = ((maxP - curP) + maxP * .2) / maxP;
         int duration = (int) Math.max(config.afkMinutes + 2, Math.min(config.afkKickMinutes, config.afkKickMinutes * fraction));
@@ -206,11 +209,16 @@ public class AFKComponent extends BukkitComponent implements Runnable, Listener 
     @Override
     public void run() {
 
+        Collection<? extends Player> onlinePlayers = config.npcCompatibilty ? server.getOnlinePlayers() : null;
         for (final AFKSession session : sessions.getSessions(AFKSession.class).values()) {
 
             if (session == null) continue;
             final Player target = session.getPlayer();
             if (target == null || !session.getPlayer().isValid()) continue;
+
+            if (onlinePlayers != null && !onlinePlayers.contains(target)) {
+                continue;
+            }
 
             boolean passedTime = isAfk(session.getLastUpdate());
             if (session.isRequested() || passedTime) {
