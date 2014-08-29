@@ -607,7 +607,7 @@ public class InputUtil {
                         if (source instanceof Player) {
                             Player player = (Player) source;
                             NamedLocation loc = manager.get(player.getWorld(), args[1]);
-                            if (loc != null && !(loc.getCreatorName().equalsIgnoreCase(player.getName()))) {
+                            if (loc != null && !(player.getUniqueId().equals(loc.getOwnerID()))) {
                                 CommandBook.inst().checkPermission(source, "commandbook.locations." + type + ".other");
                             }
                         }
@@ -616,7 +616,7 @@ public class InputUtil {
                         if (source instanceof Player) {
                             Player player = (Player) source;
                             NamedLocation loc = manager.get(matchWorld(source, args[2]), args[1]);
-                            if (loc != null && !(loc.getCreatorName().equalsIgnoreCase(player.getName()))) {
+                            if (loc != null && !(player.getUniqueId().equals(loc.getOwnerID()))) {
                                 CommandBook.inst().checkPermission(source, "commandbook.locations." + type + ".other");
                             }
                         }

@@ -116,7 +116,7 @@ public abstract class LocationsComponent extends BukkitComponent {
                 + ChatColor.BLUE + loc.getName().toUpperCase());
         // Print the owner details
         sender.sendMessage(ChatColor.YELLOW + "Owner:");
-        sender.sendMessage(ChatColor.YELLOW + " - " + ChatColor.WHITE + loc.getCreatorName());
+        sender.sendMessage(ChatColor.YELLOW + " - " + ChatColor.WHITE + loc.getOwnerName());
         // Print the Location details
         sender.sendMessage(ChatColor.YELLOW + "Location: ");
         sender.sendMessage(ChatColor.YELLOW + " - World: " + ChatColor.WHITE + worldN);
@@ -161,7 +161,7 @@ public abstract class LocationsComponent extends BukkitComponent {
         if (loc == null) {
             throw new CommandException("No " + this.name.toLowerCase() + " by that name could be found in " + world.getName() + ".");
         }
-        if (!(sender instanceof Player) || !((Player) sender).getUniqueId().equals(loc.getCreatorID())) {
+        if (!(sender instanceof Player) || !((Player) sender).getUniqueId().equals(loc.getOwnerID())) {
             CommandBook.inst().checkPermission(sender, "commandbook." + this.name.toLowerCase() + ".remove.other");
         }
 
@@ -198,11 +198,11 @@ public abstract class LocationsComponent extends BukkitComponent {
         }
         while (it.hasNext()) {
             NamedLocation next = it.next();
-            if (targetID != null && !next.getCreatorID().equals(targetID)) {
+            if (targetID != null && !next.getOwnerID().equals(targetID)) {
                 it.remove();
                 continue;
             }
-            if (!canSeeOther && !next.getCreatorID().equals(senderID)) {
+            if (!canSeeOther && !next.getOwnerID().equals(senderID)) {
                 it.remove();
                 continue;
             }

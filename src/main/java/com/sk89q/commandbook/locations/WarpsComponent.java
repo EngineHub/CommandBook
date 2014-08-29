@@ -90,7 +90,7 @@ public class WarpsComponent extends LocationsComponent {
                     try {
                         CommandBook.inst().checkPermission(sender, loc.getWorld(), "commandbook.warp.teleport");
                     } catch (CommandPermissionsException e) {
-                        String postfix = warp.getCreatorID().equals(PlayerUtil.checkPlayer(sender).getUniqueId()) ? "self" : warp.getCreatorName();
+                        String postfix = PlayerUtil.checkPlayer(sender).getUniqueId().equals(warp.getOwnerID()) ? "self" : warp.getOwnerName();
                         CommandBook.inst().checkPermission(sender, loc.getWorld(), "commandbook.warp.owner." + postfix);
                     }
                 } catch (CommandException e) {
@@ -122,7 +122,7 @@ public class WarpsComponent extends LocationsComponent {
             }
             NamedLocation existing = getManager().get(loc.getWorld(), warpName);
             if (existing != null) {
-                if (!existing.getCreatorName().equals(sender.getName())) {
+                if (!(sender instanceof Player) || !PlayerUtil.checkPlayer(sender).getUniqueId().equals(existing.getOwnerID())) {
                     CommandBook.inst().checkPermission(sender, "commandbook.warp.set.override");
                 }
                 if (!sessions.getSession(UserSession.class, sender).checkOrQueueConfirmed(args.getCommand() + " " + args.getJoinedStrings(0))) {
@@ -188,7 +188,7 @@ public class WarpsComponent extends LocationsComponent {
             @Override
             public String format(NamedLocation entry) {
                 return ChatColor.BLUE + entry.getName().toUpperCase() + ChatColor.YELLOW
-                        + " (Owner: " + ChatColor.WHITE + entry.getCreatorName()
+                        + " (Owner: " + ChatColor.WHITE + entry.getOwnerName()
                         + ChatColor.YELLOW + ", World: "
                         + ChatColor.WHITE + (entry.getWorldName() == null ? defaultWorld : entry.getWorldName())
                         + ChatColor.YELLOW + ")";

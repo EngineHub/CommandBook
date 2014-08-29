@@ -242,7 +242,7 @@ public class HomesComponent extends LocationsComponent {
             @Override
             public String format(NamedLocation entry) {
                 return ChatColor.BLUE + entry.getName().toUpperCase() + ChatColor.YELLOW
-                        + " (Owner: " + ChatColor.WHITE + entry.getCreatorName()
+                        + " (Owner: " + ChatColor.WHITE + entry.getOwnerName()
                         + ChatColor.YELLOW + ", World: "
                         + ChatColor.WHITE + (entry.getWorldName() == null ? defaultWorld : entry.getWorldName())
                         + ChatColor.YELLOW + ")";

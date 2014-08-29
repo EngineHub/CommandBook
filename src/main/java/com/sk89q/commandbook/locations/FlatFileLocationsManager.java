@@ -182,12 +182,12 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
 
                 for (NamedLocation warp : toStore) {
 
-                    UUID ID = warp.getCreatorID();
+                    UUID ID = warp.getOwnerID();
                     csv.writeNext(new String[] {
                             warp.getName(),
                             warp.getWorldName() != null ? warp.getWorldName()
                                     : warp.getLocation().getWorld().getName(),
-                            String.valueOf(ID != null ? ID : warp.getCreatorName()),
+                            String.valueOf(ID != null ? ID : warp.getOwnerName()),
                             String.valueOf(warp.getLocation().getX()),
                             String.valueOf(warp.getLocation().getY()),
                             String.valueOf(warp.getLocation().getZ()),
@@ -285,7 +285,7 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
 
         NestUtil.getNestedMap(
                 UUIDMappedLocations,
-                warp.getCreatorID()
+                warp.getOwnerID()
         ).put(warp.getName(), warp);       // Add to the owner map
         locations.put(id.toLowerCase(), warp); // Add to the name map
         return warp;
@@ -299,7 +299,7 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
             warp = new NamedLocation(id, player, loc);
             NestUtil.getNestedMap(
                     UUIDMappedLocations,
-                    warp.getCreatorID()
+                    warp.getOwnerID()
             ).put(warp.getName(), warp);       // Add to the owner map
         } else {
             warp = new NamedLocation(id, null, "", loc);
