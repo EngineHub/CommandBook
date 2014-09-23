@@ -216,7 +216,7 @@ public class AFKComponent extends BukkitComponent implements Runnable, Listener 
             final Player target = session.getPlayer();
             if (target == null || !session.getPlayer().isValid()) continue;
 
-            if (onlinePlayers != null && (target.hasMetadata("npc") || !onlinePlayers.contains(target))) {
+            if (onlinePlayers != null && (target.hasMetadata("NPC") || !onlinePlayers.contains(target))) {
                 continue;
             }
 
