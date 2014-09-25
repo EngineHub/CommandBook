@@ -12,7 +12,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -94,12 +93,12 @@ public class ChatUtil {
      * @return
      */
     public static String replaceMacros(CommandSender sender, String message) {
-        Collection<? extends Player> online = CommandBook.server().getOnlinePlayers();
+        Player[] online = CommandBook.server().getOnlinePlayers();
 
         message = message.replace("%name%", toName(sender));
         message = message.replace("%cname%", toColoredName(sender, null));
         message = message.replace("%id%", toUniqueName(sender));
-        message = message.replace("%online%", String.valueOf(online.size()));
+        message = message.replace("%online%", String.valueOf(online.length));
 
         // Don't want to build the list unless we need to
         if (message.contains("%players%")) {

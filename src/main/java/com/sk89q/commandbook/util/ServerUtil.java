@@ -5,9 +5,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 public class ServerUtil {
 
     public static String getOnlineList(Player[] online) {
@@ -21,19 +18,7 @@ public class ServerUtil {
      * @param color
      * @return
      */
-    @Deprecated
     public static String getOnlineList(Player[] online, ChatColor color) {
-        return getOnlineList(Arrays.asList(online), color);
-    }
-
-    /**
-     * Returns a comma-delimited list of players.
-     *
-     * @param online
-     * @param color
-     * @return
-     */
-    public static String getOnlineList(Collection<? extends Player> online, ChatColor color) {
         StringBuilder out = new StringBuilder();
 
         // To keep track of commas

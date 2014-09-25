@@ -35,7 +35,10 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @ComponentInformation(friendlyName = "Online List", desc = "Lists online players both on command and on player join.")
 public class OnlineListComponent extends BukkitComponent implements Listener {
@@ -67,25 +70,14 @@ public class OnlineListComponent extends BukkitComponent implements Listener {
      * @param online
      * @param sender
      */
-    @Deprecated
     public void sendOnlineList(Player[] online, CommandSender sender) {
-        sendOnlineList(Arrays.asList(online), sender);
-    }
-
-    /**
-     * Send the online player list.
-     *
-     * @param online
-     * @param sender
-     */
-    public void sendOnlineList(Collection<? extends Player> online, CommandSender sender) {
 
         StringBuilder out = new StringBuilder();
-        int onlineCount = online.size();
+        int onlineCount = online.length;
 
         // This applies mostly to the console, so there might be 0 players
         // online if that's the case!
-        if (online.isEmpty()) {
+        if (online.length == 0) {
             sender.sendMessage("0 players are online.");
             return;
         }
@@ -199,7 +191,7 @@ public class OnlineListComponent extends BukkitComponent implements Listener {
                 min = 0, max = 1)
         @CommandPermissions({"commandbook.who"})
         public void who(CommandContext args, CommandSender sender) throws CommandException {
-            Collection<? extends Player> online = CommandBook.server().getOnlinePlayers();
+            Player[] online = CommandBook.server().getOnlinePlayers();
 
             // Some crappy wrappers uses this to detect if the server is still
             // running, even though this is a very unreliable way to do it
@@ -233,7 +225,7 @@ public class OnlineListComponent extends BukkitComponent implements Listener {
 
             // This applies mostly to the console, so there might be 0 players
             // online if that's the case!
-            if (online.isEmpty()) {
+            if (online.length == 0) {
                 sender.sendMessage("0 players are online.");
                 return;
             }
@@ -253,7 +245,7 @@ public class OnlineListComponent extends BukkitComponent implements Listener {
             StringBuilder out = new StringBuilder();
 
             out.append(ChatColor.GRAY + "Found players (out of ");
-            out.append(ChatColor.GRAY + "" + online.size());
+            out.append(ChatColor.GRAY + "" + online.length);
             out.append(ChatColor.GRAY + "): ");
             out.append(ChatColor.WHITE);
 
@@ -280,7 +272,7 @@ public class OnlineListComponent extends BukkitComponent implements Listener {
             // This means that no matches were found!
             if (first) {
                 sender.sendMessage(ChatColor.RED + "No players (out of "
-                        + online.size() + ") matched '" + filter + "'.");
+                        + online.length + ") matched '" + filter + "'.");
                 return;
             }
 
