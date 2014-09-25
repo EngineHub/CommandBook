@@ -27,6 +27,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.*;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
@@ -133,7 +134,7 @@ public class AFKComponent extends BukkitComponent implements Runnable, Listener 
         if (config.afkKickMinutes < 1) return false;
 
         double maxP = server.getMaxPlayers();
-        double curP = server.getOnlinePlayers().size();
+        double curP = server.getOnlinePlayers().length;
 
         double fraction = ((maxP - curP) + maxP * .2) / maxP;
         int duration = (int) Math.max(config.afkMinutes + 2, Math.min(config.afkKickMinutes, config.afkKickMinutes * fraction));
@@ -209,7 +210,7 @@ public class AFKComponent extends BukkitComponent implements Runnable, Listener 
     @Override
     public void run() {
 
-        Collection<? extends Player> onlinePlayers = config.npcCompatibilty ? server.getOnlinePlayers() : null;
+        Collection<? extends Player> onlinePlayers = config.npcCompatibilty ? Arrays.asList(server.getOnlinePlayers()) : null;
         for (final AFKSession session : sessions.getSessions(AFKSession.class).values()) {
 
             if (session == null) continue;
