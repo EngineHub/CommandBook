@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 package com.sk89q.commandbook.locations;
 
@@ -89,6 +89,9 @@ public class RootLocationManager<T> {
     public T create(String id, Location loc, Player player) {
         LocationManager<T> manager = getManager(loc.getWorld());
         T ret = manager.create(id, loc, player);
+        if (ret == null) {
+            throw new IllegalArgumentException("Problem with save");
+        }
         save(manager);
         return ret;
     }
