@@ -110,9 +110,12 @@ public class WarpsComponent extends LocationsComponent {
                 player = PlayerUtil.checkPlayer(sender);
                 loc = player.getLocation();
             } else {
-                loc = InputUtil.LocationParser.matchLocation(sender, args.getString(1));
                 if (sender instanceof Player) {
                     player = (Player) sender;
+                    loc = InputUtil.LocationParser.matchLocation(sender, args.getString(1));
+                } else {
+                    player = InputUtil.PlayerParser.matchSinglePlayer(sender, args.getString(1));
+                    loc = player.getLocation();
                 }
             }
             NamedLocation existing = getManager().get(loc.getWorld(), warpName);
