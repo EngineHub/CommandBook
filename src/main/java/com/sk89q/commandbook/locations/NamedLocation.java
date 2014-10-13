@@ -62,7 +62,7 @@ public class NamedLocation {
     }
 
     public String getCreatorName() {
-        if (creatorName == null || creatorName.isEmpty()) {
+        if ((creatorName == null || creatorName.isEmpty()) && creatorID != null) {
             return CommandBook.server().getOfflinePlayer(creatorID).getName();
         }
         return creatorName;
