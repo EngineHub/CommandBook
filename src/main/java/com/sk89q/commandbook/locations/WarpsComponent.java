@@ -98,7 +98,7 @@ public class WarpsComponent extends LocationsComponent {
             (new TeleportPlayerIterator(sender, loc, args.hasFlag('s'))).iterate(targets);
         }
 
-        @Command(aliases = {"setwarp"}, usage = "<warp> [location]", desc = "Set a warp", min = 1, max = 2)
+        @Command(aliases = {"setwarp"}, usage = "<warp> [location] [owner]", desc = "Set a warp", min = 1, max = 3)
         @CommandPermissions({"commandbook.warp.set"})
         public void setWarp(CommandContext args, CommandSender sender) throws CommandException {
             String warpName = args.getString(0);
@@ -115,6 +115,13 @@ public class WarpsComponent extends LocationsComponent {
                     player = (Player) sender;
                 }
             }
+
+            if (args.argsLength() > 2) {
+                player = InputUtil.PlayerParser.matchSinglePlayer(sender, args.getString(1));
+            }
+
+            PlayerUtil.checkPlayer(player);
+
             NamedLocation existing = getManager().get(loc.getWorld(), warpName);
             if (existing != null) {
                 if (!existing.getCreatorName().equals(sender.getName())) {

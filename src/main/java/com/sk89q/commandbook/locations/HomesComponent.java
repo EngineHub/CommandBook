@@ -105,36 +105,28 @@ public class HomesComponent extends LocationsComponent {
         @Command(aliases = {"sethome"}, usage = "[owner] [location]", desc = "Set a home", min = 0, max = 2)
         @CommandPermissions({"commandbook.home.set"})
         public void setHome(CommandContext args, CommandSender sender) throws CommandException {
-            String homeName;
             Location loc;
-            Player player = null;
+            Player player;
 
             // Detect arguments based on the number of arguments provided
-            if (args.argsLength() == 0) {
-                player = PlayerUtil.checkPlayer(sender);
-                homeName = player.getName();
-                loc = player.getLocation();
-            } else if (args.argsLength() == 1) {
-                homeName = args.getString(0);
-                player = PlayerUtil.checkPlayer(sender);
-                loc = player.getLocation();
-
-                // Check permissions!
-                if (!homeName.equals(sender.getName())) {
-                    CommandBook.inst().checkPermission(sender, "commandbook.home.set.other");
+            if (args.argsLength() > 0) {
+                player = InputUtil.PlayerParser.matchSinglePlayer(sender, args.getString(0));
+                if (args.argsLength() > 1) {
+                    loc = InputUtil.LocationParser.matchLocation(sender, args.getString(1));
+                } else {
+                    loc = player.getLocation();
                 }
             } else {
-                homeName = args.getString(1);
-                loc = InputUtil.LocationParser.matchLocation(sender, args.getString(0));
+                player = PlayerUtil.checkPlayer(sender);
+                loc = player.getLocation();
+            }
 
-                // Check permissions!
-                if (!homeName.equals(sender.getName())) {
-                    CommandBook.inst().checkPermission(sender, "commandbook.home.set.other");
-                }
+            if (!player.equals(sender)) {
+                CommandBook.inst().checkPermission(sender, "commandbook.home.set.other");
             }
 
             try {
-                getManager().create(homeName, loc, player);
+                getManager().create(player.getName(), loc, player);
             } catch (IllegalArgumentException ex) {
                 throw new CommandException("Invalid home name!");
             }
