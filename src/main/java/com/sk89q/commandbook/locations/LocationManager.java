@@ -19,8 +19,8 @@
 package com.sk89q.commandbook.locations;
 
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
-import org.bukkit.entity.Player;
 
 import java.io.IOException;
 import java.util.List;
@@ -69,7 +69,7 @@ public interface LocationManager<T> {
      * @param player The player to own the location
      * @return The created location
      */
-    public T create(String id, Location loc, Player player);
+    public T create(String id, Location loc, OfflinePlayer player);
 
     /**
      * Removes a location.

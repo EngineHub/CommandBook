@@ -28,6 +28,7 @@ import com.sk89q.minecraft.util.commands.*;
 import com.zachsthings.libcomponents.ComponentInformation;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -106,19 +107,30 @@ public class HomesComponent extends LocationsComponent {
         @CommandPermissions({"commandbook.home.set"})
         public void setHome(CommandContext args, CommandSender sender) throws CommandException {
             Location loc;
-            Player player;
+            OfflinePlayer player;
 
             // Detect arguments based on the number of arguments provided
             if (args.argsLength() > 0) {
-                player = InputUtil.PlayerParser.matchSinglePlayer(sender, args.getString(0));
                 if (args.argsLength() > 1) {
+                    try {
+                        player = InputUtil.PlayerParser.matchSinglePlayer(sender, args.getString(0));
+                    } catch (CommandException ex) {
+                        player = CommandBook.server().getOfflinePlayer(args.getString(0));
+                    }
                     loc = InputUtil.LocationParser.matchLocation(sender, args.getString(1));
                 } else {
-                    loc = player.getLocation();
+                    Player tPlayer = InputUtil.PlayerParser.matchSinglePlayer(sender, args.getString(0));
+                    player = tPlayer;
+                    loc = tPlayer.getLocation();
                 }
             } else {
-                player = PlayerUtil.checkPlayer(sender);
-                loc = player.getLocation();
+                Player tPlayer = PlayerUtil.checkPlayer(sender);
+                player = tPlayer;
+                loc = tPlayer.getLocation();
+            }
+
+            if (player == null) {
+                throw new CommandException("No player by that name online or offline could be found!");
             }
 
             if (!player.equals(sender)) {

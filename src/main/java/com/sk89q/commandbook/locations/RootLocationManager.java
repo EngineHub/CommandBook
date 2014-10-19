@@ -20,6 +20,7 @@ package com.sk89q.commandbook.locations;
 
 import com.sk89q.commandbook.CommandBook;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
@@ -87,6 +88,10 @@ public class RootLocationManager<T> {
     }
 
     public T create(String id, Location loc, Player player) {
+        return create(id, loc, (OfflinePlayer) player);
+    }
+    
+    public T create(String id, Location loc, OfflinePlayer player) {
         LocationManager<T> manager = getManager(loc.getWorld());
         T ret = manager.create(id, loc, player);
         save(manager);

@@ -24,8 +24,8 @@ import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.util.entity.player.UUIDUtil;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
-import org.bukkit.entity.Player;
 
 import java.io.*;
 import java.util.*;
@@ -234,7 +234,7 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
         return new ArrayList<NamedLocation>(locations.values());
     }
 
-    public NamedLocation create(String id, Location loc, Player player) {
+    public NamedLocation create(String id, Location loc, OfflinePlayer player) {
         id = id.trim();
         Validate.isTrue(id.matches("^[a-zA-Z0-9-_]*$"), "Location ID contains invalid characters!");
         NamedLocation warp = new NamedLocation(id, loc);
