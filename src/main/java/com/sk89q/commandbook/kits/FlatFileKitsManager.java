@@ -100,7 +100,7 @@ public class FlatFileKitsManager implements KitManager {
                     continue;
                 }
 
-                String[] parts = line.split(",");
+                String[] parts = line.split("#");
                 ItemStack item = ItemUtil.getItem(parts[0].replace(" ", ""));
 
                 if (item == null) {
