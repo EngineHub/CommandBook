@@ -24,6 +24,7 @@ import org.bukkit.entity.Player;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 public interface LocationManager<T> {
 
@@ -55,6 +56,14 @@ public interface LocationManager<T> {
      * @return The {@link T} if registered
      */
     public T get(String id);
+
+    /**
+     * Get by creator UUID.
+     *
+     * @param id The UUID to get
+     * @return The {@link T} if registered
+     */
+    public T get(UUID id);
 
     /**
      * Updates warps from unloaded worlds.

@@ -226,6 +226,19 @@ public class FlatFileLocationsManager implements LocationManager<NamedLocation> 
         return locations.get(id.toLowerCase());
     }
 
+    // hacky method to lookup by uuid
+    public NamedLocation get(UUID id) {
+        Iterator<Map.Entry<String, NamedLocation>> i = locations.entrySet().iterator();
+        while (i.hasNext()) {
+            NamedLocation loc = i.next().getValue();
+            if (loc.getCreatorID().equals(id)) {
+                // TODO update the name if it's changed?
+                return loc;
+            }
+        }
+        return null;
+    }
+
     public boolean remove(String id) {
         return locations.remove(id.toLowerCase()) != null;
     }

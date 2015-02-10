@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static com.sk89q.commandbook.CommandBook.logger;
 
@@ -83,6 +84,10 @@ public class RootLocationManager<T> {
     }
 
     public T get(World world, String id) {
+        return getManager(world).get(id);
+    }
+
+    public T get(World world, UUID id) {
         return getManager(world).get(id);
     }
 

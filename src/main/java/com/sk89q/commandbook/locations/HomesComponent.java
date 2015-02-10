@@ -55,7 +55,7 @@ public class HomesComponent extends LocationsComponent {
             if (args.argsLength() == 0) {
                 Player player = PlayerUtil.checkPlayer(sender);
                 targets = Lists.newArrayList(player);
-                home = getManager().get(player.getWorld(), player.getName());
+                home = getManager().get(player.getWorld(), player.getUniqueId());
             } else if (args.argsLength() == 1) {
                 Player player = PlayerUtil.checkPlayer(sender);
                 targets = Lists.newArrayList(player);
@@ -91,7 +91,7 @@ public class HomesComponent extends LocationsComponent {
             }
 
             if (home != null) {
-                if (!home.getCreatorName().equals(sender.getName())) {
+                if ((sender instanceof Player) && !home.getCreatorID().equals(((Player) sender).getUniqueId())) {
                     CommandBook.inst().checkPermission(sender, "commandbook.home.other");
                 }
                 loc = home.getLocation();
