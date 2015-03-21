@@ -47,7 +47,7 @@ import java.util.concurrent.TimeUnit;
 @Depend(components = SessionComponent.class)
 @ComponentInformation(friendlyName = "Freeze", desc = "Blocks a specified player's movement on command")
 public class FreezeComponent extends BukkitComponent implements Listener, Runnable {
-    public static final int MOVE_THRESHOLD = 2;
+    public static final int MOVE_THRESHOLD = 1;
     private static final int MOVE_THRESHOLD_SQ = MOVE_THRESHOLD * MOVE_THRESHOLD;
 
     @InjectComponent private SessionComponent sessions;
