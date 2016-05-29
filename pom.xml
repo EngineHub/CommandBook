@@ -28,8 +28,8 @@
       <url>http://maven.sk89q.com/repo</url>
     </repository>
     <repository>
-      <id>bukkit-repo</id>
-      <url>http://repo.bukkit.org/content/groups/public/</url>
+      <id>spigot-repo</id>
+      <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
     </repository>
   </repositories>
   <dependencies>
@@ -38,6 +38,7 @@
       <artifactId>worldedit</artifactId>
       <version>5.5.9-SNAPSHOT</version>
     </dependency>
+
     <dependency>
       <groupId>com.zachsthings.libcomponents</groupId>
       <artifactId>libcomponents-bukkit</artifactId>
@@ -49,13 +50,12 @@
         </exclusion>
       </exclusions>
     </dependency>
-    
+
     <dependency>
       <groupId>org.bukkit</groupId>
       <artifactId>bukkit</artifactId>
-      <version>1.7.10-R0.1-SNAPSHOT</version>
-      <scope>compile</scope>
-      <type>jar</type>
+      <version>1.9.4-R0.1-SNAPSHOT</version>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -63,6 +63,7 @@
       <artifactId>opencsv</artifactId>
       <version>2.0</version>
     </dependency>
+
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
