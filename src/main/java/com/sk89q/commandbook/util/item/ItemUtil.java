@@ -19,18 +19,23 @@
 package com.sk89q.commandbook.util.item;
 
 import com.sk89q.commandbook.CommandBook;
+import com.sk89q.commandbook.api.ItemProvider;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.blocks.*;
 import org.bukkit.DyeColor;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 
 /**
  * Various item helper methods that do not depend on user-configurable information.
  */
 public class ItemUtil {
+
+    private static Set<ItemProvider> itemProviders = new HashSet<ItemProvider>();
 
     /**
      * Gets the name of an item.
@@ -65,6 +70,15 @@ public class ItemUtil {
 
 
     public static ItemStack getCommandItem(String name) throws CommandException {
+        // First try any item providers
+        for (ItemProvider provider : itemProviders) {
+            ItemStack customItem = provider.getItem(name);
+            if (customItem != null) {
+                return customItem;
+            }
+        }
+
+
         int id;
         int dmg = 0;
         String dataName = null;
@@ -253,5 +267,13 @@ public class ItemUtil {
             }
         } catch (IllegalArgumentException ignored) {}
         throw new CommandException("Unknown dye color name of '" + filter + "'.");
+    }
+
+    public static void addItemProvider(ItemProvider provider) {
+        itemProviders.add(provider);
+    }
+
+    public static void removeItemProvider(ItemProvider provider) {
+        itemProviders.remove(provider);
     }
 }

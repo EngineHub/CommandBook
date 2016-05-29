@@ -3,5 +3,6 @@
 .settings
 *.iml
 target
-
+.idea
+commandbook.iml
 .DS_Store

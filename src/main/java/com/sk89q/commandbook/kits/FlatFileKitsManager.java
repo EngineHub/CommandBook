@@ -101,23 +101,19 @@ public class FlatFileKitsManager implements KitManager {
                 }
 
                 String[] parts = line.split(",");
-                ItemStack item = ItemUtil.getItem(parts[0].replace(" ", ""));
-
-                if (item == null) {
-                    logger().warning(" Unknown kit item '" + parts[0].replaceAll(" ", "") + "'");
-                    continue;
-                }
+                String itemId = parts[0].replace(" ", "");
+                int amount = 1;
 
                 // Attempt to parse an amount
                 if (parts.length >= 2) {
                     try {
-                        item.setAmount(Integer.parseInt(parts[1]));
+                        amount = Integer.parseInt(parts[1]);
                     } catch (NumberFormatException e) {
                         logger().warning("Invalid amount: '" + parts[1] + "'");
                     }
                 }
 
-                kit.addItem(item);
+                kit.addItem(itemId, amount);
             }
 
             logger().info(kits.size() + " kit(s) loaded.");
