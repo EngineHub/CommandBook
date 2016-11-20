@@ -6,7 +6,7 @@
 #
 # The name of the items are names that you can use with the /item command,
 # so you can do step:wood if you want. If you want to specify an amount, enter
-# the number after a comma, like "wood,64".
+# the number after a hyphen, like "wood-64".
 #
 # If you put <name>=# for a kit, then you can choose a "cool down" period
 # in seconds. Players have to wait that amount of time before they can
@@ -16,4 +16,4 @@
 woodpick
 woodaxe
 woodshovel
-wood,64
+wood-64
