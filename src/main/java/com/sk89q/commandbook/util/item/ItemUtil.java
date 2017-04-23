@@ -244,7 +244,7 @@ public class ItemUtil {
      */
     public static DyeColor matchDyeColor(String filter) throws CommandException {
         if (filter.equalsIgnoreCase("random")) {
-            return DyeColor.getByData((byte) new Random().nextInt(15));
+            return DyeColor.getByWoolData((byte) new Random().nextInt(15));
         }
         try {
             DyeColor match = DyeColor.valueOf(filter.toUpperCase());
