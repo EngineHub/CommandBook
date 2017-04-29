@@ -82,14 +82,13 @@ public class MessagingComponent extends BukkitComponent implements Listener {
         @Override
         public void load(ConfigurationNode node) {
             super.load(node);
-            boolean error = false;
             try {
                 pmColor = ChatColor.valueOf(pmColorString);
             } catch (IllegalArgumentException e) {
                 CommandBook.logger().warning("Unknown PM Color  '" + pmColorString + "'! Resetting to GRAY");
                 pmColor = ChatColor.GRAY;
                 pmColorString = "GRAY";
-                error = true;
+                save(node);
             }
             try {
                 pmTextColor = ChatColor.valueOf(pmTextColorString);
@@ -97,9 +96,6 @@ public class MessagingComponent extends BukkitComponent implements Listener {
                 CommandBook.logger().warning("Unknown PM Color  '" + pmTextColorString + "'! Resetting to GRAY");
                 pmTextColor = ChatColor.GRAY;
                 pmTextColorString = "GRAY";
-                error = true;
-            }
-            if (error) {
                 save(node);
             }
         }
