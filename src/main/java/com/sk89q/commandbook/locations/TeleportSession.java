@@ -21,6 +21,7 @@ package com.sk89q.commandbook.locations;
 import com.sk89q.commandbook.session.PersistentSession;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.zachsthings.libcomponents.config.Setting;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -28,6 +29,7 @@ import org.bukkit.entity.Player;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -105,7 +107,18 @@ public class TeleportSession extends PersistentSession {
     }
 
     public Location popLastLocation() {
-        return locationHistory.poll();
+        Location l = locationHistory.poll();
+        if (l == null) {
+            return null;
+        }
+
+        // Make sure that the world of this location is still valid.
+        UUID worldId = l.getWorld().getUID();
+        if (Bukkit.getWorld(worldId) == null) {
+            return null;
+        }
+
+        return l;
     }
 
     public void setIgnoreLocation(Location loc) {
