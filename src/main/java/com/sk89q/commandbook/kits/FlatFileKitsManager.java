@@ -22,6 +22,7 @@ import com.sk89q.commandbook.util.item.ItemUtil;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -57,7 +58,7 @@ public class FlatFileKitsManager implements KitManager {
 
         try {
             input = new FileInputStream(file);
-            InputStreamReader streamReader = new InputStreamReader(input, "utf-8");
+            InputStreamReader streamReader = new InputStreamReader(input, StandardCharsets.UTF_8);
             BufferedReader reader = new BufferedReader(streamReader);
             Kit kit = null;
             String line;

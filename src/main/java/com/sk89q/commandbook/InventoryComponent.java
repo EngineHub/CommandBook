@@ -69,9 +69,9 @@ public class InventoryComponent extends BukkitComponent {
         @Setting("item-permissions-only")
         public boolean useItemPermissionsOnly;
         @Setting("allowed-items")
-        public Set<Material> allowedItems = Collections.emptySet();
+        public Set<String> allowedItems = Collections.emptySet();
         @Setting("disllowed-items")
-        public Set<Material> disallowedItems = Collections.emptySet();
+        public Set<String> disallowedItems = Collections.emptySet();
         @Setting("default-item-stack-size")
         public int defaultItemStackSize = 1;
     }
@@ -100,12 +100,12 @@ public class InventoryComponent extends BukkitComponent {
         }
 
         if (config.allowedItems.size() > 0) {
-            if (!config.allowedItems.contains(material)) {
+            if (!config.allowedItems.contains(material.name())) {
                 throw new CommandException("That item is not allowed.");
             }
         }
 
-        if (config.disallowedItems.contains(material)) {
+        if (config.disallowedItems.contains(material.name())) {
             throw new CommandException("That item is disallowed.");
         }
     }

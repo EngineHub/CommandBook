@@ -75,15 +75,14 @@ public class ThorComponent extends BukkitComponent implements Listener {
     }
 
     private static class LocalConfiguration extends ConfigurationBase {
-        @Setting("hammer-items") public Set<Material> thorItems = Sets.newHashSet(Material.DIAMOND_PICKAXE, Material.GOLDEN_PICKAXE, Material.IRON_PICKAXE, Material.WOODEN_PICKAXE, Material.STONE_PICKAXE);
+        @Setting("hammer-items") public Set<String> thorItems = Sets.newHashSet("DIAMOND_PICKAXE", "GOLDEN_PICKAXE", "IRON_PICKAXE", "WOODEN_PICKAXE", "STONE_PICKAXE");
     }
 
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-
         if (sessions.getSession(UserSession.class, player).hasThor()) {
-            if (!config.thorItems.contains(player.getItemInHand().getType())) {
+            if (!config.thorItems.contains(player.getItemInHand().getType().name())) {
                 return;
             }
 
