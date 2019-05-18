@@ -19,6 +19,7 @@
 package com.sk89q.commandbook;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.sk89q.commandbook.session.SessionComponent;
 import com.sk89q.commandbook.session.UserSession;
 import com.sk89q.commandbook.util.ChatUtil;
@@ -74,7 +75,7 @@ public class ThorComponent extends BukkitComponent implements Listener {
     }
 
     private static class LocalConfiguration extends ConfigurationBase {
-        @Setting("hammer-items") public Set<Integer> thorItems = new HashSet<Integer>(Arrays.asList(278, 285, 257, 270));
+        @Setting("hammer-items") public Set<Material> thorItems = Sets.newHashSet(Material.DIAMOND_PICKAXE, Material.GOLDEN_PICKAXE, Material.IRON_PICKAXE, Material.WOODEN_PICKAXE, Material.STONE_PICKAXE);
     }
 
     @EventHandler
@@ -82,7 +83,7 @@ public class ThorComponent extends BukkitComponent implements Listener {
         Player player = event.getPlayer();
 
         if (sessions.getSession(UserSession.class, player).hasThor()) {
-            if (!config.thorItems.contains(player.getItemInHand().getTypeId())) {
+            if (!config.thorItems.contains(player.getItemInHand().getType())) {
                 return;
             }
 

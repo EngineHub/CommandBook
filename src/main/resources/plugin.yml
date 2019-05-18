@@ -1,4 +1,5 @@
 name: CommandBook
 main: com.sk89q.commandbook.CommandBook
 version: "${project.version}"
-softdepend: [WorldEdit]
+depend: [WorldEdit]
+api-version: 1.13

@@ -30,23 +30,22 @@ public class BukkitJingleNotePlayer extends JingleNotePlayer {
     }
 
     public Sound toSound(Instrument instrument) {
+        // TODO BELL CHIME FLUTE GUITAR XYLOPHONE
         switch(instrument) {
-            case PIANO:
-                return Sound.BLOCK_NOTE_HARP;
             case GUITAR:
-                return Sound.BLOCK_NOTE_PLING;
+                return Sound.BLOCK_NOTE_BLOCK_PLING;
             case BASS:
-                return Sound.BLOCK_NOTE_BASS;
             case BASS_GUITAR:
-                return Sound.BLOCK_NOTE_BASS;
+                return Sound.BLOCK_NOTE_BLOCK_BASS;
             case STICKS:
-                return Sound.BLOCK_NOTE_HAT;
+                return Sound.BLOCK_NOTE_BLOCK_HAT;
             case BASS_DRUM:
-                return Sound.BLOCK_NOTE_BASEDRUM;
+                return Sound.BLOCK_NOTE_BLOCK_BASEDRUM;
             case SNARE_DRUM:
-                return Sound.BLOCK_NOTE_SNARE;
+                return Sound.BLOCK_NOTE_BLOCK_SNARE;
+            case PIANO:
             default:
-                return Sound.BLOCK_NOTE_HARP;
+                return Sound.BLOCK_NOTE_BLOCK_HARP;
         }
     }
 }

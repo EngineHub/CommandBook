@@ -30,7 +30,6 @@ public abstract class JingleNotePlayer implements Runnable {
      * 
      * @param player The player who is hearing this's name.
      * @param seq The JingleSequencer to play.
-     * @param area The SearchArea for this player. (optional)
      */
     public JingleNotePlayer(String player, JingleSequencer seq) {
         this.player = player;

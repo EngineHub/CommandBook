@@ -28,7 +28,6 @@ import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
-import com.sk89q.worldedit.blocks.ItemType;
 import com.zachsthings.libcomponents.ComponentInformation;
 import com.zachsthings.libcomponents.bukkit.BukkitComponent;
 import com.zachsthings.libcomponents.config.ConfigurationBase;
@@ -41,7 +40,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Set;
 
 import static com.sk89q.commandbook.util.item.InventoryUtil.giveItem;
 import static com.sk89q.commandbook.util.item.InventoryUtil.takeItem;
@@ -64,35 +66,29 @@ public class InventoryComponent extends BukkitComponent {
     }
 
     private static class LocalConfiguration extends ConfigurationBase {
-        @Setting("item-permissions-only") public boolean useItemPermissionsOnly;
-        @Setting("allowed-items") public Set<Integer> allowedItems = Collections.emptySet();
-        @Setting("disllowed-items") public Set<Integer> disallowedItems = Collections.emptySet();
-        @Setting("default-item-stack-size") public int defaultItemStackSize = 1;
+        @Setting("item-permissions-only")
+        public boolean useItemPermissionsOnly;
+        @Setting("allowed-items")
+        public Set<Material> allowedItems = Collections.emptySet();
+        @Setting("disllowed-items")
+        public Set<Material> disallowedItems = Collections.emptySet();
+        @Setting("default-item-stack-size")
+        public int defaultItemStackSize = 1;
     }
 
     // -- Helper methods
 
     /**
      * Checks to see if a user can use an item.
-     *
-     * @param sender
-     * @param id
-     * @throws CommandException
      */
-    public void checkAllowedItem(CommandSender sender, int id, int damage)
+    public void checkAllowedItem(CommandSender sender, Material material, int damage)
             throws CommandException {
-
-        if (Material.getMaterial(id) == null || id == 0) {
-            throw new CommandException("Non-existent item specified.");
-        }
-
         // Check if the user has an override
         if (CommandBook.inst().hasPermission(sender, "commandbook.override.any-item")) {
             return;
         }
 
-        boolean hasPermissions = CommandBook.inst().hasPermission(sender, "commandbook.items." + id)
-                || CommandBook.inst().hasPermission(sender, "commandbook.items." + id + "." + damage);
+        boolean hasPermissions = CommandBook.inst().hasPermission(sender, "commandbook.items." + material.getKey());
 
         // Also check the permissions system
         if (hasPermissions) {
@@ -104,12 +100,12 @@ public class InventoryComponent extends BukkitComponent {
         }
 
         if (config.allowedItems.size() > 0) {
-            if (!config.allowedItems.contains(id)) {
+            if (!config.allowedItems.contains(material)) {
                 throw new CommandException("That item is not allowed.");
             }
         }
 
-        if (config.disallowedItems.contains((id))) {
+        if (config.disallowedItems.contains(material)) {
             throw new CommandException("That item is disallowed.");
         }
     }
@@ -292,7 +288,7 @@ public class InventoryComponent extends BukkitComponent {
 
             if (args.argsLength() == 0) {
                 targets = Lists.newArrayList(PlayerUtil.checkPlayer(sender));
-            // A different player
+                // A different player
             } else {
                 targets = InputUtil.PlayerParser.matchPlayers(sender, args.getString(0));
             }
@@ -413,13 +409,12 @@ public class InventoryComponent extends BukkitComponent {
                         }
 
                         // Same type?
-                        // Blocks store their color in the damage value
-                        if (item2.getTypeId() == item.getTypeId() &&
-                                ((!ItemType.usesDamageValue(item.getTypeId()) && ignoreDamaged)
+                        if (item2.getType() == item.getType() &&
+                                (ignoreDamaged
                                         || item.getDurability() == item2.getDurability()) &&
-                                    ((item.getItemMeta() == null && item2.getItemMeta() == null)
-                                            || (item.getItemMeta() != null &&
-                                                item.getItemMeta().equals(item2.getItemMeta())))) {
+                                ((item.getItemMeta() == null && item2.getItemMeta() == null)
+                                        || (item.getItemMeta() != null &&
+                                        item.getItemMeta().equals(item2.getItemMeta())))) {
                             // This stack won't fit in the parent stack
                             if (item2.getAmount() > needed) {
                                 item.setAmount(64);
@@ -476,14 +471,14 @@ public class InventoryComponent extends BukkitComponent {
 
                 if (!repairAll && !repairHotbar && !repairEquipment) {
                     ItemStack stack = player.getItemInHand();
-                    if (stack != null && !ItemType.usesDamageValue(stack.getTypeId())) {
+                    if (stack != null) {
                         stack.setDurability((short) 0);
                     }
                 } else {
                     if (repairAll || repairHotbar) {
                         for (int i = (repairAll ? 36 : 8); i >= 0; --i) {
                             ItemStack stack = inventory.getItem(i);
-                            if (stack != null && !ItemType.usesDamageValue(stack.getTypeId())) {
+                            if (stack != null) {
                                 stack.setDurability((short) 0);
                             }
                         }
@@ -493,7 +488,7 @@ public class InventoryComponent extends BukkitComponent {
                         // Armor slots
                         for (int i = 36; i <= 39; i++) {
                             ItemStack stack = inventory.getItem(i);
-                            if (stack != null && !ItemType.usesDamageValue(stack.getTypeId())) {
+                            if (stack != null) {
                                 stack.setDurability((short) 0);
                             }
                         }
@@ -533,7 +528,7 @@ public class InventoryComponent extends BukkitComponent {
                 @Override
                 public String format(Enchantment entry) {
                     return ChatColor.BLUE + entry.getName().toUpperCase() + ChatColor.YELLOW
-                            + " (ID: " + ChatColor.WHITE + entry.getId() + ChatColor.YELLOW
+                            + " (Key: " + ChatColor.WHITE + entry.getKey() + ChatColor.YELLOW
                             + ", Max Level: " + ChatColor.WHITE + entry.getMaxLevel() + ChatColor.YELLOW + ')';
                 }
             }.display(sender, Arrays.asList(Enchantment.values()), args.getFlagInteger('p', 1));

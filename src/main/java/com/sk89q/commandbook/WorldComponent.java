@@ -92,9 +92,6 @@ public class WorldComponent extends BukkitComponent {
             } else if (weatherStr.equalsIgnoreCase("clear")
                     || weatherStr.equalsIgnoreCase("sunny")
                     || weatherStr.equalsIgnoreCase("sun")
-                    || weatherStr.equalsIgnoreCase("snowy")
-                    || weatherStr.equalsIgnoreCase("rain")
-                    || weatherStr.equalsIgnoreCase("snow")
                     || weatherStr.equalsIgnoreCase("off")) {
 
                 world.setStorm(false);
