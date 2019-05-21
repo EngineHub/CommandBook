@@ -119,7 +119,7 @@ public class ItemUtil {
      * @param infinite
      */
     public static void expandStack(ItemStack item, boolean infinite, boolean overrideStackSize) {
-        if (item == null || item.getAmount() == 0) {
+        if (item == null || item.getAmount() == 0 || item.getType() == Material.AIR) {
             return;
         }
 

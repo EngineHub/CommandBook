@@ -81,14 +81,18 @@ public class InventoryComponent extends BukkitComponent {
     /**
      * Checks to see if a user can use an item.
      */
-    public void checkAllowedItem(CommandSender sender, Material material, int damage)
+    public void checkAllowedItem(CommandSender sender, Material material)
             throws CommandException {
+        if (material == Material.AIR) {
+            throw new CommandException("The specified item must not be air.");
+        }
+
         // Check if the user has an override
         if (CommandBook.inst().hasPermission(sender, "commandbook.override.any-item")) {
             return;
         }
 
-        boolean hasPermissions = CommandBook.inst().hasPermission(sender, "commandbook.items." + material.getKey());
+        boolean hasPermissions = CommandBook.inst().hasPermission(sender, "commandbook.items." + material.name().toLowerCase());
 
         // Also check the permissions system
         if (hasPermissions) {

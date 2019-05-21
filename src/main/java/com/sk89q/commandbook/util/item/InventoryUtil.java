@@ -33,7 +33,7 @@ public class InventoryUtil {
 
         int maxStackSize = overrideStackSize ? 64 : item.getType().getMaxStackSize();
 
-        component.checkAllowedItem(sender, item.getType(), item.getDurability());
+        component.checkAllowedItem(sender, item.getType());
 
         // Check for invalid amounts
         if (amt == 0 || amt < -1) {
