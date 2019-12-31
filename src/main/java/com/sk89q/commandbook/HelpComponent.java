@@ -18,7 +18,6 @@ import org.bukkit.command.CommandMap;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.SimpleCommandMap;
-import org.bukkit.command.defaults.VanillaCommand;
 
 import java.io.File;
 import java.io.IOException;
@@ -156,8 +155,6 @@ public class HelpComponent extends BukkitComponent {
         } else if (cmd instanceof DynamicPluginCommand) {
             sender.sendMessage(ChatColor.YELLOW + "Owner: " +
                     ((DynamicPluginCommand) cmd).getOwner().getClass().getSimpleName());
-        } else if (cmd instanceof VanillaCommand) {
-            sender.sendMessage(ChatColor.YELLOW + "Vanilla command");
         }
     }
 

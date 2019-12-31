@@ -21,7 +21,9 @@ package com.sk89q.commandbook.util;
 import com.sk89q.commandbook.locations.NamedLocation;
 import com.sk89q.commandbook.locations.RootLocationManager;
 import com.sk89q.minecraft.util.commands.CommandException;
-import com.sk89q.worldedit.blocks.BlockType;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.world.block.BlockType;
 import com.zachsthings.libcomponents.bukkit.BasePlugin;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -50,8 +52,10 @@ public class LocationUtil {
 
         byte free = 0;
 
+        com.sk89q.worldedit.world.World weWorld = BukkitAdapter.adapt(world);
         while (y <= world.getMaxHeight() + 2) {
-            if (BlockType.canPassThrough(world.getBlockTypeIdAt(x, y, z))) {
+
+            if (!weWorld.getBlock(BlockVector3.at(x, y, z)).getBlockType().getMaterial().isMovementBlocker()) {
                 free++;
             } else {
                 free = 0;

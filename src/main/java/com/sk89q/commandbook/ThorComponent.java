@@ -28,6 +28,8 @@ import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.world.item.ItemTypes;
 import com.zachsthings.libcomponents.ComponentInformation;
 import com.zachsthings.libcomponents.Depend;
 import com.zachsthings.libcomponents.InjectComponent;
@@ -74,7 +76,10 @@ public class ThorComponent extends BukkitComponent implements Listener {
     }
 
     private static class LocalConfiguration extends ConfigurationBase {
-        @Setting("hammer-items") public Set<Integer> thorItems = new HashSet<Integer>(Arrays.asList(278, 285, 257, 270));
+        @Setting("hammer-items") public Set<String> thorItems = new HashSet<>(Arrays.asList(
+                ItemTypes.WOODEN_PICKAXE.getId(), ItemTypes.STONE_PICKAXE.getId(), ItemTypes.IRON_PICKAXE.getId(),
+                ItemTypes.GOLDEN_PICKAXE.getId(), ItemTypes.DIAMOND_PICKAXE.getId()
+        ));
     }
 
     @EventHandler
@@ -82,7 +87,7 @@ public class ThorComponent extends BukkitComponent implements Listener {
         Player player = event.getPlayer();
 
         if (sessions.getSession(UserSession.class, player).hasThor()) {
-            if (!config.thorItems.contains(player.getItemInHand().getTypeId())) {
+            if (!config.thorItems.contains(BukkitAdapter.adapt(player.getItemInHand()).getType().getId())) {
                 return;
             }
 
