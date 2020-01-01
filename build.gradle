@@ -74,6 +74,8 @@ allprojects {
         compile 'com.destroystokyo.paper:paper-api:1.15.1-R0.1-SNAPSHOT'
         compile 'com.sk89q.worldedit:worldedit-core:7.1.0-SNAPSHOT'
         compile 'com.sk89q.worldedit:worldedit-bukkit:7.1.0-SNAPSHOT'
+        compile 'org.enginehub.jinglenote:jinglenote-core:1.0.0-SNAPSHOT'
+        compile 'org.enginehub.jinglenote:jinglenote-bukkit:1.0.0-SNAPSHOT'
         compile 'com.zachsthings.libcomponents:libcomponents-bukkit:1.3.0-SNAPSHOT'
         compile 'net.sf.opencsv:opencsv:2.0'
 
@@ -112,6 +114,10 @@ allprojects {
         dependencies {
             include(dependency('net.sf.opencsv:opencsv'))
             include(dependency('com.zachsthings.libcomponents:libcomponents-bukkit'))
+            relocate ("org.enginehub.jinglenote", "com.sk89q.commandbook.enginehub.jinglenote") {
+                include(dependency("org.enginehub.jinglenote:jinglenote-core"))
+                include(dependency("org.enginehub.jinglenote:jinglenote-bukkit"))
+            }
         }
 
         exclude 'GradleStart**'
