@@ -18,12 +18,11 @@
 
 package com.sk89q.commandbook.util;
 
-import com.sk89q.commandbook.locations.NamedLocation;
-import com.sk89q.commandbook.locations.RootLocationManager;
+import com.sk89q.commandbook.component.locations.NamedLocation;
+import com.sk89q.commandbook.component.locations.RootLocationManager;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.world.block.BlockType;
 import com.zachsthings.libcomponents.bukkit.BasePlugin;
 import org.bukkit.Location;
 import org.bukkit.World;

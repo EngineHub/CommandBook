@@ -1,9 +1,8 @@
 package com.sk89q.commandbook.util;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import com.sk89q.commandbook.CommandBook;
-import com.sk89q.commandbook.locations.*;
+import com.sk89q.commandbook.component.locations.*;
 import com.sk89q.commandbook.util.entity.player.PlayerUtil;
 import com.sk89q.commandbook.util.entity.player.comparison.PlayerComparisonUtil;
 import com.sk89q.minecraft.util.commands.CommandContext;

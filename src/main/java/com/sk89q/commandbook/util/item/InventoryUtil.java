@@ -1,14 +1,12 @@
 package com.sk89q.commandbook.util.item;
 
 import com.sk89q.commandbook.CommandBook;
-import com.sk89q.commandbook.InventoryComponent;
+import com.sk89q.commandbook.component.inventory.InventoryComponent;
 import com.sk89q.commandbook.util.ChatUtil;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.world.registry.BundledItemData;
-import com.sk89q.worldedit.world.registry.BundledRegistries;
 import com.sk89q.worldedit.world.registry.ItemMaterial;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;

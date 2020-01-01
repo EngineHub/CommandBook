@@ -19,13 +19,12 @@
 
 package com.sk89q.commandbook;
 
-import com.sk89q.bukkit.util.CommandsManagerRegistration;
-import com.sk89q.commandbook.commands.CommandBookCommands;
+import com.google.common.base.Joiner;
+import com.sk89q.commandbook.component.session.SessionComponent;
 import com.sk89q.commandbook.config.LegacyCommandBookConfigurationMigrator;
-import com.sk89q.commandbook.session.SessionComponent;
-import com.sk89q.minecraft.util.commands.*;
 import com.sk89q.util.yaml.YAMLFormat;
 import com.sk89q.util.yaml.YAMLProcessor;
+import com.sk89q.worldedit.internal.command.CommandUtil;
 import com.zachsthings.libcomponents.InjectComponent;
 import com.zachsthings.libcomponents.InjectComponentAnnotationHandler;
 import com.zachsthings.libcomponents.bukkit.BasePlugin;
@@ -37,7 +36,6 @@ import com.zachsthings.libcomponents.loader.ClassLoaderComponentLoader;
 import com.zachsthings.libcomponents.loader.ConfigListedComponentLoader;
 import com.zachsthings.libcomponents.loader.JarFilesComponentLoader;
 import com.zachsthings.libcomponents.loader.StaticComponentLoader;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.Listener;
@@ -45,10 +43,7 @@ import org.yaml.snakeyaml.error.YAMLException;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -61,7 +56,7 @@ public final class CommandBook extends BasePlugin {
 
     private static CommandBook instance;
 
-    private CommandsManager<CommandSender> commands;
+    private PlatformCommandManager commandManager = new PlatformCommandManager(this);
 
     private Map<String, Integer> itemNames;
     public boolean broadcastChanges;
@@ -87,33 +82,15 @@ public final class CommandBook extends BasePlugin {
         server().getPluginManager().registerEvents(listener, inst());
     }
 
-    /**
-     * Called when the plugin is enabled. This is where configuration is loaded,
-     * and the plugin is setup.
-     */
+    private void publishPistonCommands() {
+        commandManager.registerCommandsWith(this);
+    }
+
+    @Override
     public void onEnable() {
         super.onEnable();
 
-        // Register the commands that we want to use
-        final CommandBook plugin = this;
-        commands = new CommandsManager<CommandSender>() {
-            @Override
-            public boolean hasPermission(CommandSender player, String perm) {
-                return plugin.hasPermission(player, perm);
-            }
-        };
-
-		final CommandsManagerRegistration cmdRegister = new CommandsManagerRegistration(this, commands);
-        if (lowPriorityCommandRegistration) {
-            getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
-                @Override
-                public void run() {
-                    cmdRegister.register(CommandBookCommands.CommandBookParentCommand.class);
-                }
-            }, 1L);
-        } else {
-            cmdRegister.register(CommandBookCommands.CommandBookParentCommand.class);
-        }
+        publishPistonCommands();
     }
 
     public void registerComponentLoaders() {
@@ -169,33 +146,34 @@ public final class CommandBook extends BasePlugin {
         componentManager.registerAnnotationHandler(InjectComponent.class, new InjectComponentAnnotationHandler(componentManager));
     }
 
+    // FIXME: Backport to WorldEdit/common lib
+    private String rebuildArguments(String commandLabel, String[] args) {
+        int plSep = commandLabel.indexOf(":");
+        if (plSep >= 0 && plSep < commandLabel.length() + 1) {
+            commandLabel = commandLabel.substring(plSep + 1);
+        }
+
+        StringBuilder sb = new StringBuilder("/").append(commandLabel);
+        if (args.length > 0) {
+            sb.append(" ");
+        }
+
+        return Joiner.on(" ").appendTo(sb, args).toString();
+    }
+
     /**
      * Called on a command.
      */
     @Override
-    public boolean onCommand(CommandSender sender, Command cmd,
-            String commandLabel, String[] args) {
-        try {
-            commands.execute(cmd.getName(), args, sender, sender);
-        } catch (CommandPermissionsException e) {
-            sender.sendMessage(ChatColor.RED + "You don't have permission.");
-        } catch (MissingNestedCommandException e) {
-            sender.sendMessage(ChatColor.RED + e.getUsage());
-        } catch (CommandUsageException e) {
-            sender.sendMessage(ChatColor.RED + e.getMessage());
-            sender.sendMessage(ChatColor.RED + e.getUsage());
-        } catch (WrappedCommandException e) {
-            if (e.getCause() instanceof NumberFormatException) {
-                sender.sendMessage(ChatColor.RED + "Number expected, string received instead.");
-            } else {
-                sender.sendMessage(ChatColor.RED + "An error has occurred. See console.");
-                e.printStackTrace();
-            }
-        } catch (CommandException e) {
-            sender.sendMessage(ChatColor.RED + e.getMessage());
-        }
-
+    public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
+        commandManager.handleCommand(sender, rebuildArguments(commandLabel, args));
         return true;
+    }
+
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command cmd, String commandLabel, String[] args) {
+        String arguments = rebuildArguments(commandLabel, args);
+        return CommandUtil.fixSuggestions(arguments, commandManager.handleCommandSuggestion(sender, arguments));
     }
 
     /**

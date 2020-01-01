@@ -1,75 +1,75 @@
 bans:
-    class: com.sk89q.commandbook.bans.BansComponent
+    class: com.sk89q.commandbook.component.bans.BansComponent
     default: true
 homes:
-    class: com.sk89q.commandbook.locations.HomesComponent
+    class: com.sk89q.commandbook.component.locations.HomesComponent
     default: true
 warps:
-    class: com.sk89q.commandbook.locations.WarpsComponent
+    class: com.sk89q.commandbook.component.locations.WarpsComponent
     default: true
 freeze:
-    class: com.sk89q.commandbook.FreezeComponent
+    class: com.sk89q.commandbook.component.freeze.FreezeComponent
     default: false
 afk:
-    class: com.sk89q.commandbook.AFKComponent
+    class: com.sk89q.commandbook.component.afk.AFKComponent
     default: true
 messaging:
-    class: com.sk89q.commandbook.MessagingComponent
+    class: com.sk89q.commandbook.component.messaging.MessagingComponent
     default: true
 teleport:
-    class: com.sk89q.commandbook.locations.TeleportComponent
+    class: com.sk89q.commandbook.component.locations.TeleportComponent
     default: true
 items:
-    class: com.sk89q.commandbook.InventoryComponent
+    class: com.sk89q.commandbook.component.inventory.InventoryComponent
     default: true
 kits:
-    class: com.sk89q.commandbook.kits.KitsComponent
+    class: com.sk89q.commandbook.component.kits.KitsComponent
     default: true
 midi:
-    class: com.sk89q.commandbook.jinglenote.JingleNoteComponent
+    class: com.sk89q.commandbook.component.jinglenote.JingleNoteComponent
     default: true
 time:
-    class: com.sk89q.commandbook.time.TimeComponent
+    class: com.sk89q.commandbook.component.time.TimeComponent
     default: true
 name-verification:
-    class: com.sk89q.commandbook.NameVerificationComponent
+    class: com.sk89q.commandbook.component.nameverification.NameVerificationComponent
     default: true
 fun:
-    class: com.sk89q.commandbook.FunComponent
+    class: com.sk89q.commandbook.component.fun.FunComponent
     default: true
 debug:
-    class: com.sk89q.commandbook.DebugComponent
+    class: com.sk89q.commandbook.component.debug.DebugComponent
     default: true
 thor:
-    class: com.sk89q.commandbook.ThorComponent
+    class: com.sk89q.commandbook.component.thor.ThorComponent
     default: true
 online-list:
-    class: com.sk89q.commandbook.OnlineListComponent
+    class: com.sk89q.commandbook.component.onlinelist.OnlineListComponent
     default: true
 stored-messages:
-    class: com.sk89q.commandbook.StoredMessagesComponent
+    class: com.sk89q.commandbook.component.storedmessages.StoredMessagesComponent
     default: true
 spawn-locations:
-    class: com.sk89q.commandbook.locations.SpawnLocationsComponent
+    class: com.sk89q.commandbook.component.locations.SpawnLocationsComponent
     default: true
 info:
-    class: com.sk89q.commandbook.InfoComponent
+    class: com.sk89q.commandbook.component.info.InfoComponent
     default: true
 world:
-    class: com.sk89q.commandbook.WorldComponent
+    class: com.sk89q.commandbook.component.world.WorldComponent
     default: true
 player:
-    class: com.sk89q.commandbook.PlayerComponent
+    class: com.sk89q.commandbook.component.player.PlayerComponent
     default: true
 help:
-    class: com.sk89q.commandbook.HelpComponent
+    class: com.sk89q.commandbook.component.help.HelpComponent
     default: false
 god:
-    class: com.sk89q.commandbook.GodComponent
+    class: com.sk89q.commandbook.component.god.GodComponent
     default: true
 flight:
-    class: com.sk89q.commandbook.FlightComponent
+    class: com.sk89q.commandbook.component.flight.FlightComponent
     default: true
 #cooldowns:
-#    class: com.sk89q.commandbook.CooldownsComponent
+#    class: com.sk89q.commandbook.component.cooldowns.CooldownsComponent
 #    default: false
