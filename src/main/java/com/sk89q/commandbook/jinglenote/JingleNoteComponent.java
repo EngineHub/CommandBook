@@ -16,13 +16,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.commandbook;
+package com.sk89q.commandbook.jinglenote;
 
 import com.google.common.collect.Lists;
+import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.util.InputUtil;
 import com.sk89q.commandbook.util.entity.player.PlayerUtil;
-import com.sk89q.jinglenote.JingleNoteManager;
-import com.sk89q.jinglenote.MidiJingleSequencer;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
@@ -36,6 +35,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.enginehub.jinglenote.sequencer.MidiJingleSequencer;
 
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiUnavailableException;
@@ -80,24 +80,19 @@ public class JingleNoteComponent extends BukkitComponent implements Listener {
             File file = new File(CommandBook.inst().getDataFolder(), "intro.mid");
             if (file.exists()) {
                 sequencer = new MidiJingleSequencer(file, false);
-                getJingleNoteManager().play(event.getPlayer().getName(), sequencer);
+                getJingleNoteManager().play(event.getPlayer(), sequencer);
             }
         } catch (MidiUnavailableException e) {
-            CommandBook.logger().log(Level.WARNING, "Failed to access MIDI: "
-                    + e.getMessage());
-        } catch (InvalidMidiDataException e) {
-            CommandBook.logger().log(Level.WARNING, "Failed to read intro MIDI file: "
-                    + e.getMessage());
+            CommandBook.logger().log(Level.WARNING, "Failed to access MIDI: " + e.getMessage());
         } catch (FileNotFoundException ignored) {
-        } catch (IOException e) {
-            CommandBook.logger().log(Level.WARNING, "Failed to read intro MIDI file: "
-                    + e.getMessage());
+        } catch (InvalidMidiDataException | IOException e) {
+            CommandBook.logger().log(Level.WARNING, "Failed to read intro MIDI file: " + e.getMessage());
         }
     }
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
-        getJingleNoteManager().stop(event.getPlayer().getName());
+        getJingleNoteManager().stop(event.getPlayer());
     }
 
     public class Commands {
@@ -124,20 +119,15 @@ public class JingleNoteComponent extends BukkitComponent implements Listener {
             try {
                 MidiJingleSequencer sequencer = new MidiJingleSequencer(new File(CommandBook.inst().getDataFolder(), "intro.mid"), false);
                 for (Player player : targets) {
-                    getJingleNoteManager().play(player.getName(), sequencer);
+                    getJingleNoteManager().play(player, sequencer);
                     player.sendMessage(ChatColor.YELLOW + "Playing intro.midi...");
                 }
             } catch (MidiUnavailableException e) {
-                throw new CommandException("Failed to access MIDI: "
-                        + e.getMessage());
-            } catch (InvalidMidiDataException e) {
-                throw new CommandException("Failed to read intro MIDI file: "
-                        + e.getMessage());
+                throw new CommandException("Failed to access MIDI: " + e.getMessage());
             } catch (FileNotFoundException e) {
                 throw new CommandException("No intro.mid is available.");
-            } catch (IOException e) {
-                throw new CommandException("Failed to read intro MIDI file: "
-                        + e.getMessage());
+            } catch (InvalidMidiDataException | IOException e) {
+                throw new CommandException("Failed to read intro MIDI file: " + e.getMessage());
             }
         }
 
@@ -161,7 +151,7 @@ public class JingleNoteComponent extends BukkitComponent implements Listener {
 
             if (args.argsLength() == 0) {
                 for (Player target : targets) {
-                    if (getJingleNoteManager().stop(target.getName())) {
+                    if (getJingleNoteManager().stop(target)) {
                         target.sendMessage(ChatColor.YELLOW + "All music stopped.");
                     }
                 }
@@ -201,21 +191,16 @@ public class JingleNoteComponent extends BukkitComponent implements Listener {
             try {
                 MidiJingleSequencer sequencer = new MidiJingleSequencer(file, false);
                 for (Player player : targets) {
-                    getJingleNoteManager().play(player.getName(), sequencer);
+                    getJingleNoteManager().play(player, sequencer);
                     player.sendMessage(ChatColor.YELLOW + "Playing " + file.getName()
                             + "... Use '/midi' to stop.");
                 }
             } catch (MidiUnavailableException e) {
-                throw new CommandException("Failed to access MIDI: "
-                        + e.getMessage());
-            } catch (InvalidMidiDataException e) {
-                throw new CommandException("Failed to read intro MIDI file: "
-                        + e.getMessage());
+                throw new CommandException("Failed to access MIDI: " + e.getMessage());
             } catch (FileNotFoundException e) {
                 throw new CommandException("The specified MIDI file was not found.");
-            } catch (IOException e) {
-                throw new CommandException("Failed to read intro MIDI file: "
-                        + e.getMessage());
+            } catch (InvalidMidiDataException | IOException e) {
+                throw new CommandException("Failed to read intro MIDI file: " + e.getMessage());
             }
         }
     }

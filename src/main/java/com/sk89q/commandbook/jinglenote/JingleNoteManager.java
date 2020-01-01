@@ -17,12 +17,16 @@
  */
 
 
-package com.sk89q.jinglenote;
+package com.sk89q.commandbook.jinglenote;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
-import com.sk89q.jinglenote.bukkit.BukkitJingleNotePlayer;
+import org.bukkit.entity.Player;
+import org.enginehub.jinglenote.JingleNotePlayer;
+import org.enginehub.jinglenote.bukkit.BukkitJingleNotePlayer;
+import org.enginehub.jinglenote.sequencer.JingleSequencer;
 
 /**
  * A manager of play instances.
@@ -30,45 +34,48 @@ import com.sk89q.jinglenote.bukkit.BukkitJingleNotePlayer;
  * @author sk89q
  */
 public class JingleNoteManager {
-
     /**
      * List of instances.
      */
-    protected final Map<String, JingleNotePlayer> instances = new HashMap<String, JingleNotePlayer>();
+    protected final Map<UUID, JingleNotePlayer> instances = new HashMap<>();
 
-    public void play(String player, JingleSequencer sequencer) {
+    public void play(Player player, JingleSequencer sequencer) {
+        UUID playerID = player.getUniqueId();
 
         // Existing player found!
-        if (instances.containsKey(player)) {
-            JingleNotePlayer existing = instances.get(player);
+        if (instances.containsKey(playerID)) {
+            JingleNotePlayer existing = instances.get(playerID);
             existing.stop();
-            instances.remove(player);
+            instances.remove(playerID);
         }
 
         JingleNotePlayer notePlayer = new BukkitJingleNotePlayer(player, sequencer);
-        Thread thread = new Thread(notePlayer);
+        Thread thread = new Thread(notePlayer::play);
         thread.setDaemon(true);
         thread.setPriority(Thread.MAX_PRIORITY);
-        thread.setName("JingleNotePlayer for " + player);
+        thread.setName("JingleNotePlayer for " + playerID);
         thread.start();
 
-        instances.put(player, notePlayer);
+        instances.put(playerID, notePlayer);
     }
 
-    public boolean stop(String player) {
-
+    public boolean stop(UUID playerID) {
         // Existing player found!
-        if (instances.containsKey(player)) {
-            JingleNotePlayer existing = instances.get(player);
+        if (instances.containsKey(playerID)) {
+            JingleNotePlayer existing = instances.get(playerID);
             existing.stop();
-            instances.remove(player);
+            instances.remove(playerID);
             return true;
         }
+
         return false;
     }
 
-    public void stopAll() {
+    public boolean stop(Player player) {
+        return stop(player.getUniqueId());
+    }
 
+    public void stopAll() {
         for (JingleNotePlayer notePlayer : instances.values()) {
             notePlayer.stop();
         }

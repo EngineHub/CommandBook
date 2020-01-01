@@ -16,7 +16,7 @@ CommandBook adds essential commands for managing your server, from teleportation
 Compiling
 ---------
 
-The project is written for Java 6 and our build process makes use of [Maven](http://maven.apache.org). Detailed compilation information [can be found on the wiki](http://wiki.sk89q.com/wiki/CommandBook/Development#Compiling).
+The project is written for Java 8 and our build process makes use of [Maven](http://maven.apache.org). Detailed compilation information [can be found on the wiki](http://wiki.sk89q.com/wiki/CommandBook/Development#Compiling).
 
 Dependencies are automatically handled by Maven.
 

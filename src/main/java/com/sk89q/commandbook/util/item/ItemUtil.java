@@ -20,8 +20,12 @@ package com.sk89q.commandbook.util.item;
 
 import com.sk89q.commandbook.CommandBook;
 import com.sk89q.minecraft.util.commands.CommandException;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.blocks.*;
+import com.sk89q.worldedit.extension.input.InputParseException;
+import com.sk89q.worldedit.extension.input.ParserContext;
 import org.bukkit.DyeColor;
+import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 
@@ -31,23 +35,6 @@ import java.util.Random;
  * Various item helper methods that do not depend on user-configurable information.
  */
 public class ItemUtil {
-
-    /**
-     * Gets the name of an item.
-     *
-     * @param id
-     * @return
-     */
-    public static String toItemName(int id) {
-        ItemType type = ItemType.fromID(id);
-
-        if (type != null) {
-            return type.getName();
-        } else {
-            return "#" + id;
-        }
-    }
-
     /**
      * Returns a matched item.
      *
@@ -55,7 +42,7 @@ public class ItemUtil {
      * @return item
      * @see  #getCommandItem(String)
      */
-    public static ItemStack getItem(String name) {
+    public static BaseItem getItem(String name) {
         try {
             return getCommandItem(name);
         } catch (CommandException e) {
@@ -64,85 +51,12 @@ public class ItemUtil {
     }
 
 
-    public static ItemStack getCommandItem(String name) throws CommandException {
-        int id;
-        int dmg = 0;
-        String dataName = null;
-        String enchantmentName = null;
-
-        if (name.contains("|")) {
-            String[] parts = name.split("\\|");
-            name = parts[0];
-            enchantmentName = parts[1];
-        }
-
-        if (name.contains(":")) {
-            String[] parts = name.split(":", 2);
-            dataName = parts[1];
-            name = parts[0];
-        }
-
-
-
+    public static BaseItem getCommandItem(String name) throws CommandException {
         try {
-            id = Integer.parseInt(name);
-        } catch (NumberFormatException e) {
-            // First check the configurable list of aliases
-            Integer idTemp = CommandBook.inst().getItemNames().get(name.toLowerCase());
-
-            if (idTemp != null) {
-                id = idTemp;
-            } else {
-                // Then check WorldEdit
-                ItemType type = ItemType.lookup(name);
-
-                if (type == null) {
-                    throw new CommandException("No item type known by '" + name + "'");
-                }
-
-                id = type.getID();
-            }
+            return WorldEdit.getInstance().getItemFactory().parseFromInput(name, new ParserContext());
+        } catch (InputParseException e) {
+            throw new CommandException(e.getMessage());
         }
-
-        // If the user specified an item data or damage value, let's try
-        // to parse it!
-        if (dataName != null) {
-            dmg = matchItemData(id, dataName);
-        }
-
-        ItemStack stack = new ItemStack(id, 1, (short)dmg);
-
-        if (enchantmentName != null) {
-            String[] enchantments = enchantmentName.split(",");
-            for (String enchStr : enchantments) {
-                int level = 1;
-                if (enchStr.contains(":")) {
-                    String[] parts = enchStr.split(":");
-                    enchStr = parts[0];
-                    try {
-                        level = Integer.parseInt(parts[1]);
-                    } catch (NumberFormatException ignore) {}
-                }
-
-                Enchantment ench = null;
-                final String testName = enchStr.toLowerCase().replaceAll("[_\\-]", "");
-                for (Enchantment possible : Enchantment.values()) {
-                    if (possible.getName().toLowerCase().replaceAll("[_\\-]", "").equals(testName)) {
-                        ench = possible;
-                        break;
-                    }
-                }
-
-                if (ench == null) {
-                    throw new CommandException("Unknown enchantment '" + enchStr + "'");
-                }
-
-                stack.addUnsafeEnchantment(ench, level);
-            }
-
-        }
-
-        return stack;
     }
 
     /**
@@ -152,7 +66,7 @@ public class ItemUtil {
      * @param infinite
      */
     public static void expandStack(ItemStack item, boolean infinite, boolean overrideStackSize) {
-        if (item == null || item.getAmount() == 0 || item.getTypeId() <= 0) {
+        if (item == null || item.getAmount() == 0 || item.getType() == Material.AIR) {
             return;
         }
 
@@ -170,72 +84,6 @@ public class ItemUtil {
     }
 
     /**
-     * Attempt to match item data values.
-     *
-     * @param id
-     * @param filter
-     * @return
-     * @throws com.sk89q.minecraft.util.commands.CommandException
-     */
-    public static int matchItemData(int id, String filter) throws CommandException {
-        try {
-            // First let's try the filter as if it was a number
-            return Integer.parseInt(filter);
-        } catch (NumberFormatException ignored) {
-        }
-
-        // So the value isn't a number, but it may be an alias!
-        switch (id) {
-            case BlockID.WOOD:
-                if (filter.equalsIgnoreCase("redwood")) {
-                    return 1;
-                } else if (filter.equalsIgnoreCase("birch")) {
-                    return 2;
-                }
-
-                throw new CommandException("Unknown wood type name of '" + filter + "'.");
-            case BlockID.STEP:
-            case BlockID.DOUBLE_STEP:
-                BlockType dataType = BlockType.lookup(filter);
-
-                if (dataType != null) {
-                    if (dataType == BlockType.STONE) {
-                        return 0;
-                    } else if (dataType == BlockType.SANDSTONE) {
-                        return 1;
-                    } else if (dataType == BlockType.WOOD) {
-                        return 2;
-                    } else if (dataType == BlockType.COBBLESTONE) {
-                        return 3;
-                    } else {
-                        throw new CommandException("Invalid slab material of '" + filter + "'.");
-                    }
-                } else {
-                    throw new CommandException("Unknown slab material of '" + filter + "'.");
-                }
-            case BlockID.CLOTH:
-            case BlockID.STAINED_CLAY:
-            case BlockID.STAINED_GLASS:
-            case BlockID.STAINED_GLASS_PANE:
-                ClothColor col = ClothColor.lookup(filter);
-                if (col != null) {
-                    return col.getID();
-                }
-
-                throw new CommandException("Unknown wool color name of '" + filter + "'.");
-            case ItemID.INK_SACK: // Dye
-                ClothColor dyeCol = ClothColor.lookup(filter);
-                if (dyeCol != null) {
-                    return 15 - dyeCol.getID();
-                }
-
-                throw new CommandException("Unknown dye color name of '" + filter + "'.");
-            default:
-                throw new CommandException("Invalid data value of '" + filter + "'.");
-        }
-    }
-
-    /**
      * Attempt to match a dye color for sheep wool.
      *
      * @param filter
@@ -244,14 +92,14 @@ public class ItemUtil {
      */
     public static DyeColor matchDyeColor(String filter) throws CommandException {
         if (filter.equalsIgnoreCase("random")) {
-            return DyeColor.getByData((byte) new Random().nextInt(15));
+            DyeColor[] values = DyeColor.values();
+            return values[new Random().nextInt(values.length)];
         }
+
         try {
-            DyeColor match = DyeColor.valueOf(filter.toUpperCase());
-            if (match != null) {
-                return match;
-            }
+            return DyeColor.valueOf(filter.toUpperCase());
         } catch (IllegalArgumentException ignored) {}
+
         throw new CommandException("Unknown dye color name of '" + filter + "'.");
     }
 }

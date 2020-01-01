@@ -19,6 +19,9 @@
 package com.sk89q.commandbook.kits;
 
 import com.sk89q.commandbook.util.item.ItemUtil;
+import com.sk89q.worldedit.blocks.BaseItem;
+import com.sk89q.worldedit.blocks.BaseItemStack;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.*;
@@ -101,28 +104,28 @@ public class FlatFileKitsManager implements KitManager {
                 }
 
                 String[] parts = line.split("-");
-                ItemStack item = ItemUtil.getItem(parts[0].replace(" ", ""));
+                BaseItem item = ItemUtil.getItem(parts[0].replace(" ", ""));
 
                 if (item == null) {
                     logger().warning(" Unknown kit item '" + parts[0].replaceAll(" ", "") + "'");
                     continue;
                 }
 
+                int amount = 1;
                 // Attempt to parse an amount
                 if (parts.length >= 2) {
                     try {
-                        item.setAmount(Integer.parseInt(parts[1]));
+                        amount = Integer.parseInt(parts[1]);
                     } catch (NumberFormatException e) {
                         logger().warning("Invalid amount: '" + parts[1] + "'");
                     }
                 }
 
-                kit.addItem(item);
+                kit.addItem(BukkitAdapter.adapt(new BaseItemStack(item.getType(), item.getNbtData(), amount)));
             }
 
             logger().info(kits.size() + " kit(s) loaded.");
-        } catch (FileNotFoundException ignore) {
-        } catch (UnsupportedEncodingException ignore) {
+        } catch (FileNotFoundException | UnsupportedEncodingException ignore) {
         } catch (IOException e) {
             logger().warning("Failed to load kits.txt: "
                     + e.getMessage());

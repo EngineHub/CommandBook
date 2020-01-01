@@ -28,6 +28,10 @@ import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
+import com.sk89q.worldedit.blocks.BaseItem;
+import com.sk89q.worldedit.blocks.BaseItemStack;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.world.block.BlockType;
 import com.zachsthings.libcomponents.ComponentInformation;
 import com.zachsthings.libcomponents.bukkit.BasePlugin;
 import com.zachsthings.libcomponents.bukkit.BukkitComponent;
@@ -110,7 +114,7 @@ public class FunComponent extends BukkitComponent {
         if (creature instanceof Skeleton) {
             creature.getEquipment().setItemInHand(new ItemStack(Material.BOW));
         } else if (creature instanceof PigZombie) {
-            creature.getEquipment().setItemInHand(new ItemStack(Material.GOLD_SWORD));
+            creature.getEquipment().setItemInHand(new ItemStack(Material.GOLDEN_SWORD));
         }
 
         String[] types = specialTypes.split(",");
@@ -177,9 +181,11 @@ public class FunComponent extends BukkitComponent {
                         }
                         break;
                     case ENDERMAN:
-                        ItemStack item = ItemUtil.getItem(specialType);
+                        BaseItem item = ItemUtil.getItem(specialType);
                         if (item == null) return creature;
-                        ((Enderman) creature).setCarriedMaterial(item.getData());
+                        BlockType blockType = item.getType().getBlockType();
+                        if (blockType == null) return creature;
+                        ((Enderman) creature).setCarriedBlock(BukkitAdapter.adapt(blockType.getDefaultState()));
                         break outerloop; // only one set of hands
                     case IRON_GOLEM:
                         if (specialType.matches("(?i)(friendly|player(-created)?)")) {

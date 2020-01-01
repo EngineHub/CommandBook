@@ -4,6 +4,12 @@ import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.InventoryComponent;
 import com.sk89q.commandbook.util.ChatUtil;
 import com.sk89q.minecraft.util.commands.CommandException;
+import com.sk89q.worldedit.blocks.BaseItem;
+import com.sk89q.worldedit.blocks.BaseItemStack;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.world.registry.BundledItemData;
+import com.sk89q.worldedit.world.registry.BundledRegistries;
+import com.sk89q.worldedit.world.registry.ItemMaterial;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -25,15 +31,16 @@ public class InventoryUtil {
      * @throws com.sk89q.minecraft.util.commands.CommandException
      */
     @SuppressWarnings("deprecation")
-    public static void giveItem(CommandSender sender, ItemStack item, int amt,
+    public static void giveItem(CommandSender sender, BaseItem item, int amt,
                                 Collection<Player> targets, InventoryComponent component, boolean drop, boolean overrideStackSize)
             throws CommandException {
 
         boolean infinite = false; // Is the stack infinite?
 
-        int maxStackSize = overrideStackSize ? 64 : item.getType().getMaxStackSize();
+        ItemMaterial material = item.getType().getMaterial();
+        int maxStackSize = overrideStackSize ? 64 : material.getMaxStackSize();
 
-        component.checkAllowedItem(sender, item.getTypeId(), item.getDurability());
+        component.checkAllowedItem(sender, item);
 
         // Check for invalid amounts
         if (amt == 0 || amt < -1) {
@@ -59,32 +66,34 @@ public class InventoryUtil {
         if (targetQuantity > 1 || !targets.contains(sender)) {
             sender.sendMessage(ChatColor.YELLOW.toString() + targetQuantity + " player(s)"
                     + " have been given " + getAmountText(false, infinite, amt)
-                    + ' ' + ItemUtil.toItemName(item.getTypeId()) + '.');
+                    + ' ' + item.getType().toString() + '.');
         }
 
 
+        BaseItemStack itemStack = new BaseItemStack(item.getType(), item.getNbtData(), 1);
+        ItemStack bukkitItemStack = BukkitAdapter.adapt(itemStack);
         for (Player player : targets) {
             int left = amt;
 
             // Give individual stacks
             while (left > 0 || infinite) {
                 int givenAmt = Math.min(maxStackSize, left);
-                item = item.clone(); // This prevents the possibility of a linked ItemStack issue
-                item.setAmount(givenAmt);
+                bukkitItemStack = bukkitItemStack.clone(); // This prevents the possibility of a linked ItemStack issue
+                bukkitItemStack.setAmount(givenAmt);
                 left -= givenAmt;
 
                 // The -d flag drops the items naturally on the ground instead
                 // of directly giving the player the item
                 if (drop) {
-                    player.getWorld().dropItemNaturally(player.getLocation(), item);
+                    player.getWorld().dropItemNaturally(player.getLocation(), bukkitItemStack);
                 } else {
-                    Collection<ItemStack> result = player.getInventory().addItem(item).values();
+                    Collection<ItemStack> result = player.getInventory().addItem(bukkitItemStack).values();
                     // Check for items that couldn't be added
                     if (!result.isEmpty()) {
                         for (ItemStack stack : result) {
                             left += stack.getAmount();
                             sender.sendMessage(ChatColor.RED + getAmountText(true, infinite, left)
-                                    + ' ' + ItemUtil.toItemName(stack.getTypeId())
+                                    + ' ' + item.getType().getName()
                                     + " could not be given to "
                                     + player.getName() + " (their inventory is probably full)!");
                         }
@@ -105,12 +114,12 @@ public class InventoryUtil {
             // Tell the user about the given item
             if (player.equals(sender)) {
                 player.sendMessage(ChatColor.YELLOW + "You've been given " + amtString + " "
-                        + ItemUtil.toItemName(item.getTypeId()) + ".");
+                        + item.getType().getName() + ".");
             } else {
                 player.sendMessage(ChatColor.YELLOW + "Given from "
                         + ChatUtil.toColoredName(sender, ChatColor.YELLOW) + ": "
                         + amtString + " "
-                        + ItemUtil.toItemName(item.getTypeId()) + ".");
+                        + item.getType().getName() + ".");
 
             }
         }
@@ -129,7 +138,7 @@ public class InventoryUtil {
      * @param target
      * @throws CommandException
      */
-    public static void takeItem(CommandSender sender, ItemStack item, int amt,
+    public static void takeItem(CommandSender sender, BaseItem item, int amt,
                                 Player target)
             throws CommandException {
 
@@ -139,20 +148,20 @@ public class InventoryUtil {
         }
 
 
-        item.setAmount(amt);
-        if (target.getInventory().contains(item.getTypeId())) {
-            target.getInventory().removeItem(item);
+        ItemStack bukkitStack = BukkitAdapter.adapt(new BaseItemStack(item.getType(), item.getNbtData(), amt));
+        if (target.getInventory().contains(bukkitStack)) {
+            target.getInventory().removeItem(bukkitStack);
 
             target.sendMessage(ChatColor.YELLOW + "Taken from "
                     + ChatUtil.toColoredName(sender, ChatColor.YELLOW) + ": "
                     + amt + " "
-                    + ItemUtil.toItemName(item.getTypeId()) + ".");
+                    + item.getType().getName() + ".");
 
             sender.sendMessage(ChatColor.YELLOW.toString() + amt + " "
-                    + ItemUtil.toItemName(item.getTypeId()) + " has been taken.");
+                    + item.getType().getName() + " has been taken.");
         } else {
             sender.sendMessage(ChatColor.YELLOW.toString() + target.getName()
-                    + " has no " + ItemUtil.toItemName(item.getTypeId()) + ".");
+                    + " has no " + item.getType().getName() + ".");
         }
     }
 }

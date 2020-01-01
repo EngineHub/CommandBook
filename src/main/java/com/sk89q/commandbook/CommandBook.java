@@ -40,7 +40,6 @@ import com.zachsthings.libcomponents.loader.StaticComponentLoader;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.yaml.snakeyaml.error.YAMLException;
 
