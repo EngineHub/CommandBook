@@ -223,9 +223,9 @@ public class InputUtil {
             List<Player> list = new ArrayList<Player>();
 
             for (Player player : players) {
-                if (player.getName().toLowerCase().startsWith(filter)
+                if (player.getName().toLowerCase().equals(filter)
                         || (useDisplayNames
-                        && ChatColor.stripColor(player.getDisplayName().toLowerCase()).startsWith(filter))) {
+                        && ChatColor.stripColor(player.getDisplayName().toLowerCase()).equals(filter))) {
                     list.add(player);
                 }
             }
