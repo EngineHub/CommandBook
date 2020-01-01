@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -88,6 +89,12 @@ public class PlatformCommandManager {
 
     private void registerCoreCommands() {
         CommandBookCommands.register(commandManagerService, commandManager, registration);
+    }
+
+    public void registerComponentCommands(BiConsumer<CommandManager, CommandRegistrationHandler> op) {
+        CommandManager componentManager = commandManagerService.newCommandManager();
+        op.accept(componentManager, registration);
+        commandManager.registerManager(componentManager);
     }
 
     public void registerCommandsWith(CommandBook commandBook) {
@@ -144,7 +151,7 @@ public class PlatformCommandManager {
         log.error("An unexpected error while handling a CommandBook command", t);
     }
 
-    protected void handleCommand(CommandSender sender, String arguments) {
+    public void handleCommand(CommandSender sender, String arguments) {
         Actor actor = WorldEditAdapter.adapt(sender);
         String[] split = parseArgs(arguments).map(Substring::getSubstring).toArray(String[]::new);
 
@@ -205,7 +212,7 @@ public class PlatformCommandManager {
         }
     }
 
-    protected List<Substring> handleCommandSuggestion(CommandSender sender, String arguments) {
+    public List<Substring> handleCommandSuggestion(CommandSender sender, String arguments) {
         try {
             List<Substring> split = parseArgs(arguments).collect(Collectors.toList());
             List<String> argStrings = split.stream()

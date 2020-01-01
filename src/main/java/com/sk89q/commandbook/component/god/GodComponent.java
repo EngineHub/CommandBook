@@ -18,21 +18,12 @@
 
 package com.sk89q.commandbook.component.god;
 
-import com.google.common.collect.Lists;
 import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.component.info.InfoComponent;
-import com.sk89q.commandbook.util.ChatUtil;
-import com.sk89q.commandbook.util.InputUtil;
-import com.sk89q.commandbook.util.entity.player.PlayerUtil;
-import com.sk89q.minecraft.util.commands.Command;
-import com.sk89q.minecraft.util.commands.CommandContext;
-import com.sk89q.minecraft.util.commands.CommandException;
 import com.zachsthings.libcomponents.ComponentInformation;
 import com.zachsthings.libcomponents.bukkit.BukkitComponent;
 import com.zachsthings.libcomponents.config.ConfigurationBase;
 import com.zachsthings.libcomponents.config.Setting;
-import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -59,7 +50,11 @@ public class GodComponent extends BukkitComponent implements Listener {
     @Override
     public void enable() {
         config = configure(new LocalConfiguration());
-        registerCommands(Commands.class);
+
+        CommandBook.registerComponentCommands((commandManager, registration) -> {
+            registration.register(commandManager, GodCommandsRegistration.builder(), new GodCommands(this));
+        });
+
         // Check god mode for existing players, if any
         for (Player player : CommandBook.server().getOnlinePlayers()) {
             checkAutoEnable(player);
@@ -90,6 +85,7 @@ public class GodComponent extends BukkitComponent implements Listener {
     public void enableGodMode(Player player) {
         if (!hasGodMode(player)) {
             player.setMetadata(METADATA_KEY, new FixedMetadataValue(CommandBook.inst(), true));
+            player.setFireTicks(0);
         }
     }
 
@@ -198,124 +194,6 @@ public class GodComponent extends BukkitComponent implements Listener {
             if (CommandBook.inst().hasPermission(event.getSource(), "commandbook.god.check")) {
                 event.addWhoisInformation(null, "Player " + (hasGodMode((Player) event.getPlayer())
                         ? "has" : "does not have") + " god mode");
-            }
-        }
-    }
-
-    public class Commands {
-        @Command(aliases = {"god"}, usage = "[player]",
-                desc = "Enable godmode on a player", flags = "s", max = 1)
-        public void god(CommandContext args, CommandSender sender) throws CommandException {
-
-            Iterable<Player> targets = null;
-            boolean included = false;
-
-            // Detect arguments based on the number of arguments provided
-            if (args.argsLength() == 0) {
-                targets = Lists.newArrayList(PlayerUtil.checkPlayer(sender));
-            } else if (args.argsLength() == 1) {
-                targets = InputUtil.PlayerParser.matchPlayers(sender, args.getString(0));
-            }
-
-            // Check permissions!
-            for (Player player : targets) {
-                if (player == sender) {
-                    CommandBook.inst().checkPermission(sender, "commandbook.god");
-                } else {
-                    CommandBook.inst().checkPermission(sender, "commandbook.god.other");
-                    break;
-                }
-            }
-
-            for (Player player : targets) {
-                if (!hasGodMode(player)) {
-                    enableGodMode(player);
-                    player.setFireTicks(0);
-                } else {
-                    if (player == sender) {
-                        player.sendMessage(ChatColor.RED + "You already have god mode!");
-                        included = true;
-                    } else {
-                        sender.sendMessage(ChatColor.RED + player.getName() + " already has god mode!");
-                    }
-                    continue;
-                }
-
-                // Tell the user
-                if (player.equals(sender)) {
-                    player.sendMessage(ChatColor.YELLOW + "God mode enabled! Use /ungod to disable.");
-
-                    // Keep track of this
-                    included = true;
-                } else {
-                    if (!args.hasFlag('s'))
-                    player.sendMessage(ChatColor.YELLOW + "God enabled by "
-                            + ChatUtil.toColoredName(sender, ChatColor.YELLOW) + ".");
-
-                }
-            }
-
-            // The player didn't receive any items, then we need to send the
-            // user a message so s/he know that something is indeed working
-            if (!included) {
-                sender.sendMessage(ChatColor.YELLOW.toString() + "Players now have god mode.");
-            }
-        }
-
-        @Command(aliases = {"ungod"}, usage = "[player]",
-                desc = "Disable godmode on a player", flags = "s", max = 1)
-        public void ungod(CommandContext args, CommandSender sender) throws CommandException {
-
-            Iterable<Player> targets = null;
-            boolean included = false;
-
-            // Detect arguments based on the number of arguments provided
-            if (args.argsLength() == 0) {
-                targets = Lists.newArrayList(PlayerUtil.checkPlayer(sender));
-            } else if (args.argsLength() == 1) {
-                targets = InputUtil.PlayerParser.matchPlayers(sender, args.getString(0));
-            }
-
-            // Check permissions!
-            for (Player player : targets) {
-                if (player == sender) {
-                    CommandBook.inst().checkPermission(sender, "commandbook.god");
-                } else {
-                    CommandBook.inst().checkPermission(sender, "commandbook.god.other");
-                    break;
-                }
-            }
-
-            for (Player player : targets) {
-                if (hasGodMode(player)) {
-                    disableGodMode(player);
-                } else {
-                    if (player == sender) {
-                        player.sendMessage(ChatColor.RED + "You do not have god mode enabled!");
-                        included = true;
-                    } else {
-                        sender.sendMessage(ChatColor.RED + player.getName() + " did not have god mode enabled!");
-                    }
-                    continue;
-                }
-
-                // Tell the user
-                if (player.equals(sender)) {
-                    player.sendMessage(ChatColor.YELLOW + "God mode disabled!");
-
-                    // Keep track of this
-                    included = true;
-                } else {
-                    player.sendMessage(ChatColor.YELLOW + "God disabled by "
-                            + ChatUtil.toColoredName(sender, ChatColor.YELLOW) + ".");
-
-                }
-            }
-
-            // The player didn't receive any items, then we need to send the
-            // user a message so s/he know that something is indeed working
-            if (!included) {
-                sender.sendMessage(ChatColor.YELLOW.toString() + "Players no longer have god mode.");
             }
         }
     }

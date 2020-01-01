@@ -24,6 +24,7 @@ import com.sk89q.commandbook.component.session.SessionComponent;
 import com.sk89q.commandbook.config.LegacyCommandBookConfigurationMigrator;
 import com.sk89q.util.yaml.YAMLFormat;
 import com.sk89q.util.yaml.YAMLProcessor;
+import com.sk89q.worldedit.internal.command.CommandRegistrationHandler;
 import com.sk89q.worldedit.internal.command.CommandUtil;
 import com.zachsthings.libcomponents.InjectComponent;
 import com.zachsthings.libcomponents.InjectComponentAnnotationHandler;
@@ -39,11 +40,13 @@ import com.zachsthings.libcomponents.loader.StaticComponentLoader;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.Listener;
+import org.enginehub.piston.CommandManager;
 import org.yaml.snakeyaml.error.YAMLException;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -80,6 +83,10 @@ public final class CommandBook extends BasePlugin {
 
     public static void registerEvents(Listener listener) {
         server().getPluginManager().registerEvents(listener, inst());
+    }
+
+    public static void registerComponentCommands(BiConsumer<CommandManager, CommandRegistrationHandler> op) {
+        inst().commandManager.registerComponentCommands(op);
     }
 
     private void publishPistonCommands() {
