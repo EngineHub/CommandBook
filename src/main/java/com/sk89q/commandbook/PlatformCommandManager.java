@@ -36,7 +36,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.function.BiConsumer;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -56,6 +55,7 @@ public class PlatformCommandManager {
     private final InjectedValueStore globalInjectedValues;
     private final DynamicStreamHandler dynamicHandler = new DynamicStreamHandler();
     private final CommandRegistrationHandler registration;
+    private final ComponentCommandRegistrar componentRegistrar;
 
     protected PlatformCommandManager(final CommandBook commandBook) {
         checkNotNull(commandBook);
@@ -65,6 +65,7 @@ public class PlatformCommandManager {
         this.commandManager = commandManagerService.newCommandManager();
         this.globalInjectedValues = MapBackedValueStore.create();
         this.registration = new CommandRegistrationHandler(ImmutableList.of());
+        this.componentRegistrar = new ComponentCommandRegistrar(commandManagerService, commandManager, registration);
 
         // setup separate from main constructor
         // ensures that everything is definitely assigned
@@ -91,10 +92,8 @@ public class PlatformCommandManager {
         CommandBookCommands.register(commandManagerService, commandManager, registration);
     }
 
-    public void registerComponentCommands(BiConsumer<CommandManager, CommandRegistrationHandler> op) {
-        CommandManager componentManager = commandManagerService.newCommandManager();
-        op.accept(componentManager, registration);
-        commandManager.registerManager(componentManager);
+    public ComponentCommandRegistrar getComponentRegistrar() {
+        return componentRegistrar;
     }
 
     public void registerCommandsWith(CommandBook commandBook) {

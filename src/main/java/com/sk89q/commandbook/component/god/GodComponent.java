@@ -51,7 +51,7 @@ public class GodComponent extends BukkitComponent implements Listener {
     public void enable() {
         config = configure(new LocalConfiguration());
 
-        CommandBook.registerComponentCommands((commandManager, registration) -> {
+        CommandBook.getComponentRegistrar().registerTopLevelCommands((commandManager, registration) -> {
             registration.register(commandManager, GodCommandsRegistration.builder(), new GodCommands(this));
         });
 
