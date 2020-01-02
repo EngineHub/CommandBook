@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class SinglePlayerTargetConverter extends PlayerTargetConverter<SinglePlayerTarget>  {
+public class SinglePlayerTargetConverter extends PlayerTargetConverter<SinglePlayerTarget> {
     public static void register(CommandManager commandManager) {
         commandManager.registerConverter(Key.of(SinglePlayerTarget.class), new SinglePlayerTargetConverter());
     }
