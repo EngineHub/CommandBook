@@ -8,3 +8,6 @@
 build/
 
 .DS_Store
+
+# Developer scripts
+scripts/
