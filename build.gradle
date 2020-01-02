@@ -84,6 +84,10 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
+tasks.withType(JavaCompile).configureEach {
+    it.options.compilerArgs.add("-Aarg.name.key.prefix=")
+}
+
 task sourcesJar(type: Jar, dependsOn: classes) {
     classifier = 'sources'
     from sourceSets.main.allSource
