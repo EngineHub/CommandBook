@@ -426,6 +426,18 @@ public class InputUtil {
     public static class LocationParser {
 
         /**
+         * Parse a location coordinate.
+         *
+         * @param string the potentially decorated string
+         * @return the coordinate number represented by this string
+         */
+        public static double parseCoordinateValue(String string) {
+            string = string.replace("~", "");
+            string = string.replace(",", "");
+            return Double.parseDouble(string);
+        }
+
+        /**
          * Match a world.
          * @param sender
          *

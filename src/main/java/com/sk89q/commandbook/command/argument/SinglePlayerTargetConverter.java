@@ -1,12 +1,14 @@
 package com.sk89q.commandbook.command.argument;
 
 import com.sk89q.commandbook.util.InputUtil;
+import com.sk89q.commandbook.util.suggestion.SuggestionHelper;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.enginehub.piston.CommandManager;
+import org.enginehub.piston.converter.ArgumentConverter;
 import org.enginehub.piston.converter.ConversionResult;
 import org.enginehub.piston.converter.FailedConversion;
 import org.enginehub.piston.converter.SuccessfulConversion;
@@ -17,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class SinglePlayerTargetConverter extends PlayerTargetConverter<SinglePlayerTarget> {
+public class SinglePlayerTargetConverter implements ArgumentConverter<SinglePlayerTarget> {
     public static void register(CommandManager commandManager) {
         commandManager.registerConverter(Key.of(SinglePlayerTarget.class), new SinglePlayerTargetConverter());
     }
@@ -47,7 +49,7 @@ public class SinglePlayerTargetConverter extends PlayerTargetConverter<SinglePla
     public List<String> getSuggestions(String input) {
         List<String> suggestions = new ArrayList<>();
 
-        addPlayerNameSuggestions(suggestions);
+        SuggestionHelper.addPlayerNameSuggestions(suggestions);
 
         return suggestions;
     }

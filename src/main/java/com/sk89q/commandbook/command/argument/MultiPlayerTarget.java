@@ -21,4 +21,8 @@ public class MultiPlayerTarget implements PlayerTarget {
     public Iterator<Player> iterator() {
         return players.iterator();
     }
+
+    public int size() {
+        return players.size();
+    }
 }

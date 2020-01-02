@@ -18,6 +18,7 @@
 
 package com.sk89q.commandbook.util.entity.player.iterators;
 
+import com.sk89q.commandbook.component.locations.LocationTarget;
 import com.sk89q.commandbook.util.ChatUtil;
 import com.sk89q.commandbook.util.entity.player.PlayerUtil;
 import org.bukkit.ChatColor;
@@ -45,6 +46,12 @@ public class TeleportPlayerIterator extends PlayerIteratorAction {
         this.loc = loc;
         this.silent = silent;
         this.relative = relative;
+    }
+
+    public TeleportPlayerIterator(CommandSender sender, LocationTarget target, boolean silent) {
+        this(sender, target.get(), silent, new boolean[] {
+                target.isRelativeX(), target.isRelativeY(), target.isRelativeZ()
+        });
     }
 
     @Override

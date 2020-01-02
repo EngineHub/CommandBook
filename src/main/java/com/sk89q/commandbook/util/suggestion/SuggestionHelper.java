@@ -1,24 +1,25 @@
-package com.sk89q.commandbook.command.argument;
+package com.sk89q.commandbook.util.suggestion;
 
 import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.util.InputUtil;
 import com.sk89q.minecraft.util.commands.CommandException;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-import org.enginehub.piston.converter.ArgumentConverter;
 
 import java.util.Collection;
 import java.util.List;
 
-public abstract class PlayerTargetConverter<T> implements ArgumentConverter<T> {
-    protected void trialAddSuggestion(List<String> suggestions, String trailText) {
+public class SuggestionHelper {
+    private SuggestionHelper() { }
+
+    public static void trialAddPlayerSuggestion(List<String> suggestions, String trailText) {
         try {
             InputUtil.PlayerParser.matchPlayers(CommandBook.server().getConsoleSender(), trailText);
             suggestions.add(trailText);
         } catch (CommandException ignored) { }
     }
 
-    protected void addPlayerNameSuggestions(List<String> suggestions) {
+    public static void addPlayerNameSuggestions(List<String> suggestions) {
         Collection<? extends Player> players = CommandBook.server().getOnlinePlayers();
         boolean useDisplayNames = CommandBook.inst().lookupWithDisplayNames;
 
