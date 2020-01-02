@@ -39,7 +39,7 @@ import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 
 /**
- * Parent class for components that use a RootLocationManager<NamedLocation> and deal with locations
+ * Parent class for components that use a RootLocationManager &lt;NamedLocation&gt; and deal with locations
  */
 @TemplateComponent
 public abstract class LocationsComponent extends BukkitComponent {
