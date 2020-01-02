@@ -58,7 +58,6 @@ allprojects {
     targetCompatibility = 1.8
 
     repositories {
-        mavenLocal()
         mavenCentral()
         maven {
             name = 'sk89q-repo'
