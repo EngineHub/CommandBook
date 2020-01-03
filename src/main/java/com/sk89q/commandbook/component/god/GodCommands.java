@@ -80,7 +80,7 @@ class GodCommands {
     @Command(name = "ungod", desc = "Disable godmode on a player")
     public void ungodCmd(CommandSender sender,
                     @Switch (name = 's', desc = "silent") boolean silent,
-                    @Arg(desc = "Player to target") MultiPlayerTarget targetPlayers)
+                    @Arg(desc = "Player to target", def = "") MultiPlayerTarget targetPlayers)
             throws CommandException {
 
         boolean included = false;
