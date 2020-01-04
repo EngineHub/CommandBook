@@ -161,7 +161,8 @@ public class TeleportCommands {
 
     @Command(name = "return", aliases = {"ret"}, desc = "Teleport back to your last location")
     @CommandPermissions({"commandbook.return"})
-    public void ret(Player sendingPlayer, @Arg(desc = "players to teleport") SinglePlayerTarget player) throws CommandException {
+    public void ret(Player sendingPlayer,
+                    @Arg(desc = "players to teleport", def = "") SinglePlayerTarget player) throws CommandException {
         if (player == null) {
             player = new SinglePlayerTarget(sendingPlayer);
         }
