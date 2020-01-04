@@ -1,7 +1,9 @@
 package com.sk89q.commandbook;
 
 import com.sk89q.bukkit.util.CommandInspector;
+import com.sk89q.commandbook.util.WorldEditAdapter;
 import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.extension.platform.Actor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.enginehub.piston.CommandManager;
@@ -55,7 +57,7 @@ class BukkitCommandInspector implements CommandInspector {
         Optional<org.enginehub.piston.Command> mapping = dispatcher.getCommand(command.getName());
         if (mapping.isPresent()) {
             InjectedValueStore store = MapBackedValueStore.create();
-            store.injectValue(Key.of(CommandSender.class), context -> Optional.of(sender));
+            store.injectValue(Key.of(Actor.class), context -> Optional.of(WorldEditAdapter.adapt(sender)));
             return mapping.get().getCondition().satisfied(store);
         } else {
             logger.warn("BukkitCommandInspector doesn't know how about the command '" + command + "'");
