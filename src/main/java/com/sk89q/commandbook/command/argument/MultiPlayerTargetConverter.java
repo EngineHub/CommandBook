@@ -49,13 +49,19 @@ public class MultiPlayerTargetConverter implements ArgumentConverter<MultiPlayer
     public List<String> getSuggestions(String input) {
         List<String> suggestions = new ArrayList<>();
 
-        SuggestionHelper.trialAddPlayerSuggestion(suggestions, "*");
-        SuggestionHelper.trialAddPlayerSuggestion(suggestions, "#world");
-        SuggestionHelper.trialAddPlayerSuggestion(suggestions, "#near");
+        if (input.isEmpty() || input.equals("*")) {
+            SuggestionHelper.trialAddPlayerSuggestion(suggestions, "*");
+        }
+
         SuggestionHelper.trialAddPlayerSuggestion(suggestions, input + "*");
         SuggestionHelper.trialAddPlayerSuggestion(suggestions, "*" + input);
 
-        SuggestionHelper.addPlayerNameSuggestions(suggestions);
+        if (input.isEmpty() || input.startsWith("#")) {
+            SuggestionHelper.trialAddPlayerSuggestion(suggestions, "#world");
+            SuggestionHelper.trialAddPlayerSuggestion(suggestions, "#near");
+        }
+
+        SuggestionHelper.addPlayerNameSuggestions(suggestions, input);
 
         return suggestions;
     }

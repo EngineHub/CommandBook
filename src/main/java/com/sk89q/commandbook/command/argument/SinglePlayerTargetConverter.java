@@ -49,7 +49,7 @@ public class SinglePlayerTargetConverter implements ArgumentConverter<SinglePlay
     public List<String> getSuggestions(String input) {
         List<String> suggestions = new ArrayList<>();
 
-        SuggestionHelper.addPlayerNameSuggestions(suggestions);
+        SuggestionHelper.addPlayerNameSuggestions(suggestions, input);
 
         return suggestions;
     }

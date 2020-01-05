@@ -109,7 +109,7 @@ public class LocationTargetConverter implements ArgumentConverter<LocationTarget
         List<String> suggestions = new ArrayList<>();
 
         if (normalizedSplit(input).length == 1) {
-            SuggestionHelper.addPlayerNameSuggestions(suggestions);
+            SuggestionHelper.addPlayerNameSuggestions(suggestions, input);
         }
 
         return suggestions;

@@ -253,7 +253,7 @@ public class InputUtil {
             }
 
             // Handle special hash tag groups
-            if (filter.charAt(0) == '#') {
+            if (!filter.isEmpty() && filter.charAt(0) == '#') {
                 // Handle #world, which matches player of the same world as the
                 // calling source
                 if (filter.equalsIgnoreCase("#world")) {
@@ -563,7 +563,7 @@ public class InputUtil {
                 }
 
                 // Handle special hash tag groups
-            } else if (filter.charAt(0) == '#') {
+            } else if (!filter.isEmpty() && filter.charAt(0) == '#') {
                 String[] args = filter.split(":");
 
                 // Handle #world, which matches player of the same world as the
