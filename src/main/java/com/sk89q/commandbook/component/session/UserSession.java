@@ -19,6 +19,7 @@
 package com.sk89q.commandbook.component.session;
 
 import com.zachsthings.libcomponents.config.Setting;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -34,7 +35,7 @@ public class UserSession extends PersistentSession {
     @Setting("messaging.last-recipient-time") private long lastRecipientTime = 0;
     private boolean hasThor = false;
     @Setting("confirm-command") private String commandToConfirm;
-
+    private ChatColor chatColorAssignment;
 
     protected UserSession() {
         super(MAX_AGE);
@@ -97,5 +98,13 @@ public class UserSession extends PersistentSession {
             return ret;
         }
         return commandToConfirm;
+    }
+
+    public ChatColor getChatColorAssignment() {
+        return chatColorAssignment;
+    }
+
+    public void setChatColorAssignment(ChatColor chatColorAssignment) {
+        this.chatColorAssignment = chatColorAssignment;
     }
 }

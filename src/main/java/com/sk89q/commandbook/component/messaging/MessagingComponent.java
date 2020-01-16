@@ -18,6 +18,7 @@
 
 package com.sk89q.commandbook.component.messaging;
 
+import com.google.common.collect.Lists;
 import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.component.afk.AFKComponent;
 import com.sk89q.commandbook.component.session.AdministrativeSession;
@@ -46,7 +47,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
-import java.util.HashSet;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.sk89q.commandbook.util.ChatUtil.replaceColorMacros;
 
@@ -55,9 +57,19 @@ import static com.sk89q.commandbook.util.ChatUtil.replaceColorMacros;
 @Depend(components = SessionComponent.class)
 public class MessagingComponent extends BukkitComponent implements Listener {
 
+    private static final Random RAND = new Random();
+
+    private static final List<ChatColor> COLOR_OPTIONS = Lists.newArrayList(
+            ChatColor.AQUA, ChatColor.BLUE, ChatColor.GREEN, ChatColor.DARK_GREEN,
+            ChatColor.RED, ChatColor.DARK_RED, ChatColor.DARK_PURPLE, ChatColor.LIGHT_PURPLE,
+            ChatColor.GOLD, ChatColor.DARK_AQUA
+    );
+
     @InjectComponent private SessionComponent sessions;
 
     private LocalConfiguration config;
+
+    private Map<UUID, ChatColor> randomColorAssignment = new ConcurrentHashMap<>();
 
     @Override
     public void enable() {
@@ -80,6 +92,7 @@ public class MessagingComponent extends BukkitComponent implements Listener {
         public ChatColor pmColor = ChatColor.GRAY; // Color for PM label
         public ChatColor pmTextColor = ChatColor.RESET; // Color for text of PM
         @Setting("twitter-style") public boolean twitterStyle = true;
+        @Setting("format-names") public boolean formatNames = true;
 
         @Override
         public void load(ConfigurationNode node) {
@@ -138,6 +151,10 @@ public class MessagingComponent extends BukkitComponent implements Listener {
         receiverSession.setNewLastRecipient(sender);
     }
 
+    private ChatColor pickColor() {
+        return COLOR_OPTIONS.get(RAND.nextInt(COLOR_OPTIONS.size()));
+    }
+
     /**
      * Called on player chat.
      *
@@ -148,7 +165,10 @@ public class MessagingComponent extends BukkitComponent implements Listener {
         if (sessions.getSession(AdministrativeSession.class, event.getPlayer()).isMute()) {
             event.getPlayer().sendMessage(ChatColor.RED + "You are muted.");
             event.setCancelled(true);
-        } else if (event.getMessage().startsWith("@") && config.twitterStyle) {
+            return;
+        }
+
+        if (event.getMessage().startsWith("@") && config.twitterStyle) {
             final String message = event.getMessage();
             int spaceIndex = message.indexOf(" ");
             if (spaceIndex > -1) {
@@ -163,7 +183,18 @@ public class MessagingComponent extends BukkitComponent implements Listener {
                     event.getPlayer().sendMessage(ChatColor.RED + e.getMessage());
                 }
                 event.setCancelled(true);
+                return;
             }
+        }
+
+        if (config.formatNames) {
+            UserSession session = sessions.getSession(UserSession.class, event.getPlayer());
+
+            ChatColor assignedColor = session.getChatColorAssignment();
+            if (assignedColor == null) {
+                session.setChatColorAssignment(assignedColor = pickColor());
+            }
+            event.setFormat("<" + assignedColor + "%1$s" + ChatColor.WHITE + "> %2$s");
         }
     }
 
