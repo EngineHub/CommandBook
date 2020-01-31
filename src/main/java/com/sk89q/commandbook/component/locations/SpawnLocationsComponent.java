@@ -44,6 +44,7 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
 import java.io.File;
+import java.util.concurrent.CompletableFuture;
 
 @ComponentInformation(friendlyName = "Spawn Locations", desc = "Allows exact spawn locations for players, " +
         "as well as getting and setting the world's spawn.")
@@ -137,7 +138,7 @@ public class SpawnLocationsComponent extends BukkitComponent implements Listener
             (new PlayerIteratorAction(sender) {
 
                 @Override
-                public boolean perform(Player player) {
+                public CompletableFuture<Boolean> perform(Player player) {
                     return PlayerUtil.teleportTo(sender, player, getSpawnPoint(player.getWorld()), true);
                 }
 

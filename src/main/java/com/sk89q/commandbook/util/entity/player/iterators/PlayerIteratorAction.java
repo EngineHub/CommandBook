@@ -21,6 +21,10 @@ package com.sk89q.commandbook.util.entity.player.iterators;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+
 /**
  * Performs an action over a list of players.
  * 
@@ -48,30 +52,38 @@ public abstract class PlayerIteratorAction {
      * @param targets
      */
     public void iterate(Iterable<Player> targets) {
+        List<CompletableFuture<Void>> teleportResults = new ArrayList<>();
+
         for (Player player : targets) {
-            if (!perform(player)) continue;
-            
-            // Tell the user
-            if (player.equals(sender)) {
-                onCaller(player);
-                
-                // Keep track of this
-                included = true;
-            } else {
-                onVictim(sender, player);
+            teleportResults.add(perform(player).thenAccept((success) -> {
+                if (!success) {
+                    return;
+                }
+
+                // Tell the user
+                if (player.equals(sender)) {
+                    onCaller(player);
+
+                    // Keep track of this
+                    included = true;
+                } else {
+                    onVictim(sender, player);
+                }
+
+                affected++;
+            }));
+        }
+
+        CompletableFuture.allOf(teleportResults.toArray(new CompletableFuture[0])).thenAccept((ignored) -> {
+            if (!included) {
+                onInform(sender, affected);
+                onInformMany(sender, affected);
+            } else if (affected > 1) {
+                onInformMany(sender, affected);
             }
-            
-            affected++;
-        }
-        
-        if (!included) {
-            onInform(sender, affected);
-            onInformMany(sender, affected);
-        } else if (affected > 1) {
-            onInformMany(sender, affected);
-        }
-        
-        onComplete(sender, affected);
+
+            onComplete(sender, affected);
+        });
     }
     
     /**
@@ -88,7 +100,7 @@ public abstract class PlayerIteratorAction {
      * 
      * @param player
      */
-    public abstract boolean perform(Player player);
+    public abstract CompletableFuture<Boolean> perform(Player player);
     
     /**
      * Called when the caller is affected by the action.

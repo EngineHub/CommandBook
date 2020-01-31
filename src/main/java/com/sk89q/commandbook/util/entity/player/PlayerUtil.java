@@ -25,6 +25,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
+import java.util.concurrent.CompletableFuture;
+
 public class PlayerUtil {
 
     /**
@@ -50,31 +52,32 @@ public class PlayerUtil {
      * @param target
      * @param allowVehicles
      */
-    public static boolean teleportTo(CommandSender sender, Player player, Location target, boolean allowVehicles) {
+    public static CompletableFuture<Boolean> teleportTo(CommandSender sender, Player player, Location target, boolean allowVehicles) {
         target.getChunk().load(true);
         if (player.getVehicle() != null) {
             Entity vehicle = player.getVehicle();
             vehicle.eject();
 
-            boolean success = player.teleport(target);
-
-            if (!allowVehicles) {
-                return success;
-            }
-
-            // Check vehicle permissions
-            String permString = "commandbook.teleport.vehicle." + vehicle.getType().getName().toLowerCase();
-
-            if (CommandBook.inst().hasPermission(player, permString)) {
-                if (player.getWorld().equals(target.getWorld())
-                        || CommandBook.inst().hasPermission(player, target.getWorld(), permString)) {
-                    success = success && vehicle.teleport(player);
-                    vehicle.setPassenger(player);
+            return player.teleportAsync(target).thenApply((success) -> {
+                if (!allowVehicles) {
+                    return success;
                 }
-            }
-            return success;
+
+
+                // Check vehicle permissions
+                String permString = "commandbook.teleport.vehicle." + vehicle.getType().getName().toLowerCase();
+
+                if (CommandBook.inst().hasPermission(player, permString)) {
+                    if (player.getWorld().equals(target.getWorld())
+                            || CommandBook.inst().hasPermission(player, target.getWorld(), permString)) {
+                        success = success && vehicle.teleport(player);
+                        vehicle.setPassenger(player);
+                    }
+                }
+                return success;
+            });
         } else {
-            return player.teleport(target);
+            return player.teleportAsync(target);
         }
     }
 }

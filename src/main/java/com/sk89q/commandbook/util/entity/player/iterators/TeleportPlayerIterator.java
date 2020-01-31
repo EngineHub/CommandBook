@@ -26,6 +26,8 @@ import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.concurrent.CompletableFuture;
+
 public class TeleportPlayerIterator extends PlayerIteratorAction {
 
     protected final Location loc;
@@ -55,7 +57,7 @@ public class TeleportPlayerIterator extends PlayerIteratorAction {
     }
 
     @Override
-    public boolean perform(Player player) {
+    public CompletableFuture<Boolean> perform(Player player) {
         oldLoc = player.getLocation();
         Location newLoc = loc;
         // for each coord, if it is relative, add the given location's coord
@@ -72,7 +74,7 @@ public class TeleportPlayerIterator extends PlayerIteratorAction {
         return teleport(player, newLoc);
     }
 
-    public boolean teleport(Player player, Location newLoc) {
+    public CompletableFuture<Boolean> teleport(Player player, Location newLoc) {
 
         return PlayerUtil.teleportTo(sender, player, newLoc, true);
     }
