@@ -46,22 +46,28 @@ public class MultiPlayerTargetConverter implements ArgumentConverter<MultiPlayer
     }
 
     @Override
-    public List<String> getSuggestions(String input) {
+    public List<String> getSuggestions(String argument, InjectedValueAccess context) {
         List<String> suggestions = new ArrayList<>();
 
-        if (input.isEmpty() || input.equals("*")) {
-            SuggestionHelper.trialAddPlayerSuggestion(suggestions, "*");
+        Optional<CommandSender> optSender = context.injectedValue(Key.of(CommandSender.class));
+        if (!optSender.isPresent()) {
+            return suggestions;
         }
 
-        SuggestionHelper.trialAddPlayerSuggestion(suggestions, input + "*");
-        SuggestionHelper.trialAddPlayerSuggestion(suggestions, "*" + input);
-
-        if (input.isEmpty() || input.startsWith("#")) {
-            SuggestionHelper.trialAddPlayerSuggestion(suggestions, "#world");
-            SuggestionHelper.trialAddPlayerSuggestion(suggestions, "#near");
+        CommandSender sender = optSender.get();
+        if (argument.isEmpty() || argument.equals("*")) {
+            SuggestionHelper.trialAddPlayerSuggestion(sender, suggestions, "*");
         }
 
-        SuggestionHelper.addPlayerNameSuggestions(suggestions, input);
+        SuggestionHelper.trialAddPlayerSuggestion(sender, suggestions, argument + "*");
+        SuggestionHelper.trialAddPlayerSuggestion(sender, suggestions, "*" + argument);
+
+        if (argument.isEmpty() || argument.startsWith("#")) {
+            SuggestionHelper.trialAddPlayerSuggestion(sender, suggestions, "#world");
+            SuggestionHelper.trialAddPlayerSuggestion(sender, suggestions, "#near");
+        }
+
+        SuggestionHelper.addPlayerNameSuggestions(suggestions, argument);
 
         return suggestions;
     }

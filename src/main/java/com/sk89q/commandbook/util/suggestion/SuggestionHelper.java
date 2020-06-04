@@ -13,9 +13,8 @@ import java.util.List;
 public class SuggestionHelper {
     private SuggestionHelper() { }
 
-    public static void trialAddPlayerSuggestion(List<String> suggestions, String trailText, int minMatch) {
+    public static void trialAddPlayerSuggestion(CommandSender sender, List<String> suggestions, String trailText, int minMatch) {
         try {
-            CommandSender sender = CommandBook.server().getConsoleSender();
             int numMatched = InputUtil.PlayerParser.matchPlayers(sender, trailText).size();
             if (numMatched >= minMatch) {
                 suggestions.add(trailText);
@@ -23,8 +22,8 @@ public class SuggestionHelper {
         } catch (CommandException ignored) { }
     }
 
-    public static void trialAddPlayerSuggestion(List<String> suggestions, String trialText) {
-        trialAddPlayerSuggestion(suggestions, trialText, 2);
+    public static void trialAddPlayerSuggestion(CommandSender sender, List<String> suggestions, String trialText) {
+        trialAddPlayerSuggestion(sender, suggestions, trialText, 2);
     }
 
     public static void addPlayerNameSuggestions(List<String> suggestions, String input) {

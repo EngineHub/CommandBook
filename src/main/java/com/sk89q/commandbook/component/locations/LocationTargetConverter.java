@@ -105,11 +105,11 @@ public class LocationTargetConverter implements ArgumentConverter<LocationTarget
     }
 
     @Override
-    public List<String> getSuggestions(String input) {
+    public List<String> getSuggestions(String argument, InjectedValueAccess context) {
         List<String> suggestions = new ArrayList<>();
 
-        if (normalizedSplit(input).length == 1) {
-            SuggestionHelper.addPlayerNameSuggestions(suggestions, input);
+        if (normalizedSplit(argument).length == 1) {
+            SuggestionHelper.addPlayerNameSuggestions(suggestions, argument);
         }
 
         return suggestions;

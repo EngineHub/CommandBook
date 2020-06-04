@@ -46,10 +46,10 @@ public class SinglePlayerTargetConverter implements ArgumentConverter<SinglePlay
     }
 
     @Override
-    public List<String> getSuggestions(String input) {
+    public List<String> getSuggestions(String argument, InjectedValueAccess context) {
         List<String> suggestions = new ArrayList<>();
 
-        SuggestionHelper.addPlayerNameSuggestions(suggestions, input);
+        SuggestionHelper.addPlayerNameSuggestions(suggestions, argument);
 
         return suggestions;
     }
