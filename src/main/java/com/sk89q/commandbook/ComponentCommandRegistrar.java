@@ -9,6 +9,8 @@ import org.enginehub.piston.converter.ArgumentConverter;
 import org.enginehub.piston.inject.Key;
 import org.enginehub.piston.part.SubCommandPart;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
@@ -23,9 +25,11 @@ public class ComponentCommandRegistrar {
         this.registration = registration;
     }
 
-    public void registerAsSubCommand(String command, String description, CommandManager parentManager, BiConsumer<CommandManager, CommandRegistrationHandler> op) {
+    public void registerAsSubCommand(String command, Collection<String> aliases, String description,
+                                     CommandManager parentManager, BiConsumer<CommandManager, CommandRegistrationHandler> op) {
         parentManager.register(command, builder -> {
             builder.description(TextComponent.of(description));
+            builder.aliases(aliases);
 
             CommandManager manager = service.newCommandManager();
             op.accept(manager, registration);
@@ -35,6 +39,11 @@ public class ComponentCommandRegistrar {
                     .required()
                     .build());
         });
+    }
+
+    public void registerAsSubCommand(String command, String description, CommandManager parentManager,
+                                     BiConsumer<CommandManager, CommandRegistrationHandler> op) {
+        registerAsSubCommand(command, new ArrayList<>(), description, parentManager, op);
     }
 
     public void registerTopLevelCommands(BiConsumer<CommandManager, CommandRegistrationHandler> op) {
