@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableSet;
 import com.sk89q.bukkit.util.CommandInfo;
 import com.sk89q.bukkit.util.CommandRegistration;
 import com.sk89q.commandbook.command.argument.MultiPlayerTargetConverter;
+import com.sk89q.commandbook.command.argument.OfflineSinglePlayerTargetConverter;
 import com.sk89q.commandbook.command.argument.SinglePlayerTargetConverter;
 import com.sk89q.commandbook.util.WorldEditAdapter;
 import com.sk89q.worldedit.WorldEdit;
@@ -86,6 +87,7 @@ public class PlatformCommandManager {
     private void registerArgumentConverters() {
         SinglePlayerTargetConverter.register(commandManager);
         MultiPlayerTargetConverter.register(commandManager);
+        OfflineSinglePlayerTargetConverter.register(commandManager);
     }
 
     private void registerCoreCommands() {
