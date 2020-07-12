@@ -5,8 +5,6 @@ import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import org.enginehub.piston.CommandManager;
 import org.enginehub.piston.CommandManagerService;
-import org.enginehub.piston.converter.ArgumentConverter;
-import org.enginehub.piston.inject.Key;
 import org.enginehub.piston.part.SubCommandPart;
 
 import java.util.ArrayList;
@@ -15,13 +13,14 @@ import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 public class ComponentCommandRegistrar {
-    private CommandManagerService service;
-    private CommandManager topLevelCommandManager;
-    private CommandRegistrationHandler registration;
+    private final PlatformCommandManager platform;
+    private final CommandManagerService service;
+    private final CommandRegistrationHandler registration;
 
-    public ComponentCommandRegistrar(CommandManagerService service, CommandManager topLevelCommandManager, CommandRegistrationHandler registration) {
+    public ComponentCommandRegistrar(PlatformCommandManager platform, CommandManagerService service,
+                                     CommandRegistrationHandler registration) {
+        this.platform = platform;
         this.service = service;
-        this.topLevelCommandManager = topLevelCommandManager;
         this.registration = registration;
     }
 
@@ -49,11 +48,7 @@ public class ComponentCommandRegistrar {
     public void registerTopLevelCommands(BiConsumer<CommandManager, CommandRegistrationHandler> op) {
         CommandManager componentManager = service.newCommandManager();
         op.accept(componentManager, registration);
-        topLevelCommandManager.registerManager(componentManager);
-    }
 
-    @Deprecated
-    public <T> void registerConverter(Key<T> key, ArgumentConverter<T> converter) {
-        topLevelCommandManager.registerConverter(key, converter);
+        platform.registerCommandsWith(componentManager, CommandBook.inst());
     }
 }

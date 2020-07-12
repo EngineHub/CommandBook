@@ -66,7 +66,7 @@ public class PlatformCommandManager {
         this.commandManager = commandManagerService.newCommandManager();
         this.globalInjectedValues = MapBackedValueStore.create();
         this.registration = new CommandRegistrationHandler(ImmutableList.of());
-        this.componentRegistrar = new ComponentCommandRegistrar(commandManagerService, commandManager, registration);
+        this.componentRegistrar = new ComponentCommandRegistrar(this, commandManagerService, registration);
 
         // setup separate from main constructor
         // ensures that everything is definitely assigned
@@ -77,7 +77,6 @@ public class PlatformCommandManager {
         // Set up the commands manager
         registerAlwaysInjectedValues();
         registerArgumentConverters();
-        registerCoreCommands();
     }
 
     private void registerAlwaysInjectedValues() {
@@ -90,15 +89,15 @@ public class PlatformCommandManager {
         OfflineSinglePlayerTargetConverter.register(commandManager);
     }
 
-    private void registerCoreCommands() {
+    protected void registerCoreCommands(CommandBook commandBook) {
         CommandBookCommands.register(commandManagerService, commandManager, registration);
+
+        // We want to register with bukkit only, as we're already registered with the global command
+        // manager.
+        registerCommandsWithBukkit(commandManager, commandBook);
     }
 
-    public ComponentCommandRegistrar getComponentRegistrar() {
-        return componentRegistrar;
-    }
-
-    public void registerCommandsWith(CommandBook commandBook) {
+    private void registerCommandsWithBukkit(CommandManager commandManager, CommandBook commandBook) {
         BukkitCommandInspector inspector = new BukkitCommandInspector(commandBook, commandManager);
 
         CommandRegistration registration = new CommandRegistration(commandBook);
@@ -119,6 +118,18 @@ public class PlatformCommandManager {
                             reduceToText(command.getDescription(), WorldEdit.getInstance().getConfiguration().defaultLocale), aliases,
                             inspector, permissionsArray);
                 }).collect(Collectors.toList()));
+    }
+
+    public void registerCommandsWith(CommandManager componentCommandManager, CommandBook commandBook) {
+        // Register the component command manager with piston
+        commandManager.registerManager(componentCommandManager);
+
+        // Register the component command manager with bukkit
+        registerCommandsWithBukkit(componentCommandManager, commandBook);
+    }
+
+    public ComponentCommandRegistrar getComponentRegistrar() {
+        return componentRegistrar;
     }
 
     private Stream<Substring> parseArgs(String input) {

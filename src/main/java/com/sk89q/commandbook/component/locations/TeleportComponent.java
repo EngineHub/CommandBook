@@ -48,9 +48,8 @@ public class TeleportComponent extends BukkitComponent implements Listener {
         CommandBook.registerEvents(this);
 
         ComponentCommandRegistrar registrar = CommandBook.getComponentRegistrar();
-        LocationTargetConverter.register(registrar);
         registrar.registerTopLevelCommands((commandManager, registration) -> {
-            //  WarpPointConverter.register(commandManager, this);
+            LocationTargetConverter.register(commandManager);
             registration.register(commandManager, TeleportCommandsRegistration.builder(), new TeleportCommands(this));
         });
 

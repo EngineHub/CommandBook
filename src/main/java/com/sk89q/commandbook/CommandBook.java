@@ -86,15 +86,11 @@ public final class CommandBook extends BasePlugin {
         return inst().commandManager.getComponentRegistrar();
     }
 
-    private void publishPistonCommands() {
-        commandManager.registerCommandsWith(this);
-    }
-
     @Override
     public void onEnable() {
         super.onEnable();
 
-        publishPistonCommands();
+        commandManager.registerCoreCommands(this);
     }
 
     public void registerComponentLoaders() {
