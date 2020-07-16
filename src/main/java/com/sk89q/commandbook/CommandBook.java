@@ -56,7 +56,7 @@ public final class CommandBook extends BasePlugin {
 
     private static CommandBook instance;
 
-    private PlatformCommandManager commandManager = new PlatformCommandManager(this);
+    private PlatformCommandManager commandManager = new PlatformCommandManager();
 
     private Map<String, Integer> itemNames;
     public boolean broadcastChanges;

@@ -18,7 +18,6 @@ import com.sk89q.worldedit.internal.util.Substring;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
-import com.sk89q.worldedit.util.logging.DynamicStreamHandler;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.enginehub.piston.Command;
@@ -41,7 +40,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static com.sk89q.worldedit.util.formatting.WorldEditText.reduceToText;
 
 public class PlatformCommandManager {
@@ -50,18 +48,13 @@ public class PlatformCommandManager {
     private static final java.util.logging.Logger COMMAND_LOG =
             java.util.logging.Logger.getLogger("com.sk89q.commandbook.CommandLog");
 
-    private final CommandBook commandBook;
     private final CommandManagerServiceImpl commandManagerService;
     private final CommandManager commandManager;
     private final InjectedValueStore globalInjectedValues;
-    private final DynamicStreamHandler dynamicHandler = new DynamicStreamHandler();
     private final CommandRegistrationHandler registration;
     private final ComponentCommandRegistrar componentRegistrar;
 
-    protected PlatformCommandManager(final CommandBook commandBook) {
-        checkNotNull(commandBook);
-
-        this.commandBook = commandBook;
+    protected PlatformCommandManager() {
         this.commandManagerService = new CommandManagerServiceImpl();
         this.commandManager = commandManagerService.newCommandManager();
         this.globalInjectedValues = MapBackedValueStore.create();
