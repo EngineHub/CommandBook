@@ -30,7 +30,7 @@ public class InventoryUtil {
      */
     @SuppressWarnings("deprecation")
     public static void giveItem(CommandSender sender, BaseItem item, int amt,
-                                Collection<Player> targets, InventoryComponent component, boolean drop, boolean overrideStackSize)
+                                Iterable<Player> targets, InventoryComponent component, boolean drop, boolean overrideStackSize)
             throws CommandException {
 
         boolean infinite = false; // Is the stack infinite?
@@ -59,14 +59,8 @@ public class InventoryUtil {
             CommandBook.inst().checkPermission(sender, "commandbook.give.stacks");
         }
 
-        int targetQuantity = targets.size();
-        // Send the message ahead of time so that we can follow up with any errors
-        if (targetQuantity > 1 || !targets.contains(sender)) {
-            sender.sendMessage(ChatColor.YELLOW.toString() + targetQuantity + " player(s)"
-                    + " have been given " + getAmountText(false, infinite, amt)
-                    + ' ' + item.getType().toString() + '.');
-        }
-
+        boolean included = false;
+        int count = 0;
 
         BaseItemStack itemStack = new BaseItemStack(item.getType(), item.getNbtData(), 1);
         ItemStack bukkitItemStack = BukkitAdapter.adapt(itemStack);
@@ -113,6 +107,8 @@ public class InventoryUtil {
             if (player.equals(sender)) {
                 player.sendMessage(ChatColor.YELLOW + "You've been given " + amtString + " "
                         + item.getType().getName() + ".");
+
+                included = true;
             } else {
                 player.sendMessage(ChatColor.YELLOW + "Given from "
                         + ChatUtil.toColoredName(sender, ChatColor.YELLOW) + ": "
@@ -120,6 +116,15 @@ public class InventoryUtil {
                         + item.getType().getName() + ".");
 
             }
+
+            ++count;
+        }
+
+        // Send the message ahead of time so that we can follow up with any errors
+        if (count > 1 || !included) {
+            sender.sendMessage(ChatColor.YELLOW.toString() + count + " player(s)"
+                + " have been given " + getAmountText(false, infinite, amt)
+                + ' ' + item.getType().toString() + '.');
         }
     }
 
