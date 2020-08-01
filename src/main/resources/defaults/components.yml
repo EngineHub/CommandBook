@@ -34,6 +34,9 @@ time:
 name-verification:
     class: com.sk89q.commandbook.component.nameverification.NameVerificationComponent
     default: true
+entity-spawn:
+    class: com.sk89q.commandbook.component.entityspawn.EntitySpawnComponent
+    default: true
 fun:
     class: com.sk89q.commandbook.component.fun.FunComponent
     default: true
