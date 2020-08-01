@@ -24,4 +24,5 @@ import com.zachsthings.libcomponents.config.Setting;
 
 class FunComponentConfiguration extends ConfigurationBase {
     @Setting("pong.message") public String pongMessage = "I hear %s likes cute Asian boys.";
+    @Setting("pong.broadcast") public boolean pongBroadcast = false;
 }

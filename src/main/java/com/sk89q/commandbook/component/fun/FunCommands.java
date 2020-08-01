@@ -27,6 +27,7 @@ import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.zachsthings.libcomponents.bukkit.BasePlugin;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Arrow;
@@ -65,10 +66,16 @@ public class FunCommands {
     )
     @CommandPermissions({"commandbook.pong"})
     public void pongCmd(CommandSender sender) {
-        String pongMessage = component.getConfig().pongMessage;
-        sender.sendMessage(
-            ChatColor.YELLOW + String.format(pongMessage, ChatUtil.toColoredName(sender, ChatColor.YELLOW))
+        FunComponentConfiguration config = component.getConfig();
+        String message = ChatColor.YELLOW + String.format(
+            config.pongMessage, ChatUtil.toColoredName(sender, ChatColor.YELLOW)
         );
+
+        if (config.pongBroadcast) {
+            Bukkit.broadcastMessage(message);
+        } else {
+            sender.sendMessage(message);
+        }
     }
 
     @Command(
