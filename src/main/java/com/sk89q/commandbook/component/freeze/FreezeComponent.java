@@ -21,12 +21,6 @@ package com.sk89q.commandbook.component.freeze;
 import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.component.session.PersistentSession;
 import com.sk89q.commandbook.component.session.SessionComponent;
-import com.sk89q.commandbook.util.ChatUtil;
-import com.sk89q.commandbook.util.InputUtil;
-import com.sk89q.minecraft.util.commands.Command;
-import com.sk89q.minecraft.util.commands.CommandContext;
-import com.sk89q.minecraft.util.commands.CommandException;
-import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.zachsthings.libcomponents.ComponentInformation;
 import com.zachsthings.libcomponents.Depend;
 import com.zachsthings.libcomponents.InjectComponent;
@@ -39,12 +33,6 @@ import org.bukkit.event.Listener;
 
 import java.util.concurrent.TimeUnit;
 
-
-/**
- *
- * @author Turtle9598
- */
-
 @Depend(components = SessionComponent.class)
 @ComponentInformation(friendlyName = "Freeze", desc = "Blocks a specified player's movement on command")
 public class FreezeComponent extends BukkitComponent implements Listener, Runnable {
@@ -55,7 +43,10 @@ public class FreezeComponent extends BukkitComponent implements Listener, Runnab
 
     @Override
     public void enable() {
-        registerCommands(Commands.class);
+        CommandBook.getComponentRegistrar().registerTopLevelCommands((commandManager, registration) -> {
+            registration.register(commandManager, FreezeCommandsRegistration.builder(), new FreezeCommands(this));
+        });
+
         CommandBook.registerEvents(this);
         CommandBook.server().getScheduler().scheduleSyncRepeatingTask(CommandBook.inst(), this, 20 * 2, 20 * 2);
     }
@@ -126,42 +117,6 @@ public class FreezeComponent extends BukkitComponent implements Listener, Runnab
         public Player getOwner() {
             CommandSender sender = super.getOwner();
             return sender instanceof Player ? (Player) sender : null;
-        }
-    }
-
-    public class Commands {
-        @Command(aliases = {"freeze"}, usage = "<target>", desc = "Freeze a player", min = 1, max = 1)
-        @CommandPermissions({"commandbook.freeze"})
-        public void freeze(CommandContext args, CommandSender sender) throws CommandException {
-            Player player = InputUtil.PlayerParser.matchSinglePlayer(sender, args.getString(0));
-
-            if (!freezePlayer(player)) {
-                player.sendMessage(ChatColor.YELLOW + "You've been frozen by "
-                        + ChatUtil.toColoredName(sender, ChatColor.YELLOW));
-                sender.sendMessage(ChatColor.YELLOW + "You've frozen "
-                        + ChatUtil.toColoredName(player, ChatColor.YELLOW));
-            } else {
-                player.sendMessage(ChatColor.YELLOW + "Your freeze location has been updated by "
-                        + ChatUtil.toColoredName(sender, ChatColor.YELLOW));
-                sender.sendMessage(ChatColor.YELLOW + "You have updated the freeze location of "
-                        + ChatUtil.toColoredName(player, ChatColor.YELLOW));
-            }
-        }
-
-        @Command(aliases = {"unfreeze"}, usage = "<target>", desc = "Unfreeze a player", min = 1, max = 1)
-        @CommandPermissions({"commandbook.freeze"})
-        public void unfreeze(CommandContext args, CommandSender sender) throws CommandException {
-            Player player = InputUtil.PlayerParser.matchSinglePlayer(sender, args.getString(0));
-
-            if (unfreezePlayer(player)) {
-
-                player.sendMessage(ChatColor.YELLOW + "You've been unfrozen by "
-                        + ChatUtil.toColoredName(sender, ChatColor.YELLOW));
-                sender.sendMessage(ChatColor.YELLOW + "You've unfrozen "
-                        + ChatUtil.toColoredName(player, ChatColor.YELLOW));
-            } else {
-                throw new CommandException(ChatUtil.toName(player) + " was not frozen");
-            }
         }
     }
 }
