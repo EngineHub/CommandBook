@@ -1,3 +1,8 @@
+plugins {
+    id 'com.github.johnrengelman.shadow' version '7.0.0'
+    id "com.jfrog.artifactory" version "4.21.0"
+}
+
 println """
 *******************************************
  You are building CommandBook! 
@@ -11,25 +16,6 @@ println """
   Output files will be in [subproject]/build/libs
 *******************************************
 """
-buildscript {
-    repositories {
-        mavenCentral()
-        maven { url = "https://oss.sonatype.org/content/repositories/snapshots/" }
-        jcenter()
-    }
-
-    configurations.all {
-        resolutionStrategy {
-            force 'com.google.guava:guava:21.0'
-        }
-    }
-
-    dependencies {
-        classpath "com.github.jengelman.gradle.plugins:shadow:4.0.3"
-        classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:4.7.5'
-        classpath 'org.ajoberstar:gradle-git:1.7.2'
-    }
-}
 
 if (!project.hasProperty("artifactory_contextUrl")) ext.artifactory_contextUrl = ""
 if (!project.hasProperty("artifactory_user")) ext.artifactory_user = ""
@@ -46,15 +32,13 @@ if (!project.hasProperty("gitCommitHash")) {
 
 apply plugin: 'java'
 apply plugin: 'maven-publish'
-apply plugin: 'com.github.johnrengelman.shadow'
-apply plugin: 'com.jfrog.artifactory'
 
 group = pluginGroup
 version = pluginVersion
 ext.internalVersion = pluginVersion + ";" + gitCommitHash
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = JavaVersion.VERSION_16
+targetCompatibility = JavaVersion.VERSION_16
 
 repositories {
     mavenLocal()
@@ -176,12 +160,10 @@ artifactoryPublish {
 }
 
 processResources {
+    duplicatesStrategy DuplicatesStrategy.INCLUDE
+
     from (sourceSets.main.resources.srcDirs) {
         expand 'internalVersion': project.internalVersion
         include 'plugin.yml'
-    }
-
-    from (sourceSets.main.resources.srcDirs) {
-        exclude 'plugin.yml'
     }
 }
