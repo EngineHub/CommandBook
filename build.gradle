@@ -44,7 +44,6 @@ java {
 }
 
 repositories {
-    mavenLocal()
     mavenCentral()
     maven {
         name = 'EngineHub Repo'
@@ -53,6 +52,10 @@ repositories {
     maven {
         name = 'Destroystokyo Repo'
         url = 'https://repo.destroystokyo.com/repository/maven-public/'
+    }
+    maven {
+        name 'Packet Loss Gaming Repository'
+        url 'https://mvn.packetloss.gg/'
     }
 }
 
@@ -64,8 +67,8 @@ dependencies {
     implementation('org.enginehub.jinglenote:jinglenote-bukkit:1.0.0-SNAPSHOT') {
         exclude group: 'org.spigotmc', module: 'spigot-api'
     }
-    implementation 'com.zachsthings.libcomponents:libcomponents-core:1.3.0-SNAPSHOT'
-    implementation 'com.zachsthings.libcomponents:libcomponents-bukkit:1.3.0-SNAPSHOT'
+    implementation 'com.zachsthings.libcomponents:libcomponents-core:1.3.0'
+    implementation 'com.zachsthings.libcomponents:libcomponents-bukkit:1.3.0'
     implementation 'net.sf.opencsv:opencsv:2.0'
 
     compileOnly 'com.sk89q.worldedit.worldedit-libs:ap:7.2.0-SNAPSHOT'
