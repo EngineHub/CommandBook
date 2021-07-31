@@ -19,7 +19,6 @@
 package com.sk89q.commandbook.component.locations;
 
 import com.sk89q.commandbook.CommandBook;
-import com.sk89q.commandbook.ComponentCommandRegistrar;
 import com.sk89q.commandbook.component.session.SessionComponent;
 import com.sk89q.commandbook.component.session.SessionFactory;
 import com.zachsthings.libcomponents.ComponentInformation;
@@ -47,10 +46,9 @@ public class TeleportComponent extends BukkitComponent implements Listener {
     public void enable() {
         CommandBook.registerEvents(this);
 
-        ComponentCommandRegistrar registrar = CommandBook.getComponentRegistrar();
-        registrar.registerTopLevelCommands((commandManager, registration) -> {
-            LocationTargetConverter.register(commandManager);
-            registration.register(commandManager, TeleportCommandsRegistration.builder(), new TeleportCommands(this));
+        CommandBook.getComponentRegistrar().registerTopLevelCommands((registrar) -> {
+            LocationTargetConverter.register(registrar);
+            registrar.register(TeleportCommandsRegistration.builder(), new TeleportCommands(this));
         });
 
         config = configure(new LocalConfiguration());

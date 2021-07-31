@@ -51,8 +51,8 @@ public class GodComponent extends BukkitComponent implements Listener {
     public void enable() {
         config = configure(new LocalConfiguration());
 
-        CommandBook.getComponentRegistrar().registerTopLevelCommands((commandManager, registration) -> {
-            registration.register(commandManager, GodCommandsRegistration.builder(), new GodCommands(this));
+        CommandBook.getComponentRegistrar().registerTopLevelCommands((registrar) -> {
+            registrar.register(GodCommandsRegistration.builder(), new GodCommands(this));
         });
 
         // Check god mode for existing players, if any

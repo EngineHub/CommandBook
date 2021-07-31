@@ -43,8 +43,8 @@ public class FreezeComponent extends BukkitComponent implements Listener, Runnab
 
     @Override
     public void enable() {
-        CommandBook.getComponentRegistrar().registerTopLevelCommands((commandManager, registration) -> {
-            registration.register(commandManager, FreezeCommandsRegistration.builder(), new FreezeCommands(this));
+        CommandBook.getComponentRegistrar().registerTopLevelCommands((registrar) -> {
+            registrar.register(FreezeCommandsRegistration.builder(), new FreezeCommands(this));
         });
 
         CommandBook.registerEvents(this);

@@ -36,8 +36,8 @@ public class InventoryComponent extends BukkitComponent {
     public void enable() {
         config = configure(new InventoryComponentConfiguration());
 
-        CommandBook.getComponentRegistrar().registerTopLevelCommands((commandManager, registration) -> {
-            registration.register(commandManager, InventoryCommandsRegistration.builder(), new InventoryCommands(this));
+        CommandBook.getComponentRegistrar().registerTopLevelCommands((registrar) -> {
+            registrar.register(InventoryCommandsRegistration.builder(), new InventoryCommands(this));
         });
     }
 

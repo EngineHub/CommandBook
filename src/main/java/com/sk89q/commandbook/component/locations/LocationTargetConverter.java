@@ -1,5 +1,6 @@
 package com.sk89q.commandbook.component.locations;
 
+import com.sk89q.commandbook.ComponentCommandRegistrar;
 import com.sk89q.commandbook.util.InputUtil;
 import com.sk89q.commandbook.util.LocationUtil;
 import com.sk89q.commandbook.util.suggestion.SuggestionHelper;
@@ -9,7 +10,6 @@ import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
-import org.enginehub.piston.CommandManager;
 import org.enginehub.piston.converter.ArgumentConverter;
 import org.enginehub.piston.converter.ConversionResult;
 import org.enginehub.piston.converter.FailedConversion;
@@ -22,8 +22,8 @@ import java.util.List;
 import java.util.Optional;
 
 public class LocationTargetConverter implements ArgumentConverter<LocationTarget> {
-    public static void register(CommandManager commandManager) {
-        commandManager.registerConverter(Key.of(LocationTarget.class), new LocationTargetConverter());
+    public static void register(ComponentCommandRegistrar.Registrar registrar) {
+        registrar.registerConverter(Key.of(LocationTarget.class), new LocationTargetConverter());
     }
 
     @Override

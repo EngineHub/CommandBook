@@ -30,8 +30,8 @@ public class FunComponent extends BukkitComponent {
     public void enable() {
         config = configure(new FunComponentConfiguration());
 
-        CommandBook.getComponentRegistrar().registerTopLevelCommands((commandManager, registration) -> {
-            registration.register(commandManager, FunCommandsRegistration.builder(), new FunCommands(this));
+        CommandBook.getComponentRegistrar().registerTopLevelCommands((registrar) -> {
+            registrar.register(FunCommandsRegistration.builder(), new FunCommands(this));
         });
     }
 
