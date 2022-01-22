@@ -433,8 +433,10 @@ public class InputUtil {
          */
         public static double parseCoordinateValue(String string) {
             string = string.replace("~", "");
+            int scalingFactor = string.startsWith("!") ? 16 : 1;
+            string = string.replace("!", "");
             string = string.replace(",", "");
-            return Double.parseDouble(string);
+            return Double.parseDouble(string) * scalingFactor;
         }
 
         /**
