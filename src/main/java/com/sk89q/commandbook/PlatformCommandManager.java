@@ -9,7 +9,6 @@ import com.sk89q.commandbook.command.argument.MultiPlayerTargetConverter;
 import com.sk89q.commandbook.command.argument.OfflineSinglePlayerTargetConverter;
 import com.sk89q.commandbook.command.argument.SinglePlayerTargetConverter;
 import com.sk89q.commandbook.util.WorldEditAdapter;
-import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.argument.Arguments;
 import com.sk89q.worldedit.command.util.PermissionCondition;
 import com.sk89q.worldedit.extension.platform.Actor;
@@ -30,6 +29,7 @@ import org.enginehub.piston.impl.CommandManagerServiceImpl;
 import org.enginehub.piston.inject.*;
 import org.enginehub.piston.suggestion.Suggestion;
 import org.enginehub.piston.util.HelpGenerator;
+import org.enginehub.piston.util.TextHelper;
 import org.enginehub.piston.util.ValueProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,8 +39,6 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static com.sk89q.worldedit.util.formatting.WorldEditText.reduceToText;
 
 public class PlatformCommandManager {
     public static final Pattern COMMAND_CLEAN_PATTERN = Pattern.compile("^[/]+");
@@ -108,9 +106,13 @@ public class PlatformCommandManager {
                             command.getAliases().stream()
                     ).toArray(String[]::new);
                     // TODO Handle localisation correctly
-                    return new CommandInfo(reduceToText(command.getUsage(), WorldEdit.getInstance().getConfiguration().defaultLocale),
-                            reduceToText(command.getDescription(), WorldEdit.getInstance().getConfiguration().defaultLocale), aliases,
-                            inspector, permissionsArray);
+                    return new CommandInfo(
+                        TextHelper.reduceToText(command.getUsage()),
+                        TextHelper.reduceToText(command.getDescription()),
+                        aliases,
+                        inspector,
+                        permissionsArray
+                    );
                 }).collect(Collectors.toList()));
     }
 

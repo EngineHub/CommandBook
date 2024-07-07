@@ -29,8 +29,6 @@ import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.world.item.ItemTypes;
 import com.zachsthings.libcomponents.ComponentInformation;
 import com.zachsthings.libcomponents.Depend;
 import com.zachsthings.libcomponents.InjectComponent;
@@ -48,10 +46,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 
-import java.util.Arrays;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @ComponentInformation(friendlyName = "Thor", desc = "Thor's hammer and other lightning effects.")
 @Depend(components = SessionComponent.class)
@@ -76,11 +74,19 @@ public class ThorComponent extends BukkitComponent implements Listener {
         configure(config);
     }
 
+    private static final List<Material> DEFAULT_THOR_ITEMS = List.of(
+        Material.WOODEN_PICKAXE,
+        Material.STONE_PICKAXE,
+        Material.IRON_PICKAXE,
+        Material.GOLDEN_PICKAXE,
+        Material.DIAMOND_PICKAXE,
+        Material.NETHERITE_PICKAXE
+    );
+
     private static class LocalConfiguration extends ConfigurationBase {
-        @Setting("hammer-items") public Set<String> thorItems = new HashSet<>(Arrays.asList(
-                ItemTypes.WOODEN_PICKAXE.getId(), ItemTypes.STONE_PICKAXE.getId(), ItemTypes.IRON_PICKAXE.getId(),
-                ItemTypes.GOLDEN_PICKAXE.getId(), ItemTypes.DIAMOND_PICKAXE.getId()
-        ));
+        @Setting("hammer-items") public Set<String> thorItems = DEFAULT_THOR_ITEMS.stream().map(
+            s -> s.key().asString()
+        ).collect(Collectors.toSet());
     }
 
     @EventHandler
@@ -88,7 +94,7 @@ public class ThorComponent extends BukkitComponent implements Listener {
         Player player = event.getPlayer();
 
         if (sessions.getSession(UserSession.class, player).hasThor()) {
-            if (!config.thorItems.contains(BukkitAdapter.adapt(player.getItemInHand()).getType().getId())) {
+            if (!config.thorItems.contains(player.getItemInHand().getType().key().asString())) {
                 return;
             }
 

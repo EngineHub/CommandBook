@@ -162,7 +162,7 @@ public class EntitySpawnComponent extends BukkitComponent {
                             ((Skeleton) creature).setSkeletonType(Skeleton.SkeletonType.WITHER);
                         }
                         break outerloop;
-                    case PIG_ZOMBIE:
+                    case ZOMBIFIED_PIGLIN:
                         if (specialType.matches("(?i)angry")) {
                             ((PigZombie) creature).setAngry(true);
                             return creature;
